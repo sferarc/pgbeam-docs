@@ -1,0 +1,233 @@
+---
+title: Getting Started
+description:
+  Connect an existing PostgreSQL app to PgBeam without changing your driver or ORM.
+---
+
+PgBeam sits between your app and Postgres. You point your client at a PgBeam
+hostname, keep speaking normal PostgreSQL, and get a control plane for pooling,
+caching, analytics, replicas, and global routing.
+
+<Callout title="Start with the boring change" type="info">
+Most teams can get started by changing one thing: the host in
+`DATABASE_URL`. No SDK. No protocol shim. No application rewrite.
+</Callout>
+
+### What changes
+
+```bash title="Update your connection string"
+# Before
+DATABASE_URL=postgresql://user:pass@db.example.com:5432/mydb
+
+# After
+DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+```
+
+PgBeam still speaks the PostgreSQL wire protocol, so your existing drivers and
+ORMs keep working. The difference is that connections now land on a PgBeam data
+plane first, where pooling, routing, analytics, and optional caching can
+happen.
+
+### What you get
+
+<Cards>
+  <Card title="Connection Pooling" href="/docs/pooling" icon="🔗">
+    Keep upstream connection pressure under control without wiring PgBouncer
+    into every environment.
+  </Card>
+  <Card title="Query Caching" href="/docs/cache" icon="⚡">
+    Cache repeated read traffic close to users, with TTL and stale-while-revalidate
+    controls when you need them.
+  </Card>
+  <Card title="Read Replicas" href="/docs/replicas" icon="📖">
+    Route selected reads to replicas instead of pretending every query should
+    behave the same way.
+  </Card>
+  <Card title="Global Routing" href="/docs/routing" icon="🌍">
+    Send clients to the nearest edge while keeping pools near the database when
+    relay makes more sense.
+  </Card>
+  <Card title="Custom Domains" href="/docs/custom-domains" icon="🔒">
+    Use your own hostname and let PgBeam handle the certificate plumbing.
+  </Card>
+  <Card title="Query Insights" href="/docs/api" icon="📊">
+    Pull metrics, usage, activity, and query insights from the same control
+    plane the dashboard uses.
+  </Card>
+</Cards>
+
+## Prerequisites
+
+Before you begin, you need:
+
+- A PostgreSQL database reachable from the internet
+- The connection details for that database: host, port, username, password, and
+  database name
+
+## Setup
+
+<Steps>
+<Step>
+
+### Create an account
+
+Sign up at [dash.pgbeam.com](https://dash.pgbeam.com). New accounts start on
+the Starter plan, which includes a 14-day trial. A default organization is created for
+you automatically.
+
+</Step>
+<Step>
+
+### Create a project
+
+Create a project in the dashboard. Each project gets a hostname like
+`abc.aws.pgbeam.app`. That hostname is what your application will connect to.
+
+</Step>
+<Step>
+
+### Add your origin database
+
+Use **Add Database** in the dashboard and enter the connection details for the
+database PgBeam should forward traffic to.
+
+| Field | Description | Example |
+| --- | --- | --- |
+| **Host** | Origin database hostname | `db.example.com` |
+| **Port** | PostgreSQL port | `5432` |
+| **Database name** | Database to connect to | `mydb` |
+| **SSL mode** | TLS mode used for the upstream connection | `verify-full` |
+
+<Callout type="info">
+`verify-full` is the right default for most managed databases. Only relax it if
+your provider does not give you a certificate chain your client can verify.
+</Callout>
+
+PgBeam stores the origin database credentials you enter here. Application user
+credentials are still checked by the origin database at connection time.
+
+</Step>
+<Step>
+
+### Replace the host in your connection string
+
+```bash title=".env"
+# Before
+DATABASE_URL=postgresql://user:pass@db.example.com:5432/mydb
+
+# After
+DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+```
+
+Keep the username, password, port, and database name. The hostname is the only
+required change.
+
+</Step>
+<Step>
+
+### Run a query
+
+At this point your app should already be talking through PgBeam:
+
+<Tabs items={["Prisma", "Drizzle", "pgx (Go)", "psycopg (Python)"]}>
+<Tab value="Prisma">
+```ts
+const users = await prisma.user.findMany();
+```
+</Tab>
+<Tab value="Drizzle">
+```ts
+const users = await db.select().from(usersTable);
+```
+</Tab>
+<Tab value="pgx (Go)">
+```go
+rows, err := pool.Query(ctx, "SELECT * FROM users")
+```
+</Tab>
+<Tab value="psycopg (Python)">
+```python
+cur.execute("SELECT * FROM users")
+users = cur.fetchall()
+```
+</Tab>
+</Tabs>
+
+If that works, the plumbing is done. Pooling and observability are already in
+the path. Caching is available when you are ready to turn it on.
+
+</Step>
+</Steps>
+
+## Turn on caching later, not first
+
+Caching starts off disabled for new databases. That is the safer default. Once
+traffic is flowing, you can enable it for stable reads that benefit from reuse.
+
+<Tabs items={["Dashboard", "SQL", "Session override"]}>
+<Tab value="Dashboard">
+Open your database in the dashboard and go to **Cache Rules**. PgBeam tracks
+query shapes automatically, so you can enable caching on the high-frequency
+reads that are worth it.
+</Tab>
+<Tab value="SQL">
+```sql
+/* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products WHERE active = true;
+/* @pgbeam:cache noCache */ SELECT NOW();
+```
+</Tab>
+<Tab value="Session override">
+```sql
+SET pgbeam.cache = on;
+SET pgbeam.debug = on;
+SELECT * FROM users WHERE id = 1;
+```
+</Tab>
+</Tabs>
+
+See the [Caching guide](/docs/cache) for TTL, SWR, bypass rules, and cache
+annotations.
+
+## Supported clients
+
+PgBeam works with any PostgreSQL-compatible client. The docs include concrete
+setup guides for the tools people ask about most often:
+
+| Language | Drivers and ORMs |
+| --- | --- |
+| TypeScript | [Prisma](/docs/prisma), [Drizzle](/docs/drizzle), Sequelize, TypeORM |
+| Python | [psycopg](/docs/psycopg), SQLAlchemy |
+| Go | [pgx](/docs/pgx) |
+| Java | [JDBC](/docs/jdbc), HikariCP, Spring Boot |
+
+## Prefer the terminal?
+
+The [PgBeam CLI](/docs/cli) covers the same setup flow:
+
+```bash title="Quick CLI setup"
+curl -fsSL https://pgbeam.com/install | sh
+pgbeam auth login
+pgbeam projects create --name my-project
+pgbeam db add --host db.example.com --port 5432 --database mydb --ssl-mode verify-full
+pgbeam env pull
+```
+
+## Where to go next
+
+<Cards>
+  <Card title="Connection Guides" href="/docs/prisma">
+    Framework-specific setup instructions and pool sizing guidance.
+  </Card>
+  <Card title="Caching" href="/docs/cache">
+    Learn when cache helps, when it bypasses, and how to turn it on safely.
+  </Card>
+  <Card title="CLI Reference" href="/docs/cli">
+    Manage PgBeam from the terminal and script the control plane.
+  </Card>
+  <Card title="API Reference" href="/docs/api">
+    Call the same REST API used by the dashboard and generated SDK.
+  </Card>
+  <Card title="Routing & Regions" href="/docs/routing">
+    Understand routing, relay, pooling, and failure behavior.
+  </Card>
+</Cards>

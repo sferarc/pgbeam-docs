@@ -1,0 +1,175 @@
+---
+title: Prisma
+icon: Triangle
+tag: TypeScript
+description:
+  Connect Prisma to your PostgreSQL database through PgBeam for connection
+  pooling, caching, and global routing.
+---
+
+Connect your Prisma application to PgBeam by updating the `DATABASE_URL`
+environment variable. No changes to your Prisma schema, queries, or application
+code are required.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Update your connection string
+
+Point `DATABASE_URL` at your PgBeam project hostname:
+
+```bash title=".env"
+DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb"
+```
+
+</Step>
+<Step>
+
+### Verify your schema
+
+No changes needed to `schema.prisma` — the `postgresql` provider works as-is:
+
+```prisma title="schema.prisma"
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+```
+
+</Step>
+<Step>
+
+### Reduce Prisma's connection pool size
+
+PgBeam handles connection pooling at the proxy layer, so Prisma does not need
+a large local pool. Append `connection_limit` to your connection string:
+
+```bash title=".env"
+DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb?connection_limit=5"
+```
+
+</Step>
+<Step>
+
+### Run a test query
+
+```ts
+const users = await prisma.user.findMany();
+```
+
+If this returns results, Prisma is connected through PgBeam.
+
+</Step>
+</Steps>
+
+## Connection pool sizing
+
+By default, Prisma creates a pool of `num_cpus * 2 + 1` connections. Since
+PgBeam manages upstream pooling, you should reduce this to avoid holding
+unnecessary upstream connections:
+
+| Deployment type         | Recommended `connection_limit` |
+| ----------------------- | ------------------------------ |
+| Single server           | 5-10                           |
+| Multiple replicas/pods  | 3-5 per instance               |
+| Serverless (Lambda)     | 1-2                            |
+
+<Callout type="info">
+With PgBeam in transaction pool mode, Prisma connections are multiplexed
+upstream. A pool of 5 per instance is sufficient for most workloads, even at
+high concurrency.
+</Callout>
+
+## Prisma Migrate
+
+<Callout type="warn" title="Run migrations against the origin">
+Run Prisma migrations directly against your origin database, not through
+PgBeam. Migrations use advisory locks and other session features that should
+bypass the proxy.
+</Callout>
+
+Set a separate environment variable for migrations or override inline:
+
+```bash title="Run migrations against origin"
+DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx prisma migrate deploy
+```
+
+This applies to both `prisma migrate deploy` (production) and
+`prisma migrate dev` (development).
+
+## Caching with Prisma
+
+### Prisma Client queries (recommended)
+
+For standard Prisma Client queries (`findMany`, `findUnique`, etc.), PgBeam
+automatically tracks the generated SQL shapes. Enable caching for these shapes
+through [Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+
+### Raw queries with annotations
+
+For Prisma raw queries, you can use inline SQL annotations for fine-grained
+cache control:
+
+```ts title="Cache control with raw queries"
+// Cache for 5 minutes
+const products = await prisma.$queryRaw`
+  /* @pgbeam:cache maxAge=300 */ SELECT * FROM products WHERE category = ${category}
+`;
+
+// Disable caching for a specific query
+const balance = await prisma.$queryRaw`
+  /* @pgbeam:cache noCache */ SELECT balance FROM accounts WHERE id = ${accountId}
+`;
+```
+
+## Read replicas with Prisma
+
+Route read queries to replicas using the `/* @pgbeam:replica */` annotation in
+raw queries:
+
+```ts title="Replica routing"
+// Route to a read replica
+const products = await prisma.$queryRaw`
+  /* @pgbeam:replica */ SELECT * FROM products WHERE active = true
+`;
+
+// Combine replica routing with caching
+const categories = await prisma.$queryRaw`
+  /* @pgbeam:replica */ /* @pgbeam:cache maxAge=600 */ SELECT * FROM categories
+`;
+```
+
+Standard Prisma Client queries (`findMany`, etc.) always go to the primary
+database. To use replica routing, use raw queries with the annotation.
+
+See [Read Replicas](/docs/replicas) for details on replica setup and routing
+behavior.
+
+## Debugging
+
+Enable PgBeam debug output to verify caching and routing behavior from within
+Prisma:
+
+```ts
+await prisma.$executeRaw`SET pgbeam.debug = on`;
+
+const result = await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
+// Check server logs for: NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+```
+
+## Common issues
+
+| Issue                               | Cause                            | Fix                                      |
+| ----------------------------------- | -------------------------------- | ---------------------------------------- |
+| "Too many connections" on startup   | Prisma pool too large            | Add `?connection_limit=5` to `DATABASE_URL` |
+| Prepared statement errors           | Using transaction pool mode      | Switch to session pool mode, or avoid prepared statements |
+| Migrations fail through PgBeam      | Advisory locks not supported in transaction mode | Run migrations against origin directly |
+| Stale data after writes             | Cache returning old results      | Use `noCache` annotation or disable cache for that query shape |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
+- [Caching](/docs/cache) — How PgBeam caching works, TTL, and SWR
+- [Read Replicas](/docs/replicas) — Replica setup and routing

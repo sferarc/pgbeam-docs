@@ -1,0 +1,267 @@
+---
+title: Connection Pooling
+icon: Waves
+description:
+  How PgBeam pools upstream PostgreSQL connections per project, keyed by user
+  credentials — and how to choose the right pool mode for your workload.
+---
+
+PostgreSQL creates a new OS process for every client connection. Each process
+consumes memory (typically 5-10 MB), and the startup cost is non-trivial. At
+scale, this becomes the bottleneck — not query execution, but the cost of
+establishing and maintaining connections.
+
+PgBeam solves this by pooling upstream connections at the proxy layer. Your
+application opens connections to PgBeam, and PgBeam manages a smaller set of
+long-lived connections to the upstream database. The result is fewer upstream
+connections, faster connection establishment, and better resource utilization.
+
+## How PgBeam pooling works
+
+Each project gets its own connection pool. PgBeam uses **credential
+passthrough** — your application sends real database credentials, and PgBeam
+forwards them to the upstream. Different users connecting through the same
+project get separate pool entries keyed by username.
+
+```
+App Instance 1  ──┐
+App Instance 2  ──┼──▶  PgBeam Pool (5 upstream conns)  ──▶  PostgreSQL
+App Instance 3  ──┘     (per-user keying)
+```
+
+This means 30 application connections can share 5 upstream connections, reducing
+load on PostgreSQL without changing how your application authenticates.
+
+## Pool modes
+
+Pool modes control how upstream connections are shared between clients. You
+configure the mode per-project from the dashboard, API, or CLI.
+
+### Session mode (default)
+
+Each client connection gets a **dedicated** upstream connection for its entire
+lifetime. No connection sharing happens between clients.
+
+**How it works:** When a client connects, PgBeam dials an upstream connection
+(or reuses an idle one from the same user's pool). That upstream connection stays
+assigned to the client until it disconnects.
+
+**Best for:**
+- Applications that use advisory locks (`pg_advisory_lock`)
+- Temporary tables that persist across queries
+- `LISTEN`/`NOTIFY` for real-time notifications
+- `SET` parameters that must persist across queries
+- Prepared statements created with `PREPARE`
+
+**Tradeoff:** Every concurrent client requires its own upstream connection.
+If you have 100 concurrent clients, you need 100 upstream connections.
+
+### Transaction mode
+
+The upstream connection is held only for the **duration of a transaction**.
+After `COMMIT` or `ROLLBACK`, the connection is reset with `DISCARD ALL` and
+returned to the pool. Other clients can reuse it immediately.
+
+**How it works:** When a client starts a transaction (explicitly or
+implicitly via a query), PgBeam acquires an upstream connection. When the
+transaction ends, the connection goes back to the pool. Between transactions,
+the client holds no upstream connection.
+
+**Best for:**
+- Serverless functions (Lambda, Cloud Functions, Edge Functions)
+- High-concurrency APIs with short-lived transactions
+- Applications where most queries are independent, stateless reads and writes
+
+**Tradeoff:** Session-level state does not persist between transactions:
+- `SET` parameters reset after each transaction
+- Prepared statements are discarded
+- `LISTEN`/`NOTIFY` is not supported
+- Advisory locks are released
+
+<Callout type="warn">
+If your application relies on session state persisting between transactions,
+transaction mode will break it. Common culprits: ORMs that use prepared
+statements implicitly, applications that set `search_path` once at connection
+startup, or code that uses `pg_advisory_lock` for distributed locking.
+</Callout>
+
+### Statement mode
+
+The upstream connection is acquired and released **per SQL statement**. This
+provides the finest-grained sharing.
+
+**How it works:** Each individual SQL statement gets an upstream connection
+for its execution. After the statement completes, the connection is immediately
+returned.
+
+**Best for:**
+- Simple, stateless read-only workloads
+- Maximum connection reuse when every query is independent
+
+**Tradeoff:** Multi-statement transactions are not supported. Each statement
+runs independently, so `BEGIN`/`COMMIT` blocks cannot span multiple statements.
+
+## Choosing the right mode
+
+| If your workload uses...                               | Use mode        |
+| ------------------------------------------------------ | --------------- |
+| Advisory locks, temp tables, `LISTEN/NOTIFY`, `SET`    | **Session**     |
+| Short transactions, serverless, high concurrency       | **Transaction** |
+| Single-statement reads, no transactions needed         | **Statement**   |
+
+If you are unsure, start with **transaction mode**. It offers the best balance
+of connection reuse and compatibility for most web applications. Only switch to
+session mode if you need session-level PostgreSQL features, or to statement mode
+if you have a purely read-only workload.
+
+## Feature compatibility matrix
+
+| Feature                  | Session | Transaction | Statement |
+| ------------------------ | ------- | ----------- | --------- |
+| Multi-statement txns     | Yes     | Yes         | No        |
+| Prepared statements      | Yes     | No          | No        |
+| `SET` / `SET LOCAL`      | Yes     | Within txn  | No        |
+| `LISTEN` / `NOTIFY`      | Yes     | No          | No        |
+| Advisory locks           | Yes     | No          | No        |
+| Temporary tables         | Yes     | No          | No        |
+| `COPY` operations        | Yes     | Yes         | No        |
+| Connection reuse         | No      | Yes         | Yes       |
+
+## Pool sizing guidance
+
+Since PgBeam handles upstream pooling, your application's client-side pool
+should be smaller than you might be used to. The goal is to let PgBeam
+multiplex — having a large client pool defeats the purpose.
+
+| Deployment type            | Recommended client pool size |
+| -------------------------- | ---------------------------- |
+| Single application server  | 5-10                         |
+| Multiple replicas / pods   | 3-5 per instance             |
+| Serverless (Lambda, etc.)  | 1-2 per invocation           |
+
+### Max active connections
+
+The `max_active` setting caps how many concurrent upstream connections PgBeam
+will open to your database for a given project. This includes both idle and
+in-use connections. Once the limit is reached, new requests wait in a queue
+until a connection is released.
+
+The default is **200**, which works well for most managed PostgreSQL providers.
+Lower it if your upstream database has strict connection limits (e.g., small
+RDS instances), or raise it for high-throughput workloads with headroom on the
+upstream.
+
+Configure via the dashboard pool settings, the API (`pool_config.max_active`),
+or the SDK.
+
+### How to think about it
+
+**Without PgBeam:** Your application pool size needs to match the maximum
+concurrent queries you expect, because each query holds an upstream connection.
+With 4 app servers each running a pool of 20, you need the upstream database to
+handle 80 connections.
+
+**With PgBeam (transaction mode):** Those same 4 servers can each use a pool
+of 5. PgBeam multiplexes 20 client connections into a smaller number of
+upstream connections, because most connections are idle between transactions.
+
+## Connection lifecycle
+
+### Pool acquire
+
+When a client connects, PgBeam looks for an idle upstream connection in the
+pool keyed by the client's username. If one is available, it is assigned
+immediately. If not, PgBeam dials a new connection to the upstream database.
+
+Your credentials are forwarded to the upstream for authentication. PgBeam does
+**not** store user passwords — credentials are passed through transparently.
+
+### Pool release
+
+When the client disconnects (or the transaction ends, in transaction mode):
+
+1. If session state was modified (via `SET`, `PREPARE`, `CREATE TEMP TABLE`,
+   etc.), PgBeam sends `DISCARD ALL` to reset it. Clean sessions skip this step.
+2. The connection is returned to the pool for reuse
+3. Connections in an error state or mid-transaction are closed instead
+
+### Idle connection cleanup
+
+Idle upstream connections are held for a period before being closed. This
+avoids the overhead of re-establishing connections for workloads with regular
+traffic patterns, while freeing resources during quiet periods.
+
+## Changing pool mode
+
+<Tabs items={["Dashboard", "API", "CLI"]}>
+<Tab value="Dashboard">
+Navigate to your project **Settings** and select the desired pool mode from the
+dropdown.
+</Tab>
+<Tab value="API">
+```bash
+curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId} \
+  -H "X-API-Key: pbo_..." \
+  -d '{"pool_mode": "transaction"}'
+```
+</Tab>
+<Tab value="CLI">
+```bash
+pgbeam projects update <project-id> --pool-mode transaction
+```
+</Tab>
+</Tabs>
+
+<Callout type="warn" title="Active connections">
+Changing pool mode takes effect for **new connections only**. Existing
+connections continue to use the previous mode until they disconnect. To apply
+the change to all connections, restart your application or wait for existing
+connections to cycle.
+</Callout>
+
+## Common pooling patterns
+
+### Serverless with transaction mode
+
+Serverless functions create a new database connection on every invocation. With
+PgBeam in transaction mode, these short-lived connections are efficiently
+multiplexed — each function invocation acquires an upstream connection only for
+the duration of its query, then releases it.
+
+```ts title="Lambda handler with PgBeam"
+// connection_limit=1 because each Lambda invocation
+// only runs one query at a time
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 1,
+});
+
+export async function handler(event) {
+  const result = await pool.query("SELECT * FROM users WHERE id = $1", [event.userId]);
+  return result.rows[0];
+}
+```
+
+### Multi-tenant with separate credentials
+
+If your application connects with different database users per tenant, PgBeam
+automatically creates separate pool entries for each user. This provides
+connection isolation between tenants without configuring separate projects.
+
+### Migrations and DDL
+
+Run migrations directly against the origin database, not through PgBeam.
+Migrations often use session-level features (advisory locks for migration
+locking, temporary tables, long-running transactions) that may not work
+correctly through a connection pool.
+
+```bash
+# Point directly at the origin for migrations
+DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx prisma migrate deploy
+```
+
+## Further reading
+
+- [Plans & Limits](/docs/plans) — Connection limits per plan tier
+- [Troubleshooting](/docs/troubleshooting) — Debugging `53300` (too many connections)
+- [Resilience](/docs/resilience) — Connection reset, circuit breakers, and recovery

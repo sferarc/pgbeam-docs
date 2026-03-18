@@ -1,0 +1,67 @@
+---
+title: UpdateProject
+description: Update a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Partially updates a project. Only provided fields are modified.
+
+## Usage
+
+```go
+result, err := client.Projects.UpdateProject(ctx, &pgbeam.UpdateProjectRequest{
+
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.UpdateProjectRequest` | Yes | Request body |
+| req.Name | `*string` | No | Updated project name. |
+| req.Description | `*string` | No | Updated project description. |
+| req.Tags | `*[]string` | No | Replacement set of user-defined project labels. |
+| req.Status | `*pgbeam.ProjectStatus` | No |  |
+| req.QueriesPerSecond | `*int` | No | Maximum queries per second. 0 means unlimited. |
+| req.BurstSize | `*int` | No | Burst allowance above steady-state rate. |
+| req.MaxConnections | `*int` | No | Maximum concurrent proxy connections. 0 means unlimited. |
+
+## Response
+
+`(*pgbeam.Project, error)` — project updated.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.UpdateProject(ctx, &pgbeam.UpdateProjectRequest{
+    Name: "...",
+    Description: "...",
+    Tags: nil,
+    Status: pgbeam.ProjectStatus{ /* ... */ },
+    QueriesPerSecond: 0,
+    BurstSize: 0,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

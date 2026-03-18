@@ -1,0 +1,6 @@
+{
+	"defaultOpen": false,
+	"title": "platform",
+	"icon": "Globe",
+	"pages": ["regions", "health"]
+}

@@ -1,0 +1,28 @@
+---
+title: auth logout
+description: Remove an authentication profile.
+---
+
+Remove stored credentials for an authentication profile.
+
+## Usage
+
+```bash
+pgbeam auth logout [--profile <name>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--profile` | Profile to remove (defaults to the active profile) |
+
+## Examples
+
+```bash
+# Remove the active profile
+pgbeam auth logout
+
+# Remove a specific profile
+pgbeam auth logout --profile staging
+```

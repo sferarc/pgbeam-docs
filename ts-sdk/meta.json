@@ -1,0 +1,17 @@
+{
+	"title": "TypeScript SDK",
+	"root": true,
+	"icon": "Package",
+	"defaultOpen": false,
+	"pages": [
+		"---Overview---",
+		"index",
+		"error-handling",
+		"---Methods---",
+		"projects",
+		"databases",
+		"analytics",
+		"platform",
+		"account"
+	]
+}

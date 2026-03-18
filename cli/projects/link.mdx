@@ -1,0 +1,33 @@
+---
+title: projects link
+description: Link the current directory to a project.
+---
+
+Link the current directory to a project. Stores the project ID in a `.pgbeam` file so subsequent commands use it automatically.
+
+## Usage
+
+```bash
+pgbeam link [flags]
+```
+
+Without `--project`, the command shows an interactive picker.
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--project <id>` | Project ID to link |
+
+## Examples
+
+```bash
+# Interactive project picker
+pgbeam link
+
+# Link to a specific project
+pgbeam link --project prj_abc123
+
+# Verify the link
+cat .pgbeam
+```

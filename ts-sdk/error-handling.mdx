@@ -1,0 +1,104 @@
+---
+title: Error Handling
+description:
+  Catch and inspect API errors, configure retries, and use idempotency keys
+  in the PgBeam TypeScript SDK.
+---
+
+All non-2xx responses throw an `ApiError`:
+
+```typescript
+import { ApiError, extractMessage } from "pgbeam";
+
+try {
+  await api.projects.deleteProject({
+    pathParams: { project_id: "prj_xxx" },
+  });
+} catch (err) {
+  if (err instanceof ApiError) {
+    console.error(err.status);     // 404
+    console.error(err.statusText); // "Not Found"
+
+    const msg = extractMessage(err.body);
+    console.error(msg);            // "Project not found"
+  }
+}
+```
+
+## ApiError properties
+
+| Property     | Type      | Description          |
+| ------------ | --------- | -------------------- |
+| `status`     | `number`  | HTTP status code     |
+| `statusText` | `string`  | HTTP status text     |
+| `body`       | `unknown` | Parsed response body |
+
+## extractMessage helper
+
+Pulls the human-readable message from the standard
+`{ error: { code, message } }` envelope:
+
+```typescript
+const msg = extractMessage(err.body);
+// "Project not found"
+```
+
+See [Response Conventions](/docs/api/response-conventions) for the full list of
+error codes and the error envelope format.
+
+## Retries
+
+The SDK automatically retries transient errors with exponential backoff.
+Non-retryable errors are thrown immediately.
+
+**Retried:** 408, 429, 502, 503, 504, and network errors (connection refused,
+DNS failure, fetch error). All other status codes are **not** retried.
+
+When the server returns a `Retry-After` header (on 429 or 503), the SDK uses
+that value instead of its own computed backoff.
+
+See [Response Conventions](/docs/api/response-conventions#retries) for the
+backoff formula and retry behavior details.
+
+### Retry configuration
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "your-api-key",
+  baseUrl: "https://api.pgbeam.com",
+  retry: {
+    maxRetries: 5,         // default: 5 (0 to disable)
+    initialDelayMs: 500,   // default: 500ms
+    maxDelayMs: 30_000,    // default: 30s
+    idempotencyKeys: true, // default: true
+  },
+});
+```
+
+| Option            | Type      | Default | Description                                                      |
+| ----------------- | --------- | ------- | ---------------------------------------------------------------- |
+| `maxRetries`      | `number`  | `5`     | Max retry attempts after the initial request. `0` disables retries. |
+| `initialDelayMs`  | `number`  | `500`   | Initial backoff delay in milliseconds.                           |
+| `maxDelayMs`      | `number`  | `30000` | Maximum backoff delay in milliseconds.                           |
+| `idempotencyKeys` | `boolean` | `true`  | Auto-send `Idempotency-Key` header on POST/PATCH.                |
+
+### Disabling retries
+
+```typescript
+const client = new PgBeamClient({
+  token: "your-api-key",
+  baseUrl: "https://api.pgbeam.com",
+  retry: false,
+});
+```
+
+## Idempotency
+
+When `idempotencyKeys` is enabled (the default), POST and PATCH requests include
+an `Idempotency-Key` header so retries never double-create resources. The server
+caches responses for 24 hours.
+
+See [Response Conventions](/docs/api/response-conventions#idempotency) for how
+idempotency keys work.

@@ -1,0 +1,19 @@
+{
+	"defaultOpen": false,
+	"title": "projects",
+	"icon": "FolderKanban",
+	"pages": [
+		"create",
+		"list",
+		"inspect",
+		"update",
+		"delete",
+		"usage",
+		"link",
+		"unlink",
+		"domains",
+		"replicas",
+		"cache-rules",
+		"env"
+	]
+}

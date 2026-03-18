@@ -1,0 +1,177 @@
+---
+title: Drizzle
+icon: Droplets
+tag: TypeScript
+description:
+  Connect Drizzle ORM to your PostgreSQL database through PgBeam for connection
+  pooling, caching, and global routing.
+---
+
+Connect your Drizzle ORM application to PgBeam by updating the connection
+string. No changes to your schema definitions, table declarations, or queries
+are required.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Update your environment
+
+```bash title=".env"
+DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+```
+
+</Step>
+<Step>
+
+### Configure the database client
+
+<Tabs items={["Simple", "With pool config"]}>
+<Tab value="Simple">
+```ts title="db.ts"
+import { drizzle } from "drizzle-orm/node-postgres";
+
+const db = drizzle(process.env.DATABASE_URL!);
+```
+</Tab>
+<Tab value="With pool config">
+```ts title="db.ts"
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 5, // PgBeam handles upstream pooling — keep this low
+});
+
+const db = drizzle(pool);
+```
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+### Run a test query
+
+```ts
+const users = await db.select().from(usersTable);
+```
+
+If this returns results, Drizzle is connected through PgBeam.
+
+</Step>
+</Steps>
+
+## Connection pool sizing
+
+PgBeam handles upstream connection pooling, so the `pg` pool on your
+application side should be small. A pool size of 3-5 per application instance
+is typically sufficient.
+
+| Deployment type         | Recommended `max` pool size |
+| ----------------------- | --------------------------- |
+| Single server           | 5-10                        |
+| Multiple replicas/pods  | 3-5 per instance            |
+| Serverless (Lambda)     | 1-2                         |
+
+<Callout type="info">
+With PgBeam in transaction pool mode, each Drizzle connection only holds an
+upstream connection for the duration of a transaction. This means a small
+local pool can handle high concurrency.
+</Callout>
+
+## Drizzle Kit migrations
+
+<Callout type="warn" title="Run migrations against the origin">
+Run Drizzle Kit migrations directly against your origin database, not through
+PgBeam. Migrations may use session features that behave differently through a
+connection pool.
+</Callout>
+
+```bash
+DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx drizzle-kit migrate
+```
+
+The same applies to `drizzle-kit push` for development:
+
+```bash
+DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx drizzle-kit push
+```
+
+## Caching with Drizzle
+
+### Query builder queries (recommended)
+
+For standard Drizzle query builder queries (`db.select()`, `db.query`, etc.),
+PgBeam automatically tracks the generated SQL shapes. Enable caching for these
+through [Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+
+### Raw queries with annotations
+
+Use Drizzle's `sql` template for fine-grained cache control:
+
+```ts title="Cache control with raw queries"
+import { sql } from "drizzle-orm";
+
+// Cache for 10 minutes
+const categories = await db.execute(
+  sql`/* @pgbeam:cache maxAge=600 */ SELECT * FROM categories`,
+);
+
+// Disable caching for a specific query
+const balance = await db.execute(
+  sql`/* @pgbeam:cache noCache */ SELECT balance FROM accounts WHERE id = ${accountId}`,
+);
+```
+
+## Read replicas with Drizzle
+
+Route read queries to replicas using the `/* @pgbeam:replica */` annotation:
+
+```ts title="Replica routing"
+import { sql } from "drizzle-orm";
+
+// Route to a read replica
+const products = await db.execute(
+  sql`/* @pgbeam:replica */ SELECT * FROM products WHERE active = true`,
+);
+
+// Combine replica routing with caching
+const stats = await db.execute(
+  sql`/* @pgbeam:replica */ /* @pgbeam:cache maxAge=300 */ SELECT count(*) FROM orders`,
+);
+```
+
+Standard query builder calls always go to the primary database. To use replica
+routing, use raw SQL with the annotation.
+
+See [Read Replicas](/docs/replicas) for details on replica setup.
+
+## Debugging
+
+Enable PgBeam debug output to verify caching and routing:
+
+```ts
+import { sql } from "drizzle-orm";
+
+await db.execute(sql`SET pgbeam.debug = on`);
+
+const result = await db.execute(sql`SELECT * FROM users WHERE id = ${userId}`);
+// Check server logs for: NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+```
+
+## Common issues
+
+| Issue                               | Cause                            | Fix                                      |
+| ----------------------------------- | -------------------------------- | ---------------------------------------- |
+| "Too many connections" errors       | `pg` pool too large              | Set `max: 5` in Pool config              |
+| Migrations fail through PgBeam      | Session features not available   | Run migrations against origin directly   |
+| Stale data after writes             | Cache returning old results      | Use `noCache` annotation or adjust TTL   |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
+- [Caching](/docs/cache) — TTL, SWR, cache rules, and SQL annotations
+- [Read Replicas](/docs/replicas) — Replica setup and routing

@@ -1,0 +1,53 @@
+---
+title: MCP Server
+description: Remote MCP endpoint for AI agent integration.
+icon: Bot
+---
+
+`POST /v1/mcp` is a remote [Model Context Protocol](https://modelcontextprotocol.io)
+server using the Streamable HTTP transport. It exposes every public API
+operation as an MCP tool so AI assistants can manage PgBeam resources directly.
+
+See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering
+both the CLI (stdio) and remote (HTTP) transports.
+
+## Quick start
+
+```bash
+curl -X POST https://api.pgbeam.com/v1/mcp \
+  -H "Authorization: Bearer pbk_..." \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2025-03-26",
+      "capabilities": {},
+      "clientInfo": { "name": "my-agent", "version": "1.0" }
+    }
+  }'
+```
+
+## Protocol
+
+| Property | Value |
+| --- | --- |
+| Transport | Streamable HTTP (MCP spec 2025-03-26) |
+| Wire format | JSON-RPC 2.0 |
+| Auth | `Authorization: Bearer <token>` |
+| Methods | `initialize`, `notifications/initialized`, `tools/list`, `tools/call`, `ping` |
+
+## Authentication
+
+The MCP endpoint uses the same authentication as the REST API. Pass a bearer
+token or API key in the `Authorization` header. See [Authentication](/docs/api#authentication).
+
+## Tools
+
+Tools are auto-generated from the OpenAPI spec. Each public endpoint becomes a
+tool named after its `operationId`. Arguments map to path parameters, query
+parameters, and an optional `body` object for mutating methods.
+
+Call `tools/list` to discover all available tools and their input schemas.

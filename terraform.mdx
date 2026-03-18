@@ -1,0 +1,295 @@
+---
+title: Terraform
+icon: Blocks
+tag: HCL
+description:
+  Manage PgBeam projects, databases, replicas, domains, and cache rules as
+  infrastructure using Terraform and the pgbeam provider.
+---
+
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
+provider offers native resources for projects, databases, replicas,
+custom domains, cache rules, and spend limits.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Configure the provider
+
+<Callout type="info">
+The Terraform provider is coming soon. Registry publishing is on the roadmap.
+</Callout>
+
+```hcl title="main.tf"
+terraform {
+  required_providers {
+    pgbeam = {
+      source  = "pgbeam/pgbeam"
+      version = "~> 1.0"
+    }
+  }
+}
+
+provider "pgbeam" {
+  api_key = var.pgbeam_api_key  # or set PGBEAM_API_KEY
+}
+```
+
+</Step>
+<Step>
+
+### Configure credentials
+
+Set your PgBeam API key via provider config or environment variable:
+
+<Tabs items={["Provider config", "Environment variable"]}>
+<Tab value="Provider config">
+```hcl title="main.tf"
+variable "pgbeam_api_key" {
+  type      = string
+  sensitive = true
+}
+
+provider "pgbeam" {
+  api_key = var.pgbeam_api_key
+}
+```
+</Tab>
+<Tab value="Environment variable">
+```bash
+export PGBEAM_API_KEY=pgb_your_api_key
+```
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+### Create a project
+
+```hcl title="main.tf"
+resource "pgbeam_project" "my_app" {
+  org_id = "org_abc123"
+  name   = "my-app"
+
+  database {
+    host     = "my-rds.us-east-1.rds.amazonaws.com"
+    port     = 5432
+    name     = "mydb"
+    username = "pgbeam"
+    password = var.db_password
+  }
+}
+
+output "proxy_host" {
+  value = pgbeam_project.my_app.proxy_host
+}
+```
+
+</Step>
+<Step>
+
+### Deploy
+
+```bash
+terraform apply
+```
+
+Terraform creates the PgBeam project and its primary database atomically.
+The `proxy_host` output gives you the PgBeam proxy endpoint to use in your
+application connection string.
+
+</Step>
+</Steps>
+
+## Resources
+
+### pgbeam_project
+
+The top-level resource. Each project gets a unique proxy hostname and is created
+with its primary upstream database.
+
+```hcl
+resource "pgbeam_project" "prod" {
+  org_id             = "org_abc123"
+  name               = "production"
+  cloud              = "aws"
+  queries_per_second = 1000
+  burst_size         = 200
+  max_connections    = 500
+
+  database {
+    host     = "primary.us-east-1.rds.amazonaws.com"
+    port     = 5432
+    name     = "mydb"
+    username = "pgbeam"
+    password = var.db_password
+    ssl_mode = "require"
+
+    pool_config {
+      pool_size     = 20
+      min_pool_size = 5
+      pool_mode     = "transaction"
+    }
+
+    cache_config {
+      enabled     = true
+      ttl_seconds = 60
+      max_entries = 10000
+      swr_seconds = 30
+    }
+  }
+}
+```
+
+**Computed:** `proxy_host`, `status`, `database_count`, `active_connections`,
+`primary_database_id`, `created_at`, `updated_at`
+
+**Import:** `terraform import pgbeam_project.prod proj_abc123`
+
+### pgbeam_database
+
+Add additional upstream databases to a project. Useful for read replicas or
+multi-database setups.
+
+```hcl
+resource "pgbeam_database" "read_replica" {
+  project_id = pgbeam_project.prod.id
+  host       = "replica.us-east-1.rds.amazonaws.com"
+  port       = 5432
+  name       = "mydb"
+  username   = "pgbeam"
+  password   = var.db_password
+  role       = "replica"
+
+  pool_config {
+    pool_size     = 20
+    min_pool_size = 5
+    pool_mode     = "transaction"
+  }
+}
+```
+
+**Computed:** `connection_string`, `role`, `ssl_mode`, `cache_config`,
+`pool_config`
+
+**Import:** `terraform import pgbeam_database.read_replica proj_abc123/db_abc123`
+
+### pgbeam_replica
+
+Register a read replica endpoint under a database. PgBeam routes read queries
+to replicas automatically based on proximity.
+
+Replicas are immutable — any property change triggers replacement.
+
+```hcl
+resource "pgbeam_replica" "us_west" {
+  database_id = pgbeam_database.read_replica.id
+  host        = "replica.us-west-2.rds.amazonaws.com"
+  port        = 5432
+  ssl_mode    = "require"
+}
+```
+
+**Import:** `terraform import pgbeam_replica.us_west db_abc123/rep_abc123`
+
+### pgbeam_custom_domain
+
+Attach a custom domain to a project. Requires the Scale or Enterprise plan.
+
+```hcl
+resource "pgbeam_custom_domain" "prod" {
+  project_id = pgbeam_project.prod.id
+  domain     = "db.example.com"
+}
+
+output "cname_target" {
+  value = pgbeam_custom_domain.prod.dns_instructions.cname_target
+}
+
+output "txt_value" {
+  value = pgbeam_custom_domain.prod.dns_instructions.txt_value
+}
+```
+
+After creation, configure DNS records according to the returned
+`dns_instructions`, then verify via the dashboard.
+
+**Import:** `terraform import pgbeam_custom_domain.prod proj_abc123/dom_abc123`
+
+### pgbeam_cache_rule
+
+Override per-query cache settings for a specific query shape.
+
+```hcl
+resource "pgbeam_cache_rule" "hot_query" {
+  project_id    = pgbeam_project.prod.id
+  database_id   = pgbeam_database.read_replica.id
+  query_hash    = "a1b2c3d4e5f67890"
+  cache_enabled = true
+  cache_ttl_seconds = 300
+  cache_swr_seconds = 60
+}
+```
+
+**Computed:** `normalized_sql`, `query_type`, `call_count`, `avg_latency_ms`,
+`recommendation`
+
+<Callout type="info">
+Find query hashes in the PgBeam dashboard under the Cache Rules tab, or via
+the API's `listCacheRules` endpoint.
+</Callout>
+
+**Import:** `terraform import pgbeam_cache_rule.hot_query proj_abc123/db_abc123/a1b2c3d4e5f67890`
+
+### pgbeam_spend_limit
+
+Set a monthly spending cap for an organization.
+
+```hcl
+resource "pgbeam_spend_limit" "prod" {
+  org_id      = "org_abc123"
+  spend_limit = 500
+}
+```
+
+When the limit is reached, the organization's projects are suspended until the
+next billing period. Removing this resource resets the limit (no cap).
+
+**Import:** `terraform import pgbeam_spend_limit.prod org_abc123`
+
+## Configuration
+
+| Setting | Source | Description |
+| --- | --- | --- |
+| `api_key` | Provider block | API key (sensitive, recommended: use a variable) |
+| `base_url` | Provider block | API base URL (default: `https://api.pgbeam.com`) |
+| `PGBEAM_API_KEY` | Environment | Fallback API key |
+| `PGBEAM_API_URL` | Environment | Fallback base URL |
+
+Config resolution order: provider block > environment variables.
+
+## Replacement vs update
+
+Some property changes trigger resource replacement (destroy + create) rather
+than in-place updates:
+
+| Resource | Replacement triggers |
+| --- | --- |
+| Project | `org_id`, `cloud` |
+| Database | `project_id` |
+| Replica | Any property change (immutable) |
+| CustomDomain | Any property change (immutable) |
+| CacheRule | `project_id`, `database_id`, `query_hash` |
+| SpendLimit | `org_id` |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — pool modes and sizing
+- [Caching](/docs/cache) — query caching and SWR
+- [Read Replicas](/docs/replicas) — replica routing
+- [Custom Domains](/docs/custom-domains) — DNS setup and verification
+- [API Keys](/docs/api-keys) — managing API credentials
+- [Plans](/docs/plans) — plan limits and pricing

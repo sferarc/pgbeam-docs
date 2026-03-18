@@ -1,0 +1,45 @@
+---
+title: listReplicas
+description: List replicas
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists all read replicas for a database.
+
+## Usage
+
+```typescript
+const result = await api.projects.listReplicas();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<ListReplicasResponse>` — list of replicas.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.listReplicas();
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

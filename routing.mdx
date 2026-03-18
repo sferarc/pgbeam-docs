@@ -1,0 +1,232 @@
+---
+title: Routing & Regions
+icon: Route
+description:
+  How PgBeam routes connections across 6 global regions using GeoDNS, peer
+  relay, and edge caching — and what happens when things fail.
+---
+
+PgBeam is a globally distributed proxy. When a client connects, GeoDNS
+automatically directs it to the nearest data plane region. From there, PgBeam
+handles everything — TLS termination, project lookup, connection pooling,
+caching, and upstream relay.
+
+You do not choose a region when creating a project. Every project is accessible
+from every region. The routing layer decides the best path to the upstream
+database.
+
+## Regions
+
+PgBeam operates data planes in 6 regions worldwide:
+
+| Region         | Location    | Identifier        |
+| -------------- | ----------- | ----------------- |
+| US East        | N. Virginia | `us-east-1`       |
+| US West        | Oregon      | `us-west-2`       |
+| EU West        | Ireland     | `eu-west-1`       |
+| Asia South     | Mumbai      | `ap-south-1`      |
+| Southeast Asia | Singapore   | `ap-southeast-1`  |
+| Northeast Asia | Tokyo       | `ap-northeast-1`  |
+
+All 6 regions are interconnected over a private network. Inter-region traffic
+never crosses the public internet.
+
+## How a connection is routed
+
+Every client connection follows the same lifecycle:
+
+<Steps>
+<Step>
+
+### DNS resolution
+
+The client resolves `abc.aws.pgbeam.app`. GeoDNS returns the IP of the nearest
+data plane based on the client's geographic location. This happens at the DNS
+layer — no application-level routing is involved.
+
+</Step>
+<Step>
+
+### TLS handshake
+
+The client connects over TLS to the resolved data plane. PgBeam uses **SNI
+(Server Name Indication)** to extract the project identifier from the hostname
+during the TLS handshake, before any PostgreSQL protocol traffic is exchanged.
+
+</Step>
+<Step>
+
+### Project lookup
+
+The data plane resolves the full project configuration from the control plane:
+upstream host, pool mode, cache settings, connection limits, and rate limits.
+Project configs are cached at the edge, so this lookup is fast after the first
+connection.
+
+</Step>
+<Step>
+
+### Cache check (for queries)
+
+When caching is enabled, each incoming query is checked against the local edge
+cache **before** any upstream communication. Cache hits are returned directly
+from the data plane, with zero upstream latency.
+
+</Step>
+<Step>
+
+### Pool acquire and upstream auth
+
+PgBeam acquires an upstream connection from the per-project pool (or dials a
+new one). Your credentials are forwarded to the upstream database for
+authentication — PgBeam does not store user passwords.
+
+</Step>
+<Step>
+
+### Query relay
+
+Queries are relayed between the client and upstream. Results flow back through
+the same path. When caching is enabled, eligible read results are stored in the
+local cache for future requests.
+
+</Step>
+<Step>
+
+### Pool release
+
+When the client disconnects (or the transaction ends, in transaction mode), the
+upstream connection is reset with `DISCARD ALL` and returned to the pool.
+
+</Step>
+</Steps>
+
+## Architecture diagram
+
+```
+Client (Oregon)
+     │
+     ▼
+GeoDNS → nearest data plane
+     │
+     ▼
+┌─────────────────────────────────────┐
+│  Data Plane (us-west-2)             │
+│                                     │
+│  TLS → SNI → Project Lookup        │
+│       │                             │
+│       ├→ Cache Hit? → Return        │
+│       │                             │
+│       ├→ Local pool? → Upstream     │
+│       │                             │
+│       └→ Relay to home region ─────────▶ Data Plane (us-east-1)
+│                                     │         │
+└─────────────────────────────────────┘         ▼
+                                           Pool → Database
+```
+
+## Peer relay
+
+When your database is hosted in a different region from the connecting client,
+PgBeam uses **peer relay** to keep connection pools close to the database while
+still serving clients from the nearest edge.
+
+### How relay works
+
+1. The client connects to the nearest data plane (the **edge**)
+2. The edge determines that the upstream database is in a different region
+3. The edge relays the connection to the data plane in the database's region
+   (the **home** region)
+4. The home data plane manages the connection pool and upstream connections
+
+```
+Client (Mumbai)  →  Edge (ap-south-1)  →  Relay  →  Home (us-east-1)  →  Database
+```
+
+### Why relay instead of direct connection
+
+Keeping pools in the home region has two advantages:
+
+1. **Connection stability.** Long-lived upstream connections stay on the
+   shortest, most stable network path to the database.
+2. **Pool efficiency.** All connections from all regions share the same pool
+   in the home region, maximizing connection reuse.
+
+### Cache and relay interaction
+
+The cache check always happens at the **edge** data plane, before any relay.
+This is the key performance benefit:
+
+- **Cache hit:** Served from the edge. No relay. No upstream query. The client
+  gets the result with local latency only.
+- **Cache miss:** The query is relayed to the home region, executed against the
+  upstream, and the result is cached at the edge for future requests.
+
+This means a client in Mumbai querying a database in Virginia can get
+sub-millisecond response times for cached queries, despite the database being
+halfway around the world.
+
+### Relay fallback
+
+If the relay connection to the home region fails (network partition, home
+region outage), PgBeam falls back to a **direct connection** from the edge
+data plane to the upstream database. This is less efficient (no pool sharing
+with other regions) but maintains connectivity.
+
+<Callout type="info">
+Relay fallback is automatic. Your application does not need to handle it — the
+connection either works via relay or via direct path, transparently.
+</Callout>
+
+## Read replica routing
+
+PgBeam supports **opt-in per-query** routing to read replicas. Annotate queries
+with `/* @pgbeam:replica */` to send them to a replica:
+
+```sql
+/* @pgbeam:replica */ SELECT * FROM products WHERE active = true;
+```
+
+| Query type                   | Routing                       |
+| ---------------------------- | ----------------------------- |
+| Read with `@pgbeam:replica`  | Round-robin across replicas   |
+| Read without annotation      | Primary database              |
+| Write                        | Primary database              |
+| Inside transaction           | Primary database              |
+
+PgBeam strips the annotation before forwarding. See [Read Replicas](/docs/replicas)
+for setup instructions, ORM examples, and health check details.
+
+## Latency characteristics
+
+Understanding where latency comes from helps you optimize your setup:
+
+| Scenario                            | Typical latency | What determines it       |
+| ----------------------------------- | --------------- | ------------------------ |
+| Cache hit at edge                   | < 1ms           | L1/L2 cache lookup       |
+| Cache miss, database in same region | 1-5ms           | Upstream query time      |
+| Cache miss, relay to another region | 30-150ms        | Inter-region RTT + query |
+| Cold start (project was parked)     | Varies          | Pool re-init + first dial |
+
+The biggest latency win comes from caching. A cache hit eliminates both the
+upstream query and any relay overhead.
+
+## Failure scenarios
+
+| Failure                        | PgBeam behavior                                    |
+| ------------------------------ | -------------------------------------------------- |
+| Edge data plane goes down      | GeoDNS removes it; clients route to next nearest   |
+| Relay to home region fails     | Fallback to direct connection from edge             |
+| Upstream database unreachable  | Circuit breaker opens after 3 failures              |
+| Shared cache goes down         | Queries fall through to upstream (fail-open)        |
+| All replicas unhealthy         | Replica-annotated queries fall back to primary      |
+
+See [Resilience](/docs/resilience) for detailed circuit breaker behavior and
+recovery.
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and connection lifecycle
+- [Caching](/docs/cache) — How cache lookup interacts with routing
+- [Read Replicas](/docs/replicas) — Opt-in replica routing with SQL annotations
+- [Resilience](/docs/resilience) — Circuit breakers, health checks, and failover

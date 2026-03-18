@@ -1,0 +1,89 @@
+---
+title: Installation & Setup
+description:
+  Install the pgbeam-go package, configure the client, authenticate, and learn
+  the service-based access pattern.
+---
+
+## Installation
+
+<Callout type="info">
+The Go SDK is coming soon. Package publishing is on the roadmap.
+</Callout>
+
+```bash
+go get github.com/pgbeam/pgbeam-go
+```
+
+## Client setup
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+    APIKey:  "pgb_your_api_key",
+    BaseURL: "https://api.pgbeam.com", // optional
+})
+```
+
+## Constructor options
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `APIKey` | `string` | PgBeam API key (required, prefix `pgb_`) |
+| `BaseURL` | `string` | API base URL (default: `https://api.pgbeam.com`) |
+| `HTTPClient` | `*http.Client` | Custom HTTP client for proxies, timeouts, etc. |
+
+## Authentication
+
+<Tabs items={["Explicit key", "From environment"]}>
+<Tab value="Explicit key">
+```go
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+    APIKey:  "pgb_your_api_key",
+    BaseURL: "https://api.pgbeam.com",
+})
+```
+</Tab>
+<Tab value="From environment">
+```go
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+    APIKey:  os.Getenv("PGBEAM_API_KEY"),
+    BaseURL: os.Getenv("PGBEAM_API_URL"),
+})
+```
+</Tab>
+</Tabs>
+
+See [API Keys](/docs/api-keys) for key creation and rotation.
+
+## Usage pattern
+
+The Go SDK uses service-based access, matching the TypeScript SDK's tag-based
+`api.projects.*`, `api.databases.*` pattern:
+
+```go
+// Projects
+resp, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{...})
+project, err := client.Projects.GetProject(ctx, "prj_xxx")
+
+// Databases
+db, err := client.Databases.GetDatabase(ctx, "prj_xxx", "db_xxx")
+
+// Analytics
+plan, err := client.Analytics.GetOrganizationPlan(ctx, "org_xxx")
+
+// Platform
+health, err := client.Platform.GetHealth(ctx)
+
+// Account
+data, err := client.Account.ExportAccountData(ctx)
+```
+
+| Service | Go | TypeScript equivalent |
+| --- | --- | --- |
+| Projects | `client.Projects` | `api.projects` |
+| Databases | `client.Databases` | `api.databases` |
+| Analytics | `client.Analytics` | `api.analytics` |
+| Platform | `client.Platform` | `api.platform` |
+| Account | `client.Account` | `api.account` |

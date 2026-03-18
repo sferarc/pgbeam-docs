@@ -1,0 +1,62 @@
+---
+title: UpdateCacheRule
+description: Update cache rule
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Enable or disable caching for a specific query shape, with optional
+TTL and SWR overrides. Requires the query to exist in the cache rules.
+
+
+## Usage
+
+```go
+result, err := client.Projects.UpdateCacheRule(ctx, &pgbeam.UpdateCacheRuleRequest{
+    CacheEnabled: true,
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.UpdateCacheRuleRequest` | Yes | Request body |
+| req.CacheEnabled | `bool` | Yes | Whether to enable caching for this query shape. |
+| req.CacheTTLSeconds | `*int` | No | TTL override in seconds. Null to use project default. |
+| req.CacheSWRSeconds | `*int` | No | SWR override in seconds. Null to use project default. |
+
+## Response
+
+`(*pgbeam.UpdateCacheRuleResponse, error)` — cache rule updated.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.UpdateCacheRule(ctx, &pgbeam.UpdateCacheRuleRequest{
+    CacheEnabled: true,
+    CacheTTLSeconds: 0,
+    CacheSWRSeconds: 0,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

@@ -1,0 +1,46 @@
+---
+title: GetHealth
+description: Health check
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns the health status of the API server.
+
+## Usage
+
+```go
+result, err := client.Platform.GetHealth(ctx)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+
+## Response
+
+`(*pgbeam.HealthResponse, error)` — service is healthy.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Platform.GetHealth(ctx)
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 429 | Rate limited. Try again later. |

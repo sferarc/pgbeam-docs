@@ -1,0 +1,59 @@
+---
+title: createReplica
+description: Add a replica
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Adds a read replica to a database.
+
+## Usage
+
+```typescript
+const result = await api.projects.createReplica({
+    body: {
+      host: "...",
+      port: 5432,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.host | `string` | Yes | PostgreSQL replica host. |
+| body.port | `number` | Yes | PostgreSQL replica port. |
+| body.ssl_mode | `SSLMode` | No |  |
+
+## Response
+
+`Promise<Replica>` — replica created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.createReplica({
+  body: {
+      host: "...",
+      port: 5432,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

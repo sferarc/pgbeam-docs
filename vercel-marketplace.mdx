@@ -1,0 +1,70 @@
+---
+title: Vercel Marketplace
+icon: Blocks
+tag: Soon
+description:
+  Deploy PgBeam as a Vercel Marketplace integration — provision connection
+  pooling and query caching directly from your Vercel dashboard.
+---
+
+Deploy PgBeam directly from the [Vercel Marketplace](https://vercel.com/marketplace).
+The integration provisions a PgBeam project, connects it to your database, and
+injects connection secrets into your Vercel project — zero configuration
+required.
+
+<Callout type="info">
+The Vercel Marketplace integration is coming soon. Join the waitlist at
+[pgbeam.com](https://pgbeam.com) to get notified when it launches.
+</Callout>
+
+## How it works
+
+<Steps>
+<Step>
+
+### Install from Vercel Marketplace
+
+Find PgBeam in the Vercel Marketplace and click **Add Integration**. This
+creates a PgBeam organization linked to your Vercel team.
+
+</Step>
+<Step>
+
+### Provision a resource
+
+From the integration page, create a new PgBeam resource. Provide your upstream
+database connection details and PgBeam provisions a project with connection
+pooling and optional query caching.
+
+</Step>
+<Step>
+
+### Connect your app
+
+PgBeam automatically sets `PGBEAM_URL` and `PGBEAM_CONNECTION_STRING` as
+environment variables in your Vercel project. Update your application to use
+the PgBeam connection string — no code changes beyond swapping the DSN.
+
+</Step>
+</Steps>
+
+## Features
+
+- **One-click provisioning** — create PgBeam projects without leaving Vercel
+- **Automatic secrets** — connection strings injected as environment variables
+- **Unified billing** — PgBeam usage appears on your Vercel invoice
+- **Per-project resources** — each Vercel project gets its own PgBeam project
+- **Team sync** — Vercel team members get access to the PgBeam dashboard
+
+## Billing
+
+PgBeam usage provisioned through the Vercel Marketplace is billed through
+Vercel. The same plan tiers (Starter, Pro, Scale) and overage rates apply.
+See [Plans and Limits](/docs/plans) for details.
+
+## Further reading
+
+- [Serverless Connections](/docs/serverless) — optimizing for serverless
+- [Connection Pooling](/docs/pooling) — pool modes and sizing
+- [Caching](/docs/cache) — query caching and SWR
+- [Plans](/docs/plans) — plan limits and pricing

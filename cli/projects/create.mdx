@@ -1,0 +1,35 @@
+---
+title: projects create
+description: Create a new project.
+---
+
+Create a new project in your organization.
+
+## Usage
+
+```bash
+pgbeam projects create [flags]
+```
+
+Without flags, the command runs interactively and prompts for a name and region.
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--name <name>` | Project name |
+| `--region <region>` | Deployment region (e.g. `us-east-1`, `eu-west-1`) |
+| `--json` | Output as JSON |
+
+## Examples
+
+```bash
+# Interactive mode
+pgbeam projects create
+
+# Create with flags
+pgbeam projects create --name my-app --region us-east-1
+
+# Create and capture the project ID
+PROJECT_ID=$(pgbeam projects create --name my-app --region us-east-1 --json | jq -r '.id')
+```

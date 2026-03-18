@@ -1,0 +1,30 @@
+---
+title: cache-rules set
+description: Enable or disable caching for a query shape.
+---
+
+Enable or disable caching for a specific query shape identified by its hash.
+
+## Usage
+
+```bash
+pgbeam cache-rules set <hash> --database-id <id> [--cached | --no-cached]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--database-id` | Database the query shape belongs to (required) |
+| `--cached` | Enable caching for this query shape |
+| `--no-cached` | Disable caching for this query shape |
+
+## Examples
+
+```bash
+# Enable caching for a query shape
+pgbeam cache-rules set a1b2c3d4 --database-id db_abc123 --cached
+
+# Disable caching for a query shape
+pgbeam cache-rules set e5f6g7h8 --database-id db_abc123 --no-cached
+```

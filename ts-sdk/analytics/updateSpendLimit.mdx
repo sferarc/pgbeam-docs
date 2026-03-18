@@ -1,0 +1,57 @@
+---
+title: updateSpendLimit
+description: Update spend limit
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Sets the monthly spend limit for an organization. Null removes the limit.
+
+## Usage
+
+```typescript
+const result = await api.analytics.updateSpendLimit({
+    pathParams: { org_id: "org_xxx" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| body.spend_limit | `number` | No | Monthly spend limit in dollars. Null to remove the limit. |
+
+## Response
+
+`Promise<OrganizationPlan>` — spend limit updated.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.updateSpendLimit({
+  pathParams: { org_id: "org_xxx" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

@@ -1,0 +1,45 @@
+---
+title: getProject
+description: Get a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns a single project by ID.
+
+## Usage
+
+```typescript
+const result = await api.projects.getProject();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<Project>` — project found.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.getProject();
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

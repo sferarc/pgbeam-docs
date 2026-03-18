@@ -1,0 +1,53 @@
+---
+title: getProjectMetrics
+description: Get project metrics
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns recent project metrics snapshots, optionally filtered by region.
+
+## Usage
+
+```typescript
+const result = await api.projects.getProjectMetrics({
+    pathParams: { project_id: "prj_xxx" },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.limit | `number` | No | Maximum number of recent snapshots to return. |
+| queryParams.region | `string` | No | Filter metrics by region code. |
+
+## Response
+
+`Promise<ProjectMetricsResponse>` — metrics snapshots
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.getProjectMetrics({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: { limit: 20, region: "..." },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

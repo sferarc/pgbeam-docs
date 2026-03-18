@@ -1,0 +1,25 @@
+---
+title: api ls
+description: List all available API endpoints.
+---
+
+List all available API endpoints with their HTTP methods and paths.
+
+## Usage
+
+```bash
+pgbeam api ls
+```
+
+## Examples
+
+```bash
+pgbeam api ls
+# METHOD   PATH                          OPERATION ID
+# GET      /v1/projects                  listProjects
+# POST     /v1/projects                  createProject
+# GET      /v1/projects/{id}             getProject
+# DELETE   /v1/projects/{id}             deleteProject
+# GET      /v1/databases                 listDatabases
+# POST     /v1/databases                 createDatabase
+```

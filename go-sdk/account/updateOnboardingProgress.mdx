@@ -1,0 +1,58 @@
+---
+title: UpdateOnboardingProgress
+description: Update onboarding progress
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Mark an onboarding step as complete or dismiss the checklist.
+
+## Usage
+
+```go
+result, err := client.Account.UpdateOnboardingProgress(ctx, &pgbeam.UpdateOnboardingRequest{
+
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.UpdateOnboardingRequest` | Yes | Request body |
+| req.Step | `*string` | No | The onboarding step to mark as complete. |
+| req.Dismiss | `*bool` | No | Set to true to dismiss the onboarding checklist. |
+
+## Response
+
+`(*pgbeam.OnboardingProgress, error)` — updated onboarding progress.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Account.UpdateOnboardingProgress(ctx, &pgbeam.UpdateOnboardingRequest{
+    Step: "...",
+    Dismiss: true,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

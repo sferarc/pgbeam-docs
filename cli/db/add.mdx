@@ -1,0 +1,31 @@
+---
+title: db add
+description: Add a database connection to the project.
+---
+
+Add a database connection to the project. Without flags, runs interactively.
+
+## Usage
+
+```bash
+pgbeam db add [--host <host>] [--port <port>] [--database <name>] [--ssl-mode <mode>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--host` | Database hostname or IP address |
+| `--port` | Database port (default `5432`) |
+| `--database` | Database name |
+| `--ssl-mode` | SSL connection mode (`prefer`, `require`, `verify-ca`, `verify-full`) |
+
+## Examples
+
+```bash
+# Interactive mode
+pgbeam db add
+
+# Fully specified
+pgbeam db add --host db.example.com --port 5432 --database myapp --ssl-mode require
+```

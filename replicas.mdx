@@ -1,0 +1,229 @@
+---
+title: Read Replicas
+icon: BookOpen
+description:
+  Distribute read load across PostgreSQL replicas with per-query SQL annotations
+  and automatic health management.
+---
+
+Read replicas let you distribute read traffic across multiple database instances.
+Instead of sending every query to a single primary, you can route eligible reads
+to replicas — reducing load on the primary and improving read throughput for
+heavy workloads.
+
+PgBeam uses **opt-in, per-query routing**. You explicitly annotate queries that
+should go to a replica using a SQL comment. PgBeam does not automatically split
+reads and writes. This gives you full control over consistency — you decide which
+queries can tolerate replication lag and which must always hit the primary.
+
+## When to use read replicas
+
+Read replicas are a good fit when:
+
+- Your primary database is CPU or connection constrained by read traffic
+- You have analytics or reporting queries that can tolerate slightly stale data
+- You want to separate OLTP traffic (primary) from heavier read patterns (replica)
+- You are running dashboards or background jobs that do not need real-time data
+
+Read replicas are **not** a good fit when:
+
+- Every read must see the latest committed write (no replication lag tolerance)
+- Your bottleneck is write throughput, not read throughput
+- You have very few distinct queries that would benefit from routing
+
+## Add a replica
+
+Register one or more read replicas for a database. Each replica needs its own
+connection details — PgBeam will connect to it independently from the primary.
+
+<Tabs items={["Dashboard", "API", "CLI"]}>
+<Tab value="Dashboard">
+Navigate to your project, select a database, and click **Add Replica**. Enter
+the replica's connection details: host, port, database name, and SSL mode.
+</Tab>
+<Tab value="API">
+```bash
+curl -X POST \
+  https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId}/replicas \
+  -H "Authorization: Bearer <key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "host": "replica.example.com",
+    "port": 5432,
+    "database": "mydb",
+    "ssl_mode": "verify-full"
+  }'
+```
+</Tab>
+<Tab value="CLI">
+```bash
+pgbeam replicas add --database-id <id> \
+  --host replica.example.com \
+  --port 5432 \
+  --database mydb \
+  --ssl-mode verify-full
+```
+</Tab>
+</Tabs>
+
+<Callout type="info">
+You can add multiple replicas. PgBeam distributes annotated reads across all
+healthy replicas using round-robin.
+</Callout>
+
+## Route queries to replicas
+
+Annotate individual queries with `/* @pgbeam:replica */` to route them to a
+replica:
+
+```sql title="Replica routing annotation"
+/* @pgbeam:replica */ SELECT * FROM products WHERE active = true;
+```
+
+PgBeam strips the annotation before forwarding the query, so the upstream
+database never sees the comment.
+
+### Routing rules
+
+| Query type                   | Where it goes                 |
+| ---------------------------- | ----------------------------- |
+| Read with `@pgbeam:replica`  | Round-robin across healthy replicas |
+| Read without annotation      | Primary database              |
+| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database         |
+| Any query inside a transaction | Primary database             |
+
+### Why opt-in matters
+
+Automatic read/write splitting sounds appealing, but it introduces a subtle
+problem: **replication lag**. If your application writes a row and immediately
+reads it back, an automatic splitter might route the read to a replica that
+hasn't received the write yet, returning stale or missing data.
+
+By requiring explicit annotations, PgBeam ensures you make a conscious decision
+about which queries can tolerate lag. Queries where consistency matters stay on
+the primary by default.
+
+## ORM and driver examples
+
+Most ORMs support raw SQL or template literals where you can include the
+annotation:
+
+<Tabs items={["Prisma", "Drizzle", "psycopg", "pgx", "JDBC"]}>
+<Tab value="Prisma">
+```ts
+const products = await prisma.$queryRaw`
+  /* @pgbeam:replica */ SELECT * FROM products WHERE active = true
+`;
+```
+</Tab>
+<Tab value="Drizzle">
+```ts
+import { sql } from "drizzle-orm";
+
+const products = await db.execute(
+  sql`/* @pgbeam:replica */ SELECT * FROM products WHERE active = true`,
+);
+```
+</Tab>
+<Tab value="psycopg">
+```python
+cur.execute(
+    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true"
+)
+```
+</Tab>
+<Tab value="pgx">
+```go
+rows, err := pool.Query(ctx,
+    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true")
+```
+</Tab>
+<Tab value="JDBC">
+```java
+ResultSet rs = stmt.executeQuery(
+    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true");
+```
+</Tab>
+</Tabs>
+
+## Combining replicas with caching
+
+Replica routing and caching can work together. A query can be both
+replica-routed and cached:
+
+```sql
+/* @pgbeam:replica */ /* @pgbeam:cache maxAge=300 */ SELECT * FROM products;
+```
+
+The evaluation order is:
+
+1. PgBeam checks the cache first
+2. On a cache miss, the query is routed to a replica (if annotated) or the primary
+3. The result is cached for future requests
+
+This means cache hits are served from the local data plane without contacting
+any upstream at all — not the primary and not the replica.
+
+## Testing and debugging
+
+Use debug mode to verify which upstream handled each query:
+
+```sql title="Verify replica routing"
+SET pgbeam.debug = on;
+/* @pgbeam:replica */ SELECT 1;
+-- NOTICE: pgbeam: cache=miss replica=true upstream=replica-host:5432
+```
+
+The `NOTICE` output tells you:
+- Whether the query was a cache hit, miss, or stale hit
+- Whether replica routing was used (`replica=true`)
+- Which upstream host handled the query
+
+## Health checks and failover
+
+PgBeam runs background health checks against each replica independently. The
+health check system is automatic — there is nothing to configure.
+
+| Event                      | What PgBeam does                                  |
+| -------------------------- | ------------------------------------------------- |
+| Replica health check fails | Replica is removed from rotation                  |
+| Replica recovers           | Re-added to rotation after consecutive successes  |
+| All replicas are unhealthy | Annotated reads fall back to the primary database |
+
+This means replica failures are transparent to your application. A
+`/* @pgbeam:replica */` query always succeeds — it just falls back to the
+primary if no healthy replica is available.
+
+## Replication lag considerations
+
+PostgreSQL streaming replication is asynchronous by default. This means there
+is always some delay (typically milliseconds, but potentially seconds under
+load) between a write on the primary and the same data appearing on a replica.
+
+**Queries safe for replica routing:**
+- Product catalogs, blog posts, static content lookups
+- Analytics and reporting queries
+- Search results, recommendations, leaderboards
+- Configuration and feature flag reads
+
+**Queries that should stay on the primary:**
+- Reading data immediately after writing it ("read-your-writes")
+- Queries used in transactional flows where consistency is critical
+- Real-time balance checks, inventory counts, or seat availability
+
+## Limitations
+
+- Replica routing only applies to queries with the `/* @pgbeam:replica */`
+  annotation. There is no automatic read/write splitting.
+- Queries inside transactions always go to the primary, even if annotated.
+  This prevents split-brain reads within a transaction.
+- All replicas receive equal traffic via round-robin. Weighted routing is not
+  supported.
+- PgBeam does not provision or manage replicas — you create them in your
+  database provider and register them in PgBeam.
+
+## Further reading
+
+- [Caching](/docs/cache) — Combine replica routing with query caching
+- [Routing & Regions](/docs/routing) — How GeoDNS and peer relay interact with replica routing
+- [Resilience](/docs/resilience) — Health check details and failover behavior

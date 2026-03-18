@@ -1,0 +1,6 @@
+{
+	"defaultOpen": false,
+	"title": "analytics",
+	"icon": "ChartLine",
+	"pages": ["metrics", "insights", "plans"]
+}

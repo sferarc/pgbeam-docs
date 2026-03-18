@@ -1,0 +1,4 @@
+{
+	"defaultOpen": false, "title": "api", "icon": "FileCode",
+	"pages": ["ls", "request", "schema"]
+}

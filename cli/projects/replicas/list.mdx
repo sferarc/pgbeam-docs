@@ -1,0 +1,29 @@
+---
+title: replicas list
+description: List read replicas for a database.
+---
+
+List read replicas configured for a database.
+
+## Usage
+
+```bash
+pgbeam replicas list --database-id <id>
+```
+
+Alias: `pgbeam replicas ls`
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--database-id` | Database to list replicas for (required) |
+
+## Examples
+
+```bash
+pgbeam replicas ls --database-id db_abc123
+# ID              HOST                       PORT   STATUS
+# rep_xyz789      replica1.example.com       5432   healthy
+# rep_xyz790      replica2.example.com       5433   healthy
+```

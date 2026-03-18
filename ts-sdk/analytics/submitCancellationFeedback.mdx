@@ -1,0 +1,58 @@
+---
+title: submitCancellationFeedback
+description: Submit cancellation feedback
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Records optional feedback when a user cancels their subscription.
+
+## Usage
+
+```typescript
+const result = await api.analytics.submitCancellationFeedback({
+    pathParams: { org_id: "org_xxx" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| body.reason | `string` | No | Predefined cancellation reason. |
+| body.feedback | `string` | No | Free-text feedback from the user. |
+
+## Response
+
+`Promise<void>` — no content.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.submitCancellationFeedback({
+  pathParams: { org_id: "org_xxx" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

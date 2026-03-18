@@ -1,0 +1,34 @@
+---
+title: projects delete
+description: Delete a project.
+---
+
+Delete a project. Prompts for confirmation unless `--force` is passed.
+
+## Usage
+
+```bash
+pgbeam projects delete <project-id> [flags]
+```
+
+Alias: `pgbeam projects rm`
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--force` | Skip confirmation prompt |
+| `--json` | Output as JSON |
+
+## Examples
+
+```bash
+# Delete with confirmation prompt
+pgbeam projects delete prj_abc123
+
+# Using the alias
+pgbeam projects rm prj_abc123
+
+# Skip confirmation
+pgbeam projects delete prj_abc123 --force
+```

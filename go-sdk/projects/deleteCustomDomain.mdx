@@ -1,0 +1,49 @@
+---
+title: DeleteCustomDomain
+description: Delete a custom domain
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Removes a custom domain from the project and revokes its TLS certificate.
+
+## Usage
+
+```go
+err := client.Projects.DeleteCustomDomain(ctx)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+
+## Response
+
+`error` — returns nil on success.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+err := client.Projects.DeleteCustomDomain(ctx)
+if err != nil {
+  log.Fatal(err)
+}
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

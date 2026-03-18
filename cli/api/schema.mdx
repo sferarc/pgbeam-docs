@@ -1,0 +1,35 @@
+---
+title: api schema
+description: Show the OpenAPI schema for a specific operation.
+---
+
+Show the OpenAPI schema for a specific API operation, including request parameters, request body, and response shapes.
+
+## Usage
+
+```bash
+pgbeam api schema <operation-id>
+```
+
+## Examples
+
+```bash
+# View the schema for the createDatabase operation
+pgbeam api schema createDatabase
+# POST /v1/databases
+#
+# Request body:
+#   name         string   required
+#   project_id   string   required
+#   region       string   optional (default: us-east-1)
+#
+# Response (201):
+#   id           string
+#   name         string
+#   project_id   string
+#   region       string
+#   created_at   string (ISO 8601)
+
+# View the schema for the getProject operation
+pgbeam api schema getProject
+```

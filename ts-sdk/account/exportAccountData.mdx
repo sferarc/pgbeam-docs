@@ -1,0 +1,43 @@
+---
+title: exportAccountData
+description: Export account data
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns all personal data associated with the authenticated user in a structured JSON format. Supports GDPR data portability and CCPA right to know. Audit logs are limited to the most recent 1000 entries.
+
+## Usage
+
+```typescript
+const result = await api.account.exportAccountData();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<AccountExport>` — account data export.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.account.exportAccountData();
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

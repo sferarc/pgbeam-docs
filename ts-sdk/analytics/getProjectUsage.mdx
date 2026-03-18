@@ -1,0 +1,54 @@
+---
+title: getProjectUsage
+description: Get project usage
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns daily usage data for a specific project, broken down by region.
+
+## Usage
+
+```typescript
+const result = await api.analytics.getProjectUsage({
+    pathParams: { project_id: "prj_xxx" },
+    queryParams: { start_date: "...", end_date: "..." },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.start_date | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
+| queryParams.end_date | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+
+## Response
+
+`Promise<ProjectUsageResponse>` — daily usage data by region.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.getProjectUsage({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: { start_date: "...", end_date: "..." },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

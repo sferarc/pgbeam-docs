@@ -1,0 +1,58 @@
+---
+title: ListCacheRules
+description: List cache rules
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns the cache rules for a database, showing all observed query
+shapes with their stats and cache recommendations.
+
+
+## Usage
+
+```go
+result, err := client.Projects.ListCacheRules(ctx, nil)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| params | `*pgbeam.ListCacheRulesParams` | No | Query parameters |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
+
+## Response
+
+`(*pgbeam.ListCacheRulesResponse, error)` — cache rule entries.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.ListCacheRules(ctx, &pgbeam.ListCacheRulesParams{
+    PageSize: 20,
+    PageToken: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

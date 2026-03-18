@@ -1,0 +1,24 @@
+---
+title: replicas delete
+description: Remove a read replica.
+---
+
+Remove a read replica from a database.
+
+## Usage
+
+```bash
+pgbeam replicas delete <replica-id>
+```
+
+Alias: `pgbeam replicas rm`
+
+## Examples
+
+```bash
+# Remove a replica by ID
+pgbeam replicas delete rep_xyz789
+
+# Using the alias
+pgbeam replicas rm rep_xyz789
+```

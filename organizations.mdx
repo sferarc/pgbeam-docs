@@ -1,0 +1,186 @@
+---
+title: Organizations
+icon: Building2
+description: Manage teams, invite members, assign roles, and control access across projects.
+---
+
+Organizations are the top-level container in PgBeam. Every project, database,
+billing subscription, and usage quota belongs to an organization. Team members
+access shared resources through their organization membership.
+
+## How organizations work
+
+When you sign up, PgBeam creates a default organization for you. You can create
+additional organizations to separate workloads — for example, one for production
+and one for staging, or separate organizations for different clients.
+
+Each organization has:
+
+- A **slug** that appears in dashboard URLs (e.g., `dash.pgbeam.com/my-team/projects`). The slug is set at creation and cannot be changed.
+- A **billing subscription** — each organization has its own plan, payment method, and invoice history.
+- **Shared quotas** — all projects within the organization share the same query, connection, and data transfer limits.
+
+## Create an organization
+
+<Tabs items={["Dashboard", "CLI"]}>
+<Tab value="Dashboard">
+Click the organization switcher in the top navigation bar and select
+**Create Organization**. Enter a name and slug.
+</Tab>
+<Tab value="CLI">
+```bash
+pgbeam orgs create --name "My Team" --slug my-team
+```
+</Tab>
+</Tabs>
+
+## Invite members
+
+<Steps>
+<Step>
+
+### Open member settings
+
+Go to **Settings > Members** in the dashboard.
+
+</Step>
+<Step>
+
+### Send an invitation
+
+Click **Invite**, enter the recipient's email address, and select a role. The
+invited user receives an email with a link to accept and join the organization.
+
+</Step>
+<Step>
+
+### Manage pending invitations
+
+Pending invitations appear in the Members list. You can resend or revoke an
+invitation at any time before it is accepted.
+
+</Step>
+</Steps>
+
+## Roles and permissions
+
+PgBeam uses three roles with progressively broader access:
+
+| Role       | Projects & databases | Members | Billing & plan | Delete org |
+| ---------- | -------------------- | ------- | -------------- | ---------- |
+| **Member** | View and use         | —       | —              | —          |
+| **Admin**  | Full CRUD            | Invite and remove (except owners) | View | — |
+| **Owner**  | Full CRUD            | Full control | Full control | Yes |
+
+<Callout type="info">
+Every organization must have at least one owner. The last owner cannot be
+removed or downgraded — transfer ownership to another member first.
+</Callout>
+
+### When to use each role
+
+| Scenario | Recommended role |
+| --- | --- |
+| Developer who needs to query through PgBeam and view dashboards | Member |
+| Team lead who manages project configuration and invites teammates | Admin |
+| Engineering manager or account holder who controls billing | Owner |
+
+## Team seats
+
+Each plan includes a set number of team seats. Additional seats can be added at
+$10/month each.
+
+| Plan    | Included seats | Max with add-ons |
+| ------- | -------------- | ---------------- |
+| Starter | 1              | Unlimited        |
+| Pro     | 3              | Unlimited        |
+| Scale   | 5              | Unlimited        |
+
+<Callout type="info">
+Additional seats are billed immediately and prorated for the current billing
+period. Removing a seat takes effect at the end of the billing period.
+</Callout>
+
+## Shared quotas
+
+All projects within an organization share the organization's plan quota. There
+are no per-project sub-limits — usage from every project counts toward the same
+pool.
+
+| Quota             | What it covers                                     |
+| ----------------- | -------------------------------------------------- |
+| **Queries/day**   | Total queries across all projects, reset at midnight UTC |
+| **Data transfer** | Total bytes transferred per billing month          |
+| **Connections**   | Total concurrent connections across all projects   |
+| **Projects**      | Maximum number of projects in the organization     |
+| **Databases**     | Maximum number of database registrations           |
+| **Query shapes**  | Maximum number of distinct query fingerprints tracked |
+
+Monitor usage from **Settings > Billing** in the dashboard, or
+programmatically:
+
+<Tabs items={["CLI", "API"]}>
+<Tab value="CLI">
+```bash
+pgbeam orgs usage
+```
+</Tab>
+<Tab value="API">
+```bash
+curl -H "Authorization: Bearer pbo_..." \
+  https://api.pgbeam.com/v1/organizations/{orgId}/usage
+```
+</Tab>
+</Tabs>
+
+## Switch organizations
+
+If you belong to multiple organizations, switch between them in the dashboard
+using the organization switcher in the top navigation bar.
+
+In the CLI:
+
+```bash
+# List your organizations
+pgbeam orgs list
+
+# Switch active organization
+pgbeam orgs switch <org-slug>
+
+# Check which organization is active
+pgbeam auth whoami
+```
+
+## Transfer ownership
+
+To transfer ownership of an organization:
+
+1. Ensure the target member already belongs to the organization
+2. Go to **Settings > Members** and change their role to **Owner**
+3. Optionally downgrade your own role to Admin or Member
+
+<Callout type="warn">
+Ownership transfers are immediate. The new owner gains full control over
+billing, plan changes, and the ability to delete the organization.
+</Callout>
+
+## Delete an organization
+
+Only owners can delete an organization. Deleting an organization:
+
+- Terminates all active connections immediately
+- Cancels the billing subscription
+- Removes all projects, databases, cache rules, and custom domains
+- Revokes all organization API keys
+- Removes all member associations
+
+<Callout type="warn" title="This action is permanent">
+Organization deletion cannot be undone. Export any configuration or data you
+need before proceeding.
+</Callout>
+
+## Further reading
+
+- [Plans & Limits](/docs/plans) — Quota details and overage billing for each tier
+- [API Keys](/docs/api-keys) — Organization-scoped keys for CI/CD and automation
+- [SSO](/docs/sso) — Enterprise single sign-on for organization authentication

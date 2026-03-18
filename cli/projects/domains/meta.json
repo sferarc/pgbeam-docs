@@ -1,0 +1,4 @@
+{
+	"defaultOpen": false, "title": "domains",
+	"pages": ["add", "list", "verify", "delete"]
+}

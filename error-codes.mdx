@@ -1,0 +1,218 @@
+---
+title: Error Codes
+icon: TriangleAlert
+description: SQLSTATE error codes returned by PgBeam, what causes them, and how to resolve each one.
+---
+
+PgBeam returns standard PostgreSQL SQLSTATE error codes. This reference covers
+every PgBeam-specific error, what triggers it, and how to fix it.
+
+## Quick reference
+
+| SQLSTATE | Situation                 | Message                                                  |
+| -------- | ------------------------- | -------------------------------------------------------- |
+| `08004`  | Unknown project           | `project not found for hostname ...`                     |
+| `08004`  | Organization suspended    | `organization suspended — update payment at dash.pgbeam.com` |
+| `08004`  | Auth rate limited         | `too many authentication attempts`                       |
+| `08006`  | Upstream auth failure     | Forwarded from upstream                                  |
+| `08006`  | Circuit breaker open      | `upstream unavailable (circuit breaker open)`            |
+| `53300`  | Connection limit exceeded | `too many connections for project`                       |
+| `53400`  | Query rate limit exceeded | `query rate limit exceeded`                              |
+
+## `08004` — Connection rejected
+
+SQLSTATE `08004` means PgBeam rejected the connection before it reached the
+upstream database. The three causes are distinct:
+
+### Project not found
+
+```
+FATAL: project not found for hostname "xyz.aws.pgbeam.app"
+```
+
+**Cause:** The hostname in the connection string does not match any project.
+This usually means a typo in the hostname or a deleted project.
+
+**Fix:**
+1. Verify the hostname in your `DATABASE_URL` matches the project hostname shown in the dashboard
+2. Check that the project has not been deleted
+3. If using a custom domain, confirm the domain is verified — see [Custom Domains](/docs/custom-domains)
+
+### Organization suspended
+
+```
+FATAL: organization suspended — update payment at dash.pgbeam.com
+```
+
+**Cause:** The organization's billing is inactive. This happens when a payment
+fails, the trial expires without a payment method on file, or an owner manually
+cancels the subscription.
+
+**Fix:**
+1. Log in to [dash.pgbeam.com](https://dash.pgbeam.com) and go to **Settings > Billing**
+2. Update the payment method or reactivate the subscription
+3. Connections resume immediately after billing is restored
+
+### Auth rate limited
+
+```
+FATAL: too many authentication attempts
+```
+
+**Cause:** Too many failed authentication attempts from the same IP address
+in a short period. PgBeam rate-limits auth attempts per IP to protect the
+upstream database from brute-force attacks.
+
+**Fix:**
+1. Verify your credentials are correct by connecting directly to the origin database
+2. Wait for the rate limit window to expire (typically a few minutes)
+3. If the issue persists, check for misconfigured clients that are retrying with wrong credentials in a loop
+
+## `08006` — Connection failure
+
+SQLSTATE `08006` means PgBeam accepted the connection but could not complete the
+upstream handshake.
+
+### Upstream auth failure
+
+```
+FATAL: password authentication failed for user "myuser"
+```
+
+**Cause:** The credentials were forwarded to the origin database and it rejected
+them. PgBeam passes this error through as-is.
+
+**Fix:**
+1. Connect directly to the origin database with the same username and password to confirm they work
+2. Verify the database name in the PgBeam project configuration matches the actual database
+3. Check that the user has `CONNECT` permission on the database
+4. If the origin uses `pg_hba.conf` rules, confirm the PgBeam IP range is allowed
+
+### Circuit breaker open
+
+```
+FATAL: upstream unavailable (circuit breaker open)
+```
+
+**Cause:** The origin database failed 3 consecutive connection attempts. PgBeam
+opens a circuit breaker to stop sending traffic to an unhealthy upstream. The
+breaker probes for recovery every 5 seconds, backing off exponentially up to 60
+seconds.
+
+**Fix:**
+1. Check the health of your origin database — can you connect to it directly?
+2. Verify network connectivity between PgBeam and the origin (firewall rules, security groups, IP allowlists)
+3. Check if the origin has hit its own connection limit (`max_connections` in PostgreSQL)
+4. Wait for the circuit breaker to probe and recover automatically, or restart the origin database if it is down
+
+See [Resilience](/docs/resilience) for details on circuit breaker behavior.
+
+## `53300` — Too many connections
+
+```
+FATAL: too many connections for project
+```
+
+**Cause:** The project has reached its concurrent connection limit. Each plan
+tier has a maximum number of simultaneous connections:
+
+| Plan    | Connection limit |
+| ------- | ---------------- |
+| Starter | 20               |
+| Pro     | 100              |
+| Scale   | 500              |
+
+**Fix:**
+1. **Reduce client-side pool size.** If you are running multiple application instances, each with a pool of 20 connections, they add up quickly. With PgBeam handling upstream pooling, a client-side pool of 3-5 per instance is usually sufficient.
+2. **Switch to transaction pool mode.** Session mode (the default) holds an upstream connection for the entire client session. Transaction mode releases it after each transaction, dramatically improving connection reuse. See [Connection Pooling](/docs/pooling).
+3. **Close idle connections.** Check for long-lived idle connections from monitoring tools, migration scripts, or dev environments that hold connections open unnecessarily.
+4. **Upgrade your plan** if the workload has genuinely outgrown the current tier.
+
+## `53400` — Query rate limit exceeded
+
+```
+FATAL: query rate limit exceeded
+```
+
+**Cause:** The project exceeded its queries-per-second (QPS) limit:
+
+| Plan    | QPS limit |
+| ------- | --------- |
+| Starter | 20        |
+| Pro     | 100       |
+| Scale   | 1,000     |
+
+**Fix:**
+1. **Enable caching** for frequently repeated reads. Cached queries do not count against the QPS limit at the upstream. See [Caching](/docs/cache).
+2. **Reduce query frequency.** Batch reads where possible, or add application-level deduplication for concurrent identical queries.
+3. **Upgrade your plan** for a higher QPS allowance.
+
+## Handling errors in application code
+
+Most PostgreSQL drivers expose the SQLSTATE code programmatically. Use it to
+distinguish PgBeam-specific errors from upstream database errors:
+
+<Tabs items={["Node.js (pg)", "Python (psycopg)", "Go (pgx)", "Java (JDBC)"]}>
+<Tab value="Node.js (pg)">
+```ts
+try {
+  await pool.query("SELECT 1");
+} catch (err) {
+  if (err.code === "53400") {
+    // Rate limited — back off and retry
+  } else if (err.code === "53300") {
+    // Too many connections — reduce pool size
+  }
+}
+```
+</Tab>
+<Tab value="Python (psycopg)">
+```python
+import psycopg
+
+try:
+    cur.execute("SELECT 1")
+except psycopg.errors.TooManyConnections:
+    # SQLSTATE 53300
+    pass
+except psycopg.errors.ConfigurationLimitExceeded:
+    # SQLSTATE 53400
+    pass
+```
+</Tab>
+<Tab value="Go (pgx)">
+```go
+_, err := pool.Exec(ctx, "SELECT 1")
+if err != nil {
+    var pgErr *pgconn.PgError
+    if errors.As(err, &pgErr) {
+        switch pgErr.Code {
+        case "53400":
+            // Rate limited
+        case "53300":
+            // Connection limit
+        }
+    }
+}
+```
+</Tab>
+<Tab value="Java (JDBC)">
+```java
+try {
+    stmt.execute("SELECT 1");
+} catch (SQLException e) {
+    if ("53400".equals(e.getSQLState())) {
+        // Rate limited
+    } else if ("53300".equals(e.getSQLState())) {
+        // Connection limit
+    }
+}
+```
+</Tab>
+</Tabs>
+
+## Further reading
+
+- [Troubleshooting](/docs/troubleshooting) — Step-by-step debug workflows for common failures
+- [Resilience](/docs/resilience) — Circuit breaker states, scale-to-zero, and recovery behavior
+- [Plans & Limits](/docs/plans) — Connection, QPS, and query quotas per plan tier

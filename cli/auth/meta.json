@@ -1,0 +1,6 @@
+{
+	"defaultOpen": false,
+	"title": "auth",
+	"icon": "KeyRound",
+	"pages": ["login", "logout", "status", "list", "switch", "whoami"]
+}

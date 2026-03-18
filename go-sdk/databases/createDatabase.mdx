@@ -1,0 +1,75 @@
+---
+title: CreateDatabase
+description: Add a database
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Registers a new upstream PostgreSQL database for the project.
+
+## Usage
+
+```go
+result, err := client.Databases.CreateDatabase(ctx, &pgbeam.CreateDatabaseRequest{
+    Host: "...",
+    Port: 5432,
+    Name: "...",
+    Username: "...",
+    Password: "...",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.CreateDatabaseRequest` | Yes | Request body |
+| req.Host | `string` | Yes | PostgreSQL host. |
+| req.Port | `int` | Yes | PostgreSQL port. |
+| req.Name | `string` | Yes | PostgreSQL database name. |
+| req.Username | `string` | Yes | PostgreSQL username. |
+| req.Password | `string` | Yes | PostgreSQL password. Stored encrypted at rest. |
+| req.SSLMode | `*pgbeam.SSLMode` | No |  |
+| req.Role | `*pgbeam.DatabaseRole` | No |  |
+| req.PoolRegion | `*string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
+ |
+| req.CacheConfig | `*pgbeam.CacheConfig` | No |  |
+| req.PoolConfig | `*pgbeam.PoolConfig` | No |  |
+
+## Response
+
+`(*pgbeam.Database, error)` — database created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Databases.CreateDatabase(ctx, &pgbeam.CreateDatabaseRequest{
+    Host: "...",
+    Port: 5432,
+    Name: "...",
+    Username: "...",
+    Password: "...",
+    SSLMode: pgbeam.SSLMode{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

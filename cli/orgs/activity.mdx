@@ -1,0 +1,22 @@
+---
+title: orgs activity
+description: Show organization activity feed.
+---
+
+Show the recent activity feed for the active organization, including member actions and configuration changes.
+
+## Usage
+
+```bash
+pgbeam orgs activity
+```
+
+## Examples
+
+```bash
+pgbeam orgs activity
+# TIMESTAMP              USER                ACTION
+# 2026-03-12 14:32:01    user@example.com    Created database "prod-db"
+# 2026-03-12 10:15:44    admin@example.com   Added domain "db.example.com"
+# 2026-03-11 09:02:17    user@example.com    Enabled caching for query a1b2c3d4
+```

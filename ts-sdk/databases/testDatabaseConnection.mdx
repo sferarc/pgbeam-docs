@@ -1,0 +1,45 @@
+---
+title: testDatabaseConnection
+description: Test database connection
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Attempts to connect to the upstream database using the stored credentials and returns the result.
+
+## Usage
+
+```typescript
+const result = await api.databases.testDatabaseConnection();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<TestConnectionResult>` — connection test result.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.databases.testDatabaseConnection();
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

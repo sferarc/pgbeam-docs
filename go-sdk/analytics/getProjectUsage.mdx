@@ -1,0 +1,59 @@
+---
+title: GetProjectUsage
+description: Get project usage
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns daily usage data for a specific project, broken down by region.
+
+## Usage
+
+```go
+result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
+    StartDate: "...",
+    EndDate: "...",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params | `*pgbeam.GetProjectUsageParams` | Yes | Query parameters |
+| params.StartDate | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
+| params.EndDate | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+
+## Response
+
+`(*pgbeam.ProjectUsageResponse, error)` — daily usage data by region.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
+    StartDate: "...",
+    EndDate: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

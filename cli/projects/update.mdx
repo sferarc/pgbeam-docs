@@ -1,0 +1,29 @@
+---
+title: projects update
+description: Update project configuration.
+---
+
+Update project configuration.
+
+## Usage
+
+```bash
+pgbeam projects update <project-id> [flags]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--name <name>` | New project name |
+| `--json` | Output as JSON |
+
+## Examples
+
+```bash
+# Rename a project
+pgbeam projects update prj_abc123 --name new-name
+
+# Rename and output as JSON
+pgbeam projects update prj_abc123 --name new-name --json
+```

@@ -1,0 +1,71 @@
+---
+title: UpdateDatabase
+description: Update a database
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Partially updates a database connection. Only provided fields are modified.
+
+## Usage
+
+```go
+result, err := client.Databases.UpdateDatabase(ctx, &pgbeam.UpdateDatabaseRequest{
+
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.UpdateDatabaseRequest` | Yes | Request body |
+| req.Host | `*string` | No | Updated PostgreSQL host. |
+| req.Port | `*int` | No | Updated PostgreSQL port. |
+| req.Name | `*string` | No | Updated PostgreSQL database name. |
+| req.Username | `*string` | No | Updated PostgreSQL username. |
+| req.Password | `*string` | No | Updated PostgreSQL password. |
+| req.SSLMode | `*pgbeam.SSLMode` | No |  |
+| req.Role | `*pgbeam.DatabaseRole` | No |  |
+| req.PoolRegion | `*string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
+ |
+| req.CacheConfig | `*pgbeam.CacheConfig` | No |  |
+| req.PoolConfig | `*pgbeam.PoolConfig` | No |  |
+
+## Response
+
+`(*pgbeam.Database, error)` — database updated.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Databases.UpdateDatabase(ctx, &pgbeam.UpdateDatabaseRequest{
+    Host: "...",
+    Port: 5432,
+    Name: "...",
+    Username: "...",
+    Password: "...",
+    SSLMode: pgbeam.SSLMode{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

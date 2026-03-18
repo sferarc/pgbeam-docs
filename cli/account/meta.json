@@ -1,0 +1,6 @@
+{
+	"defaultOpen": false,
+	"title": "account",
+	"icon": "CircleUser",
+	"pages": ["export"]
+}

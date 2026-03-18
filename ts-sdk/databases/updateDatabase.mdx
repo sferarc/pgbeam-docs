@@ -1,0 +1,65 @@
+---
+title: updateDatabase
+description: Update a database
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Partially updates a database connection. Only provided fields are modified.
+
+## Usage
+
+```typescript
+const result = await api.databases.updateDatabase({
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.host | `string` | No | Updated PostgreSQL host. |
+| body.port | `number` | No | Updated PostgreSQL port. |
+| body.name | `string` | No | Updated PostgreSQL database name. |
+| body.username | `string` | No | Updated PostgreSQL username. |
+| body.password | `string` | No | Updated PostgreSQL password. |
+| body.ssl_mode | `SSLMode` | No |  |
+| body.role | `DatabaseRole` | No |  |
+| body.pool_region | `string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
+ |
+| body.cache_config | `CacheConfig` | No |  |
+| body.pool_config | `PoolConfig` | No |  |
+
+## Response
+
+`Promise<Database>` — database updated.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.databases.updateDatabase({
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

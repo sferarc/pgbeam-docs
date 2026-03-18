@@ -1,0 +1,59 @@
+---
+title: GetOrganizationUsage
+description: Get organization usage
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns daily usage data aggregated across all projects in the organization.
+
+## Usage
+
+```go
+result, err := client.Analytics.GetOrganizationUsage(ctx, "org_xxx", &pgbeam.GetOrganizationUsageParams{
+    StartDate: "...",
+    EndDate: "...",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| params | `*pgbeam.GetOrganizationUsageParams` | Yes | Query parameters |
+| params.StartDate | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
+| params.EndDate | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+
+## Response
+
+`(*pgbeam.UsageResponse, error)` — daily usage data.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Analytics.GetOrganizationUsage(ctx, "org_xxx", &pgbeam.GetOrganizationUsageParams{
+    StartDate: "...",
+    EndDate: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

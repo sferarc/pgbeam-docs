@@ -1,0 +1,29 @@
+---
+title: auth login
+description: Authenticate with PgBeam via API key or browser-based OAuth.
+---
+
+Authenticate with PgBeam via API key or browser-based OAuth.
+
+## Usage
+
+```bash
+pgbeam auth login [--api-key] [--profile <name>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--api-key` | Authenticate with an API key instead of browser-based OAuth |
+| `--profile` | Save credentials to a named profile |
+
+## Examples
+
+```bash
+# Interactive browser login
+pgbeam auth login
+
+# API key with named profile
+pgbeam auth login --api-key --profile production
+```

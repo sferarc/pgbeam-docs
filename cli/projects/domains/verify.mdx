@@ -1,0 +1,21 @@
+---
+title: domains verify
+description: Verify domain DNS records and provision TLS certificate.
+---
+
+Verify that DNS records are configured correctly for a custom domain and provision a TLS certificate.
+
+## Usage
+
+```bash
+pgbeam domains verify <domain>
+```
+
+## Examples
+
+```bash
+# Verify a domain after configuring DNS
+pgbeam domains verify db.example.com
+# ✓ DNS records verified
+# ✓ TLS certificate provisioned
+```

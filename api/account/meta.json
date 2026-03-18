@@ -1,0 +1,6 @@
+{
+	"defaultOpen": false,
+	"title": "Account",
+	"icon": "CircleUser",
+	"pages": ["..."]
+}

@@ -1,0 +1,175 @@
+---
+title: Resilience
+icon: ShieldCheck
+description:
+  How PgBeam keeps database connections reliable with circuit breakers,
+  scale-to-zero, health checks, fail-open caching, and upstream TLS.
+---
+
+PgBeam is designed to keep your application connected even when things go wrong
+upstream. Every resilience feature is automatic — there is nothing to configure
+or enable.
+
+## Circuit breaker
+
+Each project maintains a per-upstream circuit breaker that protects a failing
+database from being overwhelmed with connection attempts.
+
+### States
+
+| State         | Behavior                                                                    |
+| ------------- | --------------------------------------------------------------------------- |
+| **Closed**    | Normal operation. All connections flow to the upstream database.            |
+| **Open**      | Triggered after 3 consecutive connection failures. New connections are rejected with SQLSTATE `08006`. |
+| **Half-open** | After a cooldown period, PgBeam sends a single probe connection to test recovery. |
+
+### Recovery flow
+
+```
+Closed  ──3 failures──▶  Open  ──cooldown──▶  Half-open
+  ▲                                              │
+  │              probe succeeds                  │
+  └──────────────────────────────────────────────┘
+                         │
+                    probe fails
+                         │
+                         ▼
+                        Open (longer cooldown)
+```
+
+The initial cooldown is 5 seconds. Each failed probe doubles the cooldown, up
+to a maximum of 60 seconds. A successful probe immediately closes the circuit
+and restores normal traffic.
+
+### What your application sees
+
+When the circuit is open, PgBeam returns:
+
+```
+FATAL: upstream unavailable (circuit breaker open)
+SQLSTATE: 08006
+```
+
+Your application should treat this as a transient failure and retry with
+backoff. See [Error Codes](/docs/error-codes) for handling guidance.
+
+### Why circuit breakers matter
+
+Without a circuit breaker, a failing database receives a flood of connection
+attempts from every client. This makes recovery harder — the database has to
+handle both its existing problem and a thundering herd of reconnections. The
+circuit breaker gives the upstream breathing room to recover.
+
+## Scale-to-zero
+
+Projects with no active connections for 5 minutes enter a **parked** state.
+This is transparent to your application — the first new connection triggers a
+cold start that re-initializes the project.
+
+### What gets suspended
+
+| Resource          | Parked behavior                    |
+| ----------------- | ---------------------------------- |
+| Connection pools  | Drained and released               |
+| Health checks     | Paused                             |
+| Rate limiters     | Reset                              |
+| Cache entries     | Local cache evicted; shared regional cache retained |
+| Project config    | Stays in memory for fast resume    |
+
+### Cold start latency
+
+The cold start adds latency to the first connection. It includes:
+
+1. Re-initializing the connection pool
+2. Dialing the first upstream connection
+3. Resuming health checks
+
+Subsequent connections within the same session are unaffected.
+
+<Callout type="info">
+Scale-to-zero only applies to the data plane resources. Your project
+configuration, databases, cache rules, and settings remain intact in the
+control plane at all times.
+</Callout>
+
+## Health checks
+
+PgBeam runs background health checks against every configured upstream database
+and read replica. Health checks are separate from application traffic — they run
+on their own schedule regardless of query volume.
+
+### Upstream database health
+
+The data plane periodically dials a TCP connection to the upstream database to
+confirm it is reachable. If the check fails, PgBeam marks the upstream as
+degraded and may open the circuit breaker after repeated failures.
+
+### Replica health
+
+Read replicas are checked independently. An unhealthy replica is removed from
+the round-robin rotation automatically. When it recovers, it is re-added
+without manual intervention.
+
+| Event              | Action                                      |
+| ------------------ | ------------------------------------------- |
+| Replica check fails | Removed from rotation. Traffic goes to remaining healthy replicas or falls back to primary. |
+| Replica recovers    | Re-added to rotation after consecutive successful checks. |
+| All replicas fail   | Annotated replica queries fall back to the primary database. |
+
+## Fail-open caching
+
+PgBeam's caching layer is designed to degrade gracefully. If the cache
+infrastructure has issues, queries fall through to the upstream database instead
+of failing.
+
+| Cache layer    | Scope              | Failure behavior                          |
+| -------------- | ------------------ | ----------------------------------------- |
+| **L1**         | Per-process        | Process-local; failure is extremely rare   |
+| **L2**         | Shared per region  | On failure, queries bypass L2 and go to upstream |
+
+This means a shared cache outage results in higher upstream load (cache misses)
+but never in dropped queries. Your application continues to work — it just
+loses the caching benefit temporarily.
+
+## Upstream TLS and SNI
+
+PgBeam connects to upstream databases over TLS and sets the TLS server name
+(SNI) to the upstream hostname. This is required for managed database providers
+that use SNI-based routing to identify the correct tenant:
+
+- **Neon** — Uses SNI to route to the correct compute endpoint
+- **Supabase** — Uses SNI for project-level routing
+- **PlanetScale** (MySQL proxy) — Similar SNI routing pattern
+
+The default SSL mode is `verify-full`, which validates the upstream certificate
+against the system CA bundle. Only relax this if your provider does not issue
+certificates from a publicly trusted CA.
+
+## Connection reset
+
+When a connection is returned to the pool and PgBeam detects that session state
+was modified (via `SET`, `PREPARE`, `CREATE TEMP TABLE`, etc.), it sends
+`DISCARD ALL` to reset all session state:
+
+- Session variables (`SET` parameters)
+- Prepared statements
+- Temporary tables
+- Advisory locks
+- Notification listeners
+
+Connections in an error state or mid-transaction are closed instead of being
+returned to the pool. This prevents a broken connection from being handed to the
+next client.
+
+## What PgBeam does not do
+
+To set expectations clearly:
+
+- **No automatic failover between primary databases.** PgBeam proxies to the
+  upstream you configure. If you need primary failover, configure it at the
+  database level (RDS Multi-AZ, Cloud SQL HA, etc.) and point PgBeam at the
+  failover endpoint.
+- **No cross-region cache replication.** Each region maintains its own cache.
+  This is deliberate — cross-region coherence would add latency to every read.
+- **No query rewriting or retry.** If a query fails at the upstream, PgBeam
+  returns the error to the client as-is. It does not retry failed queries.

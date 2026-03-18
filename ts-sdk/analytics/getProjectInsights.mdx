@@ -1,0 +1,55 @@
+---
+title: getProjectInsights
+description: Get query insights for a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns aggregated query-level analytics for a project including top queries
+by count, cache hit/miss summary, and latency statistics.
+
+
+## Usage
+
+```typescript
+const result = await api.analytics.getProjectInsights({
+    pathParams: { project_id: "prj_xxx" },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.range | `"1h" \| "6h" \| "24h" \| "7d"` | No | Time range to query. Defaults to 24h. |
+| queryParams.limit | `number` | No | Maximum number of top queries to return (1-100). |
+
+## Response
+
+`Promise<ProjectInsights>` — query insights for the project.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.getProjectInsights({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: { range: "...", limit: 20 },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

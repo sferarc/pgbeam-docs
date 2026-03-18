@@ -1,0 +1,61 @@
+---
+title: CreateReplica
+description: Add a replica
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Adds a read replica to a database.
+
+## Usage
+
+```go
+result, err := client.Projects.CreateReplica(ctx, &pgbeam.CreateReplicaRequest{
+    Host: "...",
+    Port: 5432,
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.CreateReplicaRequest` | Yes | Request body |
+| req.Host | `string` | Yes | PostgreSQL replica host. |
+| req.Port | `int` | Yes | PostgreSQL replica port. |
+| req.SSLMode | `*pgbeam.SSLMode` | No |  |
+
+## Response
+
+`(*pgbeam.Replica, error)` — replica created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.CreateReplica(ctx, &pgbeam.CreateReplicaRequest{
+    Host: "...",
+    Port: 5432,
+    SSLMode: pgbeam.SSLMode{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

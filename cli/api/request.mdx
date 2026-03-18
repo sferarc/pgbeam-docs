@@ -1,0 +1,31 @@
+---
+title: api request
+description: Make a direct API request.
+---
+
+Make a direct API request to the PgBeam API. Authentication is handled automatically using the active profile.
+
+## Usage
+
+```bash
+pgbeam api request <method> <path> [--data <json>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--data` | Request body as JSON |
+
+## Examples
+
+```bash
+# List all projects
+pgbeam api request GET /v1/projects
+
+# Create a database
+pgbeam api request POST /v1/databases --data '{"name": "my-db", "project_id": "proj_abc123"}'
+
+# Delete a project
+pgbeam api request DELETE /v1/projects/proj_abc123
+```

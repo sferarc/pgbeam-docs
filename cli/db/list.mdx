@@ -1,0 +1,36 @@
+---
+title: db list
+description: List all databases in the linked project.
+---
+
+List all databases in the linked project.
+
+## Usage
+
+```bash
+pgbeam db list [flags]
+```
+
+## Aliases
+
+`pgbeam db ls`
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--json` | Output as JSON |
+| `--project` | Project ID to list databases for |
+
+## Examples
+
+```bash
+# List databases for the linked project
+pgbeam db list
+
+# JSON output
+pgbeam db ls --json
+
+# List databases for a specific project
+pgbeam db list --project proj_abc123
+```

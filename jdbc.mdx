@@ -1,0 +1,221 @@
+---
+title: JDBC
+icon: Coffee
+tag: Java
+description:
+  Connect Java applications to PgBeam using JDBC, HikariCP, and Spring Boot for
+  connection pooling, caching, and global routing.
+---
+
+Connect your Java application to PgBeam by updating the JDBC connection URL.
+This guide covers plain JDBC, HikariCP connection pooling, and Spring Boot
+configuration.
+
+## Setup
+
+<Tabs items={["Plain JDBC", "HikariCP", "Spring Boot"]}>
+<Tab value="Plain JDBC">
+```java title="Application.java"
+String url = "jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb";
+String user = "user";
+String password = "pass";
+
+Connection conn = DriverManager.getConnection(url, user, password);
+
+// Test the connection
+ResultSet rs = conn.createStatement().executeQuery("SELECT 'hello from pgbeam'");
+rs.next();
+System.out.println(rs.getString(1));
+```
+</Tab>
+<Tab value="HikariCP">
+```java title="DatabaseConfig.java"
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
+config.setUsername("user");
+config.setPassword("pass");
+config.setMaximumPoolSize(5); // PgBeam handles upstream pooling
+
+HikariDataSource ds = new HikariDataSource(config);
+```
+</Tab>
+<Tab value="Spring Boot">
+```properties title="application.properties"
+spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb
+spring.datasource.username=user
+spring.datasource.password=pass
+spring.datasource.hikari.maximum-pool-size=5
+```
+</Tab>
+</Tabs>
+
+## Connection pool sizing
+
+PgBeam manages upstream connection pooling, so keep HikariCP's pool small:
+
+| Deployment type            | Recommended `maximumPoolSize` |
+| -------------------------- | ----------------------------- |
+| Single instance            | 5-10                          |
+| Multiple instances behind LB | 3-5 per instance            |
+| Batch processing           | 2-5                           |
+
+<Callout type="info">
+The default HikariCP pool size is 10, which is already reasonable with PgBeam.
+For deployments with many instances, reduce to 3-5 per instance to avoid
+hitting PgBeam's connection limit.
+</Callout>
+
+### HikariCP recommended settings
+
+```java title="Optimized HikariCP config"
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
+config.setUsername("user");
+config.setPassword("pass");
+
+// Pool sizing
+config.setMaximumPoolSize(5);
+config.setMinimumIdle(1);
+
+// Timeouts
+config.setConnectionTimeout(5000);    // 5s to acquire a connection
+config.setIdleTimeout(300000);        // 5min before idle connections are closed
+config.setMaxLifetime(600000);        // 10min max connection lifetime
+
+HikariDataSource ds = new HikariDataSource(config);
+```
+
+## SSL / TLS
+
+The PostgreSQL JDBC driver connects to PgBeam over TLS. PgBeam's certificate is
+publicly trusted and works with all standard Java TLS configurations.
+
+To explicitly enable SSL:
+
+```
+jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb?ssl=true&sslmode=require
+```
+
+For Spring Boot:
+
+```properties title="application.properties"
+spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb?ssl=true&sslmode=require
+```
+
+## Caching
+
+### Automatic caching via cache rules
+
+For JPA/Hibernate queries and Spring Data repositories, PgBeam automatically
+tracks the generated SQL shapes. Enable caching for specific shapes through
+[Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+
+### SQL annotations for fine-grained control
+
+```java title="Cache control with JDBC"
+Statement stmt = conn.createStatement();
+
+// Cache for 5 minutes
+ResultSet rs = stmt.executeQuery(
+    "/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories");
+
+// Disable caching for a specific query
+rs = stmt.executeQuery(
+    "/* @pgbeam:cache noCache */ SELECT balance FROM accounts WHERE id = 42");
+```
+
+With Spring's `JdbcTemplate`:
+
+```java title="Cache control with JdbcTemplate"
+// Cache for 5 minutes
+List<Category> categories = jdbcTemplate.query(
+    "/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories",
+    categoryRowMapper);
+```
+
+## Read replicas
+
+Route read queries to replicas using the `/* @pgbeam:replica */` annotation:
+
+```java title="Replica routing with JDBC"
+// Route to a read replica
+ResultSet rs = stmt.executeQuery(
+    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true");
+
+// Combine replica routing with caching
+rs = stmt.executeQuery(
+    "/* @pgbeam:replica */ /* @pgbeam:cache maxAge=300 */ SELECT * FROM products");
+```
+
+See [Read Replicas](/docs/replicas) for replica setup and routing details.
+
+## Error handling
+
+JDBC exposes PostgreSQL SQLSTATE codes through `SQLException.getSQLState()`:
+
+```java title="Handling PgBeam errors"
+try {
+    stmt.execute("SELECT 1");
+} catch (SQLException e) {
+    switch (e.getSQLState()) {
+        case "53400":
+            // Query rate limit exceeded — back off and retry
+            break;
+        case "53300":
+            // Connection limit exceeded — reduce pool size
+            break;
+        case "08006":
+            // Upstream unavailable (circuit breaker) — retry with backoff
+            break;
+    }
+}
+```
+
+See [Error Codes](/docs/error-codes) for the full reference.
+
+## Migrations
+
+Run migrations directly against your origin database:
+
+```bash
+# Flyway
+flyway -url=jdbc:postgresql://db.example.com:5432/mydb \
+  -user=user -password=pass migrate
+
+# Liquibase
+liquibase --url=jdbc:postgresql://db.example.com:5432/mydb \
+  --username=user --password=pass update
+```
+
+<Callout type="warn">
+Do not run Flyway or Liquibase migrations through PgBeam. Migration tools use
+advisory locks and session-level features that should bypass the proxy.
+</Callout>
+
+## Debugging
+
+Enable debug mode to see cache and routing details:
+
+```java
+stmt.execute("SET pgbeam.debug = on");
+ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = 1");
+// Server returns NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+```
+
+To capture NOTICE messages in JDBC, register a `NoticeListener` (pgJDBC) or
+check your logging framework's PostgreSQL driver output.
+
+## Common issues
+
+| Issue                            | Cause                           | Fix                                     |
+| -------------------------------- | ------------------------------- | --------------------------------------- |
+| "too many connections"           | HikariCP pool too large         | Reduce `maximumPoolSize` to 3-5         |
+| SSL handshake errors             | Missing `ssl=true` in URL       | Add `?ssl=true&sslmode=require`         |
+| Stale data after writes          | Cache returning old results     | Use `noCache` annotation or adjust TTL  |
+| Migrations fail through PgBeam   | Advisory locks not supported    | Run migrations against origin directly  |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and lifecycle
+- [Caching](/docs/cache) — TTL, SWR, cache layers, and cache rules
+- [Error Codes](/docs/error-codes) — SQLSTATE reference for PgBeam errors

@@ -1,0 +1,57 @@
+---
+title: CreateCustomDomain
+description: Add a custom domain
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Registers a new custom domain for the project. Returns DNS verification instructions. Requires a Scale or Enterprise plan.
+
+## Usage
+
+```go
+result, err := client.Projects.CreateCustomDomain(ctx, &pgbeam.CreateCustomDomainRequest{
+    Domain: "...",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.CreateCustomDomainRequest` | Yes | Request body |
+| req.Domain | `string` | Yes | The custom domain name to add (e.g., db.example.com). |
+
+## Response
+
+`(*pgbeam.CustomDomain, error)` — custom domain created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.CreateCustomDomain(ctx, &pgbeam.CreateCustomDomainRequest{
+    Domain: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Custom domains require a Scale or Enterprise plan. |
+| 404 | Resource not found. |
+| 409 | Resource already exists or conflicts with current state. |
+| 429 | Rate limited. Try again later. |

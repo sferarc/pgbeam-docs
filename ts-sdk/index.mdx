@@ -1,0 +1,111 @@
+---
+title: Installation & Setup
+description:
+  Install the PgBeam SDK, configure the client, authenticate, and learn the two
+  access patterns.
+---
+
+## Installation
+
+<PackageInstall pkg="pgbeam" />
+
+## Client setup
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const { api } = client;
+```
+
+## Constructor options
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `token` | `string \| null \| () => Promise<string \| null>` | JWT token, API key, or async function that resolves one |
+| `baseUrl` | `string` | Base URL of the PgBeam API |
+| `fetch` | `typeof globalThis.fetch` | Optional custom fetch implementation |
+| `onResponse` | `OnResponseHook` | Optional hook called after every response |
+
+## Authentication
+
+The `token` constructor option accepts a static string, an async function, or
+an API key. Choose the approach that fits your environment.
+
+<Tabs items={["Static token", "Async token", "API key"]}>
+<Tab value="Static token">
+```typescript
+const client = new PgBeamClient({
+  token: "your-session-token",
+  baseUrl: "https://api.pgbeam.com",
+});
+```
+</Tab>
+<Tab value="Async token">
+```typescript
+const client = new PgBeamClient({
+  token: async () => {
+    // Refresh or fetch token dynamically
+    return await getToken();
+  },
+  baseUrl: "https://api.pgbeam.com",
+});
+```
+</Tab>
+<Tab value="API key">
+```typescript
+const client = new PgBeamClient({
+  token: "pbk_your_api_key",
+  baseUrl: "https://api.pgbeam.com",
+});
+```
+</Tab>
+</Tabs>
+
+See [API Keys](/docs/api-keys) for key creation and rotation.
+
+## Usage patterns
+
+The SDK supports two styles for making requests: tag-based access and
+route-based access. Both are fully type-safe.
+
+### Tag-based access
+
+Methods are grouped by tag: `projects`, `databases`, `analytics`, `platform`,
+and `account`.
+
+```typescript
+// List all projects
+const projects = await api.projects.listProjects({
+  queryParams: { org_id: "org_xxx" },
+});
+
+// Get a single database
+const db = await api.databases.getDatabase({
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
+```
+
+### Route-based access
+
+Use `api.request()` with a route string for a more REST-like style:
+
+```typescript
+const projects = await api.request("GET /v1/projects", {
+  queryParams: { org_id: "org_xxx" },
+});
+
+const project = await api.request("GET /v1/projects/{project_id}", {
+  pathParams: { project_id: "prj_xxx" },
+});
+```
+
+<Callout type="info" title="Which style should I use?">
+Tag-based access is recommended for most use cases. It provides better
+discoverability through IDE autocomplete. Route-based access is useful when you
+want your code to mirror the REST endpoints directly.
+</Callout>

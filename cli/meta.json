@@ -1,0 +1,22 @@
+{
+	"title": "Command Line",
+	"root": true,
+	"icon": "Terminal",
+	"defaultOpen": true,
+	"pages": [
+		"---Overview---",
+		"index",
+		"global-options",
+		"---Commands---",
+		"auth",
+		"projects",
+		"db",
+		"orgs",
+		"analytics",
+		"account",
+		"api",
+		"platform",
+		"mcp",
+		"update"
+	]
+}

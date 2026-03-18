@@ -1,0 +1,50 @@
+---
+title: VerifyCustomDomain
+description: Verify custom domain DNS
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Checks DNS TXT record to verify domain ownership. Updates domain status on success. Requires a Scale or Enterprise plan.
+
+## Usage
+
+```go
+result, err := client.Projects.VerifyCustomDomain(ctx)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+
+## Response
+
+`(*pgbeam.VerifyCustomDomainResponse, error)` — verification result.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.VerifyCustomDomain(ctx)
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Custom domains require a Scale or Enterprise plan. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

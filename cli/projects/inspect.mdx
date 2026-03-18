@@ -1,0 +1,31 @@
+---
+title: projects inspect
+description: Show detailed project information.
+---
+
+Show detailed project information including databases, regions, and configuration.
+
+## Usage
+
+```bash
+pgbeam projects inspect <project-id> [flags]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--json` | Output as JSON |
+
+## Examples
+
+```bash
+# Inspect a project by ID
+pgbeam projects inspect prj_abc123
+
+# Output as JSON
+pgbeam projects inspect prj_abc123 --json
+
+# Inspect the linked project
+pgbeam projects inspect $(pgbeam projects linked)
+```

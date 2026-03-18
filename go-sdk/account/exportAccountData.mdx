@@ -1,0 +1,48 @@
+---
+title: ExportAccountData
+description: Export account data
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns all personal data associated with the authenticated user in a structured JSON format. Supports GDPR data portability and CCPA right to know. Audit logs are limited to the most recent 1000 entries.
+
+## Usage
+
+```go
+result, err := client.Account.ExportAccountData(ctx)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+
+## Response
+
+`(*pgbeam.AccountExport, error)` — account data export.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Account.ExportAccountData(ctx)
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 401 | Missing or invalid authentication. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

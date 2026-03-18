@@ -1,0 +1,19 @@
+{
+	"title": "Usage",
+	"root": true,
+	"icon": "FileCode",
+	"defaultOpen": false,
+	"pages": [
+		"---Overview---",
+		"index",
+		"response-conventions",
+		"---Endpoints---",
+		"projects",
+		"databases",
+		"analytics",
+		"platform",
+		"account",
+		"---Integrations---",
+		"mcp"
+	]
+}

@@ -1,0 +1,53 @@
+---
+title: listProjects
+description: List projects
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists projects filtered by organization. Requires org_id query parameter.
+
+## Usage
+
+```typescript
+const result = await api.projects.listProjects({
+    queryParams: { org_id: "org_xxx" },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| queryParams.org_id | `string` | Yes | Organization ID to filter projects. |
+| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
+| queryParams.sort_by | `"name" \| "created_at" \| "active_connections"` | No | Sort field for projects list. |
+
+## Response
+
+`Promise<ListProjectsResponse>` — list of projects.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.listProjects({
+  queryParams: { org_id: "org_xxx", page_size: 20, page_token: "...", sort_by: "..." },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

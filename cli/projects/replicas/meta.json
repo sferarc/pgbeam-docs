@@ -1,0 +1,4 @@
+{
+	"defaultOpen": false, "title": "replicas",
+	"pages": ["add", "list", "delete"]
+}

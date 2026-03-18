@@ -1,0 +1,64 @@
+---
+title: createProject
+description: Create a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a new project within the specified organization.
+
+## Usage
+
+```typescript
+const result = await api.projects.createProject({
+    body: {
+      name: "...",
+      org_id: "...",
+      database: { ... },
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.name | `string` | Yes | Human-readable project name. |
+| body.org_id | `string` | Yes | Better Auth organization ID. |
+| body.description | `string` | No | Optional project description. |
+| body.tags | `string[]` | No | User-defined labels to attach to the project. |
+| body.cloud | `"aws" \| "azure" \| "gcp"` | No | Cloud provider for the project. |
+| body.database | `CreateDatabaseRequest` | Yes | Primary database. Created atomically with the project. |
+
+## Response
+
+`Promise<CreateProjectResponse>` — project created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.createProject({
+  body: {
+      name: "...",
+      org_id: "...",
+      database: { ... },
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 409 | Resource already exists or conflicts with current state. |
+| 429 | Rate limited. Try again later. |

@@ -1,0 +1,32 @@
+---
+title: db update
+description: Update database configuration.
+---
+
+Update database configuration.
+
+## Usage
+
+```bash
+pgbeam db update <database-id> [--cache-ttl <seconds>] [--pool-mode <mode>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--cache-ttl` | Cache TTL in seconds |
+| `--pool-mode` | Connection pool mode (`session`, `transaction`) |
+
+## Examples
+
+```bash
+# Set cache TTL to 60 seconds
+pgbeam db update db_abc123 --cache-ttl 60
+
+# Switch to transaction pooling
+pgbeam db update db_abc123 --pool-mode transaction
+
+# Update both settings
+pgbeam db update db_abc123 --cache-ttl 30 --pool-mode session
+```

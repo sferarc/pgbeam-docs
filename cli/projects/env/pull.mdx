@@ -1,0 +1,30 @@
+---
+title: env pull
+description: Pull DATABASE_URL to a local .env file.
+---
+
+Pull the `DATABASE_URL` connection string for a project to a local `.env` file. Use `--stdout` to print to stdout instead of writing to a file.
+
+## Usage
+
+```bash
+pgbeam env pull [--stdout]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--stdout` | Print the connection string to stdout instead of writing to `.env` |
+
+## Examples
+
+```bash
+# Write DATABASE_URL to .env
+pgbeam env pull
+# ✓ Wrote DATABASE_URL to .env
+
+# Print to stdout (useful for piping)
+pgbeam env pull --stdout
+# postgresql://user:pass@proxy.pgbeam.dev:5432/mydb?sslmode=require
+```

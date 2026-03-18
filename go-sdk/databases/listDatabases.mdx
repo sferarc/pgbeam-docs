@@ -1,0 +1,56 @@
+---
+title: ListDatabases
+description: List databases
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists all databases registered for the project.
+
+## Usage
+
+```go
+result, err := client.Databases.ListDatabases(ctx, nil)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| params | `*pgbeam.ListDatabasesParams` | No | Query parameters |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
+
+## Response
+
+`(*pgbeam.ListDatabasesResponse, error)` — list of databases.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Databases.ListDatabases(ctx, &pgbeam.ListDatabasesParams{
+    PageSize: 20,
+    PageToken: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

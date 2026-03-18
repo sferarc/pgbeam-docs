@@ -1,0 +1,68 @@
+---
+title: CreateProject
+description: Create a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a new project within the specified organization.
+
+## Usage
+
+```go
+result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
+    Name: "...",
+    OrgID: "...",
+    Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `*pgbeam.CreateProjectRequest` | Yes | Request body |
+| req.Name | `string` | Yes | Human-readable project name. |
+| req.OrgID | `string` | Yes | Better Auth organization ID. |
+| req.Description | `*string` | No | Optional project description. |
+| req.Tags | `*[]string` | No | User-defined labels to attach to the project. |
+| req.Cloud | `*string` | No | Cloud provider for the project. |
+| req.Database | `pgbeam.CreateDatabaseRequest` | Yes | Primary database. Created atomically with the project. |
+
+## Response
+
+`(*pgbeam.CreateProjectResponse, error)` — project created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
+    Name: "...",
+    OrgID: "...",
+    Description: "...",
+    Tags: nil,
+    Cloud: "...",
+    Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 409 | Resource already exists or conflicts with current state. |
+| 429 | Rate limited. Try again later. |

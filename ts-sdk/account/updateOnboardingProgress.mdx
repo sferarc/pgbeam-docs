@@ -1,0 +1,56 @@
+---
+title: updateOnboardingProgress
+description: Update onboarding progress
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Mark an onboarding step as complete or dismiss the checklist.
+
+## Usage
+
+```typescript
+const result = await api.account.updateOnboardingProgress({
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.step | `"project_created" \| "database_added" \| "connection_tested" \| "connection_string_copied" \| "first_query_run"` | No | The onboarding step to mark as complete. |
+| body.dismiss | `boolean` | No | Set to true to dismiss the onboarding checklist. |
+
+## Response
+
+`Promise<OnboardingProgress>` — updated onboarding progress.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.account.updateOnboardingProgress({
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

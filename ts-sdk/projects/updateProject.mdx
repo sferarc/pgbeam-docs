@@ -1,0 +1,61 @@
+---
+title: updateProject
+description: Update a project
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Partially updates a project. Only provided fields are modified.
+
+## Usage
+
+```typescript
+const result = await api.projects.updateProject({
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.name | `string` | No | Updated project name. |
+| body.description | `string` | No | Updated project description. |
+| body.tags | `string[]` | No | Replacement set of user-defined project labels. |
+| body.status | `ProjectStatus` | No |  |
+| body.queries_per_second | `number` | No | Maximum queries per second. 0 means unlimited. |
+| body.burst_size | `number` | No | Burst allowance above steady-state rate. |
+| body.max_connections | `number` | No | Maximum concurrent proxy connections. 0 means unlimited. |
+
+## Response
+
+`Promise<Project>` — project updated.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.updateProject({
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

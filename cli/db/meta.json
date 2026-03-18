@@ -1,0 +1,4 @@
+{
+	"defaultOpen": false, "title": "db", "icon": "Database",
+	"pages": ["add", "list", "inspect", "update", "delete", "test"]
+}

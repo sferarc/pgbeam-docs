@@ -1,0 +1,59 @@
+---
+title: updateCacheRule
+description: Update cache rule
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Enable or disable caching for a specific query shape, with optional
+TTL and SWR overrides. Requires the query to exist in the cache rules.
+
+
+## Usage
+
+```typescript
+const result = await api.projects.updateCacheRule({
+    body: {
+      cache_enabled: true,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.cache_enabled | `boolean` | Yes | Whether to enable caching for this query shape. |
+| body.cache_ttl_seconds | `number` | No | TTL override in seconds. Null to use project default. |
+| body.cache_swr_seconds | `number` | No | SWR override in seconds. Null to use project default. |
+
+## Response
+
+`Promise<UpdateCacheRuleResponse>` — cache rule updated.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.updateCacheRule({
+  body: {
+      cache_enabled: true,
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

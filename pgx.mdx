@@ -1,0 +1,205 @@
+---
+title: pgx
+icon: Blocks
+tag: Go
+description:
+  Connect Go applications using pgx to PgBeam for connection pooling, caching,
+  and global routing.
+---
+
+Connect your Go application to PgBeam by updating the connection string. pgx is
+the most widely used PostgreSQL driver for Go and works with PgBeam without any
+code changes.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Set the connection string
+
+```bash title="Environment variable"
+export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+```
+
+</Step>
+<Step>
+
+### Connect with pgxpool
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func main() {
+	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		panic(err)
+	}
+	defer pool.Close()
+
+	var greeting string
+	err = pool.QueryRow(context.Background(), "SELECT 'hello from pgbeam'").Scan(&greeting)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(greeting)
+}
+```
+
+</Step>
+<Step>
+
+### Reduce pool size
+
+PgBeam handles upstream pooling, so reduce `pgxpool`'s pool:
+
+```go title="Reduced pool size"
+config, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+if err != nil {
+	panic(err)
+}
+config.MaxConns = 5
+config.MinConns = 1
+pool, err := pgxpool.NewWithConfig(context.Background(), config)
+```
+
+</Step>
+</Steps>
+
+## Pool sizing
+
+Since PgBeam manages upstream connections, keep your client-side pool small:
+
+| Deployment type                | Recommended `MaxConns` |
+| ------------------------------ | ---------------------- |
+| Single binary / single pod     | 5-10                   |
+| Multiple pods behind LB        | 3-5 per pod            |
+| Short-lived CLI tools          | 1-2                    |
+
+<Callout type="info">
+With PgBeam in transaction pool mode, upstream connections are released after
+each transaction. A `MaxConns` of 5 per pod handles high concurrency without
+pressuring the upstream database.
+</Callout>
+
+## TLS
+
+pgx uses TLS by default when connecting to PgBeam. No additional configuration
+is needed — PgBeam's `*.aws.pgbeam.app` certificate is publicly trusted and
+works with all standard Go TLS configurations.
+
+If you need to verify the TLS connection explicitly:
+
+```go
+config, _ := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+// pgx defaults to sslmode=prefer; PgBeam upgrades to TLS automatically
+```
+
+## Caching
+
+### Automatic caching via cache rules
+
+For standard queries, PgBeam tracks the SQL shapes flowing through your
+project. Enable caching for specific shapes through [Cache Rules](/docs/cache)
+in the dashboard — no code changes needed.
+
+### SQL annotations for fine-grained control
+
+Use SQL comments for per-query cache control:
+
+```go title="Cache control with pgx"
+// Cache for 5 minutes
+rows, err := pool.Query(ctx,
+    "/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories")
+
+// Disable caching for a specific query
+var balance int
+err = pool.QueryRow(ctx,
+    "/* @pgbeam:cache noCache */ SELECT balance FROM accounts WHERE id = $1",
+    accountID).Scan(&balance)
+```
+
+## Read replicas
+
+Route read queries to replicas using the `/* @pgbeam:replica */` annotation:
+
+```go title="Replica routing with pgx"
+// Route to a read replica
+rows, err := pool.Query(ctx,
+    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true")
+
+// Combine replica routing with caching
+rows, err = pool.Query(ctx,
+    "/* @pgbeam:replica */ /* @pgbeam:cache maxAge=300 */ SELECT * FROM products")
+```
+
+See [Read Replicas](/docs/replicas) for replica setup and health check details.
+
+## Error handling
+
+PgBeam returns standard PostgreSQL SQLSTATE codes. Use `pgconn.PgError` to
+handle PgBeam-specific errors:
+
+```go title="Handling PgBeam errors"
+_, err := pool.Exec(ctx, "SELECT 1")
+if err != nil {
+    var pgErr *pgconn.PgError
+    if errors.As(err, &pgErr) {
+        switch pgErr.Code {
+        case "53400":
+            // Query rate limit exceeded — back off and retry
+        case "53300":
+            // Connection limit exceeded — reduce pool size
+        case "08006":
+            // Upstream unavailable (circuit breaker) — retry with backoff
+        }
+    }
+}
+```
+
+See [Error Codes](/docs/error-codes) for the full reference.
+
+## Migrations
+
+Run migrations directly against the origin database:
+
+```bash
+DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" go run ./cmd/migrate
+```
+
+This applies to all migration tools — [golang-migrate](https://github.com/golang-migrate/migrate),
+[goose](https://github.com/pressly/goose), [atlas](https://atlasgo.io/), or
+custom migration scripts.
+
+## Debugging
+
+Enable debug mode to see cache and routing details:
+
+```go
+_, err := pool.Exec(ctx, "SET pgbeam.debug = on")
+
+rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT 1")
+// NOTICE: pgbeam: cache=miss replica=true upstream=replica-host:5432
+```
+
+## Common issues
+
+| Issue                            | Cause                           | Fix                                     |
+| -------------------------------- | ------------------------------- | --------------------------------------- |
+| "too many connections"           | `MaxConns` too high             | Reduce to 3-5 per pod                  |
+| Prepared statement errors        | Using transaction pool mode     | Use session pool mode, or avoid `Prepare()` |
+| Connection refused on startup    | Cold start after inactivity     | Normal — first connection is slower     |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and lifecycle
+- [Caching](/docs/cache) — TTL, SWR, cache layers, and cache rules
+- [Error Codes](/docs/error-codes) — SQLSTATE reference for PgBeam errors

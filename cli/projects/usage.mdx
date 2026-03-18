@@ -1,0 +1,28 @@
+---
+title: projects usage
+description: Show project usage metrics.
+---
+
+Show project usage metrics including queries, cache hits, and bandwidth.
+
+## Usage
+
+```bash
+pgbeam projects usage <project-id> [flags]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--json` | Output as JSON |
+
+## Examples
+
+```bash
+# View usage for a project
+pgbeam projects usage prj_abc123
+
+# Output as JSON for monitoring scripts
+pgbeam projects usage prj_abc123 --json
+```

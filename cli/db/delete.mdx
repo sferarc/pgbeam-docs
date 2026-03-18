@@ -1,0 +1,32 @@
+---
+title: db delete
+description: Delete a database connection.
+---
+
+Delete a database connection. Prompts for confirmation unless `--force` is passed.
+
+## Usage
+
+```bash
+pgbeam db delete <database-id> [--force]
+```
+
+## Aliases
+
+`pgbeam db rm`
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--force` | Skip confirmation prompt |
+
+## Examples
+
+```bash
+# Delete with confirmation prompt
+pgbeam db delete db_abc123
+
+# Force delete without confirmation
+pgbeam db rm db_abc123 --force
+```

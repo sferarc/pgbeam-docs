@@ -1,0 +1,25 @@
+---
+title: domains add
+description: Register a custom domain for a project.
+---
+
+Register a custom domain for a project. Returns the DNS records you need to configure for verification.
+
+## Usage
+
+```bash
+pgbeam domains add <domain>
+```
+
+## Examples
+
+```bash
+# Add a custom domain
+pgbeam domains add db.example.com
+# DNS records to configure:
+#   CNAME db.example.com → proxy.pgbeam.dev
+#   TXT   _pgbeam.db.example.com → pgbeam-verify=abc123
+
+# Add a domain for a specific project
+pgbeam domains add db.example.com --project my-project
+```

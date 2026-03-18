@@ -1,0 +1,50 @@
+---
+title: getOrganizationPlan
+description: Get organization plan
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns the current plan and limits for the organization.
+
+## Usage
+
+```typescript
+const result = await api.analytics.getOrganizationPlan({
+    pathParams: { org_id: "org_xxx" },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+
+## Response
+
+`Promise<OrganizationPlan>` — organization plan details.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.getOrganizationPlan({
+  pathParams: { org_id: "org_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

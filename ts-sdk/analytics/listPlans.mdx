@@ -1,0 +1,42 @@
+---
+title: listPlans
+description: List available plans
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns all available plan tiers with their limits and pricing.
+
+## Usage
+
+```typescript
+const result = await api.analytics.listPlans();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<ListPlansResponse>` — list of available plans.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: null,
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.listPlans();
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 401 | Missing or invalid authentication. |
+| 429 | Rate limited. Try again later. |

@@ -1,0 +1,50 @@
+---
+title: listCustomDomains
+description: List custom domains
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists all custom domains registered for the project.
+
+## Usage
+
+```typescript
+const result = await api.projects.listCustomDomains();
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
+
+## Response
+
+`Promise<ListCustomDomainsResponse>` — list of custom domains.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.projects.listCustomDomains({
+  queryParams: { page_size: 20, page_token: "..." },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

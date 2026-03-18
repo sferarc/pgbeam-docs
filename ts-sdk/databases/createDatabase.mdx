@@ -1,0 +1,73 @@
+---
+title: createDatabase
+description: Add a database
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Registers a new upstream PostgreSQL database for the project.
+
+## Usage
+
+```typescript
+const result = await api.databases.createDatabase({
+    body: {
+      host: "...",
+      port: 5432,
+      name: "...",
+      username: "...",
+      password: "...",
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.host | `string` | Yes | PostgreSQL host. |
+| body.port | `number` | Yes | PostgreSQL port. |
+| body.name | `string` | Yes | PostgreSQL database name. |
+| body.username | `string` | Yes | PostgreSQL username. |
+| body.password | `string` | Yes | PostgreSQL password. Stored encrypted at rest. |
+| body.ssl_mode | `SSLMode` | No |  |
+| body.role | `DatabaseRole` | No |  |
+| body.pool_region | `string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
+ |
+| body.cache_config | `CacheConfig` | No |  |
+| body.pool_config | `PoolConfig` | No |  |
+
+## Response
+
+`Promise<Database>` — database created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.databases.createDatabase({
+  body: {
+      host: "...",
+      port: 5432,
+      name: "...",
+      username: "...",
+      password: "...",
+    },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 429 | Rate limited. Try again later. |

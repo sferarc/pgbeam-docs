@@ -1,0 +1,252 @@
+---
+title: Serverless Driver
+icon: Zap
+tag: TypeScript
+description:
+  Use @neondatabase/serverless to connect from edge runtimes and serverless
+  functions through PgBeam with HTTP or WebSocket transports.
+---
+
+Connect from edge runtimes and serverless functions using the
+`@neondatabase/serverless` driver. PgBeam supports both the HTTP query endpoint
+and the WebSocket wire protocol — no code changes required if you're already
+using the Neon serverless driver.
+
+## Setup
+
+<Steps>
+<Step>
+
+### Install the package
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]}>
+<Tab value="npm">
+```bash
+npm install @neondatabase/serverless
+```
+</Tab>
+<Tab value="pnpm">
+```bash
+pnpm add @neondatabase/serverless
+```
+</Tab>
+<Tab value="yarn">
+```bash
+yarn add @neondatabase/serverless
+```
+</Tab>
+<Tab value="bun">
+```bash
+bun add @neondatabase/serverless
+```
+</Tab>
+</Tabs>
+
+For Node.js environments using WebSocket transport, also install `ws`:
+
+```bash
+npm install ws
+```
+
+</Step>
+<Step>
+
+### HTTP transport — `neon()` tagged template
+
+Best for one-shot queries from edge/serverless functions. Each call is a single
+HTTP request — no persistent connection required.
+
+```ts title="query.ts"
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+const rows = await sql`SELECT * FROM users WHERE active = true`;
+```
+
+</Step>
+<Step>
+
+### WebSocket transport — `Pool` / `Client`
+
+Best for interactive transactions or session-level features. Uses the
+PostgreSQL wire protocol over WebSocket.
+
+<Tabs items={["Edge runtime", "Node.js"]}>
+<Tab value="Edge runtime">
+```ts title="db.ts"
+import { Pool } from "@neondatabase/serverless";
+
+const pool = new Pool({
+  connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+});
+const { rows } = await pool.query("SELECT * FROM users");
+```
+</Tab>
+<Tab value="Node.js">
+```ts title="db.ts"
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
+neonConfig.webSocketConstructor = ws;
+
+const pool = new Pool({
+  connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+});
+const { rows } = await pool.query("SELECT * FROM users");
+```
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+### Run a test query
+
+```ts
+const result = await sql`SELECT 1 AS ok`;
+console.log(result); // [{ ok: 1 }]
+```
+
+If this returns results, the serverless driver is connected through PgBeam.
+
+</Step>
+</Steps>
+
+## HTTP vs WebSocket
+
+| | HTTP (`neon()`) | WebSocket (`Pool` / `Client`) |
+| --- | --- | --- |
+| **Best for** | One-shot queries, edge functions | Transactions, session features |
+| **Connection** | Stateless HTTP request | Persistent WebSocket |
+| **Cold start** | None | WebSocket handshake + TLS |
+| **Transactions** | `sql.transaction([...])` | `BEGIN` / `COMMIT` via client |
+| **Pipelining** | Automatic (batched in one request) | PostgreSQL wire protocol |
+| **Max payload** | ~10 MB response | Unlimited streaming |
+
+## Edge runtime compatibility
+
+The serverless driver works in any runtime with `fetch` (for HTTP) or
+`WebSocket` (for WS):
+
+| Runtime | HTTP | WebSocket | Notes |
+| --- | --- | --- | --- |
+| Vercel Edge Functions | Yes | Yes | Built-in WebSocket support |
+| Cloudflare Workers | Yes | Yes | Built-in WebSocket support |
+| Deno Deploy | Yes | Yes | Built-in WebSocket support |
+| Bun | Yes | Yes | Built-in WebSocket support |
+| Node.js | Yes | Yes | Requires `ws` package |
+
+## Drizzle ORM integration
+
+Use the serverless driver adapters with Drizzle for type-safe queries:
+
+<Tabs items={["HTTP (drizzle-orm/neon-http)", "WebSocket (drizzle-orm/neon-serverless)"]}>
+<Tab value="HTTP (drizzle-orm/neon-http)">
+```ts title="db.ts"
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+
+const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+const db = drizzle(sql);
+
+const users = await db.select().from(usersTable);
+```
+</Tab>
+<Tab value="WebSocket (drizzle-orm/neon-serverless)">
+```ts title="db.ts"
+import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
+
+const pool = new Pool({
+  connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+});
+const db = drizzle(pool);
+
+const users = await db.select().from(usersTable);
+```
+</Tab>
+</Tabs>
+
+## Transactions
+
+<Tabs items={["HTTP", "WebSocket"]}>
+<Tab value="HTTP">
+
+Use `sql.transaction()` to run multiple statements in a single HTTP request:
+
+```ts title="HTTP transactions"
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+
+const results = await sql.transaction([
+  sql`UPDATE accounts SET balance = balance - 100 WHERE id = 1`,
+  sql`UPDATE accounts SET balance = balance + 100 WHERE id = 2`,
+]);
+```
+
+</Tab>
+<Tab value="WebSocket">
+
+Use standard `BEGIN` / `COMMIT` with a dedicated client:
+
+```ts title="WebSocket transactions"
+import { Pool } from "@neondatabase/serverless";
+
+const pool = new Pool({
+  connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+});
+
+const client = await pool.connect();
+try {
+  await client.query("BEGIN");
+  await client.query("UPDATE accounts SET balance = balance - 100 WHERE id = 1");
+  await client.query("UPDATE accounts SET balance = balance + 100 WHERE id = 2");
+  await client.query("COMMIT");
+} catch (e) {
+  await client.query("ROLLBACK");
+  throw e;
+} finally {
+  client.release();
+}
+```
+
+</Tab>
+</Tabs>
+
+## Caching and replicas
+
+SQL annotations work the same with the serverless driver:
+
+```ts title="Cache and replica annotations"
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+
+// Cache for 5 minutes
+const categories = await sql`/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories`;
+
+// Route to read replica
+const stats = await sql`/* @pgbeam:replica */ SELECT count(*) FROM orders`;
+
+// Combine both
+const products = await sql`/* @pgbeam:replica */ /* @pgbeam:cache maxAge=60 */ SELECT * FROM products`;
+```
+
+See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
+
+## Common issues
+
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| `WebSocket is not defined` | Node.js missing WS constructor | Install `ws` and set `neonConfig.webSocketConstructor = ws` |
+| `fetch failed` on HTTP endpoint | Network/firewall blocking HTTPS | Verify the proxy hostname resolves and port 443 is open |
+| Slow cold starts with WebSocket | TLS + WS handshake on each invocation | Use HTTP transport for stateless queries |
+| `connection terminated` | Idle timeout exceeded | Use connection pooling or reconnect on error |
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
+- [Caching](/docs/cache) — TTL, SWR, cache rules, and SQL annotations
+- [Read Replicas](/docs/replicas) — Replica setup and routing
+- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless) — Driver documentation

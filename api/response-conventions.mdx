@@ -1,0 +1,111 @@
+---
+title: Response Conventions
+description:
+  Status codes, error envelope, retries, and idempotency across the PgBeam API.
+---
+
+Every endpoint follows the same conventions for status codes, error responses,
+retries, and idempotency.
+
+## Status codes
+
+| Code  | Meaning              | Description                              |
+| ----- | -------------------- | ---------------------------------------- |
+| `200` | OK                   | Success with a response body             |
+| `201` | Created              | A resource was created                   |
+| `204` | No Content           | Success, no response body                |
+| `4xx` | Client error         | Bad request, unauthorized, not found, etc. |
+| `5xx` | Server error         | Something went wrong on our end          |
+
+## Pagination
+
+List endpoints return an array plus pagination metadata.
+
+## Error envelope
+
+All errors use the same JSON envelope:
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Project not found"
+  }
+}
+```
+
+| Field           | Type     | Description                    |
+| --------------- | -------- | ------------------------------ |
+| `error.code`    | `string` | Machine-readable error code    |
+| `error.message` | `string` | Human-readable description     |
+
+### Error codes
+
+| HTTP Status | `error.code`    | Description                                    |
+| ----------- | --------------- | ---------------------------------------------- |
+| 400         | `INVALID_INPUT` | Bad request — fix the input                    |
+| 401         | `UNAUTHORIZED`  | Missing or invalid authentication              |
+| 403         | `FORBIDDEN`     | Insufficient permissions or plan limits        |
+| 404         | `NOT_FOUND`     | Resource not found                             |
+| 409         | `CONFLICT`      | Resource already exists or state conflict      |
+| 422         | `INVALID_INPUT` | Validation error                               |
+| 429         | `RATE_LIMITED`  | Too many requests (includes `Retry-After` header) |
+| 500         | `INTERNAL_ERROR`| Internal server error                          |
+| 502         | —               | Bad gateway                                    |
+| 503         | —               | Service unavailable                            |
+| 504         | —               | Gateway timeout                                |
+
+## Retries
+
+### Retryable status codes
+
+The SDKs automatically retry requests that fail with these status codes:
+
+| Status          | Retryable | Notes                         |
+| --------------- | --------- | ----------------------------- |
+| 408             | **Yes**   | Request timeout               |
+| 429             | **Yes**   | Rate limited — respects `Retry-After` |
+| 502             | **Yes**   | Bad gateway                   |
+| 503             | **Yes**   | Service unavailable — respects `Retry-After` |
+| 504             | **Yes**   | Gateway timeout               |
+| Network error   | **Yes**   | Connection refused, DNS failure, timeout |
+| All other codes | No        | Returned immediately          |
+
+### Exponential backoff with jitter
+
+The wait between retries follows this formula:
+
+```
+delay = min(initialDelay × 2^attempt, maxDelay) × random(0.5, 1.5)
+```
+
+| Setting        | Default | Description                      |
+| -------------- | ------- | -------------------------------- |
+| Max retries    | 5       | Total retry attempts (`0` to disable) |
+| Initial delay  | 500ms   | First backoff interval           |
+| Max delay      | 30s     | Backoff ceiling                  |
+
+### Retry-After header
+
+When the server returns a `Retry-After` header (on 429 or 503), the SDKs use
+that value instead of their own computed backoff. Both formats are supported:
+
+- **Integer seconds:** `Retry-After: 60`
+- **HTTP-date:** `Retry-After: Thu, 01 Jan 2026 00:00:00 GMT`
+
+## Idempotency
+
+POST and PATCH requests include an `Idempotency-Key` header so retries never
+double-create resources.
+
+- Keys are UUID v4, generated once per SDK call and reused across all attempts
+- Sent on every attempt (including the first) so the server can deduplicate
+  even if the initial request succeeds but the client loses the response
+- GET and DELETE are naturally idempotent — no key needed
+- The server caches idempotent responses for **24 hours**
+- Transient errors (408, 429, 502, 503, 504) are **not** cached — the next
+  retry executes the handler again
+
+See the [TypeScript SDK](/docs/ts-sdk/error-handling#retry-configuration) and
+[Go SDK](/docs/go-sdk/error-handling#retry-configuration) docs for
+language-specific configuration.

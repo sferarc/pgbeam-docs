@@ -1,0 +1,54 @@
+---
+title: getOrganizationUsage
+description: Get organization usage
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns daily usage data aggregated across all projects in the organization.
+
+## Usage
+
+```typescript
+const result = await api.analytics.getOrganizationUsage({
+    pathParams: { org_id: "org_xxx" },
+    queryParams: { start_date: "...", end_date: "..." },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| queryParams.start_date | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
+| queryParams.end_date | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+
+## Response
+
+`Promise<UsageResponse>` — daily usage data.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.getOrganizationUsage({
+  pathParams: { org_id: "org_xxx" },
+  queryParams: { start_date: "...", end_date: "..." },
+});
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 429 | Rate limited. Try again later. |

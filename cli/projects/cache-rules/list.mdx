@@ -1,0 +1,30 @@
+---
+title: cache-rules list
+description: List tracked query shapes with cache recommendations.
+---
+
+List tracked query shapes for a database along with their caching status and recommendations.
+
+## Usage
+
+```bash
+pgbeam cache-rules list --database-id <id>
+```
+
+Alias: `pgbeam cache-rules ls`
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--database-id` | Database to list cache rules for (required) |
+
+## Examples
+
+```bash
+pgbeam cache-rules ls --database-id db_abc123
+# HASH       QUERY SHAPE                    CACHED   RECOMMENDATION
+# a1b2c3d4   SELECT * FROM users WHERE …    yes      recommended
+# e5f6g7h8   SELECT * FROM orders WHERE …   no       recommended
+# i9j0k1l2   INSERT INTO events …           no       not recommended
+```

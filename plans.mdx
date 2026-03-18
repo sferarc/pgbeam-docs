@@ -1,0 +1,212 @@
+---
+title: Plans and Limits
+icon: CreditCard
+description:
+  Plan tiers, feature comparison, per-plan quotas, overage billing, rate limits,
+  and default settings.
+---
+
+PgBeam offers three self-serve plans. New signups start on **Starter** with a
+14-day trial — no credit card required.
+
+All limits apply per **organization**. Projects within an organization share the
+same quotas.
+
+## Plan comparison
+
+|                        | Starter   | Pro       | Scale      |
+| ---------------------- | --------- | --------- | ---------- |
+| **Monthly price**      | $9/mo     | $29/mo    | $99/mo     |
+| **Annual price**       | $90/yr    | $290/yr   | $990/yr    |
+| **Queries/day**        | 50K       | 250K      | 2M         |
+| **Data transfer/mo**   | 10 GB     | 50 GB     | 200 GB     |
+| **Projects**           | 5         | 20        | 100        |
+| **Databases**          | 3         | 10        | 50         |
+| **Connections**        | 20        | 100       | 500        |
+| **QPS**                | 10        | 50        | 250        |
+| **Team seats**         | 1         | 3         | 5          |
+| **Query shapes**       | 100       | 1,000     | 10,000     |
+| **Custom domains**     | —         | —         | Yes        |
+| **SSO (SAML/OIDC)**    | —         | —         | Yes        |
+
+### Which plan to choose
+
+**Starter** is for individual developers and small projects. It gives you
+enough headroom to run a production workload with moderate traffic. The 14-day
+trial lets you evaluate PgBeam without entering payment details.
+
+**Pro** is for growing teams and production workloads. The higher QPS and
+connection limits handle multi-service architectures and busier applications.
+Three included team seats cover a small engineering team.
+
+**Scale** is for teams that need enterprise features — custom domains, SSO, and
+significantly higher quotas. If you have multiple services, high traffic, or
+compliance requirements, Scale is the right fit.
+
+## Quota details
+
+### Queries/day
+
+Total queries executed across all projects in the organization, counting every
+SQL statement that passes through PgBeam. Cache hits count as queries (they
+still flow through PgBeam), but they do not generate upstream database load.
+
+The daily counter resets at **midnight UTC**.
+
+### Data transfer
+
+Total bytes transferred between PgBeam and your application (egress) per
+billing month. This does not include traffic between PgBeam and your upstream
+database.
+
+### Connections
+
+Maximum number of **concurrent** connections across all projects. Each open
+connection from your application to PgBeam counts as one connection, regardless
+of pool mode. Using transaction pool mode helps reduce upstream connections but
+does not change the client-side connection count.
+
+### QPS (queries per second)
+
+Maximum queries per second per project. When exceeded, PgBeam returns SQLSTATE
+`53400` (`query rate limit exceeded`). The rate limit is enforced per project,
+not per organization.
+
+### Query shapes
+
+Maximum number of distinct query fingerprints that PgBeam tracks for cache
+rules and query insights. A query shape is the normalized SQL template with
+parameter values removed (e.g., `SELECT * FROM users WHERE id = $1`).
+
+## 14-day trial
+
+New accounts on the Starter plan get a 14-day trial with full Starter
+features:
+
+- No credit card required to start
+- All Starter quotas and limits apply
+- **Overage billing is not active** during the trial — queries exceeding the
+  daily limit are blocked until the next UTC day
+- Add a payment method at any time to convert to a paid subscription and enable
+  overage billing
+
+After 14 days without a payment method, the organization is suspended. Projects
+and configuration are preserved — add a payment method to reactivate.
+
+## Overage billing
+
+Paid subscribers (with an active payment method) use **overage billing** instead
+of hard caps. This keeps your traffic flowing when usage spikes, rather than
+blocking queries at the plan limit.
+
+| Overage type       | Rate                   |
+| ------------------ | ---------------------- |
+| Query overage      | $0.10 per 1,000 queries |
+| Data transfer      | $0.20 per GB           |
+| Additional seats   | $10.00 per seat/month  |
+
+<Callout type="info" title="Spend limits">
+You can set a monthly spend limit to cap overage charges. When the limit is
+reached, additional queries are blocked until the next billing period. Configure
+spend limits in **Settings > Billing** in the dashboard.
+</Callout>
+
+### Overage billing examples
+
+| Scenario                          | Overage cost          |
+| --------------------------------- | --------------------- |
+| Starter plan, 60K queries in a day (10K over limit) | $1.00 |
+| Pro plan, 70 GB data transfer in a month (20 GB over limit) | $4.00 |
+| Scale plan, 2 additional team seats | $20.00/month |
+
+## Annual billing
+
+Prepay annually for a discount equivalent to two months free:
+
+| Plan    | Monthly | Annual  | You save |
+| ------- | ------- | ------- | -------- |
+| Starter | $9/mo   | $90/yr  | $18/yr   |
+| Pro     | $29/mo  | $290/yr | $58/yr   |
+| Scale   | $99/mo  | $990/yr | $198/yr  |
+
+Switch to annual billing from **Settings > Billing** in the dashboard.
+
+## Upgrades and downgrades
+
+<Tabs items={["Upgrade", "Downgrade"]}>
+<Tab value="Upgrade">
+Upgrades take effect **immediately**. Your new plan limits apply right away, and
+billing is prorated for the remainder of the current period.
+
+You keep all existing projects, databases, and configuration. Higher limits are
+available immediately.
+</Tab>
+<Tab value="Downgrade">
+Downgrades take effect at the **end of the current billing period**. Until then,
+you retain your current plan's limits.
+
+Before the downgrade takes effect, make sure your usage fits within the lower
+plan's limits:
+- Reduce the number of projects and databases if they exceed the new plan's
+  maximums
+- Remove team members if you exceed the new plan's seat count
+- Custom domains and SSO are disabled when downgrading from Scale
+</Tab>
+</Tabs>
+
+## Cancellation
+
+Cancelling the subscription suspends the organization but does not delete
+anything:
+
+- Active connections are terminated
+- New connections are blocked
+- Projects, database registrations, and cache rules remain in place
+- API keys are preserved but non-functional
+- Reactivation is possible at any time — add a payment method to resume
+
+## Rate limits
+
+| Limit                    | Value                                |
+| ------------------------ | ------------------------------------ |
+| QPS per project          | Plan tier (10 / 50 / 250)           |
+| Auth attempts per IP     | Rate-limited per IP address          |
+| API requests             | Standard REST rate limits per key    |
+
+<Callout type="warn">
+When a rate limit is exceeded, PgBeam returns SQLSTATE `53400` for query limits
+or HTTP 429 for API limits. See [Error Codes](/docs/error-codes) for handling
+guidance.
+</Callout>
+
+## Default settings
+
+New databases and projects start with these defaults:
+
+### Cache defaults
+
+| Setting     | Default  | Description                                   |
+| ----------- | -------- | --------------------------------------------- |
+| TTL         | 60s      | How long cached results are considered fresh  |
+| SWR         | 30s      | Stale-while-revalidate window after TTL       |
+| Max entries | 10,000   | Maximum cached query results per project      |
+| Enabled     | `false`  | Caching is off by default for new databases   |
+
+### Connection pooling defaults
+
+| Setting   | Default         | Description                            |
+| --------- | --------------- | -------------------------------------- |
+| Pool mode | Session         | No connection reuse between clients    |
+| SSL mode  | `verify-full`   | Full TLS verification for upstream     |
+
+## Enterprise
+
+For organizations with requirements beyond the Scale plan — custom quotas, SLAs,
+dedicated support, or volume pricing — contact [sales@pgbeam.com](mailto:sales@pgbeam.com).
+
+## Further reading
+
+- [Organizations](/docs/organizations) — How quotas, seats, and billing work at the org level
+- [Connection Pooling](/docs/pooling) — Pool mode selection and sizing guidance
+- [Caching](/docs/cache) — Cache defaults and how to tune TTL/SWR
+- [Error Codes](/docs/error-codes) — Rate limit error codes and handling

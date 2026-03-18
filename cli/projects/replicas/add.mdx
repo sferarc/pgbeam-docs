@@ -1,0 +1,30 @@
+---
+title: replicas add
+description: Add a read replica to a database.
+---
+
+Add a read replica to a database for read scaling and routing.
+
+## Usage
+
+```bash
+pgbeam replicas add --database-id <id> [--host <host>] [--port <port>]
+```
+
+## Flags
+
+| Flag | Description |
+| ---- | ----------- |
+| `--database-id` | Database to add the replica to (required) |
+| `--host` | Replica hostname |
+| `--port` | Replica port (defaults to 5432) |
+
+## Examples
+
+```bash
+# Add a replica with default port
+pgbeam replicas add --database-id db_abc123 --host replica1.example.com
+
+# Add a replica with a custom port
+pgbeam replicas add --database-id db_abc123 --host replica2.example.com --port 5433
+```
