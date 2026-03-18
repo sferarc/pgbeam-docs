@@ -30,6 +30,10 @@ const result = await api.databases.updateDatabase({
 | body.role | `DatabaseRole` | No |  |
 | body.pool_region | `string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
  |
+| body.query_timeout_ms | `number` | No | Query timeout in milliseconds. 0 means disabled.
+ |
+| body.auto_read_routing | `boolean` | No | Auto-route SELECT queries to read replicas.
+ |
 | body.cache_config | `CacheConfig` | No |  |
 | body.pool_config | `PoolConfig` | No |  |
 

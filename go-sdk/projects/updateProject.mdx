@@ -28,6 +28,8 @@ result, err := client.Projects.UpdateProject(ctx, &pgbeam.UpdateProjectRequest{
 | req.QueriesPerSecond | `*int` | No | Maximum queries per second. 0 means unlimited. |
 | req.BurstSize | `*int` | No | Burst allowance above steady-state rate. |
 | req.MaxConnections | `*int` | No | Maximum concurrent proxy connections. 0 means unlimited. |
+| req.AllowedCidrs | `*[]string` | No | IP allowlist as CIDR ranges. Empty array means allow all.
+ |
 
 ## Response
 

@@ -28,6 +28,8 @@ const result = await api.projects.updateProject({
 | body.queries_per_second | `number` | No | Maximum queries per second. 0 means unlimited. |
 | body.burst_size | `number` | No | Burst allowance above steady-state rate. |
 | body.max_connections | `number` | No | Maximum concurrent proxy connections. 0 means unlimited. |
+| body.allowed_cidrs | `string[]` | No | IP allowlist as CIDR ranges. Empty array means allow all.
+ |
 
 ## Response
 
