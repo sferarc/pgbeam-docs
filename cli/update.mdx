@@ -1,13 +1,47 @@
 ---
 title: update
-description: Check for and install CLI updates.
+description: Update the PgBeam CLI to the latest version
 icon: RefreshCw
 ---
 
-Check for new versions of the PgBeam CLI and install updates.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Check for and install CLI updates. By default, checks the latest stable release and prompts before updating. Use `--channel dev` with `--version` to install development builds (e.g. PR preview builds). The binary is downloaded from S3 and replaces the current installation in-place.
 
 ## Usage
 
 ```bash
-pgbeam update
+pgbeam update [flags]
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--yes`, `-y` | Skip the confirmation prompt before updating | No | `false` |
+| `--channel <value>` | Update channel to use: latest (stable releases) or dev (PR preview builds) | No | `latest` |
+| `--version <value>` | Specific version to install. Required for the dev channel (e.g. pr-434). Optional for latest channel (e.g. 1.2.3). | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Check for updates and install if available
+pgbeam update
+
+# Update without confirmation prompt
+pgbeam update --yes
+
+# Install a specific version
+pgbeam update --version 1.2.3
+
+# Install a dev build from a PR
+pgbeam update --channel dev --version pr-434
+```
+
+## Output
+
+Shows the current and target version. If already on the latest version, prints a success message. Otherwise, prompts for confirmation (unless `--yes`), downloads the new binary, and confirms the installation.

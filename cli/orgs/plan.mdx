@@ -1,9 +1,11 @@
 ---
 title: orgs plan
-description: Show current plan details and limits.
+description: Show organization plan details
 ---
 
-Show the current plan details and resource limits for the active organization.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Display the subscription plan and resource limits for the active organization. Shows the plan name, subscription status, billing period, and limits for projects, databases, connections, and queries.
 
 ## Usage
 
@@ -11,17 +13,23 @@ Show the current plan details and resource limits for the active organization.
 pgbeam orgs plan
 ```
 
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
+
 ## Examples
 
 ```bash
+# Show plan details
 pgbeam orgs plan
-# Organization: my-org
-# Plan:         Pro
-#
-# RESOURCE        LIMIT
-# Databases       10
-# Connections     10,000
-# Bandwidth       100 GB / month
-# Regions         5
-# Members         25
+
+# Show plan details for a specific org
+pgbeam orgs plan --org org_xxx
+
+# Get plan details as JSON
+pgbeam orgs plan --json
 ```
+
+## Output
+
+Displays the organization ID, plan name, subscription status, period end date, and a breakdown of limits (projects, databases, connections, queries/day, queries/sec). With `--json`, returns the full plan object.

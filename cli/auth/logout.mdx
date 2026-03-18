@@ -1,21 +1,28 @@
 ---
 title: auth logout
-description: Remove an authentication profile.
+description: Remove authentication profile
 ---
 
-Remove stored credentials for an authentication profile.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Remove stored authentication credentials. By default, removes the currently active profile (or the one specified with `--profile`). Use `--all` to remove every saved profile at once. A confirmation prompt is shown before deletion unless `--yes` is passed.
 
 ## Usage
 
 ```bash
-pgbeam auth logout [--profile <name>]
+pgbeam auth logout [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--profile` | Profile to remove (defaults to the active profile) |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--all` | Remove all saved profiles instead of just the active one | No | `false` |
+| `--yes`, `-y` | Skip the confirmation prompt | No | `false` |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
@@ -25,4 +32,11 @@ pgbeam auth logout
 
 # Remove a specific profile
 pgbeam auth logout --profile staging
+
+# Remove all profiles without confirmation
+pgbeam auth logout --all --yes
 ```
+
+## Output
+
+Prints a success message confirming which profile was removed (e.g. `Profile "default" removed.`). If `--all` is used, confirms all profiles were removed.

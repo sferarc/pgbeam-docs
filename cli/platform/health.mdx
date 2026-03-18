@@ -1,20 +1,33 @@
 ---
-title: health
-description: Check API health status.
+title: platform health
+description: Check API health status
 icon: HeartPulse
 ---
 
-Check the PgBeam API health status.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Check the health status of the PgBeam API. Returns the API status and version. This is a public endpoint that does not require authentication. Useful for verifying connectivity and checking which API version is running.
 
 ## Usage
 
 ```bash
-pgbeam health
+pgbeam platform health
 ```
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam health
-pgbeam health --json
+# Check API health
+pgbeam platform health
+
+# Get health status as JSON
+pgbeam platform health --json
 ```
+
+## Output
+
+Displays the API status (e.g. `ok`) and version number. With `--json`, returns the full health response object.

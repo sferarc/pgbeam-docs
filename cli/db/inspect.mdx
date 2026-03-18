@@ -1,19 +1,38 @@
 ---
 title: db inspect
-description: Show detailed database info including connection settings, pool config, and cache settings.
+description: Show database details
 ---
 
-Show detailed database info including connection settings, pool config, and cache settings.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Display detailed information about a database connection, including its ID, name, host, port, SSL mode, cache configuration, and connection pool settings.
 
 ## Usage
 
 ```bash
-pgbeam db inspect <database-id>
+pgbeam db inspect <id>
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` | ID of the database to inspect | Yes | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
 # Inspect a database
-pgbeam db inspect db_abc123
+pgbeam db inspect db_xxx
+
+# Get database details as JSON
+pgbeam db inspect db_xxx --json
 ```
+
+## Output
+
+Displays database ID, name, host:port, SSL mode, cache status (enabled/disabled), and pool mode. With `--json`, returns the full database object including cache_config and pool_config.

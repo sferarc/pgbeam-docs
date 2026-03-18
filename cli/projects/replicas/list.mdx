@@ -1,29 +1,38 @@
 ---
 title: replicas list
-description: List read replicas for a database.
+description: List read replicas
 ---
 
-List read replicas configured for a database.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all read replicas configured for a database. Shows each replica's ID, host, port, and SSL mode.
 
 ## Usage
 
 ```bash
-pgbeam replicas list --database-id <id>
+pgbeam replicas list [flags]
 ```
 
-Alias: `pgbeam replicas ls`
+## Options
 
-## Flags
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--database-id <value>` | ID of the database whose replicas to list | Yes | - |
 
-| Flag | Description |
-| ---- | ----------- |
-| `--database-id` | Database to list replicas for (required) |
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam replicas ls --database-id db_abc123
-# ID              HOST                       PORT   STATUS
-# rep_xyz789      replica1.example.com       5432   healthy
-# rep_xyz790      replica2.example.com       5433   healthy
+# List replicas for a database
+pgbeam replicas list --database-id db_xxx
+
+# List replicas as JSON
+pgbeam replicas list --database-id db_xxx --json
 ```
+
+## Output
+
+Displays a table with columns: ID, Host, Port, and SSL. With `--json`, returns the full replica list from the API.

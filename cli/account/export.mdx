@@ -1,19 +1,41 @@
 ---
 title: account export
-description: Export your account data.
+description: Export account data (GDPR/CCPA)
 ---
 
-Export your PgBeam account data (GDPR data export).
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Export all account data as required by GDPR and CCPA regulations. Includes your user profile, organizations, projects, databases, active sessions, and audit logs. Use `--file` to write the full export to a JSON file, or `--json` to print the full export to stdout.
 
 ## Usage
 
 ```bash
-pgbeam account export
+pgbeam account export [flags]
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--file <value>` | Write the full export to a JSON file at this path instead of printing to stdout | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Export account data as JSON
+# Show a summary of your account data
+pgbeam account export
+
+# Export full data to a file
+pgbeam account export --file account-export.json
+
+# Export full data as JSON to stdout
 pgbeam account export --json
 ```
+
+## Output
+
+Without `--file` or `--json`, displays a summary showing counts of organizations, projects, databases, sessions, and audit logs. With `--file`, writes the full JSON export to the specified path. With `--json`, outputs the complete export object.

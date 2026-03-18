@@ -1,9 +1,11 @@
 ---
 title: auth list
-description: List all saved authentication profiles.
+description: List authentication profiles
 ---
 
-List all saved authentication profiles and indicate which one is currently active.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all saved authentication profiles with their method, organization, and email. The currently active profile is marked with an asterisk (`*`). If no profiles are configured, prints instructions to run `pgbeam auth login`.
 
 ## Usage
 
@@ -11,11 +13,20 @@ List all saved authentication profiles and indicate which one is currently activ
 pgbeam auth list
 ```
 
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
+
 ## Examples
 
 ```bash
+# List all profiles
 pgbeam auth list
-# * default    user@example.com   (org: my-org)
-#   staging    user@example.com   (org: staging-org)
-#   production user@example.com   (org: prod-org)
+
+# List profiles as JSON
+pgbeam auth list --json
 ```
+
+## Output
+
+Displays a table with columns: active indicator, profile name, auth method, organization ID, and email. With `--json`, returns an array of profile objects.

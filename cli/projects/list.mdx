@@ -1,33 +1,35 @@
 ---
 title: projects list
-description: List all projects in your organization.
+description: List projects
 ---
 
-List all projects in your organization.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all projects in the current organization. Shows each project's ID, name, status, and creation date. Requires an active organization set via `pgbeam orgs switch` or `--org`.
 
 ## Usage
 
 ```bash
-pgbeam projects list [flags]
+pgbeam projects list
 ```
 
-Alias: `pgbeam projects ls`
-
-## Flags
-
-| Flag | Description |
-| ---- | ----------- |
-| `--json` | Output as JSON |
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# List projects
+# List projects in the active organization
 pgbeam projects list
 
-# Using the alias
-pgbeam projects ls
+# List projects in a specific organization
+pgbeam projects list --org org_xxx
 
-# Output as JSON for scripting
+# List projects as JSON
 pgbeam projects list --json
 ```
+
+## Output
+
+Displays a table with columns: ID, Name, Status, and Created. With `--json`, returns the full project list response from the API.

@@ -1,32 +1,39 @@
 ---
 title: db delete
-description: Delete a database connection.
+description: Delete a database
 ---
 
-Delete a database connection. Prompts for confirmation unless `--force` is passed.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Permanently delete a database connection from the linked project. This removes the database configuration from PgBeam — it does not affect the upstream PostgreSQL server. A confirmation prompt is shown unless `--yes` is passed.
 
 ## Usage
 
 ```bash
-pgbeam db delete <database-id> [--force]
+pgbeam db delete <id> [flags]
 ```
 
-## Aliases
+## Options
 
-`pgbeam db rm`
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` | ID of the database to delete | Yes | - |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No | `false` |
 
-## Flags
-
-| Flag | Description |
-| ---- | ----------- |
-| `--force` | Skip confirmation prompt |
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Delete with confirmation prompt
-pgbeam db delete db_abc123
+# Delete a database (with confirmation)
+pgbeam db delete db_xxx
 
-# Force delete without confirmation
-pgbeam db rm db_abc123 --force
+# Delete without confirmation
+pgbeam db delete db_xxx --yes
 ```
+
+## Output
+
+Prints a success message confirming the database was deleted. Exits with a non-zero code if the database is not found.

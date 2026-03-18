@@ -1,19 +1,38 @@
 ---
 title: db test
-description: Test the database connection.
+description: Test database connection
 ---
 
-Test the database connection. Validates connectivity, SSL, and authentication.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Test the connectivity of a database connection by sending a health check through PgBeam to the upstream PostgreSQL server. Validates that the host is reachable, credentials are correct, and SSL is properly configured. Reports the round-trip latency on success.
 
 ## Usage
 
 ```bash
-pgbeam db test <database-id>
+pgbeam db test <id>
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` | ID of the database connection to test | Yes | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
 # Test a database connection
-pgbeam db test db_abc123
+pgbeam db test db_xxx
+
+# Test and get result as JSON
+pgbeam db test db_xxx --json
 ```
+
+## Output
+
+On success, prints the connection latency in milliseconds. On failure, prints the error message and exits with a non-zero code. With `--json`, returns an object with `ok`, `latency_ms`, and `error` fields.

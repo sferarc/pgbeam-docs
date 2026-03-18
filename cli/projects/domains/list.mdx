@@ -1,9 +1,11 @@
 ---
 title: domains list
-description: List custom domains and their verification status.
+description: List custom domains
 ---
 
-List custom domains and their verification status.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all custom domains configured for the linked project. Shows each domain's ID, hostname, verification status, and creation date.
 
 ## Usage
 
@@ -11,13 +13,20 @@ List custom domains and their verification status.
 pgbeam domains list
 ```
 
-Alias: `pgbeam domains ls`
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam domains ls
-# DOMAIN              STATUS     CERTIFICATE
-# db.example.com      verified   active
-# api.example.com     pending    provisioning
+# List all custom domains
+pgbeam domains list
+
+# List domains as JSON
+pgbeam domains list --json
 ```
+
+## Output
+
+Displays a table with columns: ID, Domain, Verified (yes/no), and Created. With `--json`, returns the full domain list from the API.

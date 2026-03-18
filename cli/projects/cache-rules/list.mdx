@@ -1,30 +1,46 @@
 ---
 title: cache-rules list
-description: List tracked query shapes with cache recommendations.
+description: List cache rules for a database
 ---
 
-List tracked query shapes for a database along with their caching status and recommendations.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all tracked query shapes and their caching status for a database. Shows the query hash, a truncated SQL pattern, query type, whether caching is enabled, call count, average latency, and PgBeam's caching recommendation. Results are paginated — use `--page-size` and `--page-token` to navigate pages.
 
 ## Usage
 
 ```bash
-pgbeam cache-rules list --database-id <id>
+pgbeam cache-rules list [flags]
 ```
 
-Alias: `pgbeam cache-rules ls`
+## Options
 
-## Flags
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--database-id <value>` | ID of the database whose cache rules to list | Yes | - |
+| `--page-size <value>` | Number of entries per page (1-100). Defaults to the API default. | No | - |
+| `--page-token <value>` | Pagination token returned from a previous list call to fetch the next page | No | - |
 
-| Flag | Description |
-| ---- | ----------- |
-| `--database-id` | Database to list cache rules for (required) |
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam cache-rules ls --database-id db_abc123
-# HASH       QUERY SHAPE                    CACHED   RECOMMENDATION
-# a1b2c3d4   SELECT * FROM users WHERE …    yes      recommended
-# e5f6g7h8   SELECT * FROM orders WHERE …   no       recommended
-# i9j0k1l2   INSERT INTO events …           no       not recommended
+# List cache rules for a database
+pgbeam cache-rules list --database-id db_xxx
+
+# Get the first 20 rules
+pgbeam cache-rules list --database-id db_xxx --page-size 20
+
+# Get the next page using a pagination token
+pgbeam cache-rules list --database-id db_xxx --page-token <token>
+
+# List as JSON
+pgbeam cache-rules list --database-id db_xxx --json
 ```
+
+## Output
+
+Displays a table with columns: Hash, Query, Type, Cached, Calls, Avg (ms), and Recommendation. If more pages are available, prints the `--page-token` value for the next page. With `--json`, returns the full paginated response.

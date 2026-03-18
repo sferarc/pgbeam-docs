@@ -1,20 +1,38 @@
 ---
 title: orgs switch
-description: Switch active organization.
+description: Switch active organization
 ---
 
-Switch the active organization used by subsequent CLI commands.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Switch the active organization for the current authentication profile. All subsequent commands that require an organization will use this org. If no org ID is provided, you'll be prompted to enter one.
 
 ## Usage
 
 ```bash
-pgbeam orgs switch <org-id>
+pgbeam orgs switch [id]
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` | Organization ID to switch to. If omitted, you will be prompted. | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Switch to a different organization
-pgbeam orgs switch staging-org
-# Switched to organization: staging-org
+# Switch interactively
+pgbeam orgs switch
+
+# Switch to a specific organization
+pgbeam orgs switch org_xxx
 ```
+
+## Output
+
+Prints a confirmation message (e.g. `Switched to organization org_xxx.`).

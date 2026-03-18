@@ -1,28 +1,42 @@
 ---
 title: projects usage
-description: Show project usage metrics.
+description: Show project usage
 ---
 
-Show project usage metrics including queries, cache hits, and bandwidth.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Display usage metrics for the linked project over a date range. Shows daily breakdowns of total queries, cache hits, and data transferred by region. Defaults to the current calendar month if no date range is specified.
 
 ## Usage
 
 ```bash
-pgbeam projects usage <project-id> [flags]
+pgbeam projects usage [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--json` | Output as JSON |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--start-date <value>` | Start of the date range in YYYY-MM-DD format. Defaults to the first day of the current month. | No | - |
+| `--end-date <value>` | End of the date range in YYYY-MM-DD format. Defaults to today. | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# View usage for a project
-pgbeam projects usage prj_abc123
+# Show usage for the current month
+pgbeam projects usage
 
-# Output as JSON for monitoring scripts
-pgbeam projects usage prj_abc123 --json
+# Show usage for a specific date range
+pgbeam projects usage --start-date 2025-01-01 --end-date 2025-01-31
+
+# Get usage data as JSON for further processing
+pgbeam projects usage --json
 ```
+
+## Output
+
+Displays total queries and data transferred, followed by a day-by-day table with columns: Day, Region, Queries, Cache Hits, and Data. With `--json`, returns the full usage response from the API.

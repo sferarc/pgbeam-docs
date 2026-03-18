@@ -1,20 +1,33 @@
 ---
-title: regions
-description: List available data plane regions.
+title: platform regions
+description: List available regions
 icon: Globe
 ---
 
-List all available PgBeam data plane regions.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all available PgBeam data plane regions. Shows each region's ID, display name, and cloud provider. This is a public endpoint that does not require authentication.
 
 ## Usage
 
 ```bash
-pgbeam regions
+pgbeam platform regions
 ```
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam regions
-pgbeam regions --json
+# List all regions
+pgbeam platform regions
+
+# List regions as JSON
+pgbeam platform regions --json
 ```
+
+## Output
+
+Displays a table with columns: ID, Name, and Provider. With `--json`, returns the full regions array.

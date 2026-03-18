@@ -1,9 +1,11 @@
 ---
 title: api ls
-description: List all available API endpoints.
+description: List all API endpoints
 ---
 
-List all available API endpoints with their HTTP methods and paths.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all available PgBeam API endpoints, grouped by tag. Shows the HTTP method, path, and operation name for each endpoint. Useful for discovering API operations before using `pgbeam api request` or `pgbeam api schema`.
 
 ## Usage
 
@@ -11,15 +13,20 @@ List all available API endpoints with their HTTP methods and paths.
 pgbeam api ls
 ```
 
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
+
 ## Examples
 
 ```bash
+# List all API endpoints
 pgbeam api ls
-# METHOD   PATH                          OPERATION ID
-# GET      /v1/projects                  listProjects
-# POST     /v1/projects                  createProject
-# GET      /v1/projects/{id}             getProject
-# DELETE   /v1/projects/{id}             deleteProject
-# GET      /v1/databases                 listDatabases
-# POST     /v1/databases                 createDatabase
+
+# List endpoints as JSON
+pgbeam api ls --json
 ```
+
+## Output
+
+Displays endpoints grouped by tag, with each entry showing the HTTP method, path, and operation name. With `--json`, returns an array of endpoint objects with method, path, tag, and operation fields.

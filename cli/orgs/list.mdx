@@ -1,9 +1,11 @@
 ---
 title: orgs list
-description: List organizations you belong to.
+description: List organizations from profiles
 ---
 
-List all organizations you belong to.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all organizations associated with your saved authentication profiles. Shows the profile name, organization ID, and which profile is currently active. Organizations are extracted from stored profile credentials.
 
 ## Usage
 
@@ -11,13 +13,20 @@ List all organizations you belong to.
 pgbeam orgs list
 ```
 
-Alias: `pgbeam orgs ls`
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-pgbeam orgs ls
-# * my-org        Owner
-#   staging-org   Member
-#   client-org    Member
+# List all organizations
+pgbeam orgs list
+
+# List organizations as JSON
+pgbeam orgs list --json
 ```
+
+## Output
+
+Displays a table with columns: active indicator, profile name, and organization ID. With `--json`, returns an array of organization entries.

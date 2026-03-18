@@ -1,26 +1,21 @@
 ---
 title: db list
-description: List all databases in the linked project.
+description: List databases for a project
 ---
 
-List all databases in the linked project.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all database connections configured for the linked project. Shows each database's ID, name, host, port, and SSL mode.
 
 ## Usage
 
 ```bash
-pgbeam db list [flags]
+pgbeam db list
 ```
 
-## Aliases
-
-`pgbeam db ls`
-
-## Flags
-
-| Flag | Description |
-| ---- | ----------- |
-| `--json` | Output as JSON |
-| `--project` | Project ID to list databases for |
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
@@ -28,9 +23,13 @@ pgbeam db list [flags]
 # List databases for the linked project
 pgbeam db list
 
-# JSON output
-pgbeam db ls --json
-
 # List databases for a specific project
-pgbeam db list --project proj_abc123
+pgbeam db list --project prj_xxx
+
+# List databases as JSON
+pgbeam db list --json
 ```
+
+## Output
+
+Displays a table with columns: ID, Name, Host, Port, and SSL. With `--json`, returns the full database list from the API.

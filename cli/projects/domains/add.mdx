@@ -1,25 +1,41 @@
 ---
 title: domains add
-description: Register a custom domain for a project.
+description: Add a custom domain
 ---
 
-Register a custom domain for a project. Returns the DNS records you need to configure for verification.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Register a custom domain for the linked project. After adding, PgBeam returns the DNS records (CNAME and TXT) you need to configure with your DNS provider to verify ownership. Once DNS records are in place, run `pgbeam domains verify` to complete verification and provision a TLS certificate.
 
 ## Usage
 
 ```bash
-pgbeam domains add <domain>
+pgbeam domains add [domain]
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<domain>` | The domain name to register (e.g. pg.example.com). If omitted, you will be prompted. | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Add a custom domain
-pgbeam domains add db.example.com
-# DNS records to configure:
-#   CNAME db.example.com → proxy.pgbeam.dev
-#   TXT   _pgbeam.db.example.com → pgbeam-verify=abc123
+# Add a domain interactively
+pgbeam domains add
 
-# Add a domain for a specific project
-pgbeam domains add db.example.com --project my-project
+# Add a specific domain
+pgbeam domains add pg.example.com
+
+# Add a domain and get DNS instructions as JSON
+pgbeam domains add pg.example.com --json
 ```
+
+## Output
+
+Prints the domain name and the DNS records (CNAME and TXT) required for verification. Suggests running `pgbeam domains verify <id>` as the next step. With `--json`, returns the domain object including `dns_instructions`.

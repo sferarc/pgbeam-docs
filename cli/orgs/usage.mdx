@@ -1,26 +1,42 @@
 ---
 title: orgs usage
-description: Show organization usage metrics.
+description: Show organization usage
 ---
 
-Show current usage metrics for the active organization, including connections, queries, and bandwidth.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Display aggregated usage metrics for the active organization over a date range. Shows daily breakdowns of total queries, cache hits, and data transferred across all projects. Defaults to the current calendar month if no date range is specified.
 
 ## Usage
 
 ```bash
-pgbeam orgs usage
+pgbeam orgs usage [flags]
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--start-date <value>` | Start of the date range in YYYY-MM-DD format. Defaults to the first day of the current month. | No | - |
+| `--end-date <value>` | End of the date range in YYYY-MM-DD format. Defaults to today. | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
+# Show usage for the current month
 pgbeam orgs usage
-# Organization: my-org
-# Billing period: Mar 1 – Mar 31, 2026
-#
-# METRIC          USED       LIMIT
-# Connections     1,240      10,000
-# Queries         482K       unlimited
-# Databases       3          10
-# Bandwidth       12.4 GB    100 GB
+
+# Show usage for a specific date range
+pgbeam orgs usage --start-date 2025-01-01 --end-date 2025-01-31
+
+# Get usage as JSON
+pgbeam orgs usage --json
 ```
+
+## Output
+
+Displays total queries and data transferred, followed by a day-by-day table with columns: Day, Queries, Cache Hits, and Data. With `--json`, returns the full usage response.

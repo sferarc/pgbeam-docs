@@ -1,12 +1,40 @@
 ---
 title: mcp
-description: MCP server for AI agent integration.
+description: Start MCP server (stdio transport)
 icon: Bot
 ---
 
-PgBeam exposes every public API operation as an MCP tool. AI assistants can
-create projects, manage databases, check analytics, and configure caching
-without leaving the conversation.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Start a Model Context Protocol (MCP) server using stdio transport. This allows AI coding assistants like Claude Code, Cursor, and other MCP-compatible clients to manage PgBeam projects, databases, and cache rules directly. The server exposes PgBeam API operations as MCP tools.
+
+## Usage
+
+```bash
+pgbeam mcp
+```
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Start the MCP server
+pgbeam mcp
+
+# Use with Claude Code (add to MCP config)
+pgbeam mcp
+```
+
+## Output
+
+Starts the MCP server and listens for JSON-RPC messages on stdin/stdout. The server runs until the process is terminated. No human-readable output is produced — all communication is via the MCP protocol.
+
+{/* @preserve */}
+
+## Configuration
 
 Two transports are available:
 
@@ -15,14 +43,9 @@ Two transports are available:
 | **CLI (stdio)** | Local dev — the AI tool spawns `pgbeam mcp` as a subprocess |
 | **Remote (Streamable HTTP)** | Server-to-server, hosted agents, or when the CLI isn't installed |
 
-## CLI transport (stdio)
+### CLI transport (stdio)
 
-```bash
-pgbeam mcp
-```
-
-The CLI reads `PGBEAM_TOKEN` from the environment and communicates over
-stdin/stdout using JSON-RPC 2.0.
+Add the MCP server to your AI tool's configuration:
 
 <Tabs items={["Claude Code", "Cursor", "Generic MCP"]}>
 <Tab value="Claude Code">
@@ -72,7 +95,7 @@ stdin/stdout using JSON-RPC 2.0.
 </Tab>
 </Tabs>
 
-## Remote transport (Streamable HTTP)
+### Remote transport (Streamable HTTP)
 
 ```
 POST https://api.pgbeam.com/v1/mcp

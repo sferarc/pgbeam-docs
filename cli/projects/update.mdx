@@ -1,29 +1,42 @@
 ---
 title: projects update
-description: Update project configuration.
+description: Update project settings
 ---
 
-Update project configuration.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Update the settings of an existing project. Currently supports renaming the project. If no project ID is provided, uses the linked project in the current directory. At least one update flag must be provided.
 
 ## Usage
 
 ```bash
-pgbeam projects update <project-id> [flags]
+pgbeam projects update [id] [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--name <name>` | New project name |
-| `--json` | Output as JSON |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` | Project ID to update. Uses the linked project if omitted. | No | - |
+| `--name <value>` | New display name for the project | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Rename a project
-pgbeam projects update prj_abc123 --name new-name
+# Rename the linked project
+pgbeam projects update --name new-name
 
-# Rename and output as JSON
-pgbeam projects update prj_abc123 --name new-name --json
+# Rename a specific project
+pgbeam projects update prj_xxx --name new-name
+
+# Update and get the result as JSON
+pgbeam projects update --name new-name --json
 ```
+
+## Output
+
+Prints a success message confirming the project was updated. With `--json`, returns the updated project object.

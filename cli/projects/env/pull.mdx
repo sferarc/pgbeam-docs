@@ -1,30 +1,42 @@
 ---
 title: env pull
-description: Pull DATABASE_URL to a local .env file.
+description: Write DATABASE_URL template to .env
 ---
 
-Pull the `DATABASE_URL` connection string for a project to a local `.env` file. Use `--stdout` to print to stdout instead of writing to a file.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Write a `DATABASE_URL` connection string template to a `.env` file (or a custom file via `--file`). The URL points to the project's PgBeam proxy host. You'll need to replace `USER`, `PASS`, and `YOUR_DB` with your actual upstream database credentials. If the file already contains a `DATABASE_URL`, you'll be prompted before overwriting unless `--yes` is passed.
 
 ## Usage
 
 ```bash
-pgbeam env pull [--stdout]
+pgbeam env pull [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--stdout` | Print the connection string to stdout instead of writing to `.env` |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--file <value>` | Path to the output file | No | `.env` |
+| `--yes`, `-y` | Skip the confirmation prompt if the file already contains DATABASE_URL | No | `false` |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
 # Write DATABASE_URL to .env
 pgbeam env pull
-# ✓ Wrote DATABASE_URL to .env
 
-# Print to stdout (useful for piping)
-pgbeam env pull --stdout
-# postgresql://user:pass@proxy.pgbeam.dev:5432/mydb?sslmode=require
+# Write to a custom file
+pgbeam env pull --file .env.local
+
+# Overwrite existing DATABASE_URL without confirmation
+pgbeam env pull --yes
 ```
+
+## Output
+
+Prints a success message confirming the file was written and reminds you to replace the placeholder credentials (USER, PASS, YOUR_DB).

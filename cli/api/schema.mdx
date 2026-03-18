@@ -1,35 +1,41 @@
 ---
 title: api schema
-description: Show the OpenAPI schema for a specific operation.
+description: Show operation schema
 ---
 
-Show the OpenAPI schema for a specific API operation, including request parameters, request body, and response shapes.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Show the schema details for an API operation, including the HTTP method, path, tag, and operation ID. You can look up operations by their `tag.method` name (e.g. `projects.listProjects`), by operationId, or by route string.
 
 ## Usage
 
 ```bash
-pgbeam api schema <operation-id>
+pgbeam api schema <operation>
 ```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<operation>` | Operation name in tag.method format (e.g. projects.listProjects), operationId, or route string | Yes | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# View the schema for the createDatabase operation
-pgbeam api schema createDatabase
-# POST /v1/databases
-#
-# Request body:
-#   name         string   required
-#   project_id   string   required
-#   region       string   optional (default: us-east-1)
-#
-# Response (201):
-#   id           string
-#   name         string
-#   project_id   string
-#   region       string
-#   created_at   string (ISO 8601)
+# Look up by tag.method name
+pgbeam api schema projects.listProjects
 
-# View the schema for the getProject operation
-pgbeam api schema getProject
+# Look up by operationId
+pgbeam api schema listProjects
+
+# Get schema as JSON
+pgbeam api schema projects.listProjects --json
 ```
+
+## Output
+
+Displays the tag, operation name, HTTP method, and API path. With `--json`, returns the full operation metadata object.

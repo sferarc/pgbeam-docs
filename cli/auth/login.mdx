@@ -1,29 +1,41 @@
 ---
 title: auth login
-description: Authenticate with PgBeam via API key or browser-based OAuth.
+description: Authenticate with PgBeam
 ---
 
-Authenticate with PgBeam via API key or browser-based OAuth.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Authenticate with PgBeam to access your projects and databases. Without flags, the command opens an interactive prompt where you choose your authentication method. Credentials are stored in a local profile on disk (`~/.config/pgbeam/`). You can maintain multiple profiles for different environments using the `--profile` flag.
 
 ## Usage
 
 ```bash
-pgbeam auth login [--api-key] [--profile <name>]
+pgbeam auth login [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--api-key` | Authenticate with an API key instead of browser-based OAuth |
-| `--profile` | Save credentials to a named profile |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--api-key` | Authenticate using an API key instead of browser-based OAuth. You will be prompted to paste a key generated from the PgBeam dashboard. | No | `false` |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Interactive browser login
+# Interactive login (prompts for method)
 pgbeam auth login
 
-# API key with named profile
+# Login directly with an API key
+pgbeam auth login --api-key
+
+# Login with an API key and save to a named profile
 pgbeam auth login --api-key --profile production
 ```
+
+## Output
+
+On success, prints a confirmation message with the authenticated profile name. The token is stored locally and used for all subsequent commands.

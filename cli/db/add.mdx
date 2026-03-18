@@ -1,31 +1,46 @@
 ---
 title: db add
-description: Add a database connection to the project.
+description: Add a database connection
 ---
 
-Add a database connection to the project. Without flags, runs interactively.
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Add a new database connection to the linked project. PgBeam will use these credentials to connect to your upstream PostgreSQL server. Without flags, the command runs interactively and prompts for all required values. After adding, use `pgbeam db test` to verify connectivity.
 
 ## Usage
 
 ```bash
-pgbeam db add [--host <host>] [--port <port>] [--database <name>] [--ssl-mode <mode>]
+pgbeam db add [flags]
 ```
 
-## Flags
+## Options
 
-| Flag | Description |
-| ---- | ----------- |
-| `--host` | Database hostname or IP address |
-| `--port` | Database port (default `5432`) |
-| `--database` | Database name |
-| `--ssl-mode` | SSL connection mode (`prefer`, `require`, `verify-ca`, `verify-full`) |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `--host <value>` | Hostname or IP address of the PostgreSQL server | No | - |
+| `--port <value>` | Port number of the PostgreSQL server | No | `5432` |
+| `--name <value>` | Name of the database on the server | No | - |
+| `--username <value>` | Username for authenticating with the database | No | - |
+| `--password <value>` | Password for authenticating with the database | No | - |
+| `--ssl-mode <value>` | SSL connection mode: disable, require, verify-ca, or verify-full | No | - |
+
+<Callout type="info" title="Global options">
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+</Callout>
 
 ## Examples
 
 ```bash
-# Interactive mode
+# Interactive database setup
 pgbeam db add
 
-# Fully specified
-pgbeam db add --host db.example.com --port 5432 --database myapp --ssl-mode require
+# Add with all flags
+pgbeam db add --host db.example.com --port 5432 --name mydb --username admin --password secret --ssl-mode require
+
+# Add and get result as JSON
+pgbeam db add --host db.example.com --name mydb --username admin --password secret --json
 ```
+
+## Output
+
+Prints the new database ID, name, and host:port. Suggests running `pgbeam db test <id>` to verify the connection. With `--json`, returns the full database object.
