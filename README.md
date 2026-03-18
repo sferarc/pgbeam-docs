@@ -1,3 +1,8 @@
+---
+title: PgBeam Documentation
+unlisted: true
+---
+
 # PgBeam Documentation
 
 Source files for [docs.pgbeam.com](https://docs.pgbeam.com) — the documentation
