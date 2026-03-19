@@ -13,47 +13,42 @@ provision PgBeam with consolidated billing through your existing AWS account —
 no separate payment method required.
 
 <Callout type="info">
-The AWS Marketplace listing is coming soon. Join the waitlist at
-[pgbeam.com](https://pgbeam.com) to get notified when it launches.
+  The AWS Marketplace listing is coming soon. Join the waitlist at
+  [pgbeam.com](https://pgbeam.com) to get notified when it launches.
 </Callout>
 
 ## How it works
 
 <Steps>
-<Step>
+  <Step>
+    ### Subscribe on AWS Marketplace
 
-### Subscribe on AWS Marketplace
+    Find PgBeam on the AWS Marketplace and subscribe. AWS handles payment through
+    your existing AWS billing account.
+  </Step>
 
-Find PgBeam on the AWS Marketplace and subscribe. AWS handles payment through
-your existing AWS billing account.
+  <Step>
+    ### Create your PgBeam account
 
-</Step>
-<Step>
+    After subscribing, you are redirected to PgBeam to create an organization
+    linked to your AWS account. Your subscription and entitlements are
+    automatically synced.
+  </Step>
 
-### Create your PgBeam account
+  <Step>
+    ### Provision a project
 
-After subscribing, you are redirected to PgBeam to create an organization
-linked to your AWS account. Your subscription and entitlements are
-automatically synced.
+    From the PgBeam dashboard, create a project and connect your RDS, Aurora, or
+    other PostgreSQL database. PgBeam provisions a proxy endpoint with connection
+    pooling and optional query caching.
+  </Step>
 
-</Step>
-<Step>
+  <Step>
+    ### Connect your app
 
-### Provision a project
-
-From the PgBeam dashboard, create a project and connect your RDS, Aurora, or
-other PostgreSQL database. PgBeam provisions a proxy endpoint with connection
-pooling and optional query caching.
-
-</Step>
-<Step>
-
-### Connect your app
-
-Update your application connection string to point at the PgBeam proxy
-endpoint. No other code changes are required.
-
-</Step>
+    Update your application connection string to point at the PgBeam proxy
+    endpoint. No other code changes are required.
+  </Step>
 </Steps>
 
 ## Features

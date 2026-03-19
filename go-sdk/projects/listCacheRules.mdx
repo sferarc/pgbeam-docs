@@ -8,21 +8,22 @@ description: List cache rules
 Returns the cache rules for a database, showing all observed query
 shapes with their stats and cache recommendations.
 
-
 ## Usage
 
 ```go
-result, err := client.Projects.ListCacheRules(ctx, nil)
+result, err := client.Projects.ListCacheRules(ctx, "prj_xxx", "db_xxx", nil)
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| params | `*pgbeam.ListCacheRulesParams` | No | Query parameters |
-| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
-| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
+| Parameter        | Type                           | Required | Description                                            |
+| ---------------- | ------------------------------ | -------- | ------------------------------------------------------ |
+| ctx              | `context.Context`              | Yes      | Request context                                        |
+| projectID        | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).   |
+| databaseID       | `string`                       | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).   |
+| params           | `*pgbeam.ListCacheRulesParams` | No       | Query parameters                                       |
+| params.PageSize  | `int`                          | No       | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string`                       | No       | Opaque token for cursor-based pagination.              |
 
 ## Response
 
@@ -37,7 +38,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Projects.ListCacheRules(ctx, &pgbeam.ListCacheRulesParams{
+result, err := client.Projects.ListCacheRules(ctx, "prj_xxx", "db_xxx", &pgbeam.ListCacheRulesParams{
     PageSize: 20,
     PageToken: "...",
   })
@@ -49,10 +50,10 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

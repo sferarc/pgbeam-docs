@@ -10,15 +10,18 @@ Lists all custom domains registered for the project.
 ## Usage
 
 ```typescript
-const result = await api.projects.listCustomDomains();
+const result = await api.projects.listCustomDomains({
+    pathParams: { project_id: "prj_xxx" },
+  });
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
-| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
+| Parameter               | Type     | Required | Description                                            |
+| ----------------------- | -------- | -------- | ------------------------------------------------------ |
+| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).   |
+| queryParams.page\_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
+| queryParams.page\_token | `string` | No       | Opaque token for cursor-based pagination.              |
 
 ## Response
 
@@ -35,16 +38,17 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.projects.listCustomDomains({
+  pathParams: { project_id: "prj_xxx" },
   queryParams: { page_size: 20, page_token: "..." },
 });
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

@@ -10,19 +10,19 @@ Sets the monthly spend limit for an organization. Null removes the limit.
 ## Usage
 
 ```go
-result, err := client.Analytics.UpdateSpendLimit(ctx, "org_xxx", &pgbeam.UpdateSpendLimitRequest{
+result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", &pgbeam.UpdateSpendLimitRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| orgID | `string` | Yes | Unique organization identifier. |
-| req | `*pgbeam.UpdateSpendLimitRequest` | Yes | Request body |
-| req.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. |
+| Parameter      | Type                              | Required | Description                                               |
+| -------------- | --------------------------------- | -------- | --------------------------------------------------------- |
+| ctx            | `context.Context`                 | Yes      | Request context                                           |
+| orgID          | `string`                          | Yes      | Unique organization identifier.                           |
+| req            | `*pgbeam.UpdateSpendLimitRequest` | Yes      | Request body                                              |
+| req.SpendLimit | `*float64`                        | No       | Monthly spend limit in dollars. Null to remove the limit. |
 
 ## Response
 
@@ -37,8 +37,8 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Analytics.UpdateSpendLimit(ctx, "org_xxx", &pgbeam.UpdateSpendLimitRequest{
-    SpendLimit: 0,
+result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", &pgbeam.UpdateSpendLimitRequest{
+    SpendLimit: 500,
   })
 if err != nil {
   log.Fatal(err)
@@ -48,9 +48,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

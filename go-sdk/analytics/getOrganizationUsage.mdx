@@ -10,21 +10,21 @@ Returns daily usage data aggregated across all projects in the organization.
 ## Usage
 
 ```go
-result, err := client.Analytics.GetOrganizationUsage(ctx, "org_xxx", &pgbeam.GetOrganizationUsageParams{
-    StartDate: "...",
-    EndDate: "...",
+result, err := client.Analytics.GetOrganizationUsage(ctx, "org_abc123", &pgbeam.GetOrganizationUsageParams{
+    StartDate: "2024-01-01",
+    EndDate: "2024-01-31",
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| orgID | `string` | Yes | Unique organization identifier. |
-| params | `*pgbeam.GetOrganizationUsageParams` | Yes | Query parameters |
-| params.StartDate | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
-| params.EndDate | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+| Parameter        | Type                                 | Required | Description                         |
+| ---------------- | ------------------------------------ | -------- | ----------------------------------- |
+| ctx              | `context.Context`                    | Yes      | Request context                     |
+| orgID            | `string`                             | Yes      | Unique organization identifier.     |
+| params           | `*pgbeam.GetOrganizationUsageParams` | Yes      | Query parameters                    |
+| params.StartDate | `string`                             | Yes      | Start date (inclusive, YYYY-MM-DD). |
+| params.EndDate   | `string`                             | Yes      | End date (inclusive, YYYY-MM-DD).   |
 
 ## Response
 
@@ -39,9 +39,9 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Analytics.GetOrganizationUsage(ctx, "org_xxx", &pgbeam.GetOrganizationUsageParams{
-    StartDate: "...",
-    EndDate: "...",
+result, err := client.Analytics.GetOrganizationUsage(ctx, "org_abc123", &pgbeam.GetOrganizationUsageParams{
+    StartDate: "2024-01-01",
+    EndDate: "2024-01-31",
   })
 if err != nil {
   log.Fatal(err)
@@ -51,9 +51,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

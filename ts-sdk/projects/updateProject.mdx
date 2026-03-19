@@ -11,6 +11,7 @@ Partially updates a project. Only provided fields are modified.
 
 ```typescript
 const result = await api.projects.updateProject({
+    pathParams: { project_id: "prj_xxx" },
     body: {
       ,
     },
@@ -19,17 +20,18 @@ const result = await api.projects.updateProject({
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| body.name | `string` | No | Updated project name. |
-| body.description | `string` | No | Updated project description. |
-| body.tags | `string[]` | No | Replacement set of user-defined project labels. |
-| body.status | `ProjectStatus` | No |  |
-| body.queries_per_second | `number` | No | Maximum queries per second. 0 means unlimited. |
-| body.burst_size | `number` | No | Burst allowance above steady-state rate. |
-| body.max_connections | `number` | No | Maximum concurrent proxy connections. 0 means unlimited. |
-| body.allowed_cidrs | `string[]` | No | IP allowlist as CIDR ranges. Empty array means allow all.
- |
+| Parameter                 | Type            | Required | Description                                               |
+| ------------------------- | --------------- | -------- | --------------------------------------------------------- |
+| pathParams.project\_id    | `string`        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).      |
+| body.name                 | `string`        | No       | Updated project name.                                     |
+| body.description          | `string`        | No       | Updated project description.                              |
+| body.tags                 | `string[]`      | No       | Replacement set of user-defined project labels.           |
+| body.status               | `ProjectStatus` | No       |                                                           |
+| body.queries\_per\_second | `number`        | No       | Maximum queries per second. 0 means unlimited.            |
+| body.burst\_size          | `number`        | No       | Burst allowance above steady-state rate.                  |
+| body.max\_connections     | `number`        | No       | Maximum concurrent proxy connections. 0 means unlimited.  |
+| body.allowed\_cidrs       | `string[]`      | No       | IP allowlist as CIDR ranges. Empty array means allow all. |
+|                           |                 |          |                                                           |
 
 ## Response
 
@@ -46,6 +48,7 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.projects.updateProject({
+  pathParams: { project_id: "prj_xxx" },
   body: {
       ,
     },
@@ -54,10 +57,10 @@ const result = await client.api.projects.updateProject({
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

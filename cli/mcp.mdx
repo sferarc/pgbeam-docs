@@ -15,7 +15,7 @@ pgbeam mcp
 ```
 
 <Callout type="info" title="Global options">
-All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
 </Callout>
 
 ## Examples
@@ -38,9 +38,9 @@ Starts the MCP server and listens for JSON-RPC messages on stdin/stdout. The ser
 
 Two transports are available:
 
-| Transport | When to use |
-| --- | --- |
-| **CLI (stdio)** | Local dev — the AI tool spawns `pgbeam mcp` as a subprocess |
+| Transport                    | When to use                                                      |
+| ---------------------------- | ---------------------------------------------------------------- |
+| **CLI (stdio)**              | Local dev — the AI tool spawns `pgbeam mcp` as a subprocess      |
 | **Remote (Streamable HTTP)** | Server-to-server, hosted agents, or when the CLI isn't installed |
 
 ### CLI transport (stdio)
@@ -48,51 +48,53 @@ Two transports are available:
 Add the MCP server to your AI tool's configuration:
 
 <Tabs items={["Claude Code", "Cursor", "Generic MCP"]}>
-<Tab value="Claude Code">
-```json title=".claude/mcp.json"
-{
-  "mcpServers": {
-    "pgbeam": {
-      "command": "pgbeam",
-      "args": ["mcp"],
-      "env": {
-        "PGBEAM_TOKEN": "pbk_..."
+  <Tab value="Claude Code">
+    ```json title=".claude/mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "command": "pgbeam",
+          "args": ["mcp"],
+          "env": {
+            "PGBEAM_TOKEN": "pbk_..."
+          }
+        }
       }
     }
-  }
-}
-```
-</Tab>
-<Tab value="Cursor">
-```json title=".cursor/mcp.json"
-{
-  "mcpServers": {
-    "pgbeam": {
-      "command": "pgbeam",
-      "args": ["mcp"],
-      "env": {
-        "PGBEAM_TOKEN": "pbk_..."
+    ```
+  </Tab>
+
+  <Tab value="Cursor">
+    ```json title=".cursor/mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "command": "pgbeam",
+          "args": ["mcp"],
+          "env": {
+            "PGBEAM_TOKEN": "pbk_..."
+          }
+        }
       }
     }
-  }
-}
-```
-</Tab>
-<Tab value="Generic MCP">
-```json
-{
-  "mcpServers": {
-    "pgbeam": {
-      "command": "pgbeam",
-      "args": ["mcp"],
-      "env": {
-        "PGBEAM_TOKEN": "pbk_..."
+    ```
+  </Tab>
+
+  <Tab value="Generic MCP">
+    ```json
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "command": "pgbeam",
+          "args": ["mcp"],
+          "env": {
+            "PGBEAM_TOKEN": "pbk_..."
+          }
+        }
       }
     }
-  }
-}
-```
-</Tab>
+    ```
+  </Tab>
 </Tabs>
 
 ### Remote transport (Streamable HTTP)
@@ -110,52 +112,54 @@ The remote endpoint follows the
 server-to-server integration.
 
 <Tabs items={["Claude Code", "Cursor", "Generic MCP"]}>
-<Tab value="Claude Code">
-```json title=".claude/mcp.json"
-{
-  "mcpServers": {
-    "pgbeam": {
-      "type": "url",
-      "url": "https://api.pgbeam.com/v1/mcp",
-      "headers": {
-        "Authorization": "Bearer pbk_..."
+  <Tab value="Claude Code">
+    ```json title=".claude/mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "type": "url",
+          "url": "https://api.pgbeam.com/v1/mcp",
+          "headers": {
+            "Authorization": "Bearer pbk_..."
+          }
+        }
       }
     }
-  }
-}
-```
-</Tab>
-<Tab value="Cursor">
-```json title=".cursor/mcp.json"
-{
-  "mcpServers": {
-    "pgbeam": {
-      "url": "https://api.pgbeam.com/v1/mcp",
-      "headers": {
-        "Authorization": "Bearer pbk_..."
-      }
-    }
-  }
-}
-```
-</Tab>
-<Tab value="Generic MCP">
-Any MCP client that supports Streamable HTTP can connect directly:
+    ```
+  </Tab>
 
-```json
-{
-  "mcpServers": {
-    "pgbeam": {
-      "transport": "streamable-http",
-      "url": "https://api.pgbeam.com/v1/mcp",
-      "headers": {
-        "Authorization": "Bearer pbk_..."
+  <Tab value="Cursor">
+    ```json title=".cursor/mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "url": "https://api.pgbeam.com/v1/mcp",
+          "headers": {
+            "Authorization": "Bearer pbk_..."
+          }
+        }
       }
     }
-  }
-}
-```
-</Tab>
+    ```
+  </Tab>
+
+  <Tab value="Generic MCP">
+    Any MCP client that supports Streamable HTTP can connect directly:
+
+    ```json
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "transport": "streamable-http",
+          "url": "https://api.pgbeam.com/v1/mcp",
+          "headers": {
+            "Authorization": "Bearer pbk_..."
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
 </Tabs>
 
 ### Example: raw JSON-RPC

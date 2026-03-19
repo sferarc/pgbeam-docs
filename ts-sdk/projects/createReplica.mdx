@@ -11,8 +11,9 @@ Adds a read replica to a database.
 
 ```typescript
 const result = await api.projects.createReplica({
+    pathParams: { database_id: "db_xxx" },
     body: {
-      host: "...",
+      host: "replica.us-west-2.rds.amazonaws.com",
       port: 5432,
     },
   });
@@ -20,11 +21,12 @@ const result = await api.projects.createReplica({
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| body.host | `string` | Yes | PostgreSQL replica host. |
-| body.port | `number` | Yes | PostgreSQL replica port. |
-| body.ssl_mode | `SSLMode` | No |  |
+| Parameter               | Type      | Required | Description                                          |
+| ----------------------- | --------- | -------- | ---------------------------------------------------- |
+| pathParams.database\_id | `string`  | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
+| body.host               | `string`  | Yes      | PostgreSQL replica host.                             |
+| body.port               | `number`  | Yes      | PostgreSQL replica port.                             |
+| body.ssl\_mode          | `SSLMode` | No       |                                                      |
 
 ## Response
 
@@ -41,8 +43,9 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.projects.createReplica({
+  pathParams: { database_id: "db_xxx" },
   body: {
-      host: "...",
+      host: "replica.us-west-2.rds.amazonaws.com",
       port: 5432,
     },
 });
@@ -50,10 +53,10 @@ const result = await client.api.projects.createReplica({
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

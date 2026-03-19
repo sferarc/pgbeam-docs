@@ -10,18 +10,19 @@ Registers a new custom domain for the project. Returns DNS verification instruct
 ## Usage
 
 ```go
-result, err := client.Projects.CreateCustomDomain(ctx, &pgbeam.CreateCustomDomainRequest{
-    Domain: "...",
+result, err := client.Projects.CreateCustomDomain(ctx, "prj_xxx", &pgbeam.CreateCustomDomainRequest{
+    Domain: "db.example.com",
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| req | `*pgbeam.CreateCustomDomainRequest` | Yes | Request body |
-| req.Domain | `string` | Yes | The custom domain name to add (e.g., db.example.com). |
+| Parameter  | Type                                | Required | Description                                           |
+| ---------- | ----------------------------------- | -------- | ----------------------------------------------------- |
+| ctx        | `context.Context`                   | Yes      | Request context                                       |
+| projectID  | `string`                            | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).  |
+| req        | `*pgbeam.CreateCustomDomainRequest` | Yes      | Request body                                          |
+| req.Domain | `string`                            | Yes      | The custom domain name to add (e.g., db.example.com). |
 
 ## Response
 
@@ -36,8 +37,8 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Projects.CreateCustomDomain(ctx, &pgbeam.CreateCustomDomainRequest{
-    Domain: "...",
+result, err := client.Projects.CreateCustomDomain(ctx, "prj_xxx", &pgbeam.CreateCustomDomainRequest{
+    Domain: "db.example.com",
   })
 if err != nil {
   log.Fatal(err)
@@ -47,11 +48,11 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Custom domains require a Scale or Enterprise plan. |
-| 404 | Resource not found. |
-| 409 | Resource already exists or conflicts with current state. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Custom domains require a Scale or Enterprise plan.       |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

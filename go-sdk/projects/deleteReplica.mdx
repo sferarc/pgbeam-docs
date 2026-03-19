@@ -10,14 +10,16 @@ Removes a read replica from a database.
 ## Usage
 
 ```go
-err := client.Projects.DeleteReplica(ctx)
+err := client.Projects.DeleteReplica(ctx, "db_xxx", "rep_xxx")
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
+| Parameter  | Type              | Required | Description                                          |
+| ---------- | ----------------- | -------- | ---------------------------------------------------- |
+| ctx        | `context.Context` | Yes      | Request context                                      |
+| databaseID | `string`          | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
+| replicaID  | `string`          | Yes      | Unique replica identifier (prefixed, e.g. rep\_xxx). |
 
 ## Response
 
@@ -32,7 +34,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-err := client.Projects.DeleteReplica(ctx)
+err := client.Projects.DeleteReplica(ctx, "db_xxx", "rep_xxx")
 if err != nil {
   log.Fatal(err)
 }
@@ -40,10 +42,10 @@ if err != nil {
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

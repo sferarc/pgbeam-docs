@@ -12,16 +12,16 @@ provider. Team members sign in with their corporate credentials instead of
 managing separate PgBeam passwords.
 
 <Callout type="warn" title="Scale plan required">
-SSO requires the **Scale plan**. See [Plans & Pricing](/docs/plans) for
-details.
+  SSO requires the **Scale plan**. See [Plans & Pricing](/docs/plans) for
+  details.
 </Callout>
 
 ## Supported protocols
 
-| Protocol           | Use case                                      |
-| ------------------ | --------------------------------------------- |
-| **SAML 2.0**       | Enterprise IdPs (Okta, Azure AD, OneLogin)    |
-| **OpenID Connect** | Modern IdPs and custom OAuth2 providers       |
+| Protocol           | Use case                                   |
+| ------------------ | ------------------------------------------ |
+| **SAML 2.0**       | Enterprise IdPs (Okta, Azure AD, OneLogin) |
+| **OpenID Connect** | Modern IdPs and custom OAuth2 providers    |
 
 Choose whichever protocol your identity provider supports. If your IdP supports
 both, OIDC is generally simpler to configure.
@@ -29,108 +29,97 @@ both, OIDC is generally simpler to configure.
 ## SAML 2.0 setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Create a SAML application in your IdP
 
-### Create a SAML application in your IdP
+    In your identity provider (Okta, Azure AD, Google Workspace, OneLogin, etc.),
+    create a new SAML 2.0 application. Most providers have a "custom SAML app"
+    option.
+  </Step>
 
-In your identity provider (Okta, Azure AD, Google Workspace, OneLogin, etc.),
-create a new SAML 2.0 application. Most providers have a "custom SAML app"
-option.
+  <Step>
+    ### Get PgBeam's SAML configuration
 
-</Step>
-<Step>
+    Go to **Settings > Security > Configure SSO** in the PgBeam dashboard. You will
+    see two values to copy into your IdP:
 
-### Get PgBeam's SAML configuration
+    | Field                                    | Description                         |
+    | ---------------------------------------- | ----------------------------------- |
+    | **ACS URL** (Assertion Consumer Service) | Where your IdP sends SAML responses |
+    | **Entity ID** (SP Entity ID)             | PgBeam's SAML identifier            |
+  </Step>
 
-Go to **Settings > Security > Configure SSO** in the PgBeam dashboard. You will
-see two values to copy into your IdP:
+  <Step>
+    ### Configure attribute mapping
 
-| Field                             | Description                        |
-| --------------------------------- | ---------------------------------- |
-| **ACS URL** (Assertion Consumer Service) | Where your IdP sends SAML responses |
-| **Entity ID** (SP Entity ID)      | PgBeam's SAML identifier           |
+    Map the following SAML attributes in your IdP. PgBeam uses these to identify
+    users:
 
-</Step>
-<Step>
+    | SAML attribute      | Required | Maps to      |
+    | ------------------- | -------- | ------------ |
+    | `email` or `NameID` | Yes      | User email   |
+    | `firstName`         | No       | Display name |
+    | `lastName`          | No       | Display name |
+  </Step>
 
-### Configure attribute mapping
+  <Step>
+    ### Add IdP metadata to PgBeam
 
-Map the following SAML attributes in your IdP. PgBeam uses these to identify
-users:
+    Copy your IdP's **metadata URL** into PgBeam's SSO configuration page and
+    save. PgBeam fetches the IdP certificate, SSO URL, and entity ID from this
+    URL automatically.
 
-| SAML attribute          | Required | Maps to        |
-| ----------------------- | -------- | -------------- |
-| `email` or `NameID`     | Yes      | User email     |
-| `firstName`             | No       | Display name   |
-| `lastName`              | No       | Display name   |
+    If your IdP does not provide a metadata URL, you can paste the metadata XML
+    directly.
+  </Step>
 
-</Step>
-<Step>
+  <Step>
+    ### Test the connection
 
-### Add IdP metadata to PgBeam
-
-Copy your IdP's **metadata URL** into PgBeam's SSO configuration page and
-save. PgBeam fetches the IdP certificate, SSO URL, and entity ID from this
-URL automatically.
-
-If your IdP does not provide a metadata URL, you can paste the metadata XML
-directly.
-
-</Step>
-<Step>
-
-### Test the connection
-
-Click **Test** in the PgBeam dashboard to verify the SAML flow. This opens a
-new window that walks through the full sign-in process. If the test succeeds,
-you will see a confirmation with the authenticated user's details.
-
-</Step>
+    Click **Test** in the PgBeam dashboard to verify the SAML flow. This opens a
+    new window that walks through the full sign-in process. If the test succeeds,
+    you will see a confirmation with the authenticated user's details.
+  </Step>
 </Steps>
 
 ## OIDC setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Create an OIDC application in your IdP
 
-### Create an OIDC application in your IdP
+    In your identity provider, create a new OpenID Connect (OIDC) application.
+    Choose "Web Application" as the application type.
+  </Step>
 
-In your identity provider, create a new OpenID Connect (OIDC) application.
-Choose "Web Application" as the application type.
+  <Step>
+    ### Configure the redirect URI
 
-</Step>
-<Step>
+    Set the **redirect URI** to the value shown in PgBeam's SSO configuration page
+    (under **Settings > Security > Configure SSO**).
+  </Step>
 
-### Configure the redirect URI
+  <Step>
+    ### Add credentials to PgBeam
 
-Set the **redirect URI** to the value shown in PgBeam's SSO configuration page
-(under **Settings > Security > Configure SSO**).
+    Copy the following from your IdP into PgBeam:
 
-</Step>
-<Step>
+    | Field             | Where to find it                                                |
+    | ----------------- | --------------------------------------------------------------- |
+    | **Client ID**     | Application settings in your IdP                                |
+    | **Client secret** | Application settings in your IdP                                |
+    | **Discovery URL** | Usually `https://your-idp.com/.well-known/openid-configuration` |
 
-### Add credentials to PgBeam
+    PgBeam uses the discovery URL to automatically fetch authorization endpoints,
+    token endpoints, and signing keys.
+  </Step>
 
-Copy the following from your IdP into PgBeam:
+  <Step>
+    ### Test the connection
 
-| Field              | Where to find it                              |
-| ------------------ | --------------------------------------------- |
-| **Client ID**      | Application settings in your IdP              |
-| **Client secret**  | Application settings in your IdP              |
-| **Discovery URL**  | Usually `https://your-idp.com/.well-known/openid-configuration` |
-
-PgBeam uses the discovery URL to automatically fetch authorization endpoints,
-token endpoints, and signing keys.
-
-</Step>
-<Step>
-
-### Test the connection
-
-Click **Test** in the PgBeam dashboard to verify the OIDC flow. This redirects
-to your IdP for authentication and confirms the user details returned.
-
-</Step>
+    Click **Test** in the PgBeam dashboard to verify the OIDC flow. This redirects
+    to your IdP for authentication and confirms the user details returned.
+  </Step>
 </Steps>
 
 ## Supported identity providers
@@ -138,14 +127,14 @@ to your IdP for authentication and confirms the user details returned.
 SSO works with any SAML 2.0 or OIDC-compliant identity provider. Commonly used
 providers include:
 
-| Provider                    | SAML | OIDC | Notes                           |
-| --------------------------- | ---- | ---- | ------------------------------- |
-| Okta                        | Yes  | Yes  | Both protocols fully supported  |
-| Azure AD / Entra ID         | Yes  | Yes  | Use "Enterprise Application" for SAML |
-| Google Workspace            | Yes  | Yes  | SAML via Admin Console          |
-| OneLogin                    | Yes  | Yes  | Both protocols fully supported  |
-| Auth0                       | Yes  | Yes  | Use "Regular Web Application"   |
-| JumpCloud                   | Yes  | Yes  | Both protocols fully supported  |
+| Provider            | SAML | OIDC | Notes                                 |
+| ------------------- | ---- | ---- | ------------------------------------- |
+| Okta                | Yes  | Yes  | Both protocols fully supported        |
+| Azure AD / Entra ID | Yes  | Yes  | Use "Enterprise Application" for SAML |
+| Google Workspace    | Yes  | Yes  | SAML via Admin Console                |
+| OneLogin            | Yes  | Yes  | Both protocols fully supported        |
+| Auth0               | Yes  | Yes  | Use "Regular Web Application"         |
+| JumpCloud           | Yes  | Yes  | Both protocols fully supported        |
 
 ## Just-in-time provisioning
 
@@ -167,9 +156,9 @@ organization. Enforcement means:
 - New invitations require the recipient to sign in via SSO
 
 <Callout type="info" title="Owner recovery">
-Organization owners retain the ability to log in with email/password even when
-SSO enforcement is enabled. This serves as a recovery mechanism in case the
-IdP is unavailable or misconfigured.
+  Organization owners retain the ability to log in with email/password even when
+  SSO enforcement is enabled. This serves as a recovery mechanism in case the
+  IdP is unavailable or misconfigured.
 </Callout>
 
 ### Enable enforcement
@@ -182,28 +171,28 @@ will be signed out immediately.
 
 ### SAML issues
 
-| Problem                          | Likely cause                              | Fix                                     |
-| -------------------------------- | ----------------------------------------- | --------------------------------------- |
-| "Invalid ACS URL" error          | ACS URL mismatch between IdP and PgBeam   | Copy the exact ACS URL from PgBeam      |
-| "Audience mismatch" error        | Entity ID mismatch                        | Verify SP Entity ID matches in both systems |
-| User lands on error page         | Attribute mapping missing `email`         | Ensure `email` or `NameID` is mapped     |
-| Certificate validation failed    | IdP certificate rotated                   | Re-import the metadata URL in PgBeam     |
+| Problem                       | Likely cause                            | Fix                                         |
+| ----------------------------- | --------------------------------------- | ------------------------------------------- |
+| "Invalid ACS URL" error       | ACS URL mismatch between IdP and PgBeam | Copy the exact ACS URL from PgBeam          |
+| "Audience mismatch" error     | Entity ID mismatch                      | Verify SP Entity ID matches in both systems |
+| User lands on error page      | Attribute mapping missing `email`       | Ensure `email` or `NameID` is mapped        |
+| Certificate validation failed | IdP certificate rotated                 | Re-import the metadata URL in PgBeam        |
 
 ### OIDC issues
 
-| Problem                          | Likely cause                              | Fix                                     |
-| -------------------------------- | ----------------------------------------- | --------------------------------------- |
-| "Invalid redirect URI"           | Redirect URI mismatch                     | Copy the exact redirect URI from PgBeam  |
-| "Invalid client" error           | Wrong client ID or secret                 | Re-copy credentials from your IdP        |
-| Discovery URL fails              | URL is incorrect or not publicly reachable | Verify the URL returns JSON in a browser |
+| Problem                | Likely cause                               | Fix                                      |
+| ---------------------- | ------------------------------------------ | ---------------------------------------- |
+| "Invalid redirect URI" | Redirect URI mismatch                      | Copy the exact redirect URI from PgBeam  |
+| "Invalid client" error | Wrong client ID or secret                  | Re-copy credentials from your IdP        |
+| Discovery URL fails    | URL is incorrect or not publicly reachable | Verify the URL returns JSON in a browser |
 
 ### General issues
 
-| Problem                          | Likely cause                              | Fix                                     |
-| -------------------------------- | ----------------------------------------- | --------------------------------------- |
-| Users can still use passwords    | SSO enforcement not enabled               | Toggle "Require SSO" in Security settings |
-| New user gets wrong role         | Default JIT role is Member                | Change role after provisioning           |
-| IdP is down and nobody can log in | SSO enforcement is enabled               | Owner can log in with email/password and disable enforcement |
+| Problem                           | Likely cause                | Fix                                                          |
+| --------------------------------- | --------------------------- | ------------------------------------------------------------ |
+| Users can still use passwords     | SSO enforcement not enabled | Toggle "Require SSO" in Security settings                    |
+| New user gets wrong role          | Default JIT role is Member  | Change role after provisioning                               |
+| IdP is down and nobody can log in | SSO enforcement is enabled  | Owner can log in with email/password and disable enforcement |
 
 ## Further reading
 

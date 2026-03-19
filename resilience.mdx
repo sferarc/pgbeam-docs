@@ -17,11 +17,11 @@ database from being overwhelmed with connection attempts.
 
 ### States
 
-| State         | Behavior                                                                    |
-| ------------- | --------------------------------------------------------------------------- |
-| **Closed**    | Normal operation. All connections flow to the upstream database.            |
+| State         | Behavior                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| **Closed**    | Normal operation. All connections flow to the upstream database.                                       |
 | **Open**      | Triggered after 3 consecutive connection failures. New connections are rejected with SQLSTATE `08006`. |
-| **Half-open** | After a cooldown period, PgBeam sends a single probe connection to test recovery. |
+| **Half-open** | After a cooldown period, PgBeam sends a single probe connection to test recovery.                      |
 
 ### Recovery flow
 
@@ -68,13 +68,13 @@ cold start that re-initializes the project.
 
 ### What gets suspended
 
-| Resource          | Parked behavior                    |
-| ----------------- | ---------------------------------- |
-| Connection pools  | Drained and released               |
-| Health checks     | Paused                             |
-| Rate limiters     | Reset                              |
-| Cache entries     | Local cache evicted; shared regional cache retained |
-| Project config    | Stays in memory for fast resume    |
+| Resource         | Parked behavior                                     |
+| ---------------- | --------------------------------------------------- |
+| Connection pools | Drained and released                                |
+| Health checks    | Paused                                              |
+| Rate limiters    | Reset                                               |
+| Cache entries    | Local cache evicted; shared regional cache retained |
+| Project config   | Stays in memory for fast resume                     |
 
 ### Cold start latency
 
@@ -87,9 +87,9 @@ The cold start adds latency to the first connection. It includes:
 Subsequent connections within the same session are unaffected.
 
 <Callout type="info">
-Scale-to-zero only applies to the data plane resources. Your project
-configuration, databases, cache rules, and settings remain intact in the
-control plane at all times.
+  Scale-to-zero only applies to the data plane resources. Your project
+  configuration, databases, cache rules, and settings remain intact in the
+  control plane at all times.
 </Callout>
 
 ## Health checks
@@ -110,11 +110,11 @@ Read replicas are checked independently. An unhealthy replica is removed from
 the round-robin rotation automatically. When it recovers, it is re-added
 without manual intervention.
 
-| Event              | Action                                      |
-| ------------------ | ------------------------------------------- |
+| Event               | Action                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------- |
 | Replica check fails | Removed from rotation. Traffic goes to remaining healthy replicas or falls back to primary. |
-| Replica recovers    | Re-added to rotation after consecutive successful checks. |
-| All replicas fail   | Annotated replica queries fall back to the primary database. |
+| Replica recovers    | Re-added to rotation after consecutive successful checks.                                   |
+| All replicas fail   | Annotated replica queries fall back to the primary database.                                |
 
 ## Fail-open caching
 
@@ -122,10 +122,10 @@ PgBeam's caching layer is designed to degrade gracefully. If the cache
 infrastructure has issues, queries fall through to the upstream database instead
 of failing.
 
-| Cache layer    | Scope              | Failure behavior                          |
-| -------------- | ------------------ | ----------------------------------------- |
-| **L1**         | Per-process        | Process-local; failure is extremely rare   |
-| **L2**         | Shared per region  | On failure, queries bypass L2 and go to upstream |
+| Cache layer | Scope             | Failure behavior                                 |
+| ----------- | ----------------- | ------------------------------------------------ |
+| **L1**      | Per-process       | Process-local; failure is extremely rare         |
+| **L2**      | Shared per region | On failure, queries bypass L2 and go to upstream |
 
 This means a shared cache outage results in higher upstream load (cache misses)
 but never in dropped queries. Your application continues to work — it just

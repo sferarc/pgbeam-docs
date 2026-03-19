@@ -15,9 +15,9 @@ result, err := client.Account.ExportAccountData(ctx)
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
+| Parameter | Type              | Required | Description     |
+| --------- | ----------------- | -------- | --------------- |
+| ctx       | `context.Context` | Yes      | Request context |
 
 ## Response
 
@@ -41,8 +41,8 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |

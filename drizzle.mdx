@@ -14,54 +14,51 @@ are required.
 ## Setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Update your environment
 
-### Update your environment
+    ```bash title=".env"
+    DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+    ```
+  </Step>
 
-```bash title=".env"
-DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
-```
+  <Step>
+    ### Configure the database client
 
-</Step>
-<Step>
+    <Tabs items={["Simple", "With pool config"]}>
+      <Tab value="Simple">
+        ```ts title="db.ts"
+        import { drizzle } from "drizzle-orm/node-postgres";
 
-### Configure the database client
+        const db = drizzle(process.env.DATABASE_URL!);
+        ```
+      </Tab>
 
-<Tabs items={["Simple", "With pool config"]}>
-<Tab value="Simple">
-```ts title="db.ts"
-import { drizzle } from "drizzle-orm/node-postgres";
+      <Tab value="With pool config">
+        ```ts title="db.ts"
+        import { drizzle } from "drizzle-orm/node-postgres";
+        import { Pool } from "pg";
 
-const db = drizzle(process.env.DATABASE_URL!);
-```
-</Tab>
-<Tab value="With pool config">
-```ts title="db.ts"
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+        const pool = new Pool({
+          connectionString: process.env.DATABASE_URL,
+          max: 5, // PgBeam handles upstream pooling — keep this low
+        });
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 5, // PgBeam handles upstream pooling — keep this low
-});
+        const db = drizzle(pool);
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
 
-const db = drizzle(pool);
-```
-</Tab>
-</Tabs>
+  <Step>
+    ### Run a test query
 
-</Step>
-<Step>
+    ```ts
+    const users = await db.select().from(usersTable);
+    ```
 
-### Run a test query
-
-```ts
-const users = await db.select().from(usersTable);
-```
-
-If this returns results, Drizzle is connected through PgBeam.
-
-</Step>
+    If this returns results, Drizzle is connected through PgBeam.
+  </Step>
 </Steps>
 
 ## Connection pool sizing
@@ -70,24 +67,24 @@ PgBeam handles upstream connection pooling, so the `pg` pool on your
 application side should be small. A pool size of 3-5 per application instance
 is typically sufficient.
 
-| Deployment type         | Recommended `max` pool size |
-| ----------------------- | --------------------------- |
-| Single server           | 5-10                        |
-| Multiple replicas/pods  | 3-5 per instance            |
-| Serverless (Lambda)     | 1-2                         |
+| Deployment type        | Recommended `max` pool size |
+| ---------------------- | --------------------------- |
+| Single server          | 5-10                        |
+| Multiple replicas/pods | 3-5 per instance            |
+| Serverless (Lambda)    | 1-2                         |
 
 <Callout type="info">
-With PgBeam in transaction pool mode, each Drizzle connection only holds an
-upstream connection for the duration of a transaction. This means a small
-local pool can handle high concurrency.
+  With PgBeam in transaction pool mode, each Drizzle connection only holds an
+  upstream connection for the duration of a transaction. This means a small
+  local pool can handle high concurrency.
 </Callout>
 
 ## Drizzle Kit migrations
 
 <Callout type="warn" title="Run migrations against the origin">
-Run Drizzle Kit migrations directly against your origin database, not through
-PgBeam. Migrations may use session features that behave differently through a
-connection pool.
+  Run Drizzle Kit migrations directly against your origin database, not through
+  PgBeam. Migrations may use session features that behave differently through a
+  connection pool.
 </Callout>
 
 ```bash
@@ -164,11 +161,11 @@ const result = await db.execute(sql`SELECT * FROM users WHERE id = ${userId}`);
 
 ## Common issues
 
-| Issue                               | Cause                            | Fix                                      |
-| ----------------------------------- | -------------------------------- | ---------------------------------------- |
-| "Too many connections" errors       | `pg` pool too large              | Set `max: 5` in Pool config              |
-| Migrations fail through PgBeam      | Session features not available   | Run migrations against origin directly   |
-| Stale data after writes             | Cache returning old results      | Use `noCache` annotation or adjust TTL   |
+| Issue                          | Cause                          | Fix                                    |
+| ------------------------------ | ------------------------------ | -------------------------------------- |
+| "Too many connections" errors  | `pg` pool too large            | Set `max: 5` in Pool config            |
+| Migrations fail through PgBeam | Session features not available | Run migrations against origin directly |
+| Stale data after writes        | Cache returning old results    | Use `noCache` annotation or adjust TTL |
 
 ## Further reading
 

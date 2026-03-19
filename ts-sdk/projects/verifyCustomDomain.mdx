@@ -10,12 +10,17 @@ Checks DNS TXT record to verify domain ownership. Updates domain status on succe
 ## Usage
 
 ```typescript
-const result = await api.projects.verifyCustomDomain();
+const result = await api.projects.verifyCustomDomain({
+    pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
+  });
 ```
 
 ## Parameters
 
-None.
+| Parameter              | Type     | Required | Description                                                |
+| ---------------------- | -------- | -------- | ---------------------------------------------------------- |
+| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).       |
+| pathParams.domain\_id  | `string` | Yes      | Unique custom domain identifier (prefixed, e.g. dom\_xxx). |
 
 ## Response
 
@@ -31,15 +36,17 @@ const client = new PgBeamClient({
   baseUrl: "https://api.pgbeam.com",
 });
 
-const result = await client.api.projects.verifyCustomDomain();
+const result = await client.api.projects.verifyCustomDomain({
+  pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
+});
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Custom domains require a Scale or Enterprise plan. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                        |
+| ------ | -------------------------------------------------- |
+| 400    | Invalid request parameters.                        |
+| 401    | Missing or invalid authentication.                 |
+| 403    | Custom domains require a Scale or Enterprise plan. |
+| 404    | Resource not found.                                |
+| 429    | Rate limited. Try again later.                     |

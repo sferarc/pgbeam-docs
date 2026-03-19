@@ -15,16 +15,16 @@ pgbeam cache-rules set <query-hash> [flags]
 
 ## Options
 
-| Option | Description | Required | Default |
-| ------ | ----------- | -------- | ------- |
-| `<query-hash>` | Query hash (xxhash64 hex) identifying the query shape. Find this via `pgbeam cache-rules list`. | Yes | - |
-| `--database-id <value>` | ID of the database that owns the query | Yes | - |
-| `--enabled <value>` | Whether to enable caching for this query: "true" or "false" | Yes | - |
-| `--ttl <value>` | TTL (time-to-live) override in seconds. Omit to use the project default. | No | - |
-| `--swr <value>` | SWR (stale-while-revalidate) override in seconds. Omit to use the project default. | No | - |
+| Option                  | Description                                                                                     | Required | Default |
+| ----------------------- | ----------------------------------------------------------------------------------------------- | -------- | ------- |
+| `<query-hash>`          | Query hash (xxhash64 hex) identifying the query shape. Find this via `pgbeam cache-rules list`. | Yes      | -       |
+| `--database-id <value>` | ID of the database that owns the query                                                          | Yes      | -       |
+| `--enabled <value>`     | Whether to enable caching for this query: "true" or "false"                                     | Yes      | -       |
+| `--ttl <value>`         | TTL (time-to-live) override in seconds. Omit to use the project default.                        | No       | -       |
+| `--swr <value>`         | SWR (stale-while-revalidate) override in seconds. Omit to use the project default.              | No       | -       |
 
 <Callout type="info" title="Global options">
-All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
 </Callout>
 
 ## Examples

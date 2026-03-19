@@ -10,32 +10,34 @@ Partially updates a database connection. Only provided fields are modified.
 ## Usage
 
 ```go
-result, err := client.Databases.UpdateDatabase(ctx, &pgbeam.UpdateDatabaseRequest{
+result, err := client.Databases.UpdateDatabase(ctx, "prj_xxx", "db_xxx", &pgbeam.UpdateDatabaseRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| req | `*pgbeam.UpdateDatabaseRequest` | Yes | Request body |
-| req.Host | `*string` | No | Updated PostgreSQL host. |
-| req.Port | `*int` | No | Updated PostgreSQL port. |
-| req.Name | `*string` | No | Updated PostgreSQL database name. |
-| req.Username | `*string` | No | Updated PostgreSQL username. |
-| req.Password | `*string` | No | Updated PostgreSQL password. |
-| req.SSLMode | `*pgbeam.SSLMode` | No |  |
-| req.Role | `*pgbeam.DatabaseRole` | No |  |
-| req.PoolRegion | `*string` | No | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection.
- |
-| req.QueryTimeoutMs | `*int` | No | Query timeout in milliseconds. 0 means disabled.
- |
-| req.AutoReadRouting | `*bool` | No | Auto-route SELECT queries to read replicas.
- |
-| req.CacheConfig | `*pgbeam.CacheConfig` | No |  |
-| req.PoolConfig | `*pgbeam.PoolConfig` | No |  |
+| Parameter           | Type                            | Required | Description                                                                                                                                                                                                        |
+| ------------------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ctx                 | `context.Context`               | Yes      | Request context                                                                                                                                                                                                    |
+| projectID           | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).                                                                                                                                                               |
+| databaseID          | `string`                        | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).                                                                                                                                                               |
+| req                 | `*pgbeam.UpdateDatabaseRequest` | Yes      | Request body                                                                                                                                                                                                       |
+| req.Host            | `*string`                       | No       | Updated PostgreSQL host.                                                                                                                                                                                           |
+| req.Port            | `*int`                          | No       | Updated PostgreSQL port.                                                                                                                                                                                           |
+| req.Name            | `*string`                       | No       | Updated PostgreSQL database name.                                                                                                                                                                                  |
+| req.Username        | `*string`                       | No       | Updated PostgreSQL username.                                                                                                                                                                                       |
+| req.Password        | `*string`                       | No       | Updated PostgreSQL password.                                                                                                                                                                                       |
+| req.SSLMode         | `*pgbeam.SSLMode`               | No       |                                                                                                                                                                                                                    |
+| req.Role            | `*pgbeam.DatabaseRole`          | No       |                                                                                                                                                                                                                    |
+| req.PoolRegion      | `*string`                       | No       | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection. |
+|                     |                                 |          |                                                                                                                                                                                                                    |
+| req.QueryTimeoutMs  | `*int`                          | No       | Query timeout in milliseconds. 0 means disabled.                                                                                                                                                                   |
+|                     |                                 |          |                                                                                                                                                                                                                    |
+| req.AutoReadRouting | `*bool`                         | No       | Auto-route SELECT queries to read replicas.                                                                                                                                                                        |
+|                     |                                 |          |                                                                                                                                                                                                                    |
+| req.CacheConfig     | `*pgbeam.CacheConfig`           | No       |                                                                                                                                                                                                                    |
+| req.PoolConfig      | `*pgbeam.PoolConfig`            | No       |                                                                                                                                                                                                                    |
 
 ## Response
 
@@ -50,11 +52,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Databases.UpdateDatabase(ctx, &pgbeam.UpdateDatabaseRequest{
-    Host: "...",
+result, err := client.Databases.UpdateDatabase(ctx, "prj_xxx", "db_xxx", &pgbeam.UpdateDatabaseRequest{
+    Host: "db.example.com",
     Port: 5432,
-    Name: "...",
-    Username: "...",
+    Name: "mydb",
+    Username: "pgbeam",
     Password: "...",
     SSLMode: pgbeam.SSLMode{ /* ... */ },
   })
@@ -66,10 +68,10 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

@@ -10,20 +10,20 @@ Records optional feedback when a user cancels their subscription.
 ## Usage
 
 ```go
-err := client.Analytics.SubmitCancellationFeedback(ctx, "org_xxx", &pgbeam.CancellationFeedbackRequest{
+err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", &pgbeam.CancellationFeedbackRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| orgID | `string` | Yes | Unique organization identifier. |
-| req | `*pgbeam.CancellationFeedbackRequest` | Yes | Request body |
-| req.Reason | `*string` | No | Predefined cancellation reason. |
-| req.Feedback | `*string` | No | Free-text feedback from the user. |
+| Parameter    | Type                                  | Required | Description                       |
+| ------------ | ------------------------------------- | -------- | --------------------------------- |
+| ctx          | `context.Context`                     | Yes      | Request context                   |
+| orgID        | `string`                              | Yes      | Unique organization identifier.   |
+| req          | `*pgbeam.CancellationFeedbackRequest` | Yes      | Request body                      |
+| req.Reason   | `*string`                             | No       | Predefined cancellation reason.   |
+| req.Feedback | `*string`                             | No       | Free-text feedback from the user. |
 
 ## Response
 
@@ -38,9 +38,9 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-err := client.Analytics.SubmitCancellationFeedback(ctx, "org_xxx", &pgbeam.CancellationFeedbackRequest{
-    Reason: "...",
-    Feedback: "...",
+err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", &pgbeam.CancellationFeedbackRequest{
+    Reason: "too-expensive",
+    Feedback: "Switching to a self-hosted solution.",
   })
 if err != nil {
   log.Fatal(err)
@@ -49,9 +49,9 @@ if err != nil {
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

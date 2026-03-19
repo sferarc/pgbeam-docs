@@ -11,44 +11,45 @@ configuration, or onboarding from your own tooling.
 **Base URL:** `https://api.pgbeam.com`
 
 <Callout type="info" title="Prefer the CLI?">
-The [PgBeam CLI](/docs/cli) wraps the same API and is usually the fastest way
-to explore the platform from a terminal. Reach for the raw API when you need
-custom automation, CI integration, or your own internal tooling.
+  The [PgBeam CLI](/docs/cli) wraps the same API and is usually the fastest way
+  to explore the platform from a terminal. Reach for the raw API when you need
+  custom automation, CI integration, or your own internal tooling.
 </Callout>
 
 ## What this API is good at
 
-| Area | Use it for |
-| --- | --- |
-| Projects | Create, inspect, update, and delete PgBeam projects |
+| Area      | Use it for                                                                      |
+| --------- | ------------------------------------------------------------------------------- |
+| Projects  | Create, inspect, update, and delete PgBeam projects                             |
 | Databases | Register origin databases, test connectivity, and adjust pool or cache settings |
-| Analytics | Read usage, activity, metrics, and query insights |
-| Platform | Discover regions, plans, and health |
-| Account | Export account data and track onboarding progress |
+| Analytics | Read usage, activity, metrics, and query insights                               |
+| Platform  | Discover regions, plans, and health                                             |
+| Account   | Export account data and track onboarding progress                               |
 
 ## Authentication
 
 Most endpoints require `Authorization: Bearer ...`. The credential can be
 either:
 
-| Credential | How to get it | Header |
-| --- | --- | --- |
-| Dashboard token | Sign in to the dashboard and reuse the session token in trusted tooling | `Authorization: Bearer <token>` |
-| API key | Create one from the dashboard for scripts, CI, and long-lived automation | `Authorization: Bearer <api-key>` |
+| Credential      | How to get it                                                            | Header                            |
+| --------------- | ------------------------------------------------------------------------ | --------------------------------- |
+| Dashboard token | Sign in to the dashboard and reuse the session token in trusted tooling  | `Authorization: Bearer <token>`   |
+| API key         | Create one from the dashboard for scripts, CI, and long-lived automation | `Authorization: Bearer <api-key>` |
 
 <Tabs items={["Bearer token", "API key"]}>
-<Tab value="Bearer token">
-```bash
-curl -H "Authorization: Bearer <token>" \
-  https://api.pgbeam.com/v1/projects
-```
-</Tab>
-<Tab value="API key">
-```bash
-curl -H "Authorization: Bearer <api-key>" \
-  https://api.pgbeam.com/v1/projects
-```
-</Tab>
+  <Tab value="Bearer token">
+    ```bash
+    curl -H "Authorization: Bearer <token>" \
+      https://api.pgbeam.com/v1/projects
+    ```
+  </Tab>
+
+  <Tab value="API key">
+    ```bash
+    curl -H "Authorization: Bearer <api-key>" \
+      https://api.pgbeam.com/v1/projects
+    ```
+  </Tab>
 </Tabs>
 
 `/v1/health` is public. Everything else in the public API expects auth.
@@ -80,10 +81,10 @@ openapi-generator generate \
 ```
 
 <Callout type="info" title="Official TypeScript SDK">
-If you are working in TypeScript, use the official
-[PgBeam SDK](/docs/ts-sdk) instead of generating a client. It is maintained
-alongside the API and provides tag-based access, error handling, and full type
-safety out of the box.
+  If you are working in TypeScript, use the official
+  [PgBeam SDK](/docs/ts-sdk) instead of generating a client. It is maintained
+  alongside the API and provides tag-based access, error handling, and full type
+  safety out of the box.
 </Callout>
 
 ## Next steps

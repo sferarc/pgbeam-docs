@@ -12,17 +12,17 @@ Returns daily usage data for a specific project, broken down by region.
 ```typescript
 const result = await api.analytics.getProjectUsage({
     pathParams: { project_id: "prj_xxx" },
-    queryParams: { start_date: "...", end_date: "..." },
+    queryParams: { start_date: "2024-01-01", end_date: "2024-01-31" },
   });
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| queryParams.start_date | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
-| queryParams.end_date | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+| Parameter               | Type     | Required | Description                                          |
+| ----------------------- | -------- | -------- | ---------------------------------------------------- |
+| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| queryParams.start\_date | `string` | Yes      | Start date (inclusive, YYYY-MM-DD).                  |
+| queryParams.end\_date   | `string` | Yes      | End date (inclusive, YYYY-MM-DD).                    |
 
 ## Response
 
@@ -40,15 +40,15 @@ const client = new PgBeamClient({
 
 const result = await client.api.analytics.getProjectUsage({
   pathParams: { project_id: "prj_xxx" },
-  queryParams: { start_date: "...", end_date: "..." },
+  queryParams: { start_date: "2024-01-01", end_date: "2024-01-31" },
 });
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |

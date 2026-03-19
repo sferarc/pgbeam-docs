@@ -14,80 +14,76 @@ code changes.
 ## Setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Set the connection string
 
-### Set the connection string
+    ```bash title="Environment variable"
+    export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+    ```
+  </Step>
 
-```bash title="Environment variable"
-export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
-```
+  <Step>
+    ### Connect with pgxpool
 
-</Step>
-<Step>
+    ```go title="main.go"
+    package main
 
-### Connect with pgxpool
+    import (
+    	"context"
+    	"fmt"
+    	"os"
 
-```go title="main.go"
-package main
+    	"github.com/jackc/pgx/v5/pgxpool"
+    )
 
-import (
-	"context"
-	"fmt"
-	"os"
+    func main() {
+    	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+    	if err != nil {
+    		panic(err)
+    	}
+    	defer pool.Close()
 
-	"github.com/jackc/pgx/v5/pgxpool"
-)
+    	var greeting string
+    	err = pool.QueryRow(context.Background(), "SELECT 'hello from pgbeam'").Scan(&greeting)
+    	if err != nil {
+    		panic(err)
+    	}
+    	fmt.Println(greeting)
+    }
+    ```
+  </Step>
 
-func main() {
-	pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
-	if err != nil {
-		panic(err)
-	}
-	defer pool.Close()
+  <Step>
+    ### Reduce pool size
 
-	var greeting string
-	err = pool.QueryRow(context.Background(), "SELECT 'hello from pgbeam'").Scan(&greeting)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(greeting)
-}
-```
+    PgBeam handles upstream pooling, so reduce `pgxpool`'s pool:
 
-</Step>
-<Step>
-
-### Reduce pool size
-
-PgBeam handles upstream pooling, so reduce `pgxpool`'s pool:
-
-```go title="Reduced pool size"
-config, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
-if err != nil {
-	panic(err)
-}
-config.MaxConns = 5
-config.MinConns = 1
-pool, err := pgxpool.NewWithConfig(context.Background(), config)
-```
-
-</Step>
+    ```go title="Reduced pool size"
+    config, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+    if err != nil {
+    	panic(err)
+    }
+    config.MaxConns = 5
+    config.MinConns = 1
+    pool, err := pgxpool.NewWithConfig(context.Background(), config)
+    ```
+  </Step>
 </Steps>
 
 ## Pool sizing
 
 Since PgBeam manages upstream connections, keep your client-side pool small:
 
-| Deployment type                | Recommended `MaxConns` |
-| ------------------------------ | ---------------------- |
-| Single binary / single pod     | 5-10                   |
-| Multiple pods behind LB        | 3-5 per pod            |
-| Short-lived CLI tools          | 1-2                    |
+| Deployment type            | Recommended `MaxConns` |
+| -------------------------- | ---------------------- |
+| Single binary / single pod | 5-10                   |
+| Multiple pods behind LB    | 3-5 per pod            |
+| Short-lived CLI tools      | 1-2                    |
 
 <Callout type="info">
-With PgBeam in transaction pool mode, upstream connections are released after
-each transaction. A `MaxConns` of 5 per pod handles high concurrency without
-pressuring the upstream database.
+  With PgBeam in transaction pool mode, upstream connections are released after
+  each transaction. A `MaxConns` of 5 per pod handles high concurrency without
+  pressuring the upstream database.
 </Callout>
 
 ## TLS
@@ -192,11 +188,11 @@ rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT 1")
 
 ## Common issues
 
-| Issue                            | Cause                           | Fix                                     |
-| -------------------------------- | ------------------------------- | --------------------------------------- |
-| "too many connections"           | `MaxConns` too high             | Reduce to 3-5 per pod                  |
-| Prepared statement errors        | Using transaction pool mode     | Use session pool mode, or avoid `Prepare()` |
-| Connection refused on startup    | Cold start after inactivity     | Normal — first connection is slower     |
+| Issue                         | Cause                       | Fix                                         |
+| ----------------------------- | --------------------------- | ------------------------------------------- |
+| "too many connections"        | `MaxConns` too high         | Reduce to 3-5 per pod                       |
+| Prepared statement errors     | Using transaction pool mode | Use session pool mode, or avoid `Prepare()` |
+| Connection refused on startup | Cold start after inactivity | Normal — first connection is slower         |
 
 ## Further reading
 

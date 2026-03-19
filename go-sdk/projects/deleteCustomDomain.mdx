@@ -10,14 +10,16 @@ Removes a custom domain from the project and revokes its TLS certificate.
 ## Usage
 
 ```go
-err := client.Projects.DeleteCustomDomain(ctx)
+err := client.Projects.DeleteCustomDomain(ctx, "prj_xxx", "dom_xxx")
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
+| Parameter | Type              | Required | Description                                                |
+| --------- | ----------------- | -------- | ---------------------------------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                                            |
+| projectID | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).       |
+| domainID  | `string`          | Yes      | Unique custom domain identifier (prefixed, e.g. dom\_xxx). |
 
 ## Response
 
@@ -32,7 +34,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-err := client.Projects.DeleteCustomDomain(ctx)
+err := client.Projects.DeleteCustomDomain(ctx, "prj_xxx", "dom_xxx")
 if err != nil {
   log.Fatal(err)
 }
@@ -40,10 +42,10 @@ if err != nil {
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

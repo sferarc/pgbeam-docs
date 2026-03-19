@@ -12,8 +12,8 @@ Creates a new project within the specified organization.
 ```typescript
 const result = await api.projects.createProject({
     body: {
-      name: "...",
-      org_id: "...",
+      name: "my-app",
+      org_id: "org_abc123",
       database: { ... },
     },
   });
@@ -21,14 +21,14 @@ const result = await api.projects.createProject({
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| body.name | `string` | Yes | Human-readable project name. |
-| body.org_id | `string` | Yes | Better Auth organization ID. |
-| body.description | `string` | No | Optional project description. |
-| body.tags | `string[]` | No | User-defined labels to attach to the project. |
-| body.cloud | `"aws" \| "azure" \| "gcp"` | No | Cloud provider for the project. |
-| body.database | `CreateDatabaseRequest` | Yes | Primary database. Created atomically with the project. |
+| Parameter        | Type                        | Required | Description                                            |
+| ---------------- | --------------------------- | -------- | ------------------------------------------------------ |
+| body.name        | `string`                    | Yes      | Human-readable project name.                           |
+| body.org\_id     | `string`                    | Yes      | Better Auth organization ID.                           |
+| body.description | `string`                    | No       | Optional project description.                          |
+| body.tags        | `string[]`                  | No       | User-defined labels to attach to the project.          |
+| body.cloud       | `"aws" \| "azure" \| "gcp"` | No       | Cloud provider for the project.                        |
+| body.database    | `CreateDatabaseRequest`     | Yes      | Primary database. Created atomically with the project. |
 
 ## Response
 
@@ -46,8 +46,8 @@ const client = new PgBeamClient({
 
 const result = await client.api.projects.createProject({
   body: {
-      name: "...",
-      org_id: "...",
+      name: "my-app",
+      org_id: "org_abc123",
       database: { ... },
     },
 });
@@ -55,10 +55,10 @@ const result = await client.api.projects.createProject({
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 409 | Resource already exists or conflicts with current state. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

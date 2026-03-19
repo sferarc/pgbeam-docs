@@ -13,39 +13,35 @@ injects connection secrets into your Vercel project — zero configuration
 required.
 
 <Callout type="info">
-The Vercel Marketplace integration is coming soon. Join the waitlist at
-[pgbeam.com](https://pgbeam.com) to get notified when it launches.
+  The Vercel Marketplace integration is coming soon. Join the waitlist at
+  [pgbeam.com](https://pgbeam.com) to get notified when it launches.
 </Callout>
 
 ## How it works
 
 <Steps>
-<Step>
+  <Step>
+    ### Install from Vercel Marketplace
 
-### Install from Vercel Marketplace
+    Find PgBeam in the Vercel Marketplace and click **Add Integration**. This
+    creates a PgBeam organization linked to your Vercel team.
+  </Step>
 
-Find PgBeam in the Vercel Marketplace and click **Add Integration**. This
-creates a PgBeam organization linked to your Vercel team.
+  <Step>
+    ### Provision a resource
 
-</Step>
-<Step>
+    From the integration page, create a new PgBeam resource. Provide your upstream
+    database connection details and PgBeam provisions a project with connection
+    pooling and optional query caching.
+  </Step>
 
-### Provision a resource
+  <Step>
+    ### Connect your app
 
-From the integration page, create a new PgBeam resource. Provide your upstream
-database connection details and PgBeam provisions a project with connection
-pooling and optional query caching.
-
-</Step>
-<Step>
-
-### Connect your app
-
-PgBeam automatically sets `PGBEAM_URL` and `PGBEAM_CONNECTION_STRING` as
-environment variables in your Vercel project. Update your application to use
-the PgBeam connection string — no code changes beyond swapping the DSN.
-
-</Step>
+    PgBeam automatically sets `PGBEAM_URL` and `PGBEAM_CONNECTION_STRING` as
+    environment variables in your Vercel project. Update your application to use
+    the PgBeam connection string — no code changes beyond swapping the DSN.
+  </Step>
 </Steps>
 
 ## Features

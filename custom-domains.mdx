@@ -11,8 +11,8 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 `abc.aws.pgbeam.app`, while PgBeam handles TLS certificates automatically.
 
 <Callout type="warn" title="Scale plan required">
-Custom domains are available on the **Scale plan** only. See
-[Plans & Pricing](/docs/plans) for details.
+  Custom domains are available on the **Scale plan** only. See
+  [Plans & Pricing](/docs/plans) for details.
 </Callout>
 
 ## Why use a custom domain
@@ -34,98 +34,98 @@ Custom domains are available on the **Scale plan** only. See
 ## Setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Add the domain
 
-### Add the domain
+    <Tabs items={["Dashboard", "API", "CLI"]}>
+      <Tab value="Dashboard">
+        From the dashboard, go to your project, then **Domains**, and click
+        **Add Domain**. Enter your domain (e.g., `db.example.com`).
+      </Tab>
 
-<Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-From the dashboard, go to your project, then **Domains**, and click
-**Add Domain**. Enter your domain (e.g., `db.example.com`).
-</Tab>
-<Tab value="API">
-```bash
-curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/custom-domains \
-  -H "Authorization: Bearer <key>" \
-  -H "Content-Type: application/json" \
-  -d '{"domain": "db.example.com"}'
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam projects domains add --domain db.example.com
-```
-</Tab>
-</Tabs>
+      <Tab value="API">
+        ```bash
+        curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/custom-domains \
+          -H "Authorization: Bearer <key>" \
+          -H "Content-Type: application/json" \
+          -d '{"domain": "db.example.com"}'
+        ```
+      </Tab>
 
-The response includes your **verification token** and DNS instructions.
+      <Tab value="CLI">
+        ```bash
+        pgbeam projects domains add --domain db.example.com
+        ```
+      </Tab>
+    </Tabs>
 
-</Step>
-<Step>
+    The response includes your **verification token** and DNS instructions.
+  </Step>
 
-### Add DNS records
+  <Step>
+    ### Add DNS records
 
-Add all three records to your domain's DNS:
+    Add all three records to your domain's DNS:
 
-| Record  | Host                              | Value                                | Purpose                      |
-| ------- | --------------------------------- | ------------------------------------ | ---------------------------- |
-| `CNAME` | `db.example.com`                  | `abc.aws.pgbeam.app`                 | Routes traffic to PgBeam     |
-| `TXT`   | `_pgbeam-verify.db.example.com`   | `pgbeam-verify=<token>`             | Proves domain ownership      |
-| `CNAME` | `_acme-challenge.db.example.com`  | `_acme-challenge.abc.aws.pgbeam.app` | Delegates TLS cert issuance  |
+    | Record  | Host                             | Value                                | Purpose                     |
+    | ------- | -------------------------------- | ------------------------------------ | --------------------------- |
+    | `CNAME` | `db.example.com`                 | `abc.aws.pgbeam.app`                 | Routes traffic to PgBeam    |
+    | `TXT`   | `_pgbeam-verify.db.example.com`  | `pgbeam-verify=<token>`              | Proves domain ownership     |
+    | `CNAME` | `_acme-challenge.db.example.com` | `_acme-challenge.abc.aws.pgbeam.app` | Delegates TLS cert issuance |
 
-Replace `abc` with your project's subdomain and `<token>` with the verification
-token from the previous step.
+    Replace `abc` with your project's subdomain and `<token>` with the verification
+    token from the previous step.
 
-<Callout type="info" title="DNS propagation">
-DNS changes can take anywhere from a few minutes to 24 hours to propagate,
-depending on your DNS provider and existing TTL settings. Most providers
-complete this within 1-10 minutes.
-</Callout>
+    <Callout type="info" title="DNS propagation">
+      DNS changes can take anywhere from a few minutes to 24 hours to propagate,
+      depending on your DNS provider and existing TTL settings. Most providers
+      complete this within 1-10 minutes.
+    </Callout>
+  </Step>
 
-</Step>
-<Step>
+  <Step>
+    ### Verify the domain
 
-### Verify the domain
+    After DNS propagates, trigger verification:
 
-After DNS propagates, trigger verification:
+    <Tabs items={["Dashboard", "API", "CLI"]}>
+      <Tab value="Dashboard">
+        Click **Verify** next to the domain in your project's domain settings.
+      </Tab>
 
-<Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-Click **Verify** next to the domain in your project's domain settings.
-</Tab>
-<Tab value="API">
-```bash
-curl -X POST \
-  https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId}/verify \
-  -H "Authorization: Bearer <key>"
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam projects domains verify --domain db.example.com
-```
-</Tab>
-</Tabs>
+      <Tab value="API">
+        ```bash
+        curl -X POST \
+          https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId}/verify \
+          -H "Authorization: Bearer <key>"
+        ```
+      </Tab>
 
-PgBeam checks two things:
-1. The TXT record exists and matches the verification token
-2. The CNAME points to your PgBeam project subdomain
+      <Tab value="CLI">
+        ```bash
+        pgbeam projects domains verify --domain db.example.com
+        ```
+      </Tab>
+    </Tabs>
 
-</Step>
-<Step>
+    PgBeam checks two things:
 
-### Update your connection string
+    1. The TXT record exists and matches the verification token
+    2. The CNAME points to your PgBeam project subdomain
+  </Step>
 
-Once verified, use your custom domain in your application:
+  <Step>
+    ### Update your connection string
 
-```bash title=".env"
-DATABASE_URL=postgresql://user:pass@db.example.com:5432/mydb
-```
+    Once verified, use your custom domain in your application:
 
-TLS is handled automatically. PgBeam provisions a certificate for your domain
-and uses SNI to match incoming connections to your project.
+    ```bash title=".env"
+    DATABASE_URL=postgresql://user:pass@db.example.com:5432/mydb
+    ```
 
-</Step>
+    TLS is handled automatically. PgBeam provisions a certificate for your domain
+    and uses SNI to match incoming connections to your project.
+  </Step>
 </Steps>
 
 ## TLS certificate management
@@ -159,25 +159,28 @@ DATABASE_URL=postgresql://user:pass@db-staging.example.com:5432/mydb
 ## Remove a custom domain
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-Go to your project's **Domains** settings and click **Remove** next to the
-domain.
-</Tab>
-<Tab value="API">
-```bash
-curl -X DELETE \
-  https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId} \
-  -H "Authorization: Bearer <key>"
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam projects domains delete --domain db.example.com
-```
-</Tab>
+  <Tab value="Dashboard">
+    Go to your project's **Domains** settings and click **Remove** next to the
+    domain.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X DELETE \
+      https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId} \
+      -H "Authorization: Bearer <key>"
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam projects domains delete --domain db.example.com
+    ```
+  </Tab>
 </Tabs>
 
 After removal:
+
 - The TLS certificate is revoked
 - Connections to the custom domain stop working
 - The default `abc.aws.pgbeam.app` hostname continues to work
@@ -187,19 +190,19 @@ After removal:
 
 ### Verification failures
 
-| Issue                    | Likely cause                              | Fix                                          |
-| ------------------------ | ----------------------------------------- | -------------------------------------------- |
-| TXT record not found     | DNS propagation delay                     | Wait and retry. Check with `dig TXT _pgbeam-verify.db.example.com` |
-| CNAME mismatch           | Target is not the exact project subdomain | Verify the CNAME points to `abc.aws.pgbeam.app` exactly |
-| CNAME lookup failed      | Missing trailing dot at some providers    | Try `abc.aws.pgbeam.app.` (with trailing dot) |
+| Issue                | Likely cause                              | Fix                                                                |
+| -------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| TXT record not found | DNS propagation delay                     | Wait and retry. Check with `dig TXT _pgbeam-verify.db.example.com` |
+| CNAME mismatch       | Target is not the exact project subdomain | Verify the CNAME points to `abc.aws.pgbeam.app` exactly            |
+| CNAME lookup failed  | Missing trailing dot at some providers    | Try `abc.aws.pgbeam.app.` (with trailing dot)                      |
 
 ### Certificate issues
 
-| Issue                    | Likely cause                              | Fix                                          |
-| ------------------------ | ----------------------------------------- | -------------------------------------------- |
-| Certificate not ready    | ACME challenge CNAME missing or wrong     | Verify `_acme-challenge` CNAME record is correct |
-| Certificate expired      | ACME challenge CNAME was removed          | Re-add the ACME challenge CNAME to enable auto-renewal |
-| TLS error on connect     | Client does not trust the certificate     | Update system CA bundle; PgBeam certs are trusted by all modern systems |
+| Issue                 | Likely cause                          | Fix                                                                     |
+| --------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| Certificate not ready | ACME challenge CNAME missing or wrong | Verify `_acme-challenge` CNAME record is correct                        |
+| Certificate expired   | ACME challenge CNAME was removed      | Re-add the ACME challenge CNAME to enable auto-renewal                  |
+| TLS error on connect  | Client does not trust the certificate | Update system CA bundle; PgBeam certs are trusted by all modern systems |
 
 ### Cloudflare-specific notes
 

@@ -5,24 +5,24 @@ description: List projects
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Lists projects filtered by organization. Requires org_id query parameter.
+Lists projects filtered by organization. Requires org\_id query parameter.
 
 ## Usage
 
 ```typescript
 const result = await api.projects.listProjects({
-    queryParams: { org_id: "org_xxx" },
+    queryParams: { org_id: "org_abc123" },
   });
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| queryParams.org_id | `string` | Yes | Organization ID to filter projects. |
-| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
-| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
-| queryParams.sort_by | `"name" \| "created_at" \| "active_connections"` | No | Sort field for projects list. |
+| Parameter               | Type                                             | Required | Description                                            |
+| ----------------------- | ------------------------------------------------ | -------- | ------------------------------------------------------ |
+| queryParams.org\_id     | `string`                                         | Yes      | Organization ID to filter projects.                    |
+| queryParams.page\_size  | `number`                                         | No       | Maximum number of items to return (1-100, default 20). |
+| queryParams.page\_token | `string`                                         | No       | Opaque token for cursor-based pagination.              |
+| queryParams.sort\_by    | `"name" \| "created_at" \| "active_connections"` | No       | Sort field for projects list.                          |
 
 ## Response
 
@@ -39,15 +39,15 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.projects.listProjects({
-  queryParams: { org_id: "org_xxx", page_size: 20, page_token: "...", sort_by: "..." },
+  queryParams: { org_id: "org_abc123", page_size: 20, page_token: "...", sort_by: "created_at" },
 });
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

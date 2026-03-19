@@ -16,9 +16,9 @@ layer — that is a deliberate tradeoff. Synchronizing caches across regions wou
 add latency to every read, which defeats the purpose of caching.
 
 <Callout type="info" title="Caching is opt-in">
-Caching starts **disabled** for new databases. This is the safe default.
-Turn it on after traffic is flowing and you know which reads are stable enough
-to benefit from caching.
+  Caching starts **disabled** for new databases. This is the safe default.
+  Turn it on after traffic is flowing and you know which reads are stable enough
+  to benefit from caching.
 </Callout>
 
 ## When caching helps
@@ -41,60 +41,56 @@ Caching is **not** a good fit for:
 ## How caching works
 
 <Steps>
-<Step>
+  <Step>
+    ### Query classification
 
-### Query classification
+    PgBeam classifies each incoming query. Read statements (`SELECT`) are
+    candidates for caching. Writes (`INSERT`, `UPDATE`, `DELETE`), DDL
+    (`CREATE TABLE`, `ALTER`), session-changing commands (`SET`, `DISCARD`), and
+    queries with volatile functions (`NOW()`, `RANDOM()`, `pg_advisory_lock()`) are
+    never cached.
+  </Step>
 
-PgBeam classifies each incoming query. Read statements (`SELECT`) are
-candidates for caching. Writes (`INSERT`, `UPDATE`, `DELETE`), DDL
-(`CREATE TABLE`, `ALTER`), session-changing commands (`SET`, `DISCARD`), and
-queries with volatile functions (`NOW()`, `RANDOM()`, `pg_advisory_lock()`) are
-never cached.
+  <Step>
+    ### Cache key generation
 
-</Step>
-<Step>
+    For cacheable queries, PgBeam generates a cache key from the **normalized SQL
+    text plus parameter values**, scoped to the project. Normalization means
+    whitespace and casing differences do not create separate cache entries.
 
-### Cache key generation
+    The same query template with different parameter values produces different
+    cache entries:
 
-For cacheable queries, PgBeam generates a cache key from the **normalized SQL
-text plus parameter values**, scoped to the project. Normalization means
-whitespace and casing differences do not create separate cache entries.
+    ```sql
+    -- These produce two separate cache entries
+    SELECT * FROM products WHERE id = 1;
+    SELECT * FROM products WHERE id = 2;
+    ```
+  </Step>
 
-The same query template with different parameter values produces different
-cache entries:
+  <Step>
+    ### Cache lookup
 
-```sql
--- These produce two separate cache entries
-SELECT * FROM products WHERE id = 1;
-SELECT * FROM products WHERE id = 2;
-```
+    PgBeam checks the local cache and then the regional shared cache for a matching entry:
 
-</Step>
-<Step>
-
-### Cache lookup
-
-PgBeam checks the local cache and then the regional shared cache for a matching entry:
-
-- **Hit** — A fresh cached result is returned immediately. The upstream
-  database is never contacted.
-- **Stale hit** — The cached result has passed its TTL but is within the
-  stale-while-revalidate (SWR) window. PgBeam returns the stale result
-  immediately and refreshes the cache in the background.
-- **Miss** — No cached result exists. The query goes to the upstream database,
-  and the result is stored in the cache for future requests.
-
-</Step>
+    - **Hit** — A fresh cached result is returned immediately. The upstream
+      database is never contacted.
+    - **Stale hit** — The cached result has passed its TTL but is within the
+      stale-while-revalidate (SWR) window. PgBeam returns the stale result
+      immediately and refreshes the cache in the background.
+    - **Miss** — No cached result exists. The query goes to the upstream database,
+      and the result is stored in the cache for future requests.
+  </Step>
 </Steps>
 
 ## Cache defaults
 
-| Setting         | Default  | What it controls                                       |
-| --------------- | -------- | ------------------------------------------------------ |
-| **TTL**         | `60s`    | How long a cached result is considered fresh           |
+| Setting         | Default  | What it controls                                                          |
+| --------------- | -------- | ------------------------------------------------------------------------- |
+| **TTL**         | `60s`    | How long a cached result is considered fresh                              |
 | **SWR**         | `30s`    | Extra window after TTL where stale results can be served while refreshing |
-| **Max entries** | `10,000` | Approximate upper bound of cached entries per project  |
-| **Enabled**     | `false`  | Caching is off by default for new databases            |
+| **Max entries** | `10,000` | Approximate upper bound of cached entries per project                     |
+| **Enabled**     | `false`  | Caching is off by default for new databases                               |
 
 ### Understanding TTL and SWR
 
@@ -120,14 +116,14 @@ TTL and SWR work together to balance freshness and performance:
 
 PgBeam checks cache controls in priority order. The first match wins:
 
-| Priority | Source              | Example                         | Scope       |
-| -------- | ------------------- | ------------------------------- | ----------- |
-| 1        | SQL annotation      | `/* @pgbeam:cache noCache */`   | Per query   |
-| 2        | Session override off | `SET pgbeam.cache = off`       | Per session |
-| 3        | Cache rule          | Dashboard rule for query shape  | Per query shape |
-| 4        | Session override on | `SET pgbeam.cache = on`        | Per session |
-| 5        | Database default    | Database-level cache setting    | All queries |
-| 6        | Fallback            | Off                             | —           |
+| Priority | Source               | Example                        | Scope           |
+| -------- | -------------------- | ------------------------------ | --------------- |
+| 1        | SQL annotation       | `/* @pgbeam:cache noCache */`  | Per query       |
+| 2        | Session override off | `SET pgbeam.cache = off`       | Per session     |
+| 3        | Cache rule           | Dashboard rule for query shape | Per query shape |
+| 4        | Session override on  | `SET pgbeam.cache = on`        | Per session     |
+| 5        | Database default     | Database-level cache setting   | All queries     |
+| 6        | Fallback             | Off                            | —               |
 
 This precedence lets you set broad defaults and override them precisely where
 needed.
@@ -138,40 +134,43 @@ Embed cache directives directly in your SQL as comments. PgBeam strips the
 annotations before forwarding to the upstream, so your database never sees them.
 
 <Tabs items={["Enable caching", "Custom TTL and SWR", "Disable caching", "Route to replica"]}>
-<Tab value="Enable caching">
-```sql
-/* @pgbeam:cache */ SELECT * FROM products WHERE active = true;
-```
-</Tab>
-<Tab value="Custom TTL and SWR">
-```sql
--- Cache for 5 minutes, serve stale for 1 minute during refresh
-/* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products;
-```
-</Tab>
-<Tab value="Disable caching">
-```sql
--- Force this query to always hit the upstream
-/* @pgbeam:cache noCache */ SELECT NOW();
-```
-</Tab>
-<Tab value="Route to replica">
-```sql
-/* @pgbeam:replica */ SELECT * FROM events ORDER BY created_at DESC LIMIT 100;
-```
-</Tab>
+  <Tab value="Enable caching">
+    ```sql
+    /* @pgbeam:cache */ SELECT * FROM products WHERE active = true;
+    ```
+  </Tab>
+
+  <Tab value="Custom TTL and SWR">
+    ```sql
+    -- Cache for 5 minutes, serve stale for 1 minute during refresh
+    /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products;
+    ```
+  </Tab>
+
+  <Tab value="Disable caching">
+    ```sql
+    -- Force this query to always hit the upstream
+    /* @pgbeam:cache noCache */ SELECT NOW();
+    ```
+  </Tab>
+
+  <Tab value="Route to replica">
+    ```sql
+    /* @pgbeam:replica */ SELECT * FROM events ORDER BY created_at DESC LIMIT 100;
+    ```
+  </Tab>
 </Tabs>
 
 ### Annotation reference
 
-| Annotation                            | Effect                                  |
-| ------------------------------------- | --------------------------------------- |
-| `/* @pgbeam:cache */`                 | Enable caching with default TTL and SWR |
-| `/* @pgbeam:cache maxAge=N */`        | Cache for N seconds                     |
-| `/* @pgbeam:cache swr=N */`           | Set SWR window to N seconds             |
-| `/* @pgbeam:cache maxAge=N swr=M */`  | Set both TTL and SWR                    |
-| `/* @pgbeam:cache noCache */`         | Bypass cache for this query             |
-| `/* @pgbeam:replica */`               | Route to a read replica                 |
+| Annotation                           | Effect                                  |
+| ------------------------------------ | --------------------------------------- |
+| `/* @pgbeam:cache */`                | Enable caching with default TTL and SWR |
+| `/* @pgbeam:cache maxAge=N */`       | Cache for N seconds                     |
+| `/* @pgbeam:cache swr=N */`          | Set SWR window to N seconds             |
+| `/* @pgbeam:cache maxAge=N swr=M */` | Set both TTL and SWR                    |
+| `/* @pgbeam:cache noCache */`        | Bypass cache for this query             |
+| `/* @pgbeam:replica */`              | Route to a read replica                 |
 
 ## Session overrides
 
@@ -207,24 +206,24 @@ SELECT * FROM users WHERE id = 1;
 
 PgBeam skips the cache entirely when any of these conditions are true:
 
-| Condition                                      | Why it bypasses                                |
-| ---------------------------------------------- | ---------------------------------------------- |
-| Caching not enabled for the query              | No rule, annotation, or session override       |
-| Statement mutates data                         | `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`       |
-| Statement changes session state                | `SET`, `DISCARD`, `RESET`                      |
-| Query uses volatile functions                  | `NOW()`, `RANDOM()`, `pg_advisory_lock()`, etc.|
-| Query is inside an explicit transaction        | `BEGIN` ... `COMMIT` blocks                    |
-| SQL annotation says `noCache`                  | Explicit opt-out                               |
-| Session override is `pgbeam.cache = off`       | Session-level opt-out                          |
+| Condition                                | Why it bypasses                                 |
+| ---------------------------------------- | ----------------------------------------------- |
+| Caching not enabled for the query        | No rule, annotation, or session override        |
+| Statement mutates data                   | `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`        |
+| Statement changes session state          | `SET`, `DISCARD`, `RESET`                       |
+| Query uses volatile functions            | `NOW()`, `RANDOM()`, `pg_advisory_lock()`, etc. |
+| Query is inside an explicit transaction  | `BEGIN` ... `COMMIT` blocks                     |
+| SQL annotation says `noCache`            | Explicit opt-out                                |
+| Session override is `pgbeam.cache = off` | Session-level opt-out                           |
 
 ## Cache layers
 
 PgBeam uses a two-layer cache for speed and resilience:
 
-| Layer  | Scope           | Latency         | Failure behavior                        |
-| ------ | --------------- | --------------- | --------------------------------------- |
-| **L1** | Per-process     | Microseconds    | Process-local; failure is extremely rare |
-| **L2** | Shared per region | Sub-millisecond | Fail-open: queries go to upstream       |
+| Layer  | Scope             | Latency         | Failure behavior                         |
+| ------ | ----------------- | --------------- | ---------------------------------------- |
+| **L1** | Per-process       | Microseconds    | Process-local; failure is extremely rare |
+| **L2** | Shared per region | Sub-millisecond | Fail-open: queries go to upstream        |
 
 L1 is checked first. On an L1 miss, L2 is checked. On an L2 miss, the query
 goes to the upstream database. Results from the upstream are written back to
@@ -244,21 +243,23 @@ traffic looks like before you start caching anything.
 ### View cache rules
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-Open your database in the dashboard and go to **Cache Rules**. You will see a
-list of detected query shapes with frequency and timing data.
-</Tab>
-<Tab value="API">
-```bash
-curl -H "Authorization: Bearer <api-key>" \
-  https://api.pgbeam.com/v1/projects/{projectId}/databases/{dbId}/cache-rules
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam projects cache-rules list --database-id <id>
-```
-</Tab>
+  <Tab value="Dashboard">
+    Open your database in the dashboard and go to **Cache Rules**. You will see a
+    list of detected query shapes with frequency and timing data.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -H "Authorization: Bearer <api-key>" \
+      https://api.pgbeam.com/v1/projects/{projectId}/databases/{dbId}/cache-rules
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam projects cache-rules list --database-id <id>
+    ```
+  </Tab>
 </Tabs>
 
 ### Enable caching for a query shape
@@ -267,19 +268,20 @@ Once you identify a high-frequency read query that would benefit from caching,
 enable it from the dashboard or API:
 
 <Tabs items={["Dashboard", "API"]}>
-<Tab value="Dashboard">
-Find the query shape in **Cache Rules** and toggle caching on. You can
-optionally set a custom TTL and SWR for that shape.
-</Tab>
-<Tab value="API">
-```bash
-curl -X PUT \
-  https://api.pgbeam.com/v1/projects/{projectId}/databases/{dbId}/cache-rules/{hash} \
-  -H "Authorization: Bearer <api-key>" \
-  -H "Content-Type: application/json" \
-  -d '{"cache_enabled": true}'
-```
-</Tab>
+  <Tab value="Dashboard">
+    Find the query shape in **Cache Rules** and toggle caching on. You can
+    optionally set a custom TTL and SWR for that shape.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X PUT \
+      https://api.pgbeam.com/v1/projects/{projectId}/databases/{dbId}/cache-rules/{hash} \
+      -H "Authorization: Bearer <api-key>" \
+      -H "Content-Type: application/json" \
+      -d '{"cache_enabled": true}'
+    ```
+  </Tab>
 </Tabs>
 
 ### Recommended approach

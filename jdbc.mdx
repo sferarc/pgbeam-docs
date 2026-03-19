@@ -14,55 +14,57 @@ configuration.
 ## Setup
 
 <Tabs items={["Plain JDBC", "HikariCP", "Spring Boot"]}>
-<Tab value="Plain JDBC">
-```java title="Application.java"
-String url = "jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb";
-String user = "user";
-String password = "pass";
+  <Tab value="Plain JDBC">
+    ```java title="Application.java"
+    String url = "jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb";
+    String user = "user";
+    String password = "pass";
 
-Connection conn = DriverManager.getConnection(url, user, password);
+    Connection conn = DriverManager.getConnection(url, user, password);
 
-// Test the connection
-ResultSet rs = conn.createStatement().executeQuery("SELECT 'hello from pgbeam'");
-rs.next();
-System.out.println(rs.getString(1));
-```
-</Tab>
-<Tab value="HikariCP">
-```java title="DatabaseConfig.java"
-HikariConfig config = new HikariConfig();
-config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
-config.setUsername("user");
-config.setPassword("pass");
-config.setMaximumPoolSize(5); // PgBeam handles upstream pooling
+    // Test the connection
+    ResultSet rs = conn.createStatement().executeQuery("SELECT 'hello from pgbeam'");
+    rs.next();
+    System.out.println(rs.getString(1));
+    ```
+  </Tab>
 
-HikariDataSource ds = new HikariDataSource(config);
-```
-</Tab>
-<Tab value="Spring Boot">
-```properties title="application.properties"
-spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb
-spring.datasource.username=user
-spring.datasource.password=pass
-spring.datasource.hikari.maximum-pool-size=5
-```
-</Tab>
+  <Tab value="HikariCP">
+    ```java title="DatabaseConfig.java"
+    HikariConfig config = new HikariConfig();
+    config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
+    config.setUsername("user");
+    config.setPassword("pass");
+    config.setMaximumPoolSize(5); // PgBeam handles upstream pooling
+
+    HikariDataSource ds = new HikariDataSource(config);
+    ```
+  </Tab>
+
+  <Tab value="Spring Boot">
+    ```properties title="application.properties"
+    spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb
+    spring.datasource.username=user
+    spring.datasource.password=pass
+    spring.datasource.hikari.maximum-pool-size=5
+    ```
+  </Tab>
 </Tabs>
 
 ## Connection pool sizing
 
 PgBeam manages upstream connection pooling, so keep HikariCP's pool small:
 
-| Deployment type            | Recommended `maximumPoolSize` |
-| -------------------------- | ----------------------------- |
-| Single instance            | 5-10                          |
-| Multiple instances behind LB | 3-5 per instance            |
-| Batch processing           | 2-5                           |
+| Deployment type              | Recommended `maximumPoolSize` |
+| ---------------------------- | ----------------------------- |
+| Single instance              | 5-10                          |
+| Multiple instances behind LB | 3-5 per instance              |
+| Batch processing             | 2-5                           |
 
 <Callout type="info">
-The default HikariCP pool size is 10, which is already reasonable with PgBeam.
-For deployments with many instances, reduce to 3-5 per instance to avoid
-hitting PgBeam's connection limit.
+  The default HikariCP pool size is 10, which is already reasonable with PgBeam.
+  For deployments with many instances, reduce to 3-5 per instance to avoid
+  hitting PgBeam's connection limit.
 </Callout>
 
 ### HikariCP recommended settings
@@ -188,8 +190,8 @@ liquibase --url=jdbc:postgresql://db.example.com:5432/mydb \
 ```
 
 <Callout type="warn">
-Do not run Flyway or Liquibase migrations through PgBeam. Migration tools use
-advisory locks and session-level features that should bypass the proxy.
+  Do not run Flyway or Liquibase migrations through PgBeam. Migration tools use
+  advisory locks and session-level features that should bypass the proxy.
 </Callout>
 
 ## Debugging
@@ -207,12 +209,12 @@ check your logging framework's PostgreSQL driver output.
 
 ## Common issues
 
-| Issue                            | Cause                           | Fix                                     |
-| -------------------------------- | ------------------------------- | --------------------------------------- |
-| "too many connections"           | HikariCP pool too large         | Reduce `maximumPoolSize` to 3-5         |
-| SSL handshake errors             | Missing `ssl=true` in URL       | Add `?ssl=true&sslmode=require`         |
-| Stale data after writes          | Cache returning old results     | Use `noCache` annotation or adjust TTL  |
-| Migrations fail through PgBeam   | Advisory locks not supported    | Run migrations against origin directly  |
+| Issue                          | Cause                        | Fix                                    |
+| ------------------------------ | ---------------------------- | -------------------------------------- |
+| "too many connections"         | HikariCP pool too large      | Reduce `maximumPoolSize` to 3-5        |
+| SSL handshake errors           | Missing `ssl=true` in URL    | Add `?ssl=true&sslmode=require`        |
+| Stale data after writes        | Cache returning old results  | Use `noCache` annotation or adjust TTL |
+| Migrations fail through PgBeam | Advisory locks not supported | Run migrations against origin directly |
 
 ## Further reading
 

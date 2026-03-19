@@ -11,24 +11,24 @@ Creates a new project within the specified organization.
 
 ```go
 result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
-    Name: "...",
-    OrgID: "...",
+    Name: "my-app",
+    OrgID: "org_abc123",
     Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| req | `*pgbeam.CreateProjectRequest` | Yes | Request body |
-| req.Name | `string` | Yes | Human-readable project name. |
-| req.OrgID | `string` | Yes | Better Auth organization ID. |
-| req.Description | `*string` | No | Optional project description. |
-| req.Tags | `*[]string` | No | User-defined labels to attach to the project. |
-| req.Cloud | `*string` | No | Cloud provider for the project. |
-| req.Database | `pgbeam.CreateDatabaseRequest` | Yes | Primary database. Created atomically with the project. |
+| Parameter       | Type                           | Required | Description                                            |
+| --------------- | ------------------------------ | -------- | ------------------------------------------------------ |
+| ctx             | `context.Context`              | Yes      | Request context                                        |
+| req             | `*pgbeam.CreateProjectRequest` | Yes      | Request body                                           |
+| req.Name        | `string`                       | Yes      | Human-readable project name.                           |
+| req.OrgID       | `string`                       | Yes      | Better Auth organization ID.                           |
+| req.Description | `*string`                      | No       | Optional project description.                          |
+| req.Tags        | `*[]string`                    | No       | User-defined labels to attach to the project.          |
+| req.Cloud       | `*string`                      | No       | Cloud provider for the project.                        |
+| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      | Primary database. Created atomically with the project. |
 
 ## Response
 
@@ -44,11 +44,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 })
 
 result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
-    Name: "...",
-    OrgID: "...",
-    Description: "...",
-    Tags: nil,
-    Cloud: "...",
+    Name: "my-app",
+    OrgID: "org_abc123",
+    Description: "Production database proxy",
+    Tags: production,us-east-1,
+    Cloud: "aws",
     Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
   })
 if err != nil {
@@ -59,10 +59,10 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 409 | Resource already exists or conflicts with current state. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

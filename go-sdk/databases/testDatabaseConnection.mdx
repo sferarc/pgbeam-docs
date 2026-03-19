@@ -10,14 +10,16 @@ Attempts to connect to the upstream database using the stored credentials and re
 ## Usage
 
 ```go
-result, err := client.Databases.TestDatabaseConnection(ctx)
+result, err := client.Databases.TestDatabaseConnection(ctx, "prj_xxx", "db_xxx")
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
+| Parameter  | Type              | Required | Description                                          |
+| ---------- | ----------------- | -------- | ---------------------------------------------------- |
+| ctx        | `context.Context` | Yes      | Request context                                      |
+| projectID  | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| databaseID | `string`          | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
 
 ## Response
 
@@ -32,7 +34,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Databases.TestDatabaseConnection(ctx)
+result, err := client.Databases.TestDatabaseConnection(ctx, "prj_xxx", "db_xxx")
 if err != nil {
   log.Fatal(err)
 }
@@ -41,10 +43,10 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

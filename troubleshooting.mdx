@@ -22,6 +22,7 @@ SELECT * FROM users LIMIT 1;
 ```
 
 Debug notices tell you:
+
 - Whether the query was a cache **hit**, **miss**, **stale hit**, or **bypass**
 - Cache timing: how old the cached entry is, TTL, and SWR values
 - Whether **replica routing** was used and which upstream handled the query
@@ -49,6 +50,7 @@ FATAL: project not found for hostname "xyz.aws.pgbeam.app"
 ```
 
 The hostname does not match any project. Common causes:
+
 - Typo in the connection string
 - The project was deleted
 - Using a custom domain that hasn't been verified yet
@@ -62,6 +64,7 @@ FATAL: organization suspended — update payment at dash.pgbeam.com
 ```
 
 The organization's billing is inactive. This happens when:
+
 - A payment method fails
 - The trial expired without a payment method
 - An owner cancelled the subscription
@@ -84,7 +87,7 @@ This is an upstream issue, not a PgBeam issue.
 1. **Test direct connection.** Connect directly to the origin database with the same credentials. If it fails there too, the problem is not PgBeam.
 2. **Check the database name.** Verify that the database name configured in PgBeam matches the actual database you want to connect to.
 3. **Check user permissions.** Confirm the database user has `CONNECT` permission: `SELECT usename, usesuper FROM pg_user WHERE usename = 'myuser';`
-4. **Check pg_hba.conf.** If the origin uses host-based authentication rules, ensure the PgBeam IP range is allowed.
+4. **Check pg\_hba.conf.** If the origin uses host-based authentication rules, ensure the PgBeam IP range is allowed.
 
 ### `08004`: Auth rate limited
 
@@ -96,6 +99,7 @@ Too many failed authentication attempts from the same IP address in a short
 period.
 
 **Fix:**
+
 1. Stop the source of failed authentications (misconfigured client, wrong password in environment)
 2. Wait a few minutes for the rate limit to expire
 3. Verify credentials are correct before retrying
@@ -154,6 +158,7 @@ After a rolling deploy, old and new instances briefly overlap, doubling the
 connection count. This is normal and resolves as old instances shut down.
 
 **Mitigation:**
+
 - Set short connection pool idle timeouts in your application
 - Use transaction pool mode to reduce the per-instance connection footprint
 - If the spike exceeds your limit, consider upgrading temporarily or staggering deploys
@@ -207,6 +212,7 @@ version of the old data.
 A low cache hit rate means the cache is not saving much upstream load.
 
 **Common causes:**
+
 - Queries have highly variable parameters (each unique set of params creates a new cache entry)
 - TTL is too short for the query frequency
 - The workload is write-heavy and data changes between reads
@@ -247,21 +253,22 @@ cache misses incur cross-region relay latency (30-150ms). Cache hits are served
 locally with sub-millisecond latency.
 
 **Mitigations:**
+
 - Enable caching for repeated reads to serve them from the local edge
 - Add read replicas in regions closer to your application
 - If latency is critical, consider deploying your database closer to your users
 
 ## SQLSTATE quick reference
 
-| SQLSTATE | Message | Section |
-| -------- | ------- | ------- |
-| `08004`  | Project not found | [Connection problems](#08004-project-not-found) |
-| `08004`  | Organization suspended | [Connection problems](#08004-organization-suspended) |
-| `08004`  | Auth rate limited | [Authentication problems](#08004-auth-rate-limited) |
-| `08006`  | Upstream auth failure | [Authentication problems](#08006-authentication-failed) |
-| `08006`  | Circuit breaker open | [Upstream problems](#08006-circuit-breaker-open) |
-| `53300`  | Too many connections | [Connection limit problems](#53300-too-many-connections) |
-| `53400`  | Query rate limit exceeded | [Rate limit problems](#53400-query-rate-limit-exceeded) |
+| SQLSTATE | Message                   | Section                                                  |
+| -------- | ------------------------- | -------------------------------------------------------- |
+| `08004`  | Project not found         | [Connection problems](#08004-project-not-found)          |
+| `08004`  | Organization suspended    | [Connection problems](#08004-organization-suspended)     |
+| `08004`  | Auth rate limited         | [Authentication problems](#08004-auth-rate-limited)      |
+| `08006`  | Upstream auth failure     | [Authentication problems](#08006-authentication-failed)  |
+| `08006`  | Circuit breaker open      | [Upstream problems](#08006-circuit-breaker-open)         |
+| `53300`  | Too many connections      | [Connection limit problems](#53300-too-many-connections) |
+| `53400`  | Query rate limit exceeded | [Rate limit problems](#53400-query-rate-limit-exceeded)  |
 
 See [Error Codes](/docs/error-codes) for the full reference with code examples.
 

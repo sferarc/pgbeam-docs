@@ -15,13 +15,13 @@ result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectMetricsParams` | No | Query parameters |
-| params.Limit | `int` | No | Maximum number of recent snapshots to return. |
-| params.Region | `string` | No | Filter metrics by region code. |
+| Parameter     | Type                              | Required | Description                                          |
+| ------------- | --------------------------------- | -------- | ---------------------------------------------------- |
+| ctx           | `context.Context`                 | Yes      | Request context                                      |
+| projectID     | `string`                          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| params        | `*pgbeam.GetProjectMetricsParams` | No       | Query parameters                                     |
+| params.Limit  | `int`                             | No       | Maximum number of recent snapshots to return.        |
+| params.Region | `string`                          | No       | Filter metrics by region code.                       |
 
 ## Response
 
@@ -38,7 +38,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", &pgbeam.GetProjectMetricsParams{
     Limit: 20,
-    Region: "...",
+    Region: "us-east-1",
   })
 if err != nil {
   log.Fatal(err)
@@ -48,9 +48,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |

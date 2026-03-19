@@ -24,12 +24,12 @@ const { api } = client;
 
 ## Constructor options
 
-| Option | Type | Description |
-| --- | --- | --- |
-| `token` | `string \| null \| () => Promise<string \| null>` | JWT token, API key, or async function that resolves one |
-| `baseUrl` | `string` | Base URL of the PgBeam API |
-| `fetch` | `typeof globalThis.fetch` | Optional custom fetch implementation |
-| `onResponse` | `OnResponseHook` | Optional hook called after every response |
+| Option       | Type                                              | Description                                             |
+| ------------ | ------------------------------------------------- | ------------------------------------------------------- |
+| `token`      | `string \| null \| () => Promise<string \| null>` | JWT token, API key, or async function that resolves one |
+| `baseUrl`    | `string`                                          | Base URL of the PgBeam API                              |
+| `fetch`      | `typeof globalThis.fetch`                         | Optional custom fetch implementation                    |
+| `onResponse` | `OnResponseHook`                                  | Optional hook called after every response               |
 
 ## Authentication
 
@@ -37,33 +37,35 @@ The `token` constructor option accepts a static string, an async function, or
 an API key. Choose the approach that fits your environment.
 
 <Tabs items={["Static token", "Async token", "API key"]}>
-<Tab value="Static token">
-```typescript
-const client = new PgBeamClient({
-  token: "your-session-token",
-  baseUrl: "https://api.pgbeam.com",
-});
-```
-</Tab>
-<Tab value="Async token">
-```typescript
-const client = new PgBeamClient({
-  token: async () => {
-    // Refresh or fetch token dynamically
-    return await getToken();
-  },
-  baseUrl: "https://api.pgbeam.com",
-});
-```
-</Tab>
-<Tab value="API key">
-```typescript
-const client = new PgBeamClient({
-  token: "pbk_your_api_key",
-  baseUrl: "https://api.pgbeam.com",
-});
-```
-</Tab>
+  <Tab value="Static token">
+    ```typescript
+    const client = new PgBeamClient({
+      token: "your-session-token",
+      baseUrl: "https://api.pgbeam.com",
+    });
+    ```
+  </Tab>
+
+  <Tab value="Async token">
+    ```typescript
+    const client = new PgBeamClient({
+      token: async () => {
+        // Refresh or fetch token dynamically
+        return await getToken();
+      },
+      baseUrl: "https://api.pgbeam.com",
+    });
+    ```
+  </Tab>
+
+  <Tab value="API key">
+    ```typescript
+    const client = new PgBeamClient({
+      token: "pbk_your_api_key",
+      baseUrl: "https://api.pgbeam.com",
+    });
+    ```
+  </Tab>
 </Tabs>
 
 See [API Keys](/docs/api-keys) for key creation and rotation.
@@ -105,7 +107,7 @@ const project = await api.request("GET /v1/projects/{project_id}", {
 ```
 
 <Callout type="info" title="Which style should I use?">
-Tag-based access is recommended for most use cases. It provides better
-discoverability through IDE autocomplete. Route-based access is useful when you
-want your code to mirror the REST endpoints directly.
+  Tag-based access is recommended for most use cases. It provides better
+  discoverability through IDE autocomplete. Route-based access is useful when you
+  want your code to mirror the REST endpoints directly.
 </Callout>

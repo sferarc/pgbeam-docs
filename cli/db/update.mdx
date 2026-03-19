@@ -15,18 +15,18 @@ pgbeam db update <id> [flags]
 
 ## Options
 
-| Option | Description | Required | Default |
-| ------ | ----------- | -------- | ------- |
-| `<id>` | ID of the database to update | Yes | - |
-| `--name <value>` | New display name for the database | No | - |
-| `--cache-enabled` | Enable or disable query result caching for this database | No | - |
-| `--cache-ttl <value>` | Time-to-live for cached query results, in seconds | No | - |
-| `--pool-mode <value>` | Connection pool mode: transaction, session, or statement | No | - |
-| `--pool-size <value>` | Maximum number of connections in the pool (default: 10) | No | - |
-| `--min-pool-size <value>` | Minimum number of idle connections maintained in the pool (default: 1) | No | - |
+| Option                    | Description                                                            | Required | Default |
+| ------------------------- | ---------------------------------------------------------------------- | -------- | ------- |
+| `<id>`                    | ID of the database to update                                           | Yes      | -       |
+| `--name <value>`          | New display name for the database                                      | No       | -       |
+| `--cache-enabled`         | Enable or disable query result caching for this database               | No       | -       |
+| `--cache-ttl <value>`     | Time-to-live for cached query results, in seconds                      | No       | -       |
+| `--pool-mode <value>`     | Connection pool mode: transaction, session, or statement               | No       | -       |
+| `--pool-size <value>`     | Maximum number of connections in the pool (default: 10)                | No       | -       |
+| `--min-pool-size <value>` | Minimum number of idle connections maintained in the pool (default: 1) | No       | -       |
 
 <Callout type="info" title="Global options">
-All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
 </Callout>
 
 ## Examples

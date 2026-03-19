@@ -77,12 +77,12 @@ const client = new PgBeamClient({
 });
 ```
 
-| Option            | Type      | Default | Description                                                      |
-| ----------------- | --------- | ------- | ---------------------------------------------------------------- |
+| Option            | Type      | Default | Description                                                         |
+| ----------------- | --------- | ------- | ------------------------------------------------------------------- |
 | `maxRetries`      | `number`  | `5`     | Max retry attempts after the initial request. `0` disables retries. |
-| `initialDelayMs`  | `number`  | `500`   | Initial backoff delay in milliseconds.                           |
-| `maxDelayMs`      | `number`  | `30000` | Maximum backoff delay in milliseconds.                           |
-| `idempotencyKeys` | `boolean` | `true`  | Auto-send `Idempotency-Key` header on POST/PATCH.                |
+| `initialDelayMs`  | `number`  | `500`   | Initial backoff delay in milliseconds.                              |
+| `maxDelayMs`      | `number`  | `30000` | Maximum backoff delay in milliseconds.                              |
+| `idempotencyKeys` | `boolean` | `true`  | Auto-send `Idempotency-Key` header on POST/PATCH.                   |
 
 ### Disabling retries
 

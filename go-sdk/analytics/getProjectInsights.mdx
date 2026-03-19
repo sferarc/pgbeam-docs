@@ -8,7 +8,6 @@ description: Get query insights for a project
 Returns aggregated query-level analytics for a project including top queries
 by count, cache hit/miss summary, and latency statistics.
 
-
 ## Usage
 
 ```go
@@ -17,13 +16,13 @@ result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectInsightsParams` | No | Query parameters |
-| params.Range | `string` | No | Time range to query. Defaults to 24h. |
-| params.Limit | `int` | No | Maximum number of top queries to return (1-100). |
+| Parameter    | Type                               | Required | Description                                          |
+| ------------ | ---------------------------------- | -------- | ---------------------------------------------------- |
+| ctx          | `context.Context`                  | Yes      | Request context                                      |
+| projectID    | `string`                           | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| params       | `*pgbeam.GetProjectInsightsParams` | No       | Query parameters                                     |
+| params.Range | `string`                           | No       | Time range to query. Defaults to 24h.                |
+| params.Limit | `int`                              | No       | Maximum number of top queries to return (1-100).     |
 
 ## Response
 
@@ -39,7 +38,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 })
 
 result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", &pgbeam.GetProjectInsightsParams{
-    Range: "...",
+    Range: "24h",
     Limit: 20,
   })
 if err != nil {
@@ -50,9 +49,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |

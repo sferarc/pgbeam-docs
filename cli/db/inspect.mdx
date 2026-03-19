@@ -15,12 +15,12 @@ pgbeam db inspect <id>
 
 ## Options
 
-| Option | Description | Required | Default |
-| ------ | ----------- | -------- | ------- |
-| `<id>` | ID of the database to inspect | Yes | - |
+| Option | Description                   | Required | Default |
+| ------ | ----------------------------- | -------- | ------- |
+| `<id>` | ID of the database to inspect | Yes      | -       |
 
 <Callout type="info" title="Global options">
-All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
 </Callout>
 
 ## Examples
@@ -35,4 +35,4 @@ pgbeam db inspect db_xxx --json
 
 ## Output
 
-Displays database ID, name, host:port, SSL mode, cache status (enabled/disabled), and pool mode. With `--json`, returns the full database object including cache_config and pool_config.
+Displays database ID, name, host:port, SSL mode, cache status (enabled/disabled), and pool mode. With `--json`, returns the full database object including cache\_config and pool\_config.

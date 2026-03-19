@@ -11,7 +11,7 @@ Sets the monthly spend limit for an organization. Null removes the limit.
 
 ```typescript
 const result = await api.analytics.updateSpendLimit({
-    pathParams: { org_id: "org_xxx" },
+    pathParams: { org_id: "org_abc123" },
     body: {
       ,
     },
@@ -20,10 +20,10 @@ const result = await api.analytics.updateSpendLimit({
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| pathParams.org_id | `string` | Yes | Unique organization identifier. |
-| body.spend_limit | `number` | No | Monthly spend limit in dollars. Null to remove the limit. |
+| Parameter          | Type     | Required | Description                                               |
+| ------------------ | -------- | -------- | --------------------------------------------------------- |
+| pathParams.org\_id | `string` | Yes      | Unique organization identifier.                           |
+| body.spend\_limit  | `number` | No       | Monthly spend limit in dollars. Null to remove the limit. |
 
 ## Response
 
@@ -40,7 +40,7 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.analytics.updateSpendLimit({
-  pathParams: { org_id: "org_xxx" },
+  pathParams: { org_id: "org_abc123" },
   body: {
       ,
     },
@@ -49,9 +49,9 @@ const result = await client.api.analytics.updateSpendLimit({
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

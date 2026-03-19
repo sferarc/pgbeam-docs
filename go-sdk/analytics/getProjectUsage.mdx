@@ -11,20 +11,20 @@ Returns daily usage data for a specific project, broken down by region.
 
 ```go
 result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
-    StartDate: "...",
-    EndDate: "...",
+    StartDate: "2024-01-01",
+    EndDate: "2024-01-31",
   })
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectUsageParams` | Yes | Query parameters |
-| params.StartDate | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
-| params.EndDate | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+| Parameter        | Type                            | Required | Description                                          |
+| ---------------- | ------------------------------- | -------- | ---------------------------------------------------- |
+| ctx              | `context.Context`               | Yes      | Request context                                      |
+| projectID        | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| params           | `*pgbeam.GetProjectUsageParams` | Yes      | Query parameters                                     |
+| params.StartDate | `string`                        | Yes      | Start date (inclusive, YYYY-MM-DD).                  |
+| params.EndDate   | `string`                        | Yes      | End date (inclusive, YYYY-MM-DD).                    |
 
 ## Response
 
@@ -40,8 +40,8 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 })
 
 result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
-    StartDate: "...",
-    EndDate: "...",
+    StartDate: "2024-01-01",
+    EndDate: "2024-01-31",
   })
 if err != nil {
   log.Fatal(err)
@@ -51,9 +51,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |

@@ -37,38 +37,40 @@ Register one or more read replicas for a database. Each replica needs its own
 connection details — PgBeam will connect to it independently from the primary.
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-Navigate to your project, select a database, and click **Add Replica**. Enter
-the replica's connection details: host, port, database name, and SSL mode.
-</Tab>
-<Tab value="API">
-```bash
-curl -X POST \
-  https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId}/replicas \
-  -H "Authorization: Bearer <key>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "host": "replica.example.com",
-    "port": 5432,
-    "database": "mydb",
-    "ssl_mode": "verify-full"
-  }'
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam replicas add --database-id <id> \
-  --host replica.example.com \
-  --port 5432 \
-  --database mydb \
-  --ssl-mode verify-full
-```
-</Tab>
+  <Tab value="Dashboard">
+    Navigate to your project, select a database, and click **Add Replica**. Enter
+    the replica's connection details: host, port, database name, and SSL mode.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X POST \
+      https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId}/replicas \
+      -H "Authorization: Bearer <key>" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "host": "replica.example.com",
+        "port": 5432,
+        "database": "mydb",
+        "ssl_mode": "verify-full"
+      }'
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam replicas add --database-id <id> \
+      --host replica.example.com \
+      --port 5432 \
+      --database mydb \
+      --ssl-mode verify-full
+    ```
+  </Tab>
 </Tabs>
 
 <Callout type="info">
-You can add multiple replicas. PgBeam distributes annotated reads across all
-healthy replicas using round-robin.
+  You can add multiple replicas. PgBeam distributes annotated reads across all
+  healthy replicas using round-robin.
 </Callout>
 
 ## Route queries to replicas
@@ -85,12 +87,12 @@ database never sees the comment.
 
 ### Routing rules
 
-| Query type                   | Where it goes                 |
-| ---------------------------- | ----------------------------- |
-| Read with `@pgbeam:replica`  | Round-robin across healthy replicas |
-| Read without annotation      | Primary database              |
-| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database         |
-| Any query inside a transaction | Primary database             |
+| Query type                         | Where it goes                       |
+| ---------------------------------- | ----------------------------------- |
+| Read with `@pgbeam:replica`        | Round-robin across healthy replicas |
+| Read without annotation            | Primary database                    |
+| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database                    |
+| Any query inside a transaction     | Primary database                    |
 
 ### Why opt-in matters
 
@@ -109,41 +111,45 @@ Most ORMs support raw SQL or template literals where you can include the
 annotation:
 
 <Tabs items={["Prisma", "Drizzle", "psycopg", "pgx", "JDBC"]}>
-<Tab value="Prisma">
-```ts
-const products = await prisma.$queryRaw`
-  /* @pgbeam:replica */ SELECT * FROM products WHERE active = true
-`;
-```
-</Tab>
-<Tab value="Drizzle">
-```ts
-import { sql } from "drizzle-orm";
+  <Tab value="Prisma">
+    ```ts
+    const products = await prisma.$queryRaw`
+      /* @pgbeam:replica */ SELECT * FROM products WHERE active = true
+    `;
+    ```
+  </Tab>
 
-const products = await db.execute(
-  sql`/* @pgbeam:replica */ SELECT * FROM products WHERE active = true`,
-);
-```
-</Tab>
-<Tab value="psycopg">
-```python
-cur.execute(
-    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true"
-)
-```
-</Tab>
-<Tab value="pgx">
-```go
-rows, err := pool.Query(ctx,
-    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true")
-```
-</Tab>
-<Tab value="JDBC">
-```java
-ResultSet rs = stmt.executeQuery(
-    "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true");
-```
-</Tab>
+  <Tab value="Drizzle">
+    ```ts
+    import { sql } from "drizzle-orm";
+
+    const products = await db.execute(
+      sql`/* @pgbeam:replica */ SELECT * FROM products WHERE active = true`,
+    );
+    ```
+  </Tab>
+
+  <Tab value="psycopg">
+    ```python
+    cur.execute(
+        "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true"
+    )
+    ```
+  </Tab>
+
+  <Tab value="pgx">
+    ```go
+    rows, err := pool.Query(ctx,
+        "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true")
+    ```
+  </Tab>
+
+  <Tab value="JDBC">
+    ```java
+    ResultSet rs = stmt.executeQuery(
+        "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true");
+    ```
+  </Tab>
 </Tabs>
 
 ## Combining replicas with caching
@@ -175,6 +181,7 @@ SET pgbeam.debug = on;
 ```
 
 The `NOTICE` output tells you:
+
 - Whether the query was a cache hit, miss, or stale hit
 - Whether replica routing was used (`replica=true`)
 - Which upstream host handled the query
@@ -201,12 +208,14 @@ is always some delay (typically milliseconds, but potentially seconds under
 load) between a write on the primary and the same data appearing on a replica.
 
 **Queries safe for replica routing:**
+
 - Product catalogs, blog posts, static content lookups
 - Analytics and reporting queries
 - Search results, recommendations, leaderboards
 - Configuration and feature flag reads
 
 **Queries that should stay on the primary:**
+
 - Reading data immediately after writing it ("read-your-writes")
 - Queries used in transactional flows where consistency is critical
 - Real-time balance checks, inventory counts, or seat availability

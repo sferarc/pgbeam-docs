@@ -31,11 +31,11 @@ if err != nil {
 
 ## APIError properties
 
-| Property     | Type     | Description        |
-| ------------ | -------- | ------------------ |
-| `StatusCode` | `int`    | HTTP status code   |
-| `Status`     | `string` | HTTP status text   |
-| `Body`       | `string` | Raw response body  |
+| Property     | Type     | Description       |
+| ------------ | -------- | ----------------- |
+| `StatusCode` | `int`    | HTTP status code  |
+| `Status`     | `string` | HTTP status text  |
+| `Body`       | `string` | Raw response body |
 
 ## IsNotFound helper
 
@@ -82,11 +82,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 })
 ```
 
-| Field          | Type            | Default | Description                                                      |
-| -------------- | --------------- | ------- | ---------------------------------------------------------------- |
+| Field          | Type            | Default | Description                                                         |
+| -------------- | --------------- | ------- | ------------------------------------------------------------------- |
 | `MaxRetries`   | `int`           | `5`     | Max retry attempts after the initial request. `0` disables retries. |
-| `InitialDelay` | `time.Duration` | `500ms` | Initial backoff delay.                                           |
-| `MaxDelay`     | `time.Duration` | `30s`   | Maximum backoff delay.                                           |
+| `InitialDelay` | `time.Duration` | `500ms` | Initial backoff delay.                                              |
+| `MaxDelay`     | `time.Duration` | `30s`   | Maximum backoff delay.                                              |
 
 ### Disabling retries
 

@@ -14,54 +14,49 @@ code are required.
 ## Setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Update your connection string
 
-### Update your connection string
+    Point `DATABASE_URL` at your PgBeam project hostname:
 
-Point `DATABASE_URL` at your PgBeam project hostname:
+    ```bash title=".env"
+    DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb"
+    ```
+  </Step>
 
-```bash title=".env"
-DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb"
-```
+  <Step>
+    ### Verify your schema
 
-</Step>
-<Step>
+    No changes needed to `schema.prisma` — the `postgresql` provider works as-is:
 
-### Verify your schema
+    ```prisma title="schema.prisma"
+    datasource db {
+      provider = "postgresql"
+      url      = env("DATABASE_URL")
+    }
+    ```
+  </Step>
 
-No changes needed to `schema.prisma` — the `postgresql` provider works as-is:
+  <Step>
+    ### Reduce Prisma's connection pool size
 
-```prisma title="schema.prisma"
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
+    PgBeam handles connection pooling at the proxy layer, so Prisma does not need
+    a large local pool. Append `connection_limit` to your connection string:
 
-</Step>
-<Step>
+    ```bash title=".env"
+    DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb?connection_limit=5"
+    ```
+  </Step>
 
-### Reduce Prisma's connection pool size
+  <Step>
+    ### Run a test query
 
-PgBeam handles connection pooling at the proxy layer, so Prisma does not need
-a large local pool. Append `connection_limit` to your connection string:
+    ```ts
+    const users = await prisma.user.findMany();
+    ```
 
-```bash title=".env"
-DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb?connection_limit=5"
-```
-
-</Step>
-<Step>
-
-### Run a test query
-
-```ts
-const users = await prisma.user.findMany();
-```
-
-If this returns results, Prisma is connected through PgBeam.
-
-</Step>
+    If this returns results, Prisma is connected through PgBeam.
+  </Step>
 </Steps>
 
 ## Connection pool sizing
@@ -70,24 +65,24 @@ By default, Prisma creates a pool of `num_cpus * 2 + 1` connections. Since
 PgBeam manages upstream pooling, you should reduce this to avoid holding
 unnecessary upstream connections:
 
-| Deployment type         | Recommended `connection_limit` |
-| ----------------------- | ------------------------------ |
-| Single server           | 5-10                           |
-| Multiple replicas/pods  | 3-5 per instance               |
-| Serverless (Lambda)     | 1-2                            |
+| Deployment type        | Recommended `connection_limit` |
+| ---------------------- | ------------------------------ |
+| Single server          | 5-10                           |
+| Multiple replicas/pods | 3-5 per instance               |
+| Serverless (Lambda)    | 1-2                            |
 
 <Callout type="info">
-With PgBeam in transaction pool mode, Prisma connections are multiplexed
-upstream. A pool of 5 per instance is sufficient for most workloads, even at
-high concurrency.
+  With PgBeam in transaction pool mode, Prisma connections are multiplexed
+  upstream. A pool of 5 per instance is sufficient for most workloads, even at
+  high concurrency.
 </Callout>
 
 ## Prisma Migrate
 
 <Callout type="warn" title="Run migrations against the origin">
-Run Prisma migrations directly against your origin database, not through
-PgBeam. Migrations use advisory locks and other session features that should
-bypass the proxy.
+  Run Prisma migrations directly against your origin database, not through
+  PgBeam. Migrations use advisory locks and other session features that should
+  bypass the proxy.
 </Callout>
 
 Set a separate environment variable for migrations or override inline:
@@ -161,12 +156,12 @@ const result = await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
 
 ## Common issues
 
-| Issue                               | Cause                            | Fix                                      |
-| ----------------------------------- | -------------------------------- | ---------------------------------------- |
-| "Too many connections" on startup   | Prisma pool too large            | Add `?connection_limit=5` to `DATABASE_URL` |
-| Prepared statement errors           | Using transaction pool mode      | Switch to session pool mode, or avoid prepared statements |
-| Migrations fail through PgBeam      | Advisory locks not supported in transaction mode | Run migrations against origin directly |
-| Stale data after writes             | Cache returning old results      | Use `noCache` annotation or disable cache for that query shape |
+| Issue                             | Cause                                            | Fix                                                            |
+| --------------------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
+| "Too many connections" on startup | Prisma pool too large                            | Add `?connection_limit=5` to `DATABASE_URL`                    |
+| Prepared statement errors         | Using transaction pool mode                      | Switch to session pool mode, or avoid prepared statements      |
+| Migrations fail through PgBeam    | Advisory locks not supported in transaction mode | Run migrations against origin directly                         |
+| Stale data after writes           | Cache returning old results                      | Use `noCache` annotation or disable cache for that query shape |
 
 ## Further reading
 

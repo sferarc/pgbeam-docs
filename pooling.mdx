@@ -47,6 +47,7 @@ lifetime. No connection sharing happens between clients.
 assigned to the client until it disconnects.
 
 **Best for:**
+
 - Applications that use advisory locks (`pg_advisory_lock`)
 - Temporary tables that persist across queries
 - `LISTEN`/`NOTIFY` for real-time notifications
@@ -68,21 +69,23 @@ transaction ends, the connection goes back to the pool. Between transactions,
 the client holds no upstream connection.
 
 **Best for:**
+
 - Serverless functions (Lambda, Cloud Functions, Edge Functions)
 - High-concurrency APIs with short-lived transactions
 - Applications where most queries are independent, stateless reads and writes
 
 **Tradeoff:** Session-level state does not persist between transactions:
+
 - `SET` parameters reset after each transaction
 - Prepared statements are discarded
 - `LISTEN`/`NOTIFY` is not supported
 - Advisory locks are released
 
 <Callout type="warn">
-If your application relies on session state persisting between transactions,
-transaction mode will break it. Common culprits: ORMs that use prepared
-statements implicitly, applications that set `search_path` once at connection
-startup, or code that uses `pg_advisory_lock` for distributed locking.
+  If your application relies on session state persisting between transactions,
+  transaction mode will break it. Common culprits: ORMs that use prepared
+  statements implicitly, applications that set `search_path` once at connection
+  startup, or code that uses `pg_advisory_lock` for distributed locking.
 </Callout>
 
 ### Statement mode
@@ -95,6 +98,7 @@ for its execution. After the statement completes, the connection is immediately
 returned.
 
 **Best for:**
+
 - Simple, stateless read-only workloads
 - Maximum connection reuse when every query is independent
 
@@ -103,11 +107,11 @@ runs independently, so `BEGIN`/`COMMIT` blocks cannot span multiple statements.
 
 ## Choosing the right mode
 
-| If your workload uses...                               | Use mode        |
-| ------------------------------------------------------ | --------------- |
-| Advisory locks, temp tables, `LISTEN/NOTIFY`, `SET`    | **Session**     |
-| Short transactions, serverless, high concurrency       | **Transaction** |
-| Single-statement reads, no transactions needed         | **Statement**   |
+| If your workload uses...                            | Use mode        |
+| --------------------------------------------------- | --------------- |
+| Advisory locks, temp tables, `LISTEN/NOTIFY`, `SET` | **Session**     |
+| Short transactions, serverless, high concurrency    | **Transaction** |
+| Single-statement reads, no transactions needed      | **Statement**   |
 
 If you are unsure, start with **transaction mode**. It offers the best balance
 of connection reuse and compatibility for most web applications. Only switch to
@@ -116,16 +120,16 @@ if you have a purely read-only workload.
 
 ## Feature compatibility matrix
 
-| Feature                  | Session | Transaction | Statement |
-| ------------------------ | ------- | ----------- | --------- |
-| Multi-statement txns     | Yes     | Yes         | No        |
-| Prepared statements      | Yes     | No          | No        |
-| `SET` / `SET LOCAL`      | Yes     | Within txn  | No        |
-| `LISTEN` / `NOTIFY`      | Yes     | No          | No        |
-| Advisory locks           | Yes     | No          | No        |
-| Temporary tables         | Yes     | No          | No        |
-| `COPY` operations        | Yes     | Yes         | No        |
-| Connection reuse         | No      | Yes         | Yes       |
+| Feature              | Session | Transaction | Statement |
+| -------------------- | ------- | ----------- | --------- |
+| Multi-statement txns | Yes     | Yes         | No        |
+| Prepared statements  | Yes     | No          | No        |
+| `SET` / `SET LOCAL`  | Yes     | Within txn  | No        |
+| `LISTEN` / `NOTIFY`  | Yes     | No          | No        |
+| Advisory locks       | Yes     | No          | No        |
+| Temporary tables     | Yes     | No          | No        |
+| `COPY` operations    | Yes     | Yes         | No        |
+| Connection reuse     | No      | Yes         | Yes       |
 
 ## Pool sizing guidance
 
@@ -133,11 +137,11 @@ Since PgBeam handles upstream pooling, your application's client-side pool
 should be smaller than you might be used to. The goal is to let PgBeam
 multiplex — having a large client pool defeats the purpose.
 
-| Deployment type            | Recommended client pool size |
-| -------------------------- | ---------------------------- |
-| Single application server  | 5-10                         |
-| Multiple replicas / pods   | 3-5 per instance             |
-| Serverless (Lambda, etc.)  | 1-2 per invocation           |
+| Deployment type           | Recommended client pool size |
+| ------------------------- | ---------------------------- |
+| Single application server | 5-10                         |
+| Multiple replicas / pods  | 3-5 per instance             |
+| Serverless (Lambda, etc.) | 1-2 per invocation           |
 
 ### Max active connections
 
@@ -194,29 +198,31 @@ traffic patterns, while freeing resources during quiet periods.
 ## Changing pool mode
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
-<Tab value="Dashboard">
-Navigate to your project **Settings** and select the desired pool mode from the
-dropdown.
-</Tab>
-<Tab value="API">
-```bash
-curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId} \
-  -H "X-API-Key: pbo_..." \
-  -d '{"pool_mode": "transaction"}'
-```
-</Tab>
-<Tab value="CLI">
-```bash
-pgbeam projects update <project-id> --pool-mode transaction
-```
-</Tab>
+  <Tab value="Dashboard">
+    Navigate to your project **Settings** and select the desired pool mode from the
+    dropdown.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId} \
+      -H "X-API-Key: pbo_..." \
+      -d '{"pool_mode": "transaction"}'
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam projects update <project-id> --pool-mode transaction
+    ```
+  </Tab>
 </Tabs>
 
 <Callout type="warn" title="Active connections">
-Changing pool mode takes effect for **new connections only**. Existing
-connections continue to use the previous mode until they disconnect. To apply
-the change to all connections, restart your application or wait for existing
-connections to cycle.
+  Changing pool mode takes effect for **new connections only**. Existing
+  connections continue to use the previous mode until they disconnect. To apply
+  the change to all connections, restart your application or wait for existing
+  connections to cycle.
 </Callout>
 
 ## Common pooling patterns

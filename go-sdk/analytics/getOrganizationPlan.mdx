@@ -10,15 +10,15 @@ Returns the current plan and limits for the organization.
 ## Usage
 
 ```go
-result, err := client.Analytics.GetOrganizationPlan(ctx, "org_xxx")
+result, err := client.Analytics.GetOrganizationPlan(ctx, "org_abc123")
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| ctx | `context.Context` | Yes | Request context |
-| orgID | `string` | Yes | Unique organization identifier. |
+| Parameter | Type              | Required | Description                     |
+| --------- | ----------------- | -------- | ------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                 |
+| orgID     | `string`          | Yes      | Unique organization identifier. |
 
 ## Response
 
@@ -33,7 +33,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Analytics.GetOrganizationPlan(ctx, "org_xxx")
+result, err := client.Analytics.GetOrganizationPlan(ctx, "org_abc123")
 if err != nil {
   log.Fatal(err)
 }
@@ -42,9 +42,9 @@ fmt.Println(result)
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 429    | Rate limited. Try again later.                |

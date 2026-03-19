@@ -10,12 +10,17 @@ Removes a database registration from the project.
 ## Usage
 
 ```typescript
-const result = await api.databases.deleteDatabase();
+const result = await api.databases.deleteDatabase({
+    pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+  });
 ```
 
 ## Parameters
 
-None.
+| Parameter               | Type     | Required | Description                                          |
+| ----------------------- | -------- | -------- | ---------------------------------------------------- |
+| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| pathParams.database\_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
 
 ## Response
 
@@ -31,15 +36,17 @@ const client = new PgBeamClient({
   baseUrl: "https://api.pgbeam.com",
 });
 
-const result = await client.api.databases.deleteDatabase();
+const result = await client.api.databases.deleteDatabase({
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 403 | Operation not allowed by current plan limits. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

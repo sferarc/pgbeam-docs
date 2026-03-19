@@ -3,258 +3,232 @@ title: Pulumi
 icon: Blocks
 tag: TypeScript
 description:
-  Manage PgBeam projects, databases, replicas, domains, and cache rules as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
   infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
 Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas,
-custom domains, cache rules, and spend limits.
+package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
 
 ## Setup
 
 <Steps>
-<Step>
+  <Step>
+    ### Install the package
 
-### Install the package
+    <Tabs items={["npm", "pnpm", "yarn"]}>
+      <Tab value="npm">
+        ```bash
+        npm install @pgbeam/pulumi @pulumi/pulumi
+        ```
+      </Tab>
 
-<Tabs items={["npm", "pnpm", "yarn"]}>
-<Tab value="npm">
-```bash
-npm install @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
-<Tab value="pnpm">
-```bash
-pnpm add @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
-<Tab value="yarn">
-```bash
-yarn add @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
-</Tabs>
+      <Tab value="pnpm">
+        ```bash
+        pnpm add @pgbeam/pulumi @pulumi/pulumi
+        ```
+      </Tab>
 
-</Step>
-<Step>
+      <Tab value="yarn">
+        ```bash
+        yarn add @pgbeam/pulumi @pulumi/pulumi
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
 
-### Configure credentials
+  <Step>
+    ### Configure credentials
 
-Set your PgBeam API key via Pulumi config or environment variable:
+    Set your PgBeam API key via Pulumi config or environment variable:
 
-<Tabs items={["Pulumi config", "Environment variable", "Programmatic"]}>
-<Tab value="Pulumi config">
-```bash
-pulumi config set pgbeam:apiKey --secret pgb_your_api_key
-```
-</Tab>
-<Tab value="Environment variable">
-```bash title=".env"
-PGBEAM_API_KEY=pgb_your_api_key
-```
-</Tab>
-<Tab value="Programmatic">
-```ts title="index.ts"
-import * as pgbeam from "@pgbeam/pulumi";
+    <Tabs items={["Pulumi config", "Environment variable", "Programmatic"]}>
+      <Tab value="Pulumi config">
+        ```bash
+        pulumi config set pgbeam:apiKey --secret pgb_your_api_key
+        ```
+      </Tab>
 
-pgbeam.configure({ apiKey: "pgb_your_api_key" });
-```
-</Tab>
-</Tabs>
+      <Tab value="Environment variable">
+        ```bash title=".env"
+        PGBEAM_API_KEY=pgb_your_api_key
+        ```
+      </Tab>
 
-</Step>
-<Step>
+      <Tab value="Programmatic">
+        ```ts title="index.ts"
+        import * as pgbeam from "@pgbeam/pulumi";
 
-### Create a project
+        pgbeam.configure({ apiKey: "pgb_your_api_key" });
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
 
-```ts title="index.ts"
-import * as pgbeam from "@pgbeam/pulumi";
-import * as pulumi from "@pulumi/pulumi";
+  <Step>
+    ### Create a project
 
-const config = new pulumi.Config();
+    ```ts title="index.ts"
+    import * as pgbeam from "@pgbeam/pulumi";
+    import * as pulumi from "@pulumi/pulumi";
 
-const project = new pgbeam.Project("my-app", {
-  orgId: config.require("orgId"),
-  name: "my-app",
-  database: {
-    host: "my-rds.us-east-1.rds.amazonaws.com",
-    port: 5432,
-    name: "mydb",
-    username: "pgbeam",
-    password: config.requireSecret("dbPassword"),
-  },
-});
+    const config = new pulumi.Config();
 
-export const proxyHost = project.proxyHost;
-```
+    const project = new pgbeam.Project("my-app", {
+      orgId: config.require("orgId"),
+      name: "my-app",
+      database: {
+        host: "my-rds.us-east-1.rds.amazonaws.com",
+        port: 5432,
+        name: "mydb",
+        username: "pgbeam",
+        password: config.requireSecret("dbPassword"),
+      },
+    });
 
-</Step>
-<Step>
+    export const proxyHost = project.proxyHost;
+    ```
+  </Step>
 
-### Deploy
+  <Step>
+    ### Deploy
 
-```bash
-pulumi up
-```
+    ```bash
+    pulumi up
+    ```
 
-Pulumi creates the PgBeam project and its primary database atomically.
-The `proxyHost` output gives you the PgBeam proxy endpoint to use in your
-application connection string.
-
-</Step>
+    Pulumi creates the PgBeam project and its primary database atomically.
+    The `proxyHost` output gives you the PgBeam proxy endpoint to use in your
+    application connection string.
+  </Step>
 </Steps>
 
 ## Resources
 
 ### Project
 
-The top-level resource. Each project gets a unique proxy hostname and is created
-with its primary upstream database.
+Manages a PgBeam project with a primary database.
 
 ```ts
-const project = new pgbeam.Project("prod", {
+const res = new pgbeam.Project("example", {
   orgId: "org_abc123",
-  name: "production",
-  cloud: "aws",
+  name: "my-app",
+  description: "Production database proxy",
+  tags: ["production", "us-east-1"],
   queriesPerSecond: 1000,
   burstSize: 200,
   maxConnections: 500,
-  database: {
-    host: "primary.us-east-1.rds.amazonaws.com",
-    port: 5432,
-    name: "mydb",
-    username: "pgbeam",
-    password: secret.value,
-    sslMode: "require",
-    poolConfig: {
-      poolSize: 20,
-      minPoolSize: 5,
-      poolMode: "transaction",
-    },
-    cacheConfig: {
-      enabled: true,
-      ttlSeconds: 60,
-      maxEntries: 10000,
-      swrSeconds: 30,
-    },
-  },
+  allowedCidrs: ["10.0.0.0/8", "203.0.113.5/32"],
+  status: "active",
 });
 ```
 
-**Outputs:** `proxyHost`, `status`, `databaseCount`, `activeConnections`,
-`primaryDatabaseId`, `createdAt`, `updatedAt`
+**Outputs:** `proxyHost`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseId`
 
 ### Database
 
-Add additional upstream databases to a project. Useful for read replicas or
-multi-database setups.
+Manages an upstream database connection within a PgBeam project.
 
 ```ts
-const readDb = new pgbeam.Database("read-replica", {
-  projectId: project.id,
-  host: "replica.us-east-1.rds.amazonaws.com",
+const res = new pgbeam.Database("example", {
+  projectId: "prj_01h455vb4pex5vsknk084sn02q",
+  host: "db.example.com",
   port: 5432,
   name: "mydb",
   username: "pgbeam",
-  password: secret.value,
-  role: "replica",
+  sslMode: "require",
+  role: "primary",
+  poolRegion: "us-east-1",
+  queryTimeoutMs: 0,
+  autoReadRouting: false,
+  cacheConfig: {
+    enabled: true,
+    ttlSeconds: 60,
+    maxEntries: 10000,
+    swrSeconds: 30,
+  },
   poolConfig: {
     poolSize: 20,
     minPoolSize: 5,
     poolMode: "transaction",
+    maxActive: 200,
   },
+  password: secret.value,
 });
 ```
 
-**Outputs:** `connectionString`, `role`, `sslMode`, `cacheConfig`, `poolConfig`
+**Outputs:** `connectionString`, `createdAt`, `updatedAt`
 
 ### Replica
 
-Register a read replica endpoint under a database. PgBeam routes read queries
-to replicas automatically based on proximity.
+Manages a read replica for a PgBeam database.
 
 Replicas are immutable — any property change triggers replacement.
 
 ```ts
-const replica = new pgbeam.Replica("us-west", {
-  databaseId: readDb.id,
-  host: "replica.us-west-2.rds.amazonaws.com",
+const res = new pgbeam.Replica("example", {
+  databaseId: "db_01h455vb4pex5vsknk084sn02q",
+  host: "replica.db.example.com",
   port: 5432,
   sslMode: "require",
 });
 ```
 
+**Outputs:** `createdAt`, `updatedAt`
+
 ### CustomDomain
 
-Attach a custom domain to a project. Requires the Scale or Enterprise plan.
+Manages a custom domain for a PgBeam project.
+
+CustomDomains are immutable — any property change triggers replacement.
 
 ```ts
-const domain = new pgbeam.CustomDomain("prod-domain", {
-  projectId: project.id,
+const res = new pgbeam.CustomDomain("example", {
+  projectId: "prj_01h455vb4pex5vsknk084sn02q",
   domain: "db.example.com",
 });
-
-export const cnameTarget = domain.dnsInstructions.apply(
-  (d) => d?.cnameTarget,
-);
 ```
 
-After creation, configure DNS records according to the returned
-`dnsInstructions`, then verify:
-
-```ts
-domain.id.apply(async (id) => {
-  const result = await pgbeam.verifyCustomDomain(project.id, id);
-  console.log("Verified:", result.verified);
-});
-```
+**Outputs:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
 
 ### CacheRule
 
-Override per-query cache settings for a specific query shape.
+Manages a per-query cache rule. Deletion disables caching (soft-delete).
 
 ```ts
-const rule = new pgbeam.CacheRule("hot-query", {
-  projectId: project.id,
-  databaseId: readDb.id,
-  queryHash: "a1b2c3d4e5f67890",
+const res = new pgbeam.CacheRule("example", {
+  projectId: "prj_01h455vb4pex5vsknk084sn02q",
+  databaseId: "db_01h455vb4pex5vsknk084sn02q",
+  queryHash: "a1b2c3d4e5f60718",
   cacheEnabled: true,
   cacheTtlSeconds: 300,
   cacheSwrSeconds: 60,
 });
 ```
 
-**Outputs:** `normalizedSql`, `queryType`, `callCount`, `avgLatencyMs`,
-`recommendation`
-
-<Callout type="info">
-Find query hashes in the PgBeam dashboard under the Cache Rules tab, or via
-the API's `listCacheRules` endpoint.
-</Callout>
+**Outputs:** `queryHash`, `normalizedSql`, `queryType`, `callCount`, `avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`, `recommendation`, `firstSeenAt`, `lastSeenAt`
 
 ### SpendLimit
 
-Set a monthly spending cap for an organization.
+Manages the monthly spend limit for an organization.
 
 ```ts
-const limit = new pgbeam.SpendLimit("prod-limit", {
+const res = new pgbeam.SpendLimit("example", {
   orgId: "org_abc123",
   spendLimit: 500,
 });
 ```
 
-When the limit is reached, the organization's projects are suspended until the
-next billing period. Removing this resource resets the limit (no cap).
+**Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
 
 ## Configuration
 
-| Setting | Source | Description |
-| --- | --- | --- |
-| `pgbeam:apiKey` | Pulumi config | API key (recommended: use `--secret`) |
+| Setting          | Source        | Description                                      |
+| ---------------- | ------------- | ------------------------------------------------ |
+| `pgbeam:apiKey`  | Pulumi config | API key (recommended: use `--secret`)            |
 | `pgbeam:baseUrl` | Pulumi config | API base URL (default: `https://api.pgbeam.com`) |
-| `PGBEAM_API_KEY` | Environment | Fallback API key |
-| `PGBEAM_API_URL` | Environment | Fallback base URL |
+| `PGBEAM_API_KEY` | Environment   | Fallback API key                                 |
+| `PGBEAM_API_URL` | Environment   | Fallback base URL                                |
 
 Config resolution order: `configure()` call > Pulumi stack config > environment
 variables.
@@ -264,14 +238,14 @@ variables.
 Some property changes trigger resource replacement (delete + create) rather
 than in-place updates:
 
-| Resource | Replacement triggers |
-| --- | --- |
-| Project | `orgId`, `cloud` |
-| Database | `projectId` |
-| Replica | Any property change (immutable) |
-| CustomDomain | Any property change (immutable) |
-| CacheRule | `projectId`, `databaseId`, `queryHash` |
-| SpendLimit | `orgId` |
+| Resource     | Replacement triggers                   |
+| ------------ | -------------------------------------- |
+| Project      | `orgId`, `cloud`                       |
+| Database     | `projectId`                            |
+| Replica      | Any property change (immutable)        |
+| CustomDomain | Any property change (immutable)        |
+| CacheRule    | `projectId`, `databaseId`, `queryHash` |
+| SpendLimit   | `orgId`                                |
 
 ## Further reading
 

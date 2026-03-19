@@ -8,7 +8,6 @@ description: Get query insights for a project
 Returns aggregated query-level analytics for a project including top queries
 by count, cache hit/miss summary, and latency statistics.
 
-
 ## Usage
 
 ```typescript
@@ -19,11 +18,11 @@ const result = await api.analytics.getProjectInsights({
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| queryParams.range | `"1h" \| "6h" \| "24h" \| "7d"` | No | Time range to query. Defaults to 24h. |
-| queryParams.limit | `number` | No | Maximum number of top queries to return (1-100). |
+| Parameter              | Type                            | Required | Description                                          |
+| ---------------------- | ------------------------------- | -------- | ---------------------------------------------------- |
+| pathParams.project\_id | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| queryParams.range      | `"1h" \| "6h" \| "24h" \| "7d"` | No       | Time range to query. Defaults to 24h.                |
+| queryParams.limit      | `number`                        | No       | Maximum number of top queries to return (1-100).     |
 
 ## Response
 
@@ -41,15 +40,15 @@ const client = new PgBeamClient({
 
 const result = await client.api.analytics.getProjectInsights({
   pathParams: { project_id: "prj_xxx" },
-  queryParams: { range: "...", limit: 20 },
+  queryParams: { range: "24h", limit: 20 },
 });
 ```
 
 ## Errors
 
-| Status | Description |
-| --- | --- |
-| 400 | Invalid request parameters. |
-| 401 | Missing or invalid authentication. |
-| 404 | Resource not found. |
-| 429 | Rate limited. Try again later. |
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |
+| 429    | Rate limited. Try again later.     |
