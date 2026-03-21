@@ -13,6 +13,7 @@ every PgBeam-specific error, what triggers it, and how to fix it.
 | -------- | ------------------------- | ------------------------------------------------------------ |
 | `08004`  | Unknown project           | `project not found for hostname ...`                         |
 | `08004`  | Organization suspended    | `organization suspended — update payment at dash.pgbeam.com` |
+| `08004`  | IP not allowed            | `connection rejected: IP not in allowlist`                   |
 | `08004`  | Auth rate limited         | `too many authentication attempts`                           |
 | `08006`  | Upstream auth failure     | Forwarded from upstream                                      |
 | `08006`  | Circuit breaker open      | `upstream unavailable (circuit breaker open)`                |
@@ -54,6 +55,23 @@ cancels the subscription.
 1. Log in to [dash.pgbeam.com](https://dash.pgbeam.com) and go to **Settings > Billing**
 2. Update the payment method or reactivate the subscription
 3. Connections resume immediately after billing is restored
+
+### IP not allowed
+
+```
+FATAL: connection rejected: IP not in allowlist
+```
+
+**Cause:** The project has an [IP allowlist](/docs/ip-allowlist) configured and
+the client's source IP does not match any of the allowed CIDR ranges. The
+connection is rejected before authentication.
+
+**Fix:**
+
+1. Check the project's IP allowlist in **Settings > Security** in the dashboard
+2. Add the client's IP address or CIDR range to the allowlist
+3. If connecting from a cloud environment, make sure the NAT gateway or egress IP is included — container and serverless platforms often use shared egress IPs that differ from the instance's private IP
+4. To disable the allowlist entirely, set it to an empty array
 
 ### Auth rate limited
 

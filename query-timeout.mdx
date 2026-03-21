@@ -1,0 +1,88 @@
+---
+title: Query Timeout
+icon: Timer
+description:
+  Set per-database query timeouts to prevent long-running queries from holding
+  connections and exhausting resources.
+---
+
+Query timeout lets you set a maximum execution time for queries on a
+per-database basis. When enabled, PgBeam sends `SET statement_timeout = <ms>` to
+the upstream database after acquiring a connection, ensuring no single query runs
+longer than the configured limit.
+
+## How it works
+
+The timeout is applied at the database level, not the project level. Each
+database registered in a project can have its own timeout value.
+
+| Setting             | Behavior                                                    |
+| ------------------- | ----------------------------------------------------------- |
+| `0` (default)       | Disabled — no timeout override, upstream default applies    |
+| `1` – `300000` (ms) | PgBeam sets `statement_timeout` on each upstream connection |
+
+When a query exceeds the timeout, PostgreSQL cancels it and returns:
+
+```
+ERROR: canceling statement due to statement timeout
+SQLSTATE: 57014
+```
+
+This is a standard PostgreSQL error — your application handles it the same way
+regardless of whether PgBeam or a direct connection set the timeout.
+
+## Configure the timeout
+
+<Tabs items={["Dashboard", "API", "CLI"]}>
+  <Tab value="Dashboard">
+    Navigate to your project, select a database, and go to **Settings**. Set the
+    **Query timeout** value in milliseconds.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X PATCH \
+      https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId} \
+      -H "Authorization: Bearer <key>" \
+      -H "Content-Type: application/json" \
+      -d '{ "query_timeout_ms": 30000 }'
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam db update <database-id> --query-timeout-ms 30000
+    ```
+  </Tab>
+</Tabs>
+
+## Choosing a timeout value
+
+| Workload                         | Suggested timeout | Why                                                |
+| -------------------------------- | ----------------- | -------------------------------------------------- |
+| Web app (API responses)          | 5,000–15,000 ms   | Users won't wait longer than a few seconds         |
+| Background jobs                  | 60,000–300,000 ms | Longer queries are expected but should still bound |
+| Analytics / reporting            | 300,000 ms (max)  | Complex aggregations need more time                |
+| Mixed (OLTP + occasional report) | 30,000 ms         | Balanced default for most applications             |
+
+<Callout type="info">
+  If your application already sets `statement_timeout` in its connection
+  initialization, PgBeam's setting will override it for the duration of the
+  pooled connection. The application-level timeout is restored when the
+  connection is returned to the pool and reset with `DISCARD ALL`.
+</Callout>
+
+## Interaction with connection pooling
+
+In **transaction mode**, `statement_timeout` is set each time PgBeam acquires an
+upstream connection for a client. When the transaction ends and the connection is
+returned to the pool, `DISCARD ALL` resets it.
+
+In **session mode**, the timeout is set once when the upstream connection is
+first established for the client session.
+
+## Further reading
+
+- [Connection Pooling](/docs/pooling) — Pool modes and connection lifecycle
+- [Error Codes](/docs/error-codes) — SQLSTATE reference
+- [Troubleshooting](/docs/troubleshooting) — Debug slow queries

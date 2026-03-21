@@ -11,10 +11,11 @@ Instead of sending every query to a single primary, you can route eligible reads
 to replicas — reducing load on the primary and improving read throughput for
 heavy workloads.
 
-PgBeam uses **opt-in, per-query routing**. You explicitly annotate queries that
-should go to a replica using a SQL comment. PgBeam does not automatically split
-reads and writes. This gives you full control over consistency — you decide which
-queries can tolerate replication lag and which must always hit the primary.
+PgBeam supports two routing modes: **per-query annotations** and **auto read
+routing**. With annotations, you explicitly mark queries that should go to a
+replica using a SQL comment. With auto read routing, PgBeam automatically sends
+all SELECT queries to replicas without annotations. You choose the mode that
+fits your consistency requirements.
 
 ## When to use read replicas
 
@@ -94,16 +95,81 @@ database never sees the comment.
 | Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database                    |
 | Any query inside a transaction     | Primary database                    |
 
-### Why opt-in matters
+### Why annotations are the default
 
-Automatic read/write splitting sounds appealing, but it introduces a subtle
-problem: **replication lag**. If your application writes a row and immediately
-reads it back, an automatic splitter might route the read to a replica that
-hasn't received the write yet, returning stale or missing data.
+Automatic read/write splitting is convenient but introduces a subtle problem:
+**replication lag**. If your application writes a row and immediately reads it
+back, an automatic splitter might route the read to a replica that hasn't
+received the write yet, returning stale or missing data.
 
-By requiring explicit annotations, PgBeam ensures you make a conscious decision
+Annotations are the default because they ensure you make a conscious decision
 about which queries can tolerate lag. Queries where consistency matters stay on
 the primary by default.
+
+## Auto read routing
+
+For workloads where most reads can tolerate replication lag, you can enable
+**auto read routing** on a per-database basis. When enabled, PgBeam
+automatically routes all SELECT queries to replicas without requiring the
+`@pgbeam:replica` annotation.
+
+<Tabs items={["Dashboard", "API", "CLI"]}>
+  <Tab value="Dashboard">
+    Navigate to your project, select a database, and go to **Settings**. Enable
+    **Auto read routing**.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X PATCH \
+      https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId} \
+      -H "Authorization: Bearer <key>" \
+      -H "Content-Type: application/json" \
+      -d '{ "auto_read_routing": true }'
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam db update <database-id> --auto-read-routing
+    ```
+  </Tab>
+</Tabs>
+
+### Requirements
+
+- At least one replica must be configured on the database
+- Disabled by default to preserve backwards compatibility
+
+### What changes with auto read routing
+
+| Query type                      | Without auto routing        | With auto routing           |
+| ------------------------------- | --------------------------- | --------------------------- |
+| `SELECT` without annotation     | Primary database            | Round-robin across replicas |
+| `SELECT` with `@pgbeam:replica` | Round-robin across replicas | Round-robin across replicas |
+| `INSERT` / `UPDATE` / `DELETE`  | Primary database            | Primary database            |
+| Any query inside a transaction  | Primary database            | Primary database            |
+
+### When to use auto read routing
+
+Auto read routing is a good fit when:
+
+- The majority of your reads can tolerate replication lag
+- You want the simplicity of automatic routing without annotating every query
+- Your workload is read-heavy and you want to offload the primary
+
+It is **not** a good fit when:
+
+- Many reads require read-your-writes consistency
+- You need fine-grained control over which queries go to replicas
+- Replication lag is unpredictable and varies significantly
+
+<Callout type="warn">
+  With auto read routing enabled, a `SELECT` immediately after an `INSERT` may
+  return stale data if the replica hasn't caught up. For read-after-write
+  consistency, wrap both statements in a transaction — queries inside
+  transactions always go to the primary.
+</Callout>
 
 ## ORM and driver examples
 
@@ -222,10 +288,11 @@ load) between a write on the primary and the same data appearing on a replica.
 
 ## Limitations
 
-- Replica routing only applies to queries with the `/* @pgbeam:replica */`
-  annotation. There is no automatic read/write splitting.
-- Queries inside transactions always go to the primary, even if annotated.
-  This prevents split-brain reads within a transaction.
+- Without [auto read routing](#auto-read-routing) enabled, replica routing only
+  applies to queries with the `/* @pgbeam:replica */` annotation.
+- Queries inside transactions always go to the primary, even if annotated or
+  with auto read routing enabled. This prevents split-brain reads within a
+  transaction.
 - All replicas receive equal traffic via round-robin. Weighted routing is not
   supported.
 - PgBeam does not provision or manage replicas — you create them in your

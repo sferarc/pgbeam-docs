@@ -7,6 +7,8 @@
 		"pooling",
 		"cache",
 		"replicas",
+		"ip-allowlist",
+		"query-timeout",
 		"custom-domains",
 		"routing",
 		"resilience",

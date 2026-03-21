@@ -57,6 +57,23 @@ The hostname does not match any project. Common causes:
 
 **Fix:** Check the hostname in your `DATABASE_URL` against the project hostname in the dashboard.
 
+### `08004`: IP not allowed
+
+```
+FATAL: connection rejected: IP not in allowlist
+```
+
+The project has an IP allowlist configured and your client's IP is not in it.
+
+**Checklist:**
+
+1. **Check the allowlist.** Go to your project's **Settings > Security** to see which CIDR ranges are allowed.
+2. **Find your egress IP.** Your client's outbound IP may differ from what you expect — cloud platforms, VPNs, and NAT gateways change the source IP. Run `curl ifconfig.me` from the environment that connects to PgBeam.
+3. **Add the IP.** Add your IP (as `/32` for a single address) or CIDR range to the allowlist.
+4. **Check all environments.** Make sure CI/CD, staging, monitoring tools, and developer machines are all included.
+
+See [IP Allowlisting](/docs/ip-allowlist) for configuration details.
+
 ### `08004`: Organization suspended
 
 ```
@@ -263,6 +280,7 @@ locally with sub-millisecond latency.
 | SQLSTATE | Message                   | Section                                                  |
 | -------- | ------------------------- | -------------------------------------------------------- |
 | `08004`  | Project not found         | [Connection problems](#08004-project-not-found)          |
+| `08004`  | IP not allowed            | [Connection problems](#08004-ip-not-allowed)             |
 | `08004`  | Organization suspended    | [Connection problems](#08004-organization-suspended)     |
 | `08004`  | Auth rate limited         | [Authentication problems](#08004-auth-rate-limited)      |
 | `08006`  | Upstream auth failure     | [Authentication problems](#08006-authentication-failed)  |

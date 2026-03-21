@@ -1,0 +1,130 @@
+---
+title: IP Allowlisting
+icon: Shield
+description:
+  Restrict database connections to specific IP addresses or CIDR ranges using
+  per-project IP allowlists.
+---
+
+IP allowlisting lets you restrict which client IP addresses can connect to a
+project through PgBeam. When enabled, connections from IPs outside the allowlist
+are rejected before authentication — they never reach the upstream database.
+
+## How it works
+
+Each project has an optional allowlist of CIDR ranges. When the list is
+non-empty, PgBeam checks every incoming connection's source IP against the
+allowlist during the TLS handshake, before any PostgreSQL protocol exchange.
+
+| Allowlist state         | Behavior                                           |
+| ----------------------- | -------------------------------------------------- |
+| Empty (default)         | All IPs are allowed                                |
+| One or more CIDR ranges | Only matching IPs are allowed; others are rejected |
+
+Rejected connections receive a FATAL error and the connection is closed
+immediately:
+
+```
+FATAL: connection rejected: IP not in allowlist
+SQLSTATE: 08004
+```
+
+## Configure the allowlist
+
+You can manage the allowlist from the dashboard, API, or CLI. Each entry is a
+CIDR range — use `/32` for a single IP address.
+
+<Tabs items={["Dashboard", "API", "CLI"]}>
+  <Tab value="Dashboard">
+    Navigate to your project and go to **Settings > Security**. Add CIDR ranges
+    to the IP allowlist. Changes take effect within seconds across all data plane
+    regions.
+  </Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X PATCH \
+      https://api.pgbeam.com/v1/projects/{projectId} \
+      -H "Authorization: Bearer <key>" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "allowed_cidrs": [
+          "203.0.113.0/24",
+          "198.51.100.42/32"
+        ]
+      }'
+    ```
+  </Tab>
+
+  <Tab value="CLI">
+    ```bash
+    pgbeam projects update <project-id> \
+      --allowed-cidrs "203.0.113.0/24,198.51.100.42/32"
+    ```
+  </Tab>
+</Tabs>
+
+To disable the allowlist, set it to an empty array:
+
+```bash
+curl -X PATCH \
+  https://api.pgbeam.com/v1/projects/{projectId} \
+  -H "Authorization: Bearer <key>" \
+  -H "Content-Type: application/json" \
+  -d '{ "allowed_cidrs": [] }'
+```
+
+## Limits
+
+- Maximum **50 CIDR entries** per project
+- Both IPv4 and IPv6 CIDR notation are supported
+- Changes propagate to all data plane regions within seconds via the config
+  streaming channel
+
+## Common patterns
+
+### Allow a single office IP
+
+```json
+{ "allowed_cidrs": ["203.0.113.42/32"] }
+```
+
+### Allow a VPC range and a developer IP
+
+```json
+{ "allowed_cidrs": ["10.0.0.0/8", "198.51.100.1/32"] }
+```
+
+### Allow a cloud provider's NAT gateway range
+
+```json
+{ "allowed_cidrs": ["44.192.0.0/11"] }
+```
+
+<Callout type="warn">
+  Make sure to include the IP ranges of all environments that connect through
+  PgBeam — production servers, CI/CD pipelines, developer machines, and any
+  monitoring tools. Forgetting an IP range will block those connections.
+</Callout>
+
+## Interaction with other features
+
+IP allowlisting is checked **before** authentication, connection pooling, and
+all other proxy features. The evaluation order for an incoming connection is:
+
+1. TLS handshake and SNI-based project lookup
+2. **IP allowlist check** (if configured)
+3. Authentication (credentials forwarded to upstream)
+4. Connection pooling and query relay
+
+This means:
+
+- Blocked IPs never consume a connection slot
+- Blocked IPs never trigger auth rate limiting
+- The upstream database never sees traffic from disallowed IPs
+
+## Further reading
+
+- [Error Codes](/docs/error-codes) — SQLSTATE `08004` handling guidance
+- [Troubleshooting](/docs/troubleshooting) — Debug connection rejections
+- [Resilience](/docs/resilience) — Circuit breakers and connection lifecycle

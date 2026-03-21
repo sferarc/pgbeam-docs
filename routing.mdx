@@ -172,21 +172,30 @@ with other regions) but maintains connectivity.
 
 ## Read replica routing
 
-PgBeam supports **opt-in per-query** routing to read replicas. Annotate queries
-with `/* @pgbeam:replica */` to send them to a replica:
+PgBeam supports two modes for routing queries to read replicas:
+
+### Per-query annotations (default)
+
+Annotate queries with `/* @pgbeam:replica */` to send them to a replica:
 
 ```sql
 /* @pgbeam:replica */ SELECT * FROM products WHERE active = true;
 ```
 
-| Query type                  | Routing                     |
-| --------------------------- | --------------------------- |
-| Read with `@pgbeam:replica` | Round-robin across replicas |
-| Read without annotation     | Primary database            |
-| Write                       | Primary database            |
-| Inside transaction          | Primary database            |
+### Auto read routing
 
-PgBeam strips the annotation before forwarding. See [Read Replicas](/docs/replicas)
+When enabled on a database with replicas configured, PgBeam automatically routes
+all SELECT queries to replicas without requiring annotations. Enable it per
+database in the dashboard, API, or CLI.
+
+| Query type                         | Annotation mode             | Auto read routing mode      |
+| ---------------------------------- | --------------------------- | --------------------------- |
+| Read with `@pgbeam:replica`        | Round-robin across replicas | Round-robin across replicas |
+| Read without annotation            | Primary database            | Round-robin across replicas |
+| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database            | Primary database            |
+| Inside transaction                 | Primary database            | Primary database            |
+
+PgBeam strips annotations before forwarding. See [Read Replicas](/docs/replicas)
 for setup instructions, ORM examples, and health check details.
 
 ## Latency characteristics
