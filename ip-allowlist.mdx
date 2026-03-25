@@ -1,25 +1,25 @@
 ---
-title: IP Allowlisting
+title: IP Filtering
 icon: Shield
 description:
   Restrict database connections to specific IP addresses or CIDR ranges using
-  per-project IP allowlists.
+  per-project IP filtering with optional labels.
 ---
 
-IP allowlisting lets you restrict which client IP addresses can connect to a
+IP filtering lets you restrict which client IP addresses can connect to a
 project through PgBeam. When enabled, connections from IPs outside the allowlist
 are rejected before authentication — they never reach the upstream database.
 
 ## How it works
 
-Each project has an optional allowlist of CIDR ranges. When the list is
+Each project has an optional list of CIDR filtering rules. When the list is
 non-empty, PgBeam checks every incoming connection's source IP against the
-allowlist during the TLS handshake, before any PostgreSQL protocol exchange.
+rules during the TLS handshake, before any PostgreSQL protocol exchange.
 
-| Allowlist state         | Behavior                                           |
-| ----------------------- | -------------------------------------------------- |
-| Empty (default)         | All IPs are allowed                                |
-| One or more CIDR ranges | Only matching IPs are allowed; others are rejected |
+| Filter state           | Behavior                                           |
+| ---------------------- | -------------------------------------------------- |
+| Empty (default)        | All IPs are allowed                                |
+| One or more CIDR rules | Only matching IPs are allowed; others are rejected |
 
 Rejected connections receive a FATAL error and the connection is closed
 immediately:
@@ -29,16 +29,17 @@ FATAL: connection rejected: IP not in allowlist
 SQLSTATE: 08004
 ```
 
-## Configure the allowlist
+## Configure IP filtering
 
-You can manage the allowlist from the dashboard, API, or CLI. Each entry is a
-CIDR range — use `/32` for a single IP address.
+You can manage IP filtering from the dashboard, API, or CLI. Each entry
+consists of a CIDR range and an optional label. Use `/32` for a single IPv4
+address or `/128` for a single IPv6 address.
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
   <Tab value="Dashboard">
-    Navigate to your project and go to **Settings > Security**. Add CIDR ranges
-    to the IP allowlist. Changes take effect within seconds across all data plane
-    regions.
+    Navigate to your project and go to **Settings > Security**. Toggle IP
+    filtering on, then add CIDR blocks with optional labels. Changes take
+    effect within seconds across all data plane regions.
   </Tab>
 
   <Tab value="API">
@@ -49,8 +50,9 @@ CIDR range — use `/32` for a single IP address.
       -H "Content-Type: application/json" \
       -d '{
         "allowed_cidrs": [
-          "203.0.113.0/24",
-          "198.51.100.42/32"
+          { "cidr": "203.0.113.0/24", "label": "Office" },
+          { "cidr": "198.51.100.42/32", "label": "CI/CD" },
+          { "cidr": "2001:db8::/32", "label": "IPv6 range" }
         ]
       }'
     ```
@@ -59,12 +61,12 @@ CIDR range — use `/32` for a single IP address.
   <Tab value="CLI">
     ```bash
     pgbeam projects update <project-id> \
-      --allowed-cidrs "203.0.113.0/24,198.51.100.42/32"
+      --allowed-cidrs "203.0.113.0/24,198.51.100.42/32,2001:db8::/32"
     ```
   </Tab>
 </Tabs>
 
-To disable the allowlist, set it to an empty array:
+To disable IP filtering, set it to an empty array:
 
 ```bash
 curl -X PATCH \
@@ -78,6 +80,8 @@ curl -X PATCH \
 
 - Maximum **50 CIDR entries** per project
 - Both IPv4 and IPv6 CIDR notation are supported
+- Each entry supports an optional human-readable label (max 100 characters)
+- A plain IP without prefix length defaults to `/32` (IPv4) or `/128` (IPv6)
 - Changes propagate to all data plane regions within seconds via the config
   streaming channel
 
@@ -86,19 +90,29 @@ curl -X PATCH \
 ### Allow a single office IP
 
 ```json
-{ "allowed_cidrs": ["203.0.113.42/32"] }
+{ "allowed_cidrs": [{ "cidr": "203.0.113.42/32", "label": "Office" }] }
 ```
 
 ### Allow a VPC range and a developer IP
 
 ```json
-{ "allowed_cidrs": ["10.0.0.0/8", "198.51.100.1/32"] }
+{
+  "allowed_cidrs": [
+    { "cidr": "10.0.0.0/8", "label": "VPC" },
+    { "cidr": "198.51.100.1/32", "label": "Dev laptop" }
+  ]
+}
 ```
 
-### Allow a cloud provider's NAT gateway range
+### Allow IPv6 ranges
 
 ```json
-{ "allowed_cidrs": ["44.192.0.0/11"] }
+{
+  "allowed_cidrs": [
+    { "cidr": "2001:db8::/32", "label": "IPv6 prefix" },
+    { "cidr": "fd00::/8", "label": "Private IPv6" }
+  ]
+}
 ```
 
 <Callout type="warn">

@@ -114,7 +114,7 @@ resource "pgbeam_project" "example" {
   queries_per_second = 1000
   burst_size = 200
   max_connections = 500
-  allowed_cidrs = ["10.0.0.0/8", "203.0.113.5/32"]
+  allowed_cidrs = [[object Object], [object Object]]
   status = "active"
 }
 ```
