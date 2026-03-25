@@ -111,15 +111,12 @@ resource "pgbeam_project" "example" {
   name = "my-app"
   description = "Production database proxy"
   tags = ["production", "us-east-1"]
-  queries_per_second = 1000
-  burst_size = 200
-  max_connections = 500
   allowed_cidrs = [[object Object], [object Object]]
   status = "active"
 }
 ```
 
-**Computed:** `proxy_host`, `database_count`, `active_connections`, `created_at`, `updated_at`, `primary_database_id`
+**Computed:** `proxy_host`, `queries_per_second`, `burst_size`, `max_connections`, `database_count`, `active_connections`, `created_at`, `updated_at`, `primary_database_id`
 
 **Import:** `terraform import pgbeam_project.example <id>`
 

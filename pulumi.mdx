@@ -115,15 +115,12 @@ const res = new pgbeam.Project("example", {
   name: "my-app",
   description: "Production database proxy",
   tags: ["production", "us-east-1"],
-  queriesPerSecond: 1000,
-  burstSize: 200,
-  maxConnections: 500,
   allowedCidrs: [[object Object], [object Object]],
   status: "active",
 });
 ```
 
-**Outputs:** `proxyHost`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseId`
+**Outputs:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseId`
 
 ### Database
 

@@ -129,16 +129,13 @@ spec:
     name: my-app
     description: Production database proxy
     tags: ["production", "us-east-1"]
-    queriesPerSecond: 1000
-    burstSize: 200
-    maxConnections: 500
     allowedCidrs: [[object Object], [object Object]]
     status: active
   providerConfigRef:
     name: default
 ```
 
-**Status:** `proxyHost`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseID`
+**Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseID`
 
 ### Database
 

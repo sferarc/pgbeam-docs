@@ -17,20 +17,17 @@ result, err := client.Projects.UpdateProject(ctx, "prj_xxx", &pgbeam.UpdateProje
 
 ## Parameters
 
-| Parameter            | Type                           | Required | Description                                                                                                                          |
-| -------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ctx                  | `context.Context`              | Yes      | Request context                                                                                                                      |
-| projectID            | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).                                                                                 |
-| req                  | `*pgbeam.UpdateProjectRequest` | Yes      | Request body                                                                                                                         |
-| req.Name             | `*string`                      | No       | Updated project name.                                                                                                                |
-| req.Description      | `*string`                      | No       | Updated project description.                                                                                                         |
-| req.Tags             | `*[]string`                    | No       | Replacement set of user-defined project labels.                                                                                      |
-| req.Status           | `*pgbeam.ProjectStatus`        | No       |                                                                                                                                      |
-| req.QueriesPerSecond | `*int`                         | No       | Maximum queries per second. 0 means unlimited.                                                                                       |
-| req.BurstSize        | `*int`                         | No       | Burst allowance above steady-state rate.                                                                                             |
-| req.MaxConnections   | `*int`                         | No       | Maximum concurrent proxy connections. 0 means unlimited.                                                                             |
-| req.AllowedCidrs     | `*[]pgbeam.CidrEntry`          | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
-|                      |                                |          |                                                                                                                                      |
+| Parameter        | Type                           | Required | Description                                                                                                                          |
+| ---------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ctx              | `context.Context`              | Yes      | Request context                                                                                                                      |
+| projectID        | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).                                                                                 |
+| req              | `*pgbeam.UpdateProjectRequest` | Yes      | Request body                                                                                                                         |
+| req.Name         | `*string`                      | No       | Updated project name.                                                                                                                |
+| req.Description  | `*string`                      | No       | Updated project description.                                                                                                         |
+| req.Tags         | `*[]string`                    | No       | Replacement set of user-defined project labels.                                                                                      |
+| req.Status       | `*pgbeam.ProjectStatus`        | No       |                                                                                                                                      |
+| req.AllowedCidrs | `*[]pgbeam.CidrEntry`          | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
+|                  |                                |          |                                                                                                                                      |
 
 ## Response
 
@@ -50,8 +47,7 @@ result, err := client.Projects.UpdateProject(ctx, "prj_xxx", &pgbeam.UpdateProje
     Description: "Production database proxy",
     Tags: production,us-east-1,
     Status: pgbeam.ProjectStatus{ /* ... */ },
-    QueriesPerSecond: 1000,
-    BurstSize: 200,
+    AllowedCidrs: [object Object],[object Object],
   })
 if err != nil {
   log.Fatal(err)
