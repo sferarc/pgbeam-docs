@@ -13,8 +13,8 @@ are rejected before authentication — they never reach the upstream database.
 ## How it works
 
 Each project has an optional list of CIDR filtering rules. When the list is
-non-empty, PgBeam checks every incoming connection's source IP against the
-rules during the TLS handshake, before any PostgreSQL protocol exchange.
+non-empty, PgBeam checks every incoming connection's source IP against the rules
+during the TLS handshake, before any PostgreSQL protocol exchange.
 
 | Filter state           | Behavior                                           |
 | ---------------------- | -------------------------------------------------- |
@@ -31,9 +31,9 @@ SQLSTATE: 08004
 
 ## Configure IP filtering
 
-You can manage IP filtering from the dashboard, API, or CLI. Each entry
-consists of a CIDR range and an optional label. Use `/32` for a single IPv4
-address or `/128` for a single IPv6 address.
+You can manage IP filtering from the dashboard, API, or CLI. Each entry consists
+of a CIDR range and an optional label. Use `/32` for a single IPv4 address or
+`/128` for a single IPv6 address.
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
   <Tab value="Dashboard">

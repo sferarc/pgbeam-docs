@@ -5,7 +5,9 @@ description: Switch active authentication profile
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Switch the active authentication profile. If no profile name is provided, an interactive selector is shown listing all available profiles. The active profile determines which API token and organization are used for subsequent commands.
+Switch the active authentication profile. If no profile name is provided, an
+interactive selector is shown listing all available profiles. The active profile
+determines which API token and organization are used for subsequent commands.
 
 ## Usage
 
@@ -20,7 +22,9 @@ pgbeam auth switch [name]
 | `<name>` | Name of the profile to switch to. If omitted, an interactive selector is shown. | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -35,4 +39,5 @@ pgbeam auth switch production
 
 ## Output
 
-Prints a confirmation message (e.g. `Switched to profile "production".`). If the profile is not found, exits with an error.
+Prints a confirmation message (e.g. `Switched to profile "production".`). If the
+profile is not found, exits with an error.

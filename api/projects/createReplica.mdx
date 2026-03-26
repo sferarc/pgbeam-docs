@@ -24,7 +24,8 @@ Adds a read replica to a database.
 
 ## Quick request
 
-Use this as a starting point. Replace the placeholder IDs, set `PGBEAM_TOKEN`, and create `body.json` from the schema below.
+Use this as a starting point. Replace the placeholder IDs, set `PGBEAM_TOKEN`,
+and create `body.json` from the schema below.
 
 ```bash
 curl -X POST \
@@ -34,4 +35,9 @@ curl -X POST \
   --data @body.json
 ```
 
-<APIPage document={"../../../backend/openapi/bundles/public.yaml"} operations={[{"path":"/v1/databases/{database_id}/replicas","method":"post"}]} />
+<APIPage
+  document={"../../../backend/openapi/bundles/public.yaml"}
+  operations={[
+    { path: "/v1/databases/{database_id}/replicas", method: "post" },
+  ]}
+/>

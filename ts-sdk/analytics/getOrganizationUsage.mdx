@@ -11,18 +11,18 @@ Returns daily usage data aggregated across all projects in the organization.
 
 ```typescript
 const result = await api.analytics.getOrganizationUsage({
-    pathParams: { org_id: "org_abc123" },
-    queryParams: { start_date: "2024-01-01", end_date: "2024-01-31" },
-  });
+  pathParams: { org_id: "org_abc123" },
+  queryParams: { start_date: "2024-01-01", end_date: "2024-01-31" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                         |
-| ----------------------- | -------- | -------- | ----------------------------------- |
-| pathParams.org\_id      | `string` | Yes      | Unique organization identifier.     |
-| queryParams.start\_date | `string` | Yes      | Start date (inclusive, YYYY-MM-DD). |
-| queryParams.end\_date   | `string` | Yes      | End date (inclusive, YYYY-MM-DD).   |
+| Parameter              | Type     | Required | Description                         |
+| ---------------------- | -------- | -------- | ----------------------------------- |
+| pathParams.org_id      | `string` | Yes      | Unique organization identifier.     |
+| queryParams.start_date | `string` | Yes      | Start date (inclusive, YYYY-MM-DD). |
+| queryParams.end_date   | `string` | Yes      | End date (inclusive, YYYY-MM-DD).   |
 
 ## Response
 

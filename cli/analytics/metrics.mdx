@@ -5,7 +5,10 @@ description: Show project metrics
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Display real-time performance metrics for the linked project, including query counts, cache hits, active connections, and latency percentiles. Results are broken down by region. Use `--limit` to control how many snapshots to return and `--region` to filter by a specific region.
+Display real-time performance metrics for the linked project, including query
+counts, cache hits, active connections, and latency percentiles. Results are
+broken down by region. Use `--limit` to control how many snapshots to return and
+`--region` to filter by a specific region.
 
 ## Usage
 
@@ -21,7 +24,9 @@ pgbeam analytics metrics [flags]
 | `--region <value>` | Filter results to a specific region (e.g. us-east-1) | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -42,4 +47,5 @@ pgbeam analytics metrics --json
 
 ## Output
 
-Displays a table with columns: Region, Queries, Cache Hits, Connections, Avg (ms), and P99 (ms). With `--json`, returns the full metrics snapshot array.
+Displays a table with columns: Region, Queries, Cache Hits, Connections, Avg
+(ms), and P99 (ms). With `--json`, returns the full metrics snapshot array.

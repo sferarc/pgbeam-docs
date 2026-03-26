@@ -11,8 +11,8 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 `abc.aws.pgbeam.app`, while PgBeam handles TLS certificates automatically.
 
 <Callout type="warn" title="Scale plan required">
-  Custom domains are available on the **Scale plan** only. See
-  [Plans & Pricing](/docs/plans) for details.
+  Custom domains are available on the **Scale plan** only. See [Plans &
+  Pricing](/docs/plans) for details.
 </Callout>
 
 ## Why use a custom domain
@@ -60,6 +60,7 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
     </Tabs>
 
     The response includes your **verification token** and DNS instructions.
+
   </Step>
 
   <Step>
@@ -81,6 +82,7 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
       depending on your DNS provider and existing TTL settings. Most providers
       complete this within 1-10 minutes.
     </Callout>
+
   </Step>
 
   <Step>
@@ -112,6 +114,7 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 
     1. The TXT record exists and matches the verification token
     2. The CNAME points to your PgBeam project subdomain
+
   </Step>
 
   <Step>
@@ -125,15 +128,16 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 
     TLS is handled automatically. PgBeam provisions a certificate for your domain
     and uses SNI to match incoming connections to your project.
+
   </Step>
 </Steps>
 
 ## TLS certificate management
 
 PgBeam provisions and renews TLS certificates for your custom domain
-automatically. The ACME challenge CNAME you added in the
-DNS step delegates the certificate challenge, so PgBeam can issue and renew
-certificates without any further action from you.
+automatically. The ACME challenge CNAME you added in the DNS step delegates the
+certificate challenge, so PgBeam can issue and renew certificates without any
+further action from you.
 
 - **Provisioning** happens within minutes of successful domain verification.
 - **Renewal** happens automatically before the certificate expires.
@@ -206,9 +210,9 @@ After removal:
 
 ### Cloudflare-specific notes
 
-If your DNS is managed by Cloudflare, make sure the CNAME record has the
-**proxy toggle disabled** (DNS-only / grey cloud). Cloudflare's proxy
-intercepts TCP traffic and will break PostgreSQL wire protocol connections.
+If your DNS is managed by Cloudflare, make sure the CNAME record has the **proxy
+toggle disabled** (DNS-only / grey cloud). Cloudflare's proxy intercepts TCP
+traffic and will break PostgreSQL wire protocol connections.
 
 ## Further reading
 

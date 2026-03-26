@@ -24,7 +24,8 @@ Returns the onboarding checklist progress for an organization.
 
 ## Quick request
 
-Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN` if the endpoint requires auth.
+Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN`
+if the endpoint requires auth.
 
 ```bash
 curl -X GET \
@@ -32,4 +33,9 @@ curl -X GET \
   -H "Authorization: Bearer $PGBEAM_TOKEN"
 ```
 
-<APIPage document={"../../../backend/openapi/bundles/public.yaml"} operations={[{"path":"/v1/organizations/{org_id}/onboarding","method":"get"}]} />
+<APIPage
+  document={"../../../backend/openapi/bundles/public.yaml"}
+  operations={[
+    { path: "/v1/organizations/{org_id}/onboarding", method: "get" },
+  ]}
+/>

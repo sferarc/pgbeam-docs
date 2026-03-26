@@ -5,22 +5,23 @@ description: Verify custom domain DNS
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Checks DNS TXT record to verify domain ownership. Updates domain status on success. Requires a Scale or Enterprise plan.
+Checks DNS TXT record to verify domain ownership. Updates domain status on
+success. Requires a Scale or Enterprise plan.
 
 ## Usage
 
 ```typescript
 const result = await api.projects.verifyCustomDomain({
-    pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                                |
-| ---------------------- | -------- | -------- | ---------------------------------------------------------- |
-| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).       |
-| pathParams.domain\_id  | `string` | Yes      | Unique custom domain identifier (prefixed, e.g. dom\_xxx). |
+| Parameter             | Type     | Required | Description                                               |
+| --------------------- | -------- | -------- | --------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| pathParams.domain_id  | `string` | Yes      | Unique custom domain identifier (prefixed, e.g. dom_xxx). |
 
 ## Response
 

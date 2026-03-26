@@ -37,11 +37,19 @@ Disable it again with `SET pgbeam.debug = off`.
 
 **Checklist:**
 
-1. **Verify the hostname.** It should be `<project-id>.aws.pgbeam.app` on port `5432`. Check for typos.
-2. **Verify TLS is enabled.** PgBeam requires TLS. Most PostgreSQL drivers enable it by default, but check your connection string for `sslmode=disable` — that will not work.
-3. **Check your firewall.** Confirm outbound TCP traffic on port 5432 is allowed from your environment. Corporate networks, VPNs, and cloud security groups sometimes block non-HTTP ports.
-4. **Confirm the project exists.** Log in to [dash.pgbeam.com](https://dash.pgbeam.com) and verify the project is there and the organization is active.
-5. **Check PgBeam status.** Visit the PgBeam status page or run `pgbeam platform health` in the CLI.
+1. **Verify the hostname.** It should be `<project-id>.aws.pgbeam.app` on port
+   `5432`. Check for typos.
+2. **Verify TLS is enabled.** PgBeam requires TLS. Most PostgreSQL drivers
+   enable it by default, but check your connection string for `sslmode=disable`
+   — that will not work.
+3. **Check your firewall.** Confirm outbound TCP traffic on port 5432 is allowed
+   from your environment. Corporate networks, VPNs, and cloud security groups
+   sometimes block non-HTTP ports.
+4. **Confirm the project exists.** Log in to
+   [dash.pgbeam.com](https://dash.pgbeam.com) and verify the project is there
+   and the organization is active.
+5. **Check PgBeam status.** Visit the PgBeam status page or run
+   `pgbeam platform health` in the CLI.
 
 ### `08004`: Project not found
 
@@ -55,7 +63,8 @@ The hostname does not match any project. Common causes:
 - The project was deleted
 - Using a custom domain that hasn't been verified yet
 
-**Fix:** Check the hostname in your `DATABASE_URL` against the project hostname in the dashboard.
+**Fix:** Check the hostname in your `DATABASE_URL` against the project hostname
+in the dashboard.
 
 ### `08004`: IP not allowed
 
@@ -67,10 +76,15 @@ The project has an IP allowlist configured and your client's IP is not in it.
 
 **Checklist:**
 
-1. **Check the allowlist.** Go to your project's **Settings > Security** to see which CIDR ranges are allowed.
-2. **Find your egress IP.** Your client's outbound IP may differ from what you expect — cloud platforms, VPNs, and NAT gateways change the source IP. Run `curl ifconfig.me` from the environment that connects to PgBeam.
-3. **Add the IP.** Add your IP (as `/32` for a single address) or CIDR range to the allowlist.
-4. **Check all environments.** Make sure CI/CD, staging, monitoring tools, and developer machines are all included.
+1. **Check the allowlist.** Go to your project's **Settings > Security** to see
+   which CIDR ranges are allowed.
+2. **Find your egress IP.** Your client's outbound IP may differ from what you
+   expect — cloud platforms, VPNs, and NAT gateways change the source IP. Run
+   `curl ifconfig.me` from the environment that connects to PgBeam.
+3. **Add the IP.** Add your IP (as `/32` for a single address) or CIDR range to
+   the allowlist.
+4. **Check all environments.** Make sure CI/CD, staging, monitoring tools, and
+   developer machines are all included.
 
 See [IP Allowlisting](/docs/ip-allowlist) for configuration details.
 
@@ -86,7 +100,8 @@ The organization's billing is inactive. This happens when:
 - The trial expired without a payment method
 - An owner cancelled the subscription
 
-**Fix:** Go to **Settings > Billing** in the dashboard and update the payment method or reactivate.
+**Fix:** Go to **Settings > Billing** in the dashboard and update the payment
+method or reactivate.
 
 ## Authentication problems
 
@@ -101,10 +116,14 @@ This is an upstream issue, not a PgBeam issue.
 
 **Checklist:**
 
-1. **Test direct connection.** Connect directly to the origin database with the same credentials. If it fails there too, the problem is not PgBeam.
-2. **Check the database name.** Verify that the database name configured in PgBeam matches the actual database you want to connect to.
-3. **Check user permissions.** Confirm the database user has `CONNECT` permission: `SELECT usename, usesuper FROM pg_user WHERE usename = 'myuser';`
-4. **Check pg\_hba.conf.** If the origin uses host-based authentication rules, ensure the PgBeam IP range is allowed.
+1. **Test direct connection.** Connect directly to the origin database with the
+   same credentials. If it fails there too, the problem is not PgBeam.
+2. **Check the database name.** Verify that the database name configured in
+   PgBeam matches the actual database you want to connect to.
+3. **Check user permissions.** Confirm the database user has `CONNECT`
+   permission: `SELECT usename, usesuper FROM pg_user WHERE usename = 'myuser';`
+4. **Check pg_hba.conf.** If the origin uses host-based authentication rules,
+   ensure the PgBeam IP range is allowed.
 
 ### `08004`: Auth rate limited
 
@@ -117,7 +136,8 @@ period.
 
 **Fix:**
 
-1. Stop the source of failed authentications (misconfigured client, wrong password in environment)
+1. Stop the source of failed authentications (misconfigured client, wrong
+   password in environment)
 2. Wait a few minutes for the rate limit to expire
 3. Verify credentials are correct before retrying
 
@@ -129,17 +149,22 @@ period.
 FATAL: upstream unavailable (circuit breaker open)
 ```
 
-The origin database failed 3 consecutive connection attempts. PgBeam opened
-the circuit breaker to stop hammering it.
+The origin database failed 3 consecutive connection attempts. PgBeam opened the
+circuit breaker to stop hammering it.
 
 **Checklist:**
 
-1. **Check origin health.** Can you connect directly to the origin database from another client?
-2. **Check connection limits.** Has the origin database hit its own `max_connections` limit?
-3. **Check network path.** Are there firewall rules, security groups, or IP allowlists blocking PgBeam?
-4. **Wait for recovery.** The circuit breaker probes automatically every 5-60 seconds (exponential backoff). Successful probes restore traffic.
+1. **Check origin health.** Can you connect directly to the origin database from
+   another client?
+2. **Check connection limits.** Has the origin database hit its own
+   `max_connections` limit?
+3. **Check network path.** Are there firewall rules, security groups, or IP
+   allowlists blocking PgBeam?
+4. **Wait for recovery.** The circuit breaker probes automatically every 5-60
+   seconds (exponential backoff). Successful probes restore traffic.
 
-See [Resilience](/docs/resilience) for details on circuit breaker states and recovery.
+See [Resilience](/docs/resilience) for details on circuit breaker states and
+recovery.
 
 ### Origin database is slow
 
@@ -148,9 +173,11 @@ correctly — the issue is upstream.
 
 **Checklist:**
 
-1. Enable `pgbeam.debug` to confirm queries are reaching the upstream (you'll see `cache=miss`)
+1. Enable `pgbeam.debug` to confirm queries are reaching the upstream (you'll
+   see `cache=miss`)
 2. Run the same query directly against the origin to compare latency
-3. Check the origin database for slow query logs, lock contention, or resource exhaustion
+3. Check the origin database for slow query logs, lock contention, or resource
+   exhaustion
 
 ## Connection limit problems
 
@@ -160,14 +187,21 @@ correctly — the issue is upstream.
 FATAL: too many connections for project
 ```
 
-The project hit its concurrent connection limit (20 / 100 / 500 depending on plan).
+The project hit its concurrent connection limit (20 / 100 / 500 depending on
+plan).
 
 **Fixes, in order of preference:**
 
-1. **Reduce client pool size.** If you have 4 app servers each with a pool of 20, that's 80 connections. With PgBeam, use 3-5 per instance instead. See [Connection Pooling](/docs/pooling).
-2. **Switch to transaction pool mode.** Session mode (the default) holds an upstream connection for the entire client session. Transaction mode releases it after each transaction, dramatically improving reuse.
-3. **Close idle connections.** Check for dev tools, monitoring scripts, or migration runners holding connections open.
-4. **Upgrade your plan.** If the workload has genuinely outgrown the current tier.
+1. **Reduce client pool size.** If you have 4 app servers each with a pool of
+   20, that's 80 connections. With PgBeam, use 3-5 per instance instead. See
+   [Connection Pooling](/docs/pooling).
+2. **Switch to transaction pool mode.** Session mode (the default) holds an
+   upstream connection for the entire client session. Transaction mode releases
+   it after each transaction, dramatically improving reuse.
+3. **Close idle connections.** Check for dev tools, monitoring scripts, or
+   migration runners holding connections open.
+4. **Upgrade your plan.** If the workload has genuinely outgrown the current
+   tier.
 
 ### Connections spike after deploy
 
@@ -178,7 +212,8 @@ connection count. This is normal and resolves as old instances shut down.
 
 - Set short connection pool idle timeouts in your application
 - Use transaction pool mode to reduce the per-instance connection footprint
-- If the spike exceeds your limit, consider upgrading temporarily or staggering deploys
+- If the spike exceeds your limit, consider upgrading temporarily or staggering
+  deploys
 
 ## Rate limit problems
 
@@ -192,9 +227,12 @@ The project exceeded its QPS limit (10 / 50 / 250 depending on plan).
 
 **Fixes:**
 
-1. **Enable caching** for high-frequency repeated reads. Cached queries reduce upstream load and the effective QPS. See [Caching](/docs/cache).
-2. **Batch queries** where possible. Multiple small queries can sometimes be combined.
-3. **Check for runaway clients.** A misconfigured cron job or retry loop can exhaust the QPS budget.
+1. **Enable caching** for high-frequency repeated reads. Cached queries reduce
+   upstream load and the effective QPS. See [Caching](/docs/cache).
+2. **Batch queries** where possible. Multiple small queries can sometimes be
+   combined.
+3. **Check for runaway clients.** A misconfigured cron job or retry loop can
+   exhaust the QPS budget.
 4. **Upgrade your plan** for a higher QPS allowance.
 
 ## Cache problems
@@ -203,12 +241,17 @@ The project exceeded its QPS limit (10 / 50 / 250 depending on plan).
 
 **Checklist:**
 
-1. **Is caching enabled?** Caching is off by default. Check that it is enabled via cache rules, session override, or database default.
+1. **Is caching enabled?** Caching is off by default. Check that it is enabled
+   via cache rules, session override, or database default.
 2. **Is the query a read?** Only `SELECT` statements are cacheable.
-3. **Is the query inside a transaction?** Queries in `BEGIN`/`COMMIT` blocks are never cached.
-4. **Does the query use volatile functions?** `NOW()`, `RANDOM()`, `pg_advisory_lock()`, and similar functions cause bypass.
-5. **Does the SQL explicitly disable cache?** Check for `/* @pgbeam:cache noCache */`.
-6. **Enable debug mode** and check the NOTICE output to see why the query is not being cached.
+3. **Is the query inside a transaction?** Queries in `BEGIN`/`COMMIT` blocks are
+   never cached.
+4. **Does the query use volatile functions?** `NOW()`, `RANDOM()`,
+   `pg_advisory_lock()`, and similar functions cause bypass.
+5. **Does the SQL explicitly disable cache?** Check for
+   `/* @pgbeam:cache noCache */`.
+6. **Enable debug mode** and check the NOTICE output to see why the query is not
+   being cached.
 
 ### Getting stale data after writes
 
@@ -230,7 +273,8 @@ A low cache hit rate means the cache is not saving much upstream load.
 
 **Common causes:**
 
-- Queries have highly variable parameters (each unique set of params creates a new cache entry)
+- Queries have highly variable parameters (each unique set of params creates a
+  new cache entry)
 - TTL is too short for the query frequency
 - The workload is write-heavy and data changes between reads
 
@@ -240,9 +284,15 @@ A low cache hit rate means the cache is not saving much upstream load.
 
 **Checklist:**
 
-1. **Update your CA bundle.** PgBeam uses publicly trusted certificates that work with all modern systems. If your client is running on an old OS or container image, the CA bundle may be outdated.
-2. **Check the hostname.** The certificate matches `*.aws.pgbeam.app`. If you are using an IP address or a hostname that does not match, TLS validation will fail.
-3. **Custom domains:** If using a custom domain, verify the ACME challenge CNAME is in place so PgBeam can provision the certificate. See [Custom Domains](/docs/custom-domains).
+1. **Update your CA bundle.** PgBeam uses publicly trusted certificates that
+   work with all modern systems. If your client is running on an old OS or
+   container image, the CA bundle may be outdated.
+2. **Check the hostname.** The certificate matches `*.aws.pgbeam.app`. If you
+   are using an IP address or a hostname that does not match, TLS validation
+   will fail.
+3. **Custom domains:** If using a custom domain, verify the ACME challenge CNAME
+   is in place so PgBeam can provision the certificate. See
+   [Custom Domains](/docs/custom-domains).
 
 ### TLS required but client is not using it
 
@@ -265,8 +315,8 @@ scale-to-zero.
 
 ### Cross-region latency
 
-If your database is in one region but your application is in another,
-cache misses incur cross-region relay latency (30-150ms). Cache hits are served
+If your database is in one region but your application is in another, cache
+misses incur cross-region relay latency (30-150ms). Cache hits are served
 locally with sub-millisecond latency.
 
 **Mitigations:**

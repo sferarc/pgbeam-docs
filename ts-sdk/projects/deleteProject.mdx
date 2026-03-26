@@ -11,15 +11,15 @@ Soft-deletes a project and all associated databases.
 
 ```typescript
 const result = await api.projects.deleteProject({
-    pathParams: { project_id: "prj_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                          |
-| ---------------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
+| Parameter             | Type     | Required | Description                                         |
+| --------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
 
 ## Response
 

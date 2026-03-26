@@ -11,17 +11,17 @@ Returns recent project metrics snapshots, optionally filtered by region.
 
 ```typescript
 const result = await api.projects.getProjectMetrics({
-    pathParams: { project_id: "prj_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                          |
-| ---------------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| queryParams.limit      | `number` | No       | Maximum number of recent snapshots to return.        |
-| queryParams.region     | `string` | No       | Filter metrics by region code.                       |
+| Parameter             | Type     | Required | Description                                         |
+| --------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.limit     | `number` | No       | Maximum number of recent snapshots to return.       |
+| queryParams.region    | `string` | No       | Filter metrics by region code.                      |
 
 ## Response
 

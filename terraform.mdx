@@ -3,105 +3,110 @@ title: Terraform
 icon: Blocks
 tag: HCL
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
-  infrastructure using Terraform and the pgbeam provider.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
+  spend limits as infrastructure using Terraform and the pgbeam provider.
 ---
 
-Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
-provider offers native resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider
+offers native resources for projects, databases, replicas, custom domains, cache
+rules, and spend limits.
 
 ## Setup
 
 <Steps>
-  <Step>
-    ### Configure the provider
+<Step>
 
-    <Callout type="info">
-      The Terraform provider is coming soon. Registry publishing is on the roadmap.
-    </Callout>
+### Configure the provider
 
-    ```hcl title="main.tf"
-    terraform {
-      required_providers {
-        pgbeam = {
-          source  = "pgbeam/pgbeam"
-          version = "~> 1.0"
-        }
-      }
+<Callout type="info">
+  The Terraform provider is coming soon. Registry publishing is on the roadmap.
+</Callout>
+
+```hcl title="main.tf"
+terraform {
+  required_providers {
+    pgbeam = {
+      source  = "pgbeam/pgbeam"
+      version = "~> 1.0"
     }
+  }
+}
 
-    provider "pgbeam" {
-      api_key = var.pgbeam_api_key  # or set PGBEAM_API_KEY
-    }
-    ```
-  </Step>
+provider "pgbeam" {
+  api_key = var.pgbeam_api_key  # or set PGBEAM_API_KEY
+}
+```
 
-  <Step>
-    ### Configure credentials
+</Step>
+<Step>
 
-    Set your PgBeam API key via provider config or environment variable:
+### Configure credentials
 
-    <Tabs items={["Provider config", "Environment variable"]}>
-      <Tab value="Provider config">
-        ```hcl title="main.tf"
-        variable "pgbeam_api_key" {
-          type      = string
-          sensitive = true
-        }
+Set your PgBeam API key via provider config or environment variable:
 
-        provider "pgbeam" {
-          api_key = var.pgbeam_api_key
-        }
-        ```
-      </Tab>
+<Tabs items={["Provider config", "Environment variable"]}>
+<Tab value="Provider config">
+```hcl title="main.tf"
+variable "pgbeam_api_key" {
+  type      = string
+  sensitive = true
+}
 
-      <Tab value="Environment variable">
-        ```bash
-        export PGBEAM_API_KEY=pgb_your_api_key
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
+provider "pgbeam" { api_key = var.pgbeam_api_key }
 
-  <Step>
-    ### Create a project
+````
+</Tab>
+<Tab value="Environment variable">
+```bash
+export PGBEAM_API_KEY=pgb_your_api_key
+````
 
-    ```hcl title="main.tf"
-    resource "pgbeam_project" "my_app" {
-      org_id = "org_abc123"
-      name   = "my-app"
+</Tab>
+</Tabs>
 
-      database {
-        host     = "my-rds.us-east-1.rds.amazonaws.com"
-        port     = 5432
-        name     = "mydb"
-        username = "pgbeam"
-        password = var.db_password
-      }
-    }
+</Step>
+<Step>
 
-    output "proxy_host" {
-      value = pgbeam_project.my_app.proxy_host
-    }
-    ```
-  </Step>
+### Create a project
 
-  <Step>
-    ### Deploy
+```hcl title="main.tf"
+resource "pgbeam_project" "my_app" {
+  org_id = "org_abc123"
+  name   = "my-app"
 
-    ```bash
-    terraform apply
-    ```
+  database {
+    host     = "my-rds.us-east-1.rds.amazonaws.com"
+    port     = 5432
+    name     = "mydb"
+    username = "pgbeam"
+    password = var.db_password
+  }
+}
 
-    Terraform creates the PgBeam project and its primary database atomically.
-    The `proxy_host` output gives you the PgBeam proxy endpoint to use in your
-    application connection string.
-  </Step>
+output "proxy_host" {
+  value = pgbeam_project.my_app.proxy_host
+}
+```
+
+</Step>
+<Step>
+
+### Deploy
+
+```bash
+terraform apply
+```
+
+Terraform creates the PgBeam project and its primary database atomically. The
+`proxy_host` output gives you the PgBeam proxy endpoint to use in your
+application connection string.
+
+</Step>
 </Steps>
 
 ## Resources
 
-### pgbeam\_project
+### pgbeam_project
 
 Manages a PgBeam project with a primary database.
 
@@ -116,11 +121,13 @@ resource "pgbeam_project" "example" {
 }
 ```
 
-**Computed:** `proxy_host`, `queries_per_second`, `burst_size`, `max_connections`, `database_count`, `active_connections`, `created_at`, `updated_at`, `primary_database_id`
+**Computed:** `proxy_host`, `queries_per_second`, `burst_size`,
+`max_connections`, `database_count`, `active_connections`, `created_at`,
+`updated_at`, `primary_database_id`
 
 **Import:** `terraform import pgbeam_project.example <id>`
 
-### pgbeam\_database
+### pgbeam_database
 
 Manages an upstream database connection within a PgBeam project.
 
@@ -156,7 +163,7 @@ resource "pgbeam_database" "example" {
 
 **Import:** `terraform import pgbeam_database.example <project_id>/<id>`
 
-### pgbeam\_replica
+### pgbeam_replica
 
 Manages a read replica for a PgBeam database.
 
@@ -175,7 +182,7 @@ resource "pgbeam_replica" "example" {
 
 **Import:** `terraform import pgbeam_replica.example <database_id>/<id>`
 
-### pgbeam\_custom\_domain
+### pgbeam_custom_domain
 
 Manages a custom domain for a PgBeam project.
 
@@ -188,11 +195,12 @@ resource "pgbeam_custom_domain" "example" {
 }
 ```
 
-**Computed:** `verified`, `verified_at`, `tls_cert_expiry`, `dns_verification_token`, `dns_instructions`, `created_at`, `updated_at`
+**Computed:** `verified`, `verified_at`, `tls_cert_expiry`,
+`dns_verification_token`, `dns_instructions`, `created_at`, `updated_at`
 
 **Import:** `terraform import pgbeam_custom_domain.example <project_id>/<id>`
 
-### pgbeam\_cache\_rule
+### pgbeam_cache_rule
 
 Manages a per-query cache rule. Deletion disables caching (soft-delete).
 
@@ -207,11 +215,14 @@ resource "pgbeam_cache_rule" "example" {
 }
 ```
 
-**Computed:** `query_hash`, `normalized_sql`, `query_type`, `call_count`, `avg_latency_ms`, `p95_latency_ms`, `avg_response_bytes`, `stability_rate`, `recommendation`, `first_seen_at`, `last_seen_at`
+**Computed:** `query_hash`, `normalized_sql`, `query_type`, `call_count`,
+`avg_latency_ms`, `p95_latency_ms`, `avg_response_bytes`, `stability_rate`,
+`recommendation`, `first_seen_at`, `last_seen_at`
 
-**Import:** `terraform import pgbeam_cache_rule.example <project_id>/<database_id>/<query_hash>`
+**Import:**
+`terraform import pgbeam_cache_rule.example <project_id>/<database_id>/<query_hash>`
 
-### pgbeam\_spend\_limit
+### pgbeam_spend_limit
 
 Manages the monthly spend limit for an organization.
 
@@ -222,7 +233,9 @@ resource "pgbeam_spend_limit" "example" {
 }
 ```
 
-**Computed:** `org_id`, `plan`, `billing_provider`, `subscription_status`, `current_period_end`, `enabled`, `custom_pricing`, `limits`, `created_at`, `updated_at`
+**Computed:** `org_id`, `plan`, `billing_provider`, `subscription_status`,
+`current_period_end`, `enabled`, `custom_pricing`, `limits`, `created_at`,
+`updated_at`
 
 **Import:** `terraform import pgbeam_spend_limit.example <org_id>`
 

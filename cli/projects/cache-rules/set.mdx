@@ -5,7 +5,10 @@ description: Update cache rule for a query
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Enable or disable caching for a specific query shape, identified by its xxhash64 hash. You can optionally override the TTL (time-to-live) and SWR (stale-while-revalidate) durations. Omitting `--ttl` or `--swr` uses the project-level defaults. Use `pgbeam cache-rules list` to find query hashes.
+Enable or disable caching for a specific query shape, identified by its xxhash64
+hash. You can optionally override the TTL (time-to-live) and SWR
+(stale-while-revalidate) durations. Omitting `--ttl` or `--swr` uses the
+project-level defaults. Use `pgbeam cache-rules list` to find query hashes.
 
 ## Usage
 
@@ -24,7 +27,9 @@ pgbeam cache-rules set <query-hash> [flags]
 | `--swr <value>`         | SWR (stale-while-revalidate) override in seconds. Omit to use the project default.              | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -42,4 +47,5 @@ pgbeam cache-rules set a1b2c3d4 --database-id db_xxx --enabled false
 
 ## Output
 
-Prints the updated cache rule showing whether caching is enabled, the TTL, and the SWR duration. With `--json`, returns the full cache rule entry.
+Prints the updated cache rule showing whether caching is enabled, the TTL, and
+the SWR duration. With `--json`, returns the full cache rule entry.

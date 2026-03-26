@@ -99,12 +99,12 @@ POST and PATCH requests include an `Idempotency-Key` header so retries never
 double-create resources.
 
 - Keys are UUID v4, generated once per SDK call and reused across all attempts
-- Sent on every attempt (including the first) so the server can deduplicate
-  even if the initial request succeeds but the client loses the response
+- Sent on every attempt (including the first) so the server can deduplicate even
+  if the initial request succeeds but the client loses the response
 - GET and DELETE are naturally idempotent — no key needed
 - The server caches idempotent responses for **24 hours**
-- Transient errors (408, 429, 502, 503, 504) are **not** cached — the next
-  retry executes the handler again
+- Transient errors (408, 429, 502, 503, 504) are **not** cached — the next retry
+  executes the handler again
 
 See the [TypeScript SDK](/docs/ts-sdk/error-handling#retry-configuration) and
 [Go SDK](/docs/go-sdk/error-handling#retry-configuration) docs for

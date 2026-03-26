@@ -5,8 +5,8 @@ description: Get query insights for a project
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Returns aggregated query-level analytics for a project including top queries
-by count, cache hit/miss summary, and latency statistics.
+Returns aggregated query-level analytics for a project including top queries by
+count, cache hit/miss summary, and latency statistics.
 
 ## Usage
 
@@ -16,13 +16,13 @@ result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter    | Type                               | Required | Description                                          |
-| ------------ | ---------------------------------- | -------- | ---------------------------------------------------- |
-| ctx          | `context.Context`                  | Yes      | Request context                                      |
-| projectID    | `string`                           | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| params       | `*pgbeam.GetProjectInsightsParams` | No       | Query parameters                                     |
-| params.Range | `string`                           | No       | Time range to query. Defaults to 24h.                |
-| params.Limit | `int`                              | No       | Maximum number of top queries to return (1-100).     |
+| Parameter    | Type                               | Required | Description                                         |
+| ------------ | ---------------------------------- | -------- | --------------------------------------------------- |
+| ctx          | `context.Context`                  | Yes      | Request context                                     |
+| projectID    | `string`                           | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params       | `*pgbeam.GetProjectInsightsParams` | No       | Query parameters                                    |
+| params.Range | `string`                           | No       | Time range to query. Defaults to 24h.               |
+| params.Limit | `int`                              | No       | Maximum number of top queries to return (1-100).    |
 
 ## Response
 

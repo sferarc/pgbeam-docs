@@ -11,17 +11,17 @@ Lists all custom domains registered for the project.
 
 ```typescript
 const result = await api.projects.listCustomDomains({
-    pathParams: { project_id: "prj_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                            |
-| ----------------------- | -------- | -------- | ------------------------------------------------------ |
-| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).   |
-| queryParams.page\_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
-| queryParams.page\_token | `string` | No       | Opaque token for cursor-based pagination.              |
+| Parameter              | Type     | Required | Description                                            |
+| ---------------------- | -------- | -------- | ------------------------------------------------------ |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
+| queryParams.page_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No       | Opaque token for cursor-based pagination.              |
 
 ## Response
 

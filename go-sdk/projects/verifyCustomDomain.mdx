@@ -5,7 +5,8 @@ description: Verify custom domain DNS
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Checks DNS TXT record to verify domain ownership. Updates domain status on success. Requires a Scale or Enterprise plan.
+Checks DNS TXT record to verify domain ownership. Updates domain status on
+success. Requires a Scale or Enterprise plan.
 
 ## Usage
 
@@ -15,11 +16,11 @@ result, err := client.Projects.VerifyCustomDomain(ctx, "prj_xxx", "dom_xxx")
 
 ## Parameters
 
-| Parameter | Type              | Required | Description                                                |
-| --------- | ----------------- | -------- | ---------------------------------------------------------- |
-| ctx       | `context.Context` | Yes      | Request context                                            |
-| projectID | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).       |
-| domainID  | `string`          | Yes      | Unique custom domain identifier (prefixed, e.g. dom\_xxx). |
+| Parameter | Type              | Required | Description                                               |
+| --------- | ----------------- | -------- | --------------------------------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                                           |
+| projectID | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| domainID  | `string`          | Yes      | Unique custom domain identifier (prefixed, e.g. dom_xxx). |
 
 ## Response
 

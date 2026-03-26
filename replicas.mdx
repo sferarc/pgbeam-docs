@@ -6,10 +6,10 @@ description:
   and automatic health management.
 ---
 
-Read replicas let you distribute read traffic across multiple database instances.
-Instead of sending every query to a single primary, you can route eligible reads
-to replicas — reducing load on the primary and improving read throughput for
-heavy workloads.
+Read replicas let you distribute read traffic across multiple database
+instances. Instead of sending every query to a single primary, you can route
+eligible reads to replicas — reducing load on the primary and improving read
+throughput for heavy workloads.
 
 PgBeam supports two routing modes: **per-query annotations** and **auto read
 routing**. With annotations, you explicitly mark queries that should go to a
@@ -23,7 +23,8 @@ Read replicas are a good fit when:
 
 - Your primary database is CPU or connection constrained by read traffic
 - You have analytics or reporting queries that can tolerate slightly stale data
-- You want to separate OLTP traffic (primary) from heavier read patterns (replica)
+- You want to separate OLTP traffic (primary) from heavier read patterns
+  (replica)
 - You are running dashboards or background jobs that do not need real-time data
 
 Read replicas are **not** a good fit when:
@@ -193,22 +194,18 @@ annotation:
       sql`/* @pgbeam:replica */ SELECT * FROM products WHERE active = true`,
     );
     ```
+
   </Tab>
 
-  <Tab value="psycopg">
-    ```python
-    cur.execute(
-        "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true"
-    )
-    ```
-  </Tab>
+<Tab value="psycopg">
+  ```python cur.execute( "/* @pgbeam:replica */ SELECT * FROM products WHERE
+  active = true" ) ```
+</Tab>
 
-  <Tab value="pgx">
-    ```go
-    rows, err := pool.Query(ctx,
-        "/* @pgbeam:replica */ SELECT * FROM products WHERE active = true")
-    ```
-  </Tab>
+<Tab value="pgx">
+  ```go rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT * FROM
+  products WHERE active = true") ```
+</Tab>
 
   <Tab value="JDBC">
     ```java
@@ -230,7 +227,8 @@ replica-routed and cached:
 The evaluation order is:
 
 1. PgBeam checks the cache first
-2. On a cache miss, the query is routed to a replica (if annotated) or the primary
+2. On a cache miss, the query is routed to a replica (if annotated) or the
+   primary
 3. The result is cached for future requests
 
 This means cache hits are served from the local data plane without contacting
@@ -269,9 +267,9 @@ primary if no healthy replica is available.
 
 ## Replication lag considerations
 
-PostgreSQL streaming replication is asynchronous by default. This means there
-is always some delay (typically milliseconds, but potentially seconds under
-load) between a write on the primary and the same data appearing on a replica.
+PostgreSQL streaming replication is asynchronous by default. This means there is
+always some delay (typically milliseconds, but potentially seconds under load)
+between a write on the primary and the same data appearing on a replica.
 
 **Queries safe for replica routing:**
 
@@ -301,5 +299,6 @@ load) between a write on the primary and the same data appearing on a replica.
 ## Further reading
 
 - [Caching](/docs/cache) — Combine replica routing with query caching
-- [Routing & Regions](/docs/routing) — How GeoDNS and peer relay interact with replica routing
+- [Routing & Regions](/docs/routing) — How GeoDNS and peer relay interact with
+  replica routing
 - [Resilience](/docs/resilience) — Health check details and failover behavior

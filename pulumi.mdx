@@ -3,104 +3,95 @@ title: Pulumi
 icon: Blocks
 tag: TypeScript
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
-  infrastructure using Pulumi and the @pgbeam/pulumi package.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
+  spend limits as infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
 Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
+package provides native Pulumi resources for projects, databases, replicas,
+custom domains, cache rules, and spend limits.
 
 ## Setup
 
 <Steps>
-  <Step>
-    ### Install the package
+<Step>
 
-    <Tabs items={["npm", "pnpm", "yarn"]}>
-      <Tab value="npm">
-        ```bash
-        npm install @pgbeam/pulumi @pulumi/pulumi
-        ```
-      </Tab>
+### Install the package
 
-      <Tab value="pnpm">
-        ```bash
-        pnpm add @pgbeam/pulumi @pulumi/pulumi
-        ```
-      </Tab>
+<Tabs items={["npm", "pnpm", "yarn"]}>
+  <Tab value="npm">```bash npm install @pgbeam/pulumi @pulumi/pulumi ```</Tab>
+  <Tab value="pnpm">```bash pnpm add @pgbeam/pulumi @pulumi/pulumi ```</Tab>
+  <Tab value="yarn">```bash yarn add @pgbeam/pulumi @pulumi/pulumi ```</Tab>
+</Tabs>
 
-      <Tab value="yarn">
-        ```bash
-        yarn add @pgbeam/pulumi @pulumi/pulumi
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
+</Step>
+<Step>
 
-  <Step>
-    ### Configure credentials
+### Configure credentials
 
-    Set your PgBeam API key via Pulumi config or environment variable:
+Set your PgBeam API key via Pulumi config or environment variable:
 
-    <Tabs items={["Pulumi config", "Environment variable", "Programmatic"]}>
-      <Tab value="Pulumi config">
-        ```bash
-        pulumi config set pgbeam:apiKey --secret pgb_your_api_key
-        ```
-      </Tab>
+<Tabs items={["Pulumi config", "Environment variable", "Programmatic"]}>
+<Tab value="Pulumi config">
+```bash
+pulumi config set pgbeam:apiKey --secret pgb_your_api_key
+```
+</Tab>
+<Tab value="Environment variable">
+```bash title=".env"
+PGBEAM_API_KEY=pgb_your_api_key
+```
+</Tab>
+<Tab value="Programmatic">
+```ts title="index.ts"
+import * as pgbeam from "@pgbeam/pulumi";
 
-      <Tab value="Environment variable">
-        ```bash title=".env"
-        PGBEAM_API_KEY=pgb_your_api_key
-        ```
-      </Tab>
+pgbeam.configure({ apiKey: "pgb_your_api_key" });
 
-      <Tab value="Programmatic">
-        ```ts title="index.ts"
-        import * as pgbeam from "@pgbeam/pulumi";
+````
+</Tab>
+</Tabs>
 
-        pgbeam.configure({ apiKey: "pgb_your_api_key" });
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
+</Step>
+<Step>
 
-  <Step>
-    ### Create a project
+### Create a project
 
-    ```ts title="index.ts"
-    import * as pgbeam from "@pgbeam/pulumi";
-    import * as pulumi from "@pulumi/pulumi";
+```ts title="index.ts"
+import * as pgbeam from "@pgbeam/pulumi";
+import * as pulumi from "@pulumi/pulumi";
 
-    const config = new pulumi.Config();
+const config = new pulumi.Config();
 
-    const project = new pgbeam.Project("my-app", {
-      orgId: config.require("orgId"),
-      name: "my-app",
-      database: {
-        host: "my-rds.us-east-1.rds.amazonaws.com",
-        port: 5432,
-        name: "mydb",
-        username: "pgbeam",
-        password: config.requireSecret("dbPassword"),
-      },
-    });
+const project = new pgbeam.Project("my-app", {
+  orgId: config.require("orgId"),
+  name: "my-app",
+  database: {
+    host: "my-rds.us-east-1.rds.amazonaws.com",
+    port: 5432,
+    name: "mydb",
+    username: "pgbeam",
+    password: config.requireSecret("dbPassword"),
+  },
+});
 
-    export const proxyHost = project.proxyHost;
-    ```
-  </Step>
+export const proxyHost = project.proxyHost;
+````
 
-  <Step>
-    ### Deploy
+</Step>
+<Step>
 
-    ```bash
-    pulumi up
-    ```
+### Deploy
 
-    Pulumi creates the PgBeam project and its primary database atomically.
-    The `proxyHost` output gives you the PgBeam proxy endpoint to use in your
-    application connection string.
-  </Step>
+```bash
+pulumi up
+```
+
+Pulumi creates the PgBeam project and its primary database atomically. The
+`proxyHost` output gives you the PgBeam proxy endpoint to use in your
+application connection string.
+
+</Step>
 </Steps>
 
 ## Resources
@@ -120,7 +111,9 @@ const res = new pgbeam.Project("example", {
 });
 ```
 
-**Outputs:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseId`
+**Outputs:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`,
+`databaseCount`, `activeConnections`, `createdAt`, `updatedAt`,
+`primaryDatabaseId`
 
 ### Database
 
@@ -186,7 +179,8 @@ const res = new pgbeam.CustomDomain("example", {
 });
 ```
 
-**Outputs:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
+**Outputs:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`,
+`dnsInstructions`, `createdAt`, `updatedAt`
 
 ### CacheRule
 
@@ -203,7 +197,9 @@ const res = new pgbeam.CacheRule("example", {
 });
 ```
 
-**Outputs:** `queryHash`, `normalizedSql`, `queryType`, `callCount`, `avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`, `recommendation`, `firstSeenAt`, `lastSeenAt`
+**Outputs:** `queryHash`, `normalizedSql`, `queryType`, `callCount`,
+`avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`,
+`recommendation`, `firstSeenAt`, `lastSeenAt`
 
 ### SpendLimit
 
@@ -216,7 +212,9 @@ const res = new pgbeam.SpendLimit("example", {
 });
 ```
 
-**Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
+**Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`,
+`currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`,
+`updatedAt`
 
 ## Configuration
 
@@ -232,8 +230,8 @@ variables.
 
 ## Replacement vs update
 
-Some property changes trigger resource replacement (delete + create) rather
-than in-place updates:
+Some property changes trigger resource replacement (delete + create) rather than
+in-place updates:
 
 | Resource     | Replacement triggers                   |
 | ------------ | -------------------------------------- |

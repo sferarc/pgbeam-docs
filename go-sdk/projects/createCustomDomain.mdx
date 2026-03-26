@@ -5,7 +5,8 @@ description: Add a custom domain
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Registers a new custom domain for the project. Returns DNS verification instructions. Requires a Scale or Enterprise plan.
+Registers a new custom domain for the project. Returns DNS verification
+instructions. Requires a Scale or Enterprise plan.
 
 ## Usage
 
@@ -20,7 +21,7 @@ result, err := client.Projects.CreateCustomDomain(ctx, "prj_xxx", &pgbeam.Create
 | Parameter  | Type                                | Required | Description                                           |
 | ---------- | ----------------------------------- | -------- | ----------------------------------------------------- |
 | ctx        | `context.Context`                   | Yes      | Request context                                       |
-| projectID  | `string`                            | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).  |
+| projectID  | `string`                            | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).   |
 | req        | `*pgbeam.CreateCustomDomainRequest` | Yes      | Request body                                          |
 | req.Domain | `string`                            | Yes      | The custom domain name to add (e.g., db.example.com). |
 

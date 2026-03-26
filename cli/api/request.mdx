@@ -5,7 +5,10 @@ description: Make a raw API request
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Make a direct HTTP request to the PgBeam API. Supports path parameter interpolation — if the path matches a known API route template, path parameters are extracted automatically. Use `--data` (or `-d`) to send a JSON request body. Authentication is handled via the active profile.
+Make a direct HTTP request to the PgBeam API. Supports path parameter
+interpolation — if the path matches a known API route template, path parameters
+are extracted automatically. Use `--data` (or `-d`) to send a JSON request body.
+Authentication is handled via the active profile.
 
 ## Usage
 
@@ -22,7 +25,9 @@ pgbeam api request <method> <path> [flags]
 | `--data <value>`, `-d` | JSON request body to send with the request    | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -43,4 +48,5 @@ pgbeam api request DELETE /v1/projects/prj_xxx/databases/db_xxx
 
 ## Output
 
-Outputs the API response as formatted JSON. Exits with a non-zero code on HTTP errors.
+Outputs the API response as formatted JSON. Exits with a non-zero code on HTTP
+errors.

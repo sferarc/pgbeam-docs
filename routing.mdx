@@ -42,6 +42,7 @@ Every client connection follows the same lifecycle:
     The client resolves `abc.aws.pgbeam.app`. GeoDNS returns the IP of the nearest
     data plane based on the client's geographic location. This happens at the DNS
     layer — no application-level routing is involved.
+
   </Step>
 
   <Step>
@@ -50,6 +51,7 @@ Every client connection follows the same lifecycle:
     The client connects over TLS to the resolved data plane. PgBeam uses **SNI
     (Server Name Indication)** to extract the project identifier from the hostname
     during the TLS handshake, before any PostgreSQL protocol traffic is exchanged.
+
   </Step>
 
   <Step>
@@ -59,6 +61,7 @@ Every client connection follows the same lifecycle:
     upstream host, pool mode, cache settings, connection limits, and rate limits.
     Project configs are cached at the edge, so this lookup is fast after the first
     connection.
+
   </Step>
 
   <Step>
@@ -67,6 +70,7 @@ Every client connection follows the same lifecycle:
     When caching is enabled, each incoming query is checked against the local edge
     cache **before** any upstream communication. Cache hits are returned directly
     from the data plane, with zero upstream latency.
+
   </Step>
 
   <Step>
@@ -75,6 +79,7 @@ Every client connection follows the same lifecycle:
     PgBeam acquires an upstream connection from the per-project pool (or dials a
     new one). Your credentials are forwarded to the upstream database for
     authentication — PgBeam does not store user passwords.
+
   </Step>
 
   <Step>
@@ -83,6 +88,7 @@ Every client connection follows the same lifecycle:
     Queries are relayed between the client and upstream. Results flow back through
     the same path. When caching is enabled, eligible read results are stored in the
     local cache for future requests.
+
   </Step>
 
   <Step>
@@ -90,6 +96,7 @@ Every client connection follows the same lifecycle:
 
     When the client disconnects (or the transaction ends, in transaction mode), the
     upstream connection is reset with `DISCARD ALL` and returned to the pool.
+
   </Step>
 </Steps>
 
@@ -141,8 +148,8 @@ Keeping pools in the home region has two advantages:
 
 1. **Connection stability.** Long-lived upstream connections stay on the
    shortest, most stable network path to the database.
-2. **Pool efficiency.** All connections from all regions share the same pool
-   in the home region, maximizing connection reuse.
+2. **Pool efficiency.** All connections from all regions share the same pool in
+   the home region, maximizing connection reuse.
 
 ### Cache and relay interaction
 
@@ -160,10 +167,10 @@ halfway around the world.
 
 ### Relay fallback
 
-If the relay connection to the home region fails (network partition, home
-region outage), PgBeam falls back to a **direct connection** from the edge
-data plane to the upstream database. This is less efficient (no pool sharing
-with other regions) but maintains connectivity.
+If the relay connection to the home region fails (network partition, home region
+outage), PgBeam falls back to a **direct connection** from the edge data plane
+to the upstream database. This is less efficient (no pool sharing with other
+regions) but maintains connectivity.
 
 <Callout type="info">
   Relay fallback is automatic. Your application does not need to handle it — the
@@ -227,7 +234,8 @@ recovery.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and connection lifecycle
+- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and connection
+  lifecycle
 - [Caching](/docs/cache) — How cache lookup interacts with routing
 - [Read Replicas](/docs/replicas) — Opt-in replica routing with SQL annotations
 - [Resilience](/docs/resilience) — Circuit breakers, health checks, and failover

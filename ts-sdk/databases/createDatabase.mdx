@@ -11,37 +11,37 @@ Registers a new upstream PostgreSQL database for the project.
 
 ```typescript
 const result = await api.databases.createDatabase({
-    pathParams: { project_id: "prj_xxx" },
-    body: {
-      host: "db.example.com",
-      port: 5432,
-      name: "mydb",
-      username: "pgbeam",
-      password: "...",
-    },
-  });
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    host: "db.example.com",
+    port: 5432,
+    name: "mydb",
+    username: "pgbeam",
+    password: "...",
+  },
+});
 ```
 
 ## Parameters
 
-| Parameter                | Type           | Required | Description                                                                                                                                                                                                        |
-| ------------------------ | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| pathParams.project\_id   | `string`       | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).                                                                                                                                                               |
-| body.host                | `string`       | Yes      | PostgreSQL host.                                                                                                                                                                                                   |
-| body.port                | `number`       | Yes      | PostgreSQL port.                                                                                                                                                                                                   |
-| body.name                | `string`       | Yes      | PostgreSQL database name.                                                                                                                                                                                          |
-| body.username            | `string`       | Yes      | PostgreSQL username.                                                                                                                                                                                               |
-| body.password            | `string`       | Yes      | PostgreSQL password. Stored encrypted at rest.                                                                                                                                                                     |
-| body.ssl\_mode           | `SSLMode`      | No       |                                                                                                                                                                                                                    |
-| body.role                | `DatabaseRole` | No       |                                                                                                                                                                                                                    |
-| body.pool\_region        | `string`       | No       | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection. |
-|                          |                |          |                                                                                                                                                                                                                    |
-| body.query\_timeout\_ms  | `number`       | No       | Query timeout in milliseconds. 0 means disabled (default).                                                                                                                                                         |
-|                          |                |          |                                                                                                                                                                                                                    |
-| body.auto\_read\_routing | `boolean`      | No       | Auto-route SELECT queries to read replicas.                                                                                                                                                                        |
-|                          |                |          |                                                                                                                                                                                                                    |
-| body.cache\_config       | `CacheConfig`  | No       |                                                                                                                                                                                                                    |
-| body.pool\_config        | `PoolConfig`   | No       |                                                                                                                                                                                                                    |
+| Parameter              | Type           | Required | Description                                                                                                                                                                                                        |
+| ---------------------- | -------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| pathParams.project_id  | `string`       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                                                                                                |
+| body.host              | `string`       | Yes      | PostgreSQL host.                                                                                                                                                                                                   |
+| body.port              | `number`       | Yes      | PostgreSQL port.                                                                                                                                                                                                   |
+| body.name              | `string`       | Yes      | PostgreSQL database name.                                                                                                                                                                                          |
+| body.username          | `string`       | Yes      | PostgreSQL username.                                                                                                                                                                                               |
+| body.password          | `string`       | Yes      | PostgreSQL password. Stored encrypted at rest.                                                                                                                                                                     |
+| body.ssl_mode          | `SSLMode`      | No       |                                                                                                                                                                                                                    |
+| body.role              | `DatabaseRole` | No       |                                                                                                                                                                                                                    |
+| body.pool_region       | `string`       | No       | Region where the connection pool is maintained (near the database). When set and different from the client's edge region, queries are relayed through the pool region's data plane. Empty means direct connection. |
+|                        |
+| body.query_timeout_ms  | `number`       | No       | Query timeout in milliseconds. 0 means disabled (default).                                                                                                                                                         |
+|                        |
+| body.auto_read_routing | `boolean`      | No       | Auto-route SELECT queries to read replicas.                                                                                                                                                                        |
+|                        |
+| body.cache_config      | `CacheConfig`  | No       |                                                                                                                                                                                                                    |
+| body.pool_config       | `PoolConfig`   | No       |                                                                                                                                                                                                                    |
 
 ## Response
 
@@ -60,12 +60,12 @@ const client = new PgBeamClient({
 const result = await client.api.databases.createDatabase({
   pathParams: { project_id: "prj_xxx" },
   body: {
-      host: "db.example.com",
-      port: 5432,
-      name: "mydb",
-      username: "pgbeam",
-      password: "...",
-    },
+    host: "db.example.com",
+    port: 5432,
+    name: "mydb",
+    username: "pgbeam",
+    password: "...",
+  },
 });
 ```
 

@@ -18,14 +18,14 @@ result, err := client.Projects.CreateReplica(ctx, "db_xxx", &pgbeam.CreateReplic
 
 ## Parameters
 
-| Parameter   | Type                           | Required | Description                                          |
-| ----------- | ------------------------------ | -------- | ---------------------------------------------------- |
-| ctx         | `context.Context`              | Yes      | Request context                                      |
-| databaseID  | `string`                       | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
-| req         | `*pgbeam.CreateReplicaRequest` | Yes      | Request body                                         |
-| req.Host    | `string`                       | Yes      | PostgreSQL replica host.                             |
-| req.Port    | `int`                          | Yes      | PostgreSQL replica port.                             |
-| req.SSLMode | `*pgbeam.SSLMode`              | No       |                                                      |
+| Parameter   | Type                           | Required | Description                                         |
+| ----------- | ------------------------------ | -------- | --------------------------------------------------- |
+| ctx         | `context.Context`              | Yes      | Request context                                     |
+| databaseID  | `string`                       | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
+| req         | `*pgbeam.CreateReplicaRequest` | Yes      | Request body                                        |
+| req.Host    | `string`                       | Yes      | PostgreSQL replica host.                            |
+| req.Port    | `int`                          | Yes      | PostgreSQL replica port.                            |
+| req.SSLMode | `*pgbeam.SSLMode`              | No       |                                                     |
 
 ## Response
 

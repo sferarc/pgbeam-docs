@@ -20,15 +20,15 @@ const result = await api.projects.updateProject({
 
 ## Parameters
 
-| Parameter              | Type            | Required | Description                                                                                                                          |
-| ---------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| pathParams.project\_id | `string`        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).                                                                                 |
-| body.name              | `string`        | No       | Updated project name.                                                                                                                |
-| body.description       | `string`        | No       | Updated project description.                                                                                                         |
-| body.tags              | `string[]`      | No       | Replacement set of user-defined project labels.                                                                                      |
-| body.status            | `ProjectStatus` | No       |                                                                                                                                      |
-| body.allowed\_cidrs    | `CidrEntry[]`   | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
-|                        |                 |          |                                                                                                                                      |
+| Parameter             | Type            | Required | Description                                                                                                                          |
+| --------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| pathParams.project_id | `string`        | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                  |
+| body.name             | `string`        | No       | Updated project name.                                                                                                                |
+| body.description      | `string`        | No       | Updated project description.                                                                                                         |
+| body.tags             | `string[]`      | No       | Replacement set of user-defined project labels.                                                                                      |
+| body.status           | `ProjectStatus` | No       |                                                                                                                                      |
+| body.allowed_cidrs    | `CidrEntry[]`   | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
+|                       |
 
 ## Response
 

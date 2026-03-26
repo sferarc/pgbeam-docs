@@ -5,25 +5,26 @@ description: Add a custom domain
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Registers a new custom domain for the project. Returns DNS verification instructions. Requires a Scale or Enterprise plan.
+Registers a new custom domain for the project. Returns DNS verification
+instructions. Requires a Scale or Enterprise plan.
 
 ## Usage
 
 ```typescript
 const result = await api.projects.createCustomDomain({
-    pathParams: { project_id: "prj_xxx" },
-    body: {
-      domain: "db.example.com",
-    },
-  });
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    domain: "db.example.com",
+  },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                           |
-| ---------------------- | -------- | -------- | ----------------------------------------------------- |
-| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).  |
-| body.domain            | `string` | Yes      | The custom domain name to add (e.g., db.example.com). |
+| Parameter             | Type     | Required | Description                                           |
+| --------------------- | -------- | -------- | ----------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).   |
+| body.domain           | `string` | Yes      | The custom domain name to add (e.g., db.example.com). |
 
 ## Response
 
@@ -42,8 +43,8 @@ const client = new PgBeamClient({
 const result = await client.api.projects.createCustomDomain({
   pathParams: { project_id: "prj_xxx" },
   body: {
-      domain: "db.example.com",
-    },
+    domain: "db.example.com",
+  },
 });
 ```
 

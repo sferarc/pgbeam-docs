@@ -31,9 +31,9 @@ same quotas.
 
 ### Which plan to choose
 
-**Starter** is for individual developers and small projects. It gives you
-enough headroom to run a production workload with moderate traffic. The 14-day
-trial lets you evaluate PgBeam without entering payment details.
+**Starter** is for individual developers and small projects. It gives you enough
+headroom to run a production workload with moderate traffic. The 14-day trial
+lets you evaluate PgBeam without entering payment details.
 
 **Pro** is for growing teams and production workloads. The higher QPS and
 connection limits handle multi-service architectures and busier applications.
@@ -55,9 +55,8 @@ The daily counter resets at **midnight UTC**.
 
 ### Data transfer
 
-Total bytes transferred between PgBeam and your application (egress) per
-billing month. This does not include traffic between PgBeam and your upstream
-database.
+Total bytes transferred between PgBeam and your application (egress) per billing
+month. This does not include traffic between PgBeam and your upstream database.
 
 ### Connections
 
@@ -74,14 +73,13 @@ not per organization.
 
 ### Query shapes
 
-Maximum number of distinct query fingerprints that PgBeam tracks for cache
-rules and query insights. A query shape is the normalized SQL template with
-parameter values removed (e.g., `SELECT * FROM users WHERE id = $1`).
+Maximum number of distinct query fingerprints that PgBeam tracks for cache rules
+and query insights. A query shape is the normalized SQL template with parameter
+values removed (e.g., `SELECT * FROM users WHERE id = $1`).
 
 ## 14-day trial
 
-New accounts on the Starter plan get a 14-day trial with full Starter
-features:
+New accounts on the Starter plan get a 14-day trial with full Starter features:
 
 - No credit card required to start
 - All Starter quotas and limits apply
@@ -140,6 +138,7 @@ Switch to annual billing from **Settings > Billing** in the dashboard.
 
     You keep all existing projects, databases, and configuration. Higher limits are
     available immediately.
+
   </Tab>
 
   <Tab value="Downgrade">
@@ -153,6 +152,7 @@ Switch to annual billing from **Settings > Billing** in the dashboard.
       maximums
     - Remove team members if you exceed the new plan's seat count
     - Custom domains and SSO are disabled when downgrading from Scale
+
   </Tab>
 </Tabs>
 
@@ -176,9 +176,9 @@ anything:
 | API requests         | Standard REST rate limits per key |
 
 <Callout type="warn">
-  When a rate limit is exceeded, PgBeam returns SQLSTATE `53400` for query limits
-  or HTTP 429 for API limits. See [Error Codes](/docs/error-codes) for handling
-  guidance.
+  When a rate limit is exceeded, PgBeam returns SQLSTATE `53400` for query
+  limits or HTTP 429 for API limits. See [Error Codes](/docs/error-codes) for
+  handling guidance.
 </Callout>
 
 ## Default settings
@@ -204,11 +204,13 @@ New databases and projects start with these defaults:
 ## Enterprise
 
 For organizations with requirements beyond the Scale plan — custom quotas, SLAs,
-dedicated support, or volume pricing — contact [sales@pgbeam.com](mailto:sales@pgbeam.com).
+dedicated support, or volume pricing — contact
+[sales@pgbeam.com](mailto:sales@pgbeam.com).
 
 ## Further reading
 
-- [Organizations](/docs/organizations) — How quotas, seats, and billing work at the org level
+- [Organizations](/docs/organizations) — How quotas, seats, and billing work at
+  the org level
 - [Connection Pooling](/docs/pooling) — Pool mode selection and sizing guidance
 - [Caching](/docs/cache) — Cache defaults and how to tune TTL/SWR
 - [Error Codes](/docs/error-codes) — Rate limit error codes and handling

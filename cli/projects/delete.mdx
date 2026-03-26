@@ -5,7 +5,10 @@ description: Delete a project
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Permanently delete a project and all its associated databases, cache rules, domains, and replicas. This action cannot be undone. A confirmation prompt is shown unless `--yes` is passed. If no project ID is provided, uses the linked project in the current directory.
+Permanently delete a project and all its associated databases, cache rules,
+domains, and replicas. This action cannot be undone. A confirmation prompt is
+shown unless `--yes` is passed. If no project ID is provided, uses the linked
+project in the current directory.
 
 ## Usage
 
@@ -21,7 +24,9 @@ pgbeam projects delete [id] [flags]
 | `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | `false` |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -39,4 +44,5 @@ pgbeam projects delete prj_xxx --yes
 
 ## Output
 
-Prints a success message confirming the project was deleted. Exits with a non-zero code if the project is not found.
+Prints a success message confirming the project was deleted. Exits with a
+non-zero code if the project is not found.

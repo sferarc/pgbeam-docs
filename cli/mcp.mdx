@@ -6,7 +6,10 @@ icon: Bot
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Start a Model Context Protocol (MCP) server using stdio transport. This allows AI coding assistants like Claude Code, Cursor, and other MCP-compatible clients to manage PgBeam projects, databases, and cache rules directly. The server exposes PgBeam API operations as MCP tools.
+Start a Model Context Protocol (MCP) server using stdio transport. This allows
+AI coding assistants like Claude Code, Cursor, and other MCP-compatible clients
+to manage PgBeam projects, databases, and cache rules directly. The server
+exposes PgBeam API operations as MCP tools.
 
 ## Usage
 
@@ -15,7 +18,9 @@ pgbeam mcp
 ```
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -30,7 +35,9 @@ pgbeam mcp
 
 ## Output
 
-Starts the MCP server and listens for JSON-RPC messages on stdin/stdout. The server runs until the process is terminated. No human-readable output is produced — all communication is via the MCP protocol.
+Starts the MCP server and listens for JSON-RPC messages on stdin/stdout. The
+server runs until the process is terminated. No human-readable output is
+produced — all communication is via the MCP protocol.
 
 {/* @preserve */}
 
@@ -159,6 +166,7 @@ server-to-server integration.
       }
     }
     ```
+
   </Tab>
 </Tabs>
 

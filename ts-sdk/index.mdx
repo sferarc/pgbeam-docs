@@ -33,8 +33,8 @@ const { api } = client;
 
 ## Authentication
 
-The `token` constructor option accepts a static string, an async function, or
-an API key. Choose the approach that fits your environment.
+The `token` constructor option accepts a static string, an async function, or an
+API key. Choose the approach that fits your environment.
 
 <Tabs items={["Static token", "Async token", "API key"]}>
   <Tab value="Static token">
@@ -108,6 +108,6 @@ const project = await api.request("GET /v1/projects/{project_id}", {
 
 <Callout type="info" title="Which style should I use?">
   Tag-based access is recommended for most use cases. It provides better
-  discoverability through IDE autocomplete. Route-based access is useful when you
-  want your code to mirror the REST endpoints directly.
+  discoverability through IDE autocomplete. Route-based access is useful when
+  you want your code to mirror the REST endpoints directly.
 </Callout>

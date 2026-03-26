@@ -5,7 +5,9 @@ description: Show current authentication status
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Display the currently authenticated user, active profile, authentication method, organization, and email. If not authenticated, prints a warning with instructions to log in. Also available as the `pgbeam whoami` alias.
+Display the currently authenticated user, active profile, authentication method,
+organization, and email. If not authenticated, prints a warning with
+instructions to log in. Also available as the `pgbeam whoami` alias.
 
 ## Usage
 
@@ -14,7 +16,9 @@ pgbeam auth status
 ```
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -32,4 +36,6 @@ pgbeam auth status --json
 
 ## Output
 
-Displays profile name, authentication method, email, and organization ID. With `--json`, returns an object with `authenticated`, `profile`, `method`, `orgId`, and `email` fields.
+Displays profile name, authentication method, email, and organization ID. With
+`--json`, returns an object with `authenticated`, `profile`, `method`, `orgId`,
+and `email` fields.

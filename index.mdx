@@ -1,7 +1,8 @@
 ---
 title: Getting Started
 description:
-  Connect an existing PostgreSQL app to PgBeam without changing your driver or ORM.
+  Connect an existing PostgreSQL app to PgBeam without changing your driver or
+  ORM.
 ---
 
 PgBeam sits between your app and Postgres. You point your client at a PgBeam
@@ -9,8 +10,8 @@ hostname, keep speaking normal PostgreSQL, and get a control plane for pooling,
 caching, analytics, replicas, and global routing.
 
 <Callout title="Start with the boring change" type="info">
-  Most teams can get started by changing one thing: the host in
-  `DATABASE_URL`. No SDK. No protocol shim. No application rewrite.
+  Most teams can get started by changing one thing: the host in `DATABASE_URL`.
+  No SDK. No protocol shim. No application rewrite.
 </Callout>
 
 ### What changes
@@ -25,8 +26,7 @@ DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
 
 PgBeam still speaks the PostgreSQL wire protocol, so your existing drivers and
 ORMs keep working. The difference is that connections now land on a PgBeam data
-plane first, where pooling, routing, analytics, and optional caching can
-happen.
+plane first, where pooling, routing, analytics, and optional caching can happen.
 
 ### What you get
 
@@ -36,24 +36,24 @@ happen.
     into every environment.
   </Card>
 
-  <Card title="Query Caching" href="/docs/cache" icon="⚡">
-    Cache repeated read traffic close to users, with TTL and stale-while-revalidate
-    controls when you need them.
-  </Card>
+<Card title="Query Caching" href="/docs/cache" icon="⚡">
+  Cache repeated read traffic close to users, with TTL and
+  stale-while-revalidate controls when you need them.
+</Card>
 
-  <Card title="Read Replicas" href="/docs/replicas" icon="📖">
-    Route selected reads to replicas instead of pretending every query should
-    behave the same way.
-  </Card>
+<Card title="Read Replicas" href="/docs/replicas" icon="📖">
+  Route selected reads to replicas instead of pretending every query should
+  behave the same way.
+</Card>
 
-  <Card title="Global Routing" href="/docs/routing" icon="🌍">
-    Send clients to the nearest edge while keeping pools near the database when
-    relay makes more sense.
-  </Card>
+<Card title="Global Routing" href="/docs/routing" icon="🌍">
+  Send clients to the nearest edge while keeping pools near the database when
+  relay makes more sense.
+</Card>
 
-  <Card title="Custom Domains" href="/docs/custom-domains" icon="🔒">
-    Use your own hostname and let PgBeam handle the certificate plumbing.
-  </Card>
+<Card title="Custom Domains" href="/docs/custom-domains" icon="🔒">
+  Use your own hostname and let PgBeam handle the certificate plumbing.
+</Card>
 
   <Card title="Query Insights" href="/docs/api" icon="📊">
     Pull metrics, usage, activity, and query insights from the same control
@@ -78,6 +78,7 @@ Before you begin, you need:
     Sign up at [dash.pgbeam.com](https://dash.pgbeam.com). New accounts start on
     the Starter plan, which includes a 14-day trial. A default organization is created for
     you automatically.
+
   </Step>
 
   <Step>
@@ -85,6 +86,7 @@ Before you begin, you need:
 
     Create a project in the dashboard. Each project gets a hostname like
     `abc.aws.pgbeam.app`. That hostname is what your application will connect to.
+
   </Step>
 
   <Step>
@@ -107,6 +109,7 @@ Before you begin, you need:
 
     PgBeam stores the origin database credentials you enter here. Application user
     credentials are still checked by the origin database at connection time.
+
   </Step>
 
   <Step>
@@ -122,6 +125,7 @@ Before you begin, you need:
 
     Keep the username, password, port, and database name. The hostname is the only
     required change.
+
   </Step>
 
   <Step>
@@ -158,6 +162,7 @@ Before you begin, you need:
 
     If that works, the plumbing is done. Pooling and observability are already in
     the path. Caching is available when you are ready to turn it on.
+
   </Step>
 </Steps>
 
@@ -173,12 +178,10 @@ traffic is flowing, you can enable it for stable reads that benefit from reuse.
     reads that are worth it.
   </Tab>
 
-  <Tab value="SQL">
-    ```sql
-    /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products WHERE active = true;
-    /* @pgbeam:cache noCache */ SELECT NOW();
-    ```
-  </Tab>
+<Tab value="SQL">
+  ```sql /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products WHERE
+  active = true; /* @pgbeam:cache noCache */ SELECT NOW(); ```
+</Tab>
 
   <Tab value="Session override">
     ```sql
@@ -223,17 +226,17 @@ pgbeam env pull
     Framework-specific setup instructions and pool sizing guidance.
   </Card>
 
-  <Card title="Caching" href="/docs/cache">
-    Learn when cache helps, when it bypasses, and how to turn it on safely.
-  </Card>
+<Card title="Caching" href="/docs/cache">
+  Learn when cache helps, when it bypasses, and how to turn it on safely.
+</Card>
 
-  <Card title="CLI Reference" href="/docs/cli">
-    Manage PgBeam from the terminal and script the control plane.
-  </Card>
+<Card title="CLI Reference" href="/docs/cli">
+  Manage PgBeam from the terminal and script the control plane.
+</Card>
 
-  <Card title="API Reference" href="/docs/api">
-    Call the same REST API used by the dashboard and generated SDK.
-  </Card>
+<Card title="API Reference" href="/docs/api">
+  Call the same REST API used by the dashboard and generated SDK.
+</Card>
 
   <Card title="Routing & Regions" href="/docs/routing">
     Understand routing, relay, pooling, and failure behavior.

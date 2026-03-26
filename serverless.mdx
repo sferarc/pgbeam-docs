@@ -49,6 +49,7 @@ using the Neon serverless driver.
     ```bash
     npm install ws
     ```
+
   </Step>
 
   <Step>
@@ -63,6 +64,7 @@ using the Neon serverless driver.
     const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
     const rows = await sql`SELECT * FROM users WHERE active = true`;
     ```
+
   </Step>
 
   <Step>
@@ -97,6 +99,7 @@ using the Neon serverless driver.
         ```
       </Tab>
     </Tabs>
+
   </Step>
 
   <Step>
@@ -108,6 +111,7 @@ using the Neon serverless driver.
     ```
 
     If this returns results, the serverless driver is connected through PgBeam.
+
   </Step>
 </Steps>
 
@@ -150,6 +154,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
 
     const users = await db.select().from(usersTable);
     ```
+
   </Tab>
 
   <Tab value="WebSocket (drizzle-orm/neon-serverless)">
@@ -164,6 +169,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
 
     const users = await db.select().from(usersTable);
     ```
+
   </Tab>
 </Tabs>
 
@@ -183,6 +189,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
       sql`UPDATE accounts SET balance = balance + 100 WHERE id = 2`,
     ]);
     ```
+
   </Tab>
 
   <Tab value="WebSocket">
@@ -208,6 +215,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
       client.release();
     }
     ```
+
   </Tab>
 </Tabs>
 
@@ -221,13 +229,15 @@ import { neon } from "@neondatabase/serverless";
 const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
 
 // Cache for 5 minutes
-const categories = await sql`/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories`;
+const categories =
+  await sql`/* @pgbeam:cache maxAge=300 */ SELECT * FROM categories`;
 
 // Route to read replica
 const stats = await sql`/* @pgbeam:replica */ SELECT count(*) FROM orders`;
 
 // Combine both
-const products = await sql`/* @pgbeam:replica */ /* @pgbeam:cache maxAge=60 */ SELECT * FROM products`;
+const products =
+  await sql`/* @pgbeam:replica */ /* @pgbeam:cache maxAge=60 */ SELECT * FROM products`;
 ```
 
 See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
@@ -246,4 +256,5 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 - [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
 - [Caching](/docs/cache) — TTL, SWR, cache rules, and SQL annotations
 - [Read Replicas](/docs/replicas) — Replica setup and routing
-- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless) — Driver documentation
+- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless)
+  — Driver documentation

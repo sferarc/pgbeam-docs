@@ -1,8 +1,8 @@
 ---
 title: Error Handling
 description:
-  Catch and inspect API errors, configure retries, and use idempotency keys
-  in the PgBeam TypeScript SDK.
+  Catch and inspect API errors, configure retries, and use idempotency keys in
+  the PgBeam TypeScript SDK.
 ---
 
 All non-2xx responses throw an `ApiError`:
@@ -16,11 +16,11 @@ try {
   });
 } catch (err) {
   if (err instanceof ApiError) {
-    console.error(err.status);     // 404
+    console.error(err.status); // 404
     console.error(err.statusText); // "Not Found"
 
     const msg = extractMessage(err.body);
-    console.error(msg);            // "Project not found"
+    console.error(msg); // "Project not found"
   }
 }
 ```
@@ -69,9 +69,9 @@ const client = new PgBeamClient({
   token: "your-api-key",
   baseUrl: "https://api.pgbeam.com",
   retry: {
-    maxRetries: 5,         // default: 5 (0 to disable)
-    initialDelayMs: 500,   // default: 500ms
-    maxDelayMs: 30_000,    // default: 30s
+    maxRetries: 5, // default: 5 (0 to disable)
+    initialDelayMs: 500, // default: 500ms
+    maxDelayMs: 30_000, // default: 30s
     idempotencyKeys: true, // default: true
   },
 });

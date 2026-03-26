@@ -5,8 +5,8 @@ description: List cache rules
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Returns the cache rules for a database, showing all observed query
-shapes with their stats and cache recommendations.
+Returns the cache rules for a database, showing all observed query shapes with
+their stats and cache recommendations.
 
 ## Usage
 
@@ -19,8 +19,8 @@ result, err := client.Projects.ListCacheRules(ctx, "prj_xxx", "db_xxx", nil)
 | Parameter        | Type                           | Required | Description                                            |
 | ---------------- | ------------------------------ | -------- | ------------------------------------------------------ |
 | ctx              | `context.Context`              | Yes      | Request context                                        |
-| projectID        | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).   |
-| databaseID       | `string`                       | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).   |
+| projectID        | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
+| databaseID       | `string`                       | Yes      | Unique database identifier (prefixed, e.g. db_xxx).    |
 | params           | `*pgbeam.ListCacheRulesParams` | No       | Query parameters                                       |
 | params.PageSize  | `int`                          | No       | Maximum number of items to return (1-100, default 20). |
 | params.PageToken | `string`                       | No       | Opaque token for cursor-based pagination.              |

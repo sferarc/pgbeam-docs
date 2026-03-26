@@ -24,7 +24,8 @@ Lists all databases registered for the project.
 
 ## Quick request
 
-Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN` if the endpoint requires auth.
+Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN`
+if the endpoint requires auth.
 
 ```bash
 curl -X GET \
@@ -32,4 +33,7 @@ curl -X GET \
   -H "Authorization: Bearer $PGBEAM_TOKEN"
 ```
 
-<APIPage document={"../../../backend/openapi/bundles/public.yaml"} operations={[{"path":"/v1/projects/{project_id}/databases","method":"get"}]} />
+<APIPage
+  document={"../../../backend/openapi/bundles/public.yaml"}
+  operations={[{ path: "/v1/projects/{project_id}/databases", method: "get" }]}
+/>

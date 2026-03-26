@@ -6,7 +6,10 @@ icon: RefreshCw
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Check for and install CLI updates. By default, checks the latest stable release and prompts before updating. Use `--channel dev` with `--version` to install development builds (e.g. PR preview builds). The binary is downloaded from S3 and replaces the current installation in-place.
+Check for and install CLI updates. By default, checks the latest stable release
+and prompts before updating. Use `--channel dev` with `--version` to install
+development builds (e.g. PR preview builds). The binary is downloaded from S3
+and replaces the current installation in-place.
 
 ## Usage
 
@@ -23,7 +26,9 @@ pgbeam update [flags]
 | `--version <value>` | Specific version to install. Required for the dev channel (e.g. pr-434). Optional for latest channel (e.g. 1.2.3). | No       | -        |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -44,4 +49,6 @@ pgbeam update --channel dev --version pr-434
 
 ## Output
 
-Shows the current and target version. If already on the latest version, prints a success message. Otherwise, prompts for confirmation (unless `--yes`), downloads the new binary, and confirms the installation.
+Shows the current and target version. If already on the latest version, prints a
+success message. Otherwise, prompts for confirmation (unless `--yes`), downloads
+the new binary, and confirms the installation.

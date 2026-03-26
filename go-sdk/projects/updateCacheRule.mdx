@@ -5,8 +5,8 @@ description: Update cache rule
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Enable or disable caching for a specific query shape, with optional
-TTL and SWR overrides. Requires the query to exist in the cache rules.
+Enable or disable caching for a specific query shape, with optional TTL and SWR
+overrides. Requires the query to exist in the cache rules.
 
 ## Usage
 
@@ -21,8 +21,8 @@ result, err := client.Projects.UpdateCacheRule(ctx, "prj_xxx", "db_xxx", "...", 
 | Parameter           | Type                             | Required | Description                                           |
 | ------------------- | -------------------------------- | -------- | ----------------------------------------------------- |
 | ctx                 | `context.Context`                | Yes      | Request context                                       |
-| projectID           | `string`                         | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).  |
-| databaseID          | `string`                         | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).  |
+| projectID           | `string`                         | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).   |
+| databaseID          | `string`                         | Yes      | Unique database identifier (prefixed, e.g. db_xxx).   |
 | queryHash           | `string`                         | Yes      | xxhash64 hex of the normalized SQL.                   |
 | req                 | `*pgbeam.UpdateCacheRuleRequest` | Yes      | Request body                                          |
 | req.CacheEnabled    | `bool`                           | Yes      | Whether to enable caching for this query shape.       |

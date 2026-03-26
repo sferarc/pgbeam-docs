@@ -4,9 +4,10 @@ description: Remote MCP endpoint for AI agent integration.
 icon: Bot
 ---
 
-`POST /v1/mcp` is a remote [Model Context Protocol](https://modelcontextprotocol.io)
-server using the Streamable HTTP transport. It exposes every public API
-operation as an MCP tool so AI assistants can manage PgBeam resources directly.
+`POST /v1/mcp` is a remote
+[Model Context Protocol](https://modelcontextprotocol.io) server using the
+Streamable HTTP transport. It exposes every public API operation as an MCP tool
+so AI assistants can manage PgBeam resources directly.
 
 See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering
 both the CLI (stdio) and remote (HTTP) transports.
@@ -42,7 +43,8 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
 ## Authentication
 
 The MCP endpoint uses the same authentication as the REST API. Pass a bearer
-token or API key in the `Authorization` header. See [Authentication](/docs/api#authentication).
+token or API key in the `Authorization` header. See
+[Authentication](/docs/api#authentication).
 
 ## Tools
 

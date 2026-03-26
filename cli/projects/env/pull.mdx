@@ -5,7 +5,11 @@ description: Write DATABASE_URL template to .env
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Write a `DATABASE_URL` connection string template to a `.env` file (or a custom file via `--file`). The URL points to the project's PgBeam proxy host. You'll need to replace `USER`, `PASS`, and `YOUR_DB` with your actual upstream database credentials. If the file already contains a `DATABASE_URL`, you'll be prompted before overwriting unless `--yes` is passed.
+Write a `DATABASE_URL` connection string template to a `.env` file (or a custom
+file via `--file`). The URL points to the project's PgBeam proxy host. You'll
+need to replace `USER`, `PASS`, and `YOUR_DB` with your actual upstream database
+credentials. If the file already contains a `DATABASE_URL`, you'll be prompted
+before overwriting unless `--yes` is passed.
 
 ## Usage
 
@@ -15,13 +19,15 @@ pgbeam env pull [flags]
 
 ## Options
 
-| Option           | Description                                                             | Required | Default |
-| ---------------- | ----------------------------------------------------------------------- | -------- | ------- |
-| `--file <value>` | Path to the output file                                                 | No       | `.env`  |
-| `--yes`, `-y`    | Skip the confirmation prompt if the file already contains DATABASE\_URL | No       | `false` |
+| Option           | Description                                                            | Required | Default |
+| ---------------- | ---------------------------------------------------------------------- | -------- | ------- |
+| `--file <value>` | Path to the output file                                                | No       | `.env`  |
+| `--yes`, `-y`    | Skip the confirmation prompt if the file already contains DATABASE_URL | No       | `false` |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -39,4 +45,5 @@ pgbeam env pull --yes
 
 ## Output
 
-Prints a success message confirming the file was written and reminds you to replace the placeholder credentials (USER, PASS, YOUR\_DB).
+Prints a success message confirming the file was written and reminds you to
+replace the placeholder credentials (USER, PASS, YOUR_DB).

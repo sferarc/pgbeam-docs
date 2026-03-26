@@ -1,12 +1,12 @@
 ---
 title: Error Handling
 description:
-  Catch and inspect API errors, configure retries, and use idempotency keys
-  in the PgBeam Go SDK.
+  Catch and inspect API errors, configure retries, and use idempotency keys in
+  the PgBeam Go SDK.
 ---
 
-All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check
-for 404 responses, and `errors.As` to extract detailed status information from
+All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for
+404 responses, and `errors.As` to extract detailed status information from
 `*pgbeam.APIError`.
 
 ```go

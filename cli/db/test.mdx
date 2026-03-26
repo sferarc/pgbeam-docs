@@ -5,7 +5,10 @@ description: Test database connection
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Test the connectivity of a database connection by sending a health check through PgBeam to the upstream PostgreSQL server. Validates that the host is reachable, credentials are correct, and SSL is properly configured. Reports the round-trip latency on success.
+Test the connectivity of a database connection by sending a health check through
+PgBeam to the upstream PostgreSQL server. Validates that the host is reachable,
+credentials are correct, and SSL is properly configured. Reports the round-trip
+latency on success.
 
 ## Usage
 
@@ -20,7 +23,9 @@ pgbeam db test <id>
 | `<id>` | ID of the database connection to test | Yes      | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -35,4 +40,6 @@ pgbeam db test db_xxx --json
 
 ## Output
 
-On success, prints the connection latency in milliseconds. On failure, prints the error message and exits with a non-zero code. With `--json`, returns an object with `ok`, `latency_ms`, and `error` fields.
+On success, prints the connection latency in milliseconds. On failure, prints
+the error message and exits with a non-zero code. With `--json`, returns an
+object with `ok`, `latency_ms`, and `error` fields.

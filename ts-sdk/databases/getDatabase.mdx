@@ -11,16 +11,16 @@ Returns a single database by ID.
 
 ```typescript
 const result = await api.databases.getDatabase({
-    pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                          |
-| ----------------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| pathParams.database\_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
+| Parameter              | Type     | Required | Description                                         |
+| ---------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.database_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
 
 ## Response
 

@@ -5,7 +5,10 @@ description: Export account data (GDPR/CCPA)
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Export all account data as required by GDPR and CCPA regulations. Includes your user profile, organizations, projects, databases, active sessions, and audit logs. Use `--file` to write the full export to a JSON file, or `--json` to print the full export to stdout.
+Export all account data as required by GDPR and CCPA regulations. Includes your
+user profile, organizations, projects, databases, active sessions, and audit
+logs. Use `--file` to write the full export to a JSON file, or `--json` to print
+the full export to stdout.
 
 ## Usage
 
@@ -20,7 +23,9 @@ pgbeam account export [flags]
 | `--file <value>` | Write the full export to a JSON file at this path instead of printing to stdout | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -38,4 +43,7 @@ pgbeam account export --json
 
 ## Output
 
-Without `--file` or `--json`, displays a summary showing counts of organizations, projects, databases, sessions, and audit logs. With `--file`, writes the full JSON export to the specified path. With `--json`, outputs the complete export object.
+Without `--file` or `--json`, displays a summary showing counts of
+organizations, projects, databases, sessions, and audit logs. With `--file`,
+writes the full JSON export to the specified path. With `--json`, outputs the
+complete export object.

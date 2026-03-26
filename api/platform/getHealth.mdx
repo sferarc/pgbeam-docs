@@ -24,11 +24,15 @@ Returns the health status of the API server.
 
 ## Quick request
 
-Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN` if the endpoint requires auth.
+Use this as a starting point. Replace the placeholder IDs and set `PGBEAM_TOKEN`
+if the endpoint requires auth.
 
 ```bash
 curl -X GET \
   "$PGBEAM_API_URL/v1/health"
 ```
 
-<APIPage document={"../../../backend/openapi/bundles/public.yaml"} operations={[{"path":"/v1/health","method":"get"}]} />
+<APIPage
+  document={"../../../backend/openapi/bundles/public.yaml"}
+  operations={[{ path: "/v1/health", method: "get" }]}
+/>

@@ -16,9 +16,9 @@ layer — that is a deliberate tradeoff. Synchronizing caches across regions wou
 add latency to every read, which defeats the purpose of caching.
 
 <Callout type="info" title="Caching is opt-in">
-  Caching starts **disabled** for new databases. This is the safe default.
-  Turn it on after traffic is flowing and you know which reads are stable enough
-  to benefit from caching.
+  Caching starts **disabled** for new databases. This is the safe default. Turn
+  it on after traffic is flowing and you know which reads are stable enough to
+  benefit from caching.
 </Callout>
 
 ## When caching helps
@@ -49,6 +49,7 @@ Caching is **not** a good fit for:
     (`CREATE TABLE`, `ALTER`), session-changing commands (`SET`, `DISCARD`), and
     queries with volatile functions (`NOW()`, `RANDOM()`, `pg_advisory_lock()`) are
     never cached.
+
   </Step>
 
   <Step>
@@ -66,6 +67,7 @@ Caching is **not** a good fit for:
     SELECT * FROM products WHERE id = 1;
     SELECT * FROM products WHERE id = 2;
     ```
+
   </Step>
 
   <Step>
@@ -80,6 +82,7 @@ Caching is **not** a good fit for:
       immediately and refreshes the cache in the background.
     - **Miss** — No cached result exists. The query goes to the upstream database,
       and the result is stored in the cache for future requests.
+
   </Step>
 </Steps>
 
@@ -105,8 +108,7 @@ TTL and SWR work together to balance freshness and performance:
  cache write          TTL expires      SWR expires
 ```
 
-- During the TTL window, cached results are returned without any upstream
-  query.
+- During the TTL window, cached results are returned without any upstream query.
 - During the SWR window, the stale result is returned immediately (keeping
   latency low), and PgBeam refreshes the entry in the background.
 - After the SWR window, the entry is treated as a miss and the upstream is
@@ -140,19 +142,15 @@ annotations before forwarding to the upstream, so your database never sees them.
     ```
   </Tab>
 
-  <Tab value="Custom TTL and SWR">
-    ```sql
-    -- Cache for 5 minutes, serve stale for 1 minute during refresh
-    /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products;
-    ```
-  </Tab>
+<Tab value="Custom TTL and SWR">
+  ```sql -- Cache for 5 minutes, serve stale for 1 minute during refresh /*
+  @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products; ```
+</Tab>
 
-  <Tab value="Disable caching">
-    ```sql
-    -- Force this query to always hit the upstream
-    /* @pgbeam:cache noCache */ SELECT NOW();
-    ```
-  </Tab>
+<Tab value="Disable caching">
+  ```sql -- Force this query to always hit the upstream /* @pgbeam:cache noCache
+  */ SELECT NOW(); ```
+</Tab>
 
   <Tab value="Route to replica">
     ```sql
@@ -225,13 +223,13 @@ PgBeam uses a two-layer cache for speed and resilience:
 | **L1** | Per-process       | Microseconds    | Process-local; failure is extremely rare |
 | **L2** | Shared per region | Sub-millisecond | Fail-open: queries go to upstream        |
 
-L1 is checked first. On an L1 miss, L2 is checked. On an L2 miss, the query
-goes to the upstream database. Results from the upstream are written back to
-both layers.
+L1 is checked first. On an L1 miss, L2 is checked. On an L2 miss, the query goes
+to the upstream database. Results from the upstream are written back to both
+layers.
 
-If the shared cache is unavailable, PgBeam falls through to the origin
-database. Your application continues working — it just loses the caching
-benefit until the cache recovers.
+If the shared cache is unavailable, PgBeam falls through to the origin database.
+Your application continues working — it just loses the caching benefit until the
+cache recovers.
 
 ## Cache rules
 
@@ -298,6 +296,8 @@ enable it from the dashboard or API:
 
 ## Further reading
 
-- [Read Replicas](/docs/replicas) — Route reads to replicas for load distribution
+- [Read Replicas](/docs/replicas) — Route reads to replicas for load
+  distribution
 - [Plans & Limits](/docs/plans) — Cache entry limits and defaults per plan tier
-- [Troubleshooting](/docs/troubleshooting) — Debugging "cache is not doing anything"
+- [Troubleshooting](/docs/troubleshooting) — Debugging "cache is not doing
+  anything"

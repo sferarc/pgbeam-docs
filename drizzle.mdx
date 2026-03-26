@@ -20,6 +20,7 @@ are required.
     ```bash title=".env"
     DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
     ```
+
   </Step>
 
   <Step>
@@ -48,6 +49,7 @@ are required.
         ```
       </Tab>
     </Tabs>
+
   </Step>
 
   <Step>
@@ -58,14 +60,15 @@ are required.
     ```
 
     If this returns results, Drizzle is connected through PgBeam.
+
   </Step>
 </Steps>
 
 ## Connection pool sizing
 
-PgBeam handles upstream connection pooling, so the `pg` pool on your
-application side should be small. A pool size of 3-5 per application instance
-is typically sufficient.
+PgBeam handles upstream connection pooling, so the `pg` pool on your application
+side should be small. A pool size of 3-5 per application instance is typically
+sufficient.
 
 | Deployment type        | Recommended `max` pool size |
 | ---------------------- | --------------------------- |

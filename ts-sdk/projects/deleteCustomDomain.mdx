@@ -11,16 +11,16 @@ Removes a custom domain from the project and revokes its TLS certificate.
 
 ```typescript
 const result = await api.projects.deleteCustomDomain({
-    pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx", domain_id: "dom_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                                |
-| ---------------------- | -------- | -------- | ---------------------------------------------------------- |
-| pathParams.project\_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).       |
-| pathParams.domain\_id  | `string` | Yes      | Unique custom domain identifier (prefixed, e.g. dom\_xxx). |
+| Parameter             | Type     | Required | Description                                               |
+| --------------------- | -------- | -------- | --------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| pathParams.domain_id  | `string` | Yes      | Unique custom domain identifier (prefixed, e.g. dom_xxx). |
 
 ## Response
 

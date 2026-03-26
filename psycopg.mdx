@@ -20,6 +20,7 @@ integration.
     ```bash title="Environment variable"
     export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
     ```
+
   </Step>
 
   <Step>
@@ -37,6 +38,7 @@ integration.
 
     conn.close()
     ```
+
   </Step>
 
   <Step>
@@ -59,6 +61,7 @@ integration.
             cur.execute("SELECT 1")
             print(cur.fetchone())
     ```
+
   </Step>
 </Steps>
 
@@ -95,6 +98,7 @@ engine configuration to point at PgBeam:
     url = re.sub(r"^postgres(ql)?://", "postgresql+psycopg://", os.environ["DATABASE_URL"])
     engine = create_engine(url, pool_size=5, max_overflow=0)
     ```
+
   </Tab>
 
   <Tab value="SQLAlchemy 1.x">
@@ -104,12 +108,13 @@ engine configuration to point at PgBeam:
 
     engine = create_engine(os.environ["DATABASE_URL"], pool_size=5, max_overflow=0)
     ```
+
   </Tab>
 </Tabs>
 
 <Callout type="info">
-  Set `max_overflow=0` to prevent SQLAlchemy from creating connections beyond the
-  pool size. PgBeam handles overflow at the proxy level.
+  Set `max_overflow=0` to prevent SQLAlchemy from creating connections beyond
+  the pool size. PgBeam handles overflow at the proxy level.
 </Callout>
 
 ## Caching

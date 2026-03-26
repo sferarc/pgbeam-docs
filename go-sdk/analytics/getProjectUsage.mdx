@@ -18,13 +18,13 @@ result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProje
 
 ## Parameters
 
-| Parameter        | Type                            | Required | Description                                          |
-| ---------------- | ------------------------------- | -------- | ---------------------------------------------------- |
-| ctx              | `context.Context`               | Yes      | Request context                                      |
-| projectID        | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| params           | `*pgbeam.GetProjectUsageParams` | Yes      | Query parameters                                     |
-| params.StartDate | `string`                        | Yes      | Start date (inclusive, YYYY-MM-DD).                  |
-| params.EndDate   | `string`                        | Yes      | End date (inclusive, YYYY-MM-DD).                    |
+| Parameter        | Type                            | Required | Description                                         |
+| ---------------- | ------------------------------- | -------- | --------------------------------------------------- |
+| ctx              | `context.Context`               | Yes      | Request context                                     |
+| projectID        | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params           | `*pgbeam.GetProjectUsageParams` | Yes      | Query parameters                                    |
+| params.StartDate | `string`                        | Yes      | Start date (inclusive, YYYY-MM-DD).                 |
+| params.EndDate   | `string`                        | Yes      | End date (inclusive, YYYY-MM-DD).                   |
 
 ## Response
 

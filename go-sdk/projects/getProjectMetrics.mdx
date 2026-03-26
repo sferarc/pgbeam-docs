@@ -15,13 +15,13 @@ result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter     | Type                              | Required | Description                                          |
-| ------------- | --------------------------------- | -------- | ---------------------------------------------------- |
-| ctx           | `context.Context`                 | Yes      | Request context                                      |
-| projectID     | `string`                          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| params        | `*pgbeam.GetProjectMetricsParams` | No       | Query parameters                                     |
-| params.Limit  | `int`                             | No       | Maximum number of recent snapshots to return.        |
-| params.Region | `string`                          | No       | Filter metrics by region code.                       |
+| Parameter     | Type                              | Required | Description                                         |
+| ------------- | --------------------------------- | -------- | --------------------------------------------------- |
+| ctx           | `context.Context`                 | Yes      | Request context                                     |
+| projectID     | `string`                          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params        | `*pgbeam.GetProjectMetricsParams` | No       | Query parameters                                    |
+| params.Limit  | `int`                             | No       | Maximum number of recent snapshots to return.       |
+| params.Region | `string`                          | No       | Filter metrics by region code.                      |
 
 ## Response
 

@@ -24,7 +24,8 @@ Mark an onboarding step as complete or dismiss the checklist.
 
 ## Quick request
 
-Use this as a starting point. Replace the placeholder IDs, set `PGBEAM_TOKEN`, and create `body.json` from the schema below.
+Use this as a starting point. Replace the placeholder IDs, set `PGBEAM_TOKEN`,
+and create `body.json` from the schema below.
 
 ```bash
 curl -X PATCH \
@@ -34,4 +35,9 @@ curl -X PATCH \
   --data @body.json
 ```
 
-<APIPage document={"../../../backend/openapi/bundles/public.yaml"} operations={[{"path":"/v1/organizations/{org_id}/onboarding","method":"patch"}]} />
+<APIPage
+  document={"../../../backend/openapi/bundles/public.yaml"}
+  operations={[
+    { path: "/v1/organizations/{org_id}/onboarding", method: "patch" },
+  ]}
+/>

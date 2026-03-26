@@ -11,22 +11,22 @@ Adds a read replica to a database.
 
 ```typescript
 const result = await api.projects.createReplica({
-    pathParams: { database_id: "db_xxx" },
-    body: {
-      host: "replica.us-west-2.rds.amazonaws.com",
-      port: 5432,
-    },
-  });
+  pathParams: { database_id: "db_xxx" },
+  body: {
+    host: "replica.us-west-2.rds.amazonaws.com",
+    port: 5432,
+  },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type      | Required | Description                                          |
-| ----------------------- | --------- | -------- | ---------------------------------------------------- |
-| pathParams.database\_id | `string`  | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
-| body.host               | `string`  | Yes      | PostgreSQL replica host.                             |
-| body.port               | `number`  | Yes      | PostgreSQL replica port.                             |
-| body.ssl\_mode          | `SSLMode` | No       |                                                      |
+| Parameter              | Type      | Required | Description                                         |
+| ---------------------- | --------- | -------- | --------------------------------------------------- |
+| pathParams.database_id | `string`  | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
+| body.host              | `string`  | Yes      | PostgreSQL replica host.                            |
+| body.port              | `number`  | Yes      | PostgreSQL replica port.                            |
+| body.ssl_mode          | `SSLMode` | No       |                                                     |
 
 ## Response
 
@@ -45,9 +45,9 @@ const client = new PgBeamClient({
 const result = await client.api.projects.createReplica({
   pathParams: { database_id: "db_xxx" },
   body: {
-      host: "replica.us-west-2.rds.amazonaws.com",
-      port: 5432,
-    },
+    host: "replica.us-west-2.rds.amazonaws.com",
+    port: 5432,
+  },
 });
 ```
 

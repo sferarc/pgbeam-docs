@@ -5,24 +5,24 @@ description: Get query insights for a project
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Returns aggregated query-level analytics for a project including top queries
-by count, cache hit/miss summary, and latency statistics.
+Returns aggregated query-level analytics for a project including top queries by
+count, cache hit/miss summary, and latency statistics.
 
 ## Usage
 
 ```typescript
 const result = await api.analytics.getProjectInsights({
-    pathParams: { project_id: "prj_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter              | Type                            | Required | Description                                          |
-| ---------------------- | ------------------------------- | -------- | ---------------------------------------------------- |
-| pathParams.project\_id | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| queryParams.range      | `"1h" \| "6h" \| "24h" \| "7d"` | No       | Time range to query. Defaults to 24h.                |
-| queryParams.limit      | `number`                        | No       | Maximum number of top queries to return (1-100).     |
+| Parameter             | Type                            | Required | Description                                         |
+| --------------------- | ------------------------------- | -------- | --------------------------------------------------- |
+| pathParams.project_id | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.range     | `"1h" \| "6h" \| "24h" \| "7d"` | No       | Time range to query. Defaults to 24h.               |
+| queryParams.limit     | `number`                        | No       | Maximum number of top queries to return (1-100).    |
 
 ## Response
 

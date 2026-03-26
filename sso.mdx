@@ -35,6 +35,7 @@ both, OIDC is generally simpler to configure.
     In your identity provider (Okta, Azure AD, Google Workspace, OneLogin, etc.),
     create a new SAML 2.0 application. Most providers have a "custom SAML app"
     option.
+
   </Step>
 
   <Step>
@@ -47,6 +48,7 @@ both, OIDC is generally simpler to configure.
     | ---------------------------------------- | ----------------------------------- |
     | **ACS URL** (Assertion Consumer Service) | Where your IdP sends SAML responses |
     | **Entity ID** (SP Entity ID)             | PgBeam's SAML identifier            |
+
   </Step>
 
   <Step>
@@ -60,6 +62,7 @@ both, OIDC is generally simpler to configure.
     | `email` or `NameID` | Yes      | User email   |
     | `firstName`         | No       | Display name |
     | `lastName`          | No       | Display name |
+
   </Step>
 
   <Step>
@@ -71,6 +74,7 @@ both, OIDC is generally simpler to configure.
 
     If your IdP does not provide a metadata URL, you can paste the metadata XML
     directly.
+
   </Step>
 
   <Step>
@@ -79,6 +83,7 @@ both, OIDC is generally simpler to configure.
     Click **Test** in the PgBeam dashboard to verify the SAML flow. This opens a
     new window that walks through the full sign-in process. If the test succeeds,
     you will see a confirmation with the authenticated user's details.
+
   </Step>
 </Steps>
 
@@ -90,6 +95,7 @@ both, OIDC is generally simpler to configure.
 
     In your identity provider, create a new OpenID Connect (OIDC) application.
     Choose "Web Application" as the application type.
+
   </Step>
 
   <Step>
@@ -97,6 +103,7 @@ both, OIDC is generally simpler to configure.
 
     Set the **redirect URI** to the value shown in PgBeam's SSO configuration page
     (under **Settings > Security > Configure SSO**).
+
   </Step>
 
   <Step>
@@ -112,6 +119,7 @@ both, OIDC is generally simpler to configure.
 
     PgBeam uses the discovery URL to automatically fetch authorization endpoints,
     token endpoints, and signing keys.
+
   </Step>
 
   <Step>
@@ -119,6 +127,7 @@ both, OIDC is generally simpler to configure.
 
     Click **Test** in the PgBeam dashboard to verify the OIDC flow. This redirects
     to your IdP for authentication and confirms the user details returned.
+
   </Step>
 </Steps>
 
@@ -147,8 +156,8 @@ Admins and Owners can change a user's role after they have been provisioned.
 
 ## SSO enforcement
 
-Once SSO is configured and tested, you can **enforce** it for your
-organization. Enforcement means:
+Once SSO is configured and tested, you can **enforce** it for your organization.
+Enforcement means:
 
 - All organization members **must** authenticate via SSO
 - Password-based login is **disabled** for the organization
@@ -164,8 +173,8 @@ organization. Enforcement means:
 ### Enable enforcement
 
 Go to **Settings > Security** in the dashboard. After configuring SSO, toggle
-**Require SSO for all members**. Confirm the action — all non-owner members
-will be signed out immediately.
+**Require SSO for all members**. Confirm the action — all non-owner members will
+be signed out immediately.
 
 ## Troubleshooting
 
@@ -196,6 +205,7 @@ will be signed out immediately.
 
 ## Further reading
 
-- [Organizations](/docs/organizations) — Roles, team seats, and member management
+- [Organizations](/docs/organizations) — Roles, team seats, and member
+  management
 - [Plans & Limits](/docs/plans) — SSO is available on the Scale plan
 - [API Keys](/docs/api-keys) — Programmatic access that does not require SSO

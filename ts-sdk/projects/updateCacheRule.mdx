@@ -5,30 +5,34 @@ description: Update cache rule
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Enable or disable caching for a specific query shape, with optional
-TTL and SWR overrides. Requires the query to exist in the cache rules.
+Enable or disable caching for a specific query shape, with optional TTL and SWR
+overrides. Requires the query to exist in the cache rules.
 
 ## Usage
 
 ```typescript
 const result = await api.projects.updateCacheRule({
-    pathParams: { project_id: "prj_xxx", database_id: "db_xxx", query_hash: "..." },
-    body: {
-      cache_enabled: true,
-    },
-  });
+  pathParams: {
+    project_id: "prj_xxx",
+    database_id: "db_xxx",
+    query_hash: "...",
+  },
+  body: {
+    cache_enabled: true,
+  },
+});
 ```
 
 ## Parameters
 
-| Parameter                | Type      | Required | Description                                           |
-| ------------------------ | --------- | -------- | ----------------------------------------------------- |
-| pathParams.project\_id   | `string`  | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).  |
-| pathParams.database\_id  | `string`  | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).  |
-| pathParams.query\_hash   | `string`  | Yes      | xxhash64 hex of the normalized SQL.                   |
-| body.cache\_enabled      | `boolean` | Yes      | Whether to enable caching for this query shape.       |
-| body.cache\_ttl\_seconds | `number`  | No       | TTL override in seconds. Null to use project default. |
-| body.cache\_swr\_seconds | `number`  | No       | SWR override in seconds. Null to use project default. |
+| Parameter              | Type      | Required | Description                                           |
+| ---------------------- | --------- | -------- | ----------------------------------------------------- |
+| pathParams.project_id  | `string`  | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).   |
+| pathParams.database_id | `string`  | Yes      | Unique database identifier (prefixed, e.g. db_xxx).   |
+| pathParams.query_hash  | `string`  | Yes      | xxhash64 hex of the normalized SQL.                   |
+| body.cache_enabled     | `boolean` | Yes      | Whether to enable caching for this query shape.       |
+| body.cache_ttl_seconds | `number`  | No       | TTL override in seconds. Null to use project default. |
+| body.cache_swr_seconds | `number`  | No       | SWR override in seconds. Null to use project default. |
 
 ## Response
 
@@ -45,10 +49,14 @@ const client = new PgBeamClient({
 });
 
 const result = await client.api.projects.updateCacheRule({
-  pathParams: { project_id: "prj_xxx", database_id: "db_xxx", query_hash: "..." },
+  pathParams: {
+    project_id: "prj_xxx",
+    database_id: "db_xxx",
+    query_hash: "...",
+  },
   body: {
-      cache_enabled: true,
-    },
+    cache_enabled: true,
+  },
 });
 ```
 

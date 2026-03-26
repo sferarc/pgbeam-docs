@@ -5,25 +5,25 @@ description: List cache rules
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Returns the cache rules for a database, showing all observed query
-shapes with their stats and cache recommendations.
+Returns the cache rules for a database, showing all observed query shapes with
+their stats and cache recommendations.
 
 ## Usage
 
 ```typescript
 const result = await api.projects.listCacheRules({
-    pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                            |
-| ----------------------- | -------- | -------- | ------------------------------------------------------ |
-| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx).   |
-| pathParams.database\_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db\_xxx).   |
-| queryParams.page\_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
-| queryParams.page\_token | `string` | No       | Opaque token for cursor-based pagination.              |
+| Parameter              | Type     | Required | Description                                            |
+| ---------------------- | -------- | -------- | ------------------------------------------------------ |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
+| pathParams.database_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db_xxx).    |
+| queryParams.page_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No       | Opaque token for cursor-based pagination.              |
 
 ## Response
 

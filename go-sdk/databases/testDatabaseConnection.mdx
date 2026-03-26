@@ -5,7 +5,8 @@ description: Test database connection
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Attempts to connect to the upstream database using the stored credentials and returns the result.
+Attempts to connect to the upstream database using the stored credentials and
+returns the result.
 
 ## Usage
 
@@ -15,11 +16,11 @@ result, err := client.Databases.TestDatabaseConnection(ctx, "prj_xxx", "db_xxx")
 
 ## Parameters
 
-| Parameter  | Type              | Required | Description                                          |
-| ---------- | ----------------- | -------- | ---------------------------------------------------- |
-| ctx        | `context.Context` | Yes      | Request context                                      |
-| projectID  | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| databaseID | `string`          | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
+| Parameter  | Type              | Required | Description                                         |
+| ---------- | ----------------- | -------- | --------------------------------------------------- |
+| ctx        | `context.Context` | Yes      | Request context                                     |
+| projectID  | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| databaseID | `string`          | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
 
 ## Response
 

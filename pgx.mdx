@@ -20,6 +20,7 @@ code changes.
     ```bash title="Environment variable"
     export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
     ```
+
   </Step>
 
   <Step>
@@ -51,6 +52,7 @@ code changes.
     	fmt.Println(greeting)
     }
     ```
+
   </Step>
 
   <Step>
@@ -67,6 +69,7 @@ code changes.
     config.MinConns = 1
     pool, err := pgxpool.NewWithConfig(context.Background(), config)
     ```
+
   </Step>
 </Steps>
 
@@ -103,9 +106,9 @@ config, _ := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
 
 ### Automatic caching via cache rules
 
-For standard queries, PgBeam tracks the SQL shapes flowing through your
-project. Enable caching for specific shapes through [Cache Rules](/docs/cache)
-in the dashboard — no code changes needed.
+For standard queries, PgBeam tracks the SQL shapes flowing through your project.
+Enable caching for specific shapes through [Cache Rules](/docs/cache) in the
+dashboard — no code changes needed.
 
 ### SQL annotations for fine-grained control
 
@@ -171,7 +174,8 @@ Run migrations directly against the origin database:
 DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" go run ./cmd/migrate
 ```
 
-This applies to all migration tools — [golang-migrate](https://github.com/golang-migrate/migrate),
+This applies to all migration tools —
+[golang-migrate](https://github.com/golang-migrate/migrate),
 [goose](https://github.com/pressly/goose), [atlas](https://atlasgo.io/), or
 custom migration scripts.
 

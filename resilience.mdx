@@ -37,9 +37,9 @@ Closed  ──3 failures──▶  Open  ──cooldown──▶  Half-open
                         Open (longer cooldown)
 ```
 
-The initial cooldown is 5 seconds. Each failed probe doubles the cooldown, up
-to a maximum of 60 seconds. A successful probe immediately closes the circuit
-and restores normal traffic.
+The initial cooldown is 5 seconds. Each failed probe doubles the cooldown, up to
+a maximum of 60 seconds. A successful probe immediately closes the circuit and
+restores normal traffic.
 
 ### What your application sees
 
@@ -62,9 +62,9 @@ circuit breaker gives the upstream breathing room to recover.
 
 ## Scale-to-zero
 
-Projects with no active connections for 5 minutes enter a **parked** state.
-This is transparent to your application — the first new connection triggers a
-cold start that re-initializes the project.
+Projects with no active connections for 5 minutes enter a **parked** state. This
+is transparent to your application — the first new connection triggers a cold
+start that re-initializes the project.
 
 ### What gets suspended
 
@@ -107,8 +107,8 @@ degraded and may open the circuit breaker after repeated failures.
 ### Replica health
 
 Read replicas are checked independently. An unhealthy replica is removed from
-the round-robin rotation automatically. When it recovers, it is re-added
-without manual intervention.
+the round-robin rotation automatically. When it recovers, it is re-added without
+manual intervention.
 
 | Event               | Action                                                                                      |
 | ------------------- | ------------------------------------------------------------------------------------------- |
@@ -128,8 +128,8 @@ of failing.
 | **L2**      | Shared per region | On failure, queries bypass L2 and go to upstream |
 
 This means a shared cache outage results in higher upstream load (cache misses)
-but never in dropped queries. Your application continues to work — it just
-loses the caching benefit temporarily.
+but never in dropped queries. Your application continues to work — it just loses
+the caching benefit temporarily.
 
 ## Upstream TLS and SNI
 

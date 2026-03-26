@@ -5,7 +5,9 @@ description: Show project query insights
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Display query performance insights for the linked project, including cache hit rate, average and P99 latency, and the top queries by call count. Use `--range` to adjust the time window.
+Display query performance insights for the linked project, including cache hit
+rate, average and P99 latency, and the top queries by call count. Use `--range`
+to adjust the time window.
 
 ## Usage
 
@@ -20,7 +22,9 @@ pgbeam analytics insights [flags]
 | `--range <value>` | Time window for insights: 1h, 6h, 24h, or 7d | No       | `24h`   |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -41,4 +45,6 @@ pgbeam analytics insights --json
 
 ## Output
 
-Displays cache hit rate, average latency, and P99 latency, followed by a table of top queries with columns: Query (truncated), Count, Avg (ms), and Cache Hits. With `--json`, returns the full insights response.
+Displays cache hit rate, average latency, and P99 latency, followed by a table
+of top queries with columns: Query (truncated), Count, Avg (ms), and Cache Hits.
+With `--json`, returns the full insights response.

@@ -16,8 +16,8 @@ PgBeam supports two types of API keys:
 | **Organization keys** | `pbo_` | Single organization    | **Settings > Organization > API Keys** |
 
 <Callout type="info">
-  Use **organization keys** for CI/CD and shared automation. Use **personal keys**
-  for your own tools and scripts.
+  Use **organization keys** for CI/CD and shared automation. Use **personal
+  keys** for your own tools and scripts.
 </Callout>
 
 ## Create an API key
@@ -28,6 +28,7 @@ PgBeam supports two types of API keys:
 
     From the dashboard, go to **Settings** and select the relevant **API Keys**
     page (Account or Organization level).
+
   </Step>
 
   <Step>
@@ -38,6 +39,7 @@ PgBeam supports two types of API keys:
     - **Name** — A label to identify the key (e.g., "CI/CD", "monitoring",
       "staging deploy")
     - **Expiry** — Optional. Choose 30 days, 90 days, 365 days, or no expiry.
+
   </Step>
 
   <Step>
@@ -47,6 +49,7 @@ PgBeam supports two types of API keys:
       The full key is shown **only once** after creation. Copy it immediately and
       store it securely. You cannot retrieve the full key after closing the dialog.
     </Callout>
+
   </Step>
 </Steps>
 
@@ -81,6 +84,7 @@ Pass the key in the `Authorization` header as a bearer token:
         headers={"X-API-Key": os.environ["PGBEAM_API_KEY"]},
     )
     ```
+
   </Tab>
 
   <Tab value="CLI">
@@ -93,6 +97,7 @@ Pass the key in the `Authorization` header as a bearer token:
     export PGBEAM_TOKEN=pbu_...
     pgbeam projects list
     ```
+
   </Tab>
 </Tabs>
 
@@ -103,18 +108,21 @@ Pass the key in the `Authorization` header as a bearer token:
     ### Create a new key
 
     Generate a new key with the same permissions as the one you want to rotate.
+
   </Step>
 
   <Step>
     ### Update your application
 
     Update your application, CI/CD pipeline, or scripts to use the new key.
+
   </Step>
 
   <Step>
     ### Verify the new key
 
     Confirm the new key works correctly in all environments.
+
   </Step>
 
   <Step>
@@ -122,6 +130,7 @@ Pass the key in the `Authorization` header as a bearer token:
 
     Delete the old key from **Settings > API Keys**. Revoked keys stop working
     immediately.
+
   </Step>
 </Steps>
 

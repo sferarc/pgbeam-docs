@@ -5,7 +5,10 @@ description: List cache rules for a database
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List all tracked query shapes and their caching status for a database. Shows the query hash, a truncated SQL pattern, query type, whether caching is enabled, call count, average latency, and PgBeam's caching recommendation. Results are paginated — use `--page-size` and `--page-token` to navigate pages.
+List all tracked query shapes and their caching status for a database. Shows the
+query hash, a truncated SQL pattern, query type, whether caching is enabled,
+call count, average latency, and PgBeam's caching recommendation. Results are
+paginated — use `--page-size` and `--page-token` to navigate pages.
 
 ## Usage
 
@@ -22,7 +25,9 @@ pgbeam cache-rules list [flags]
 | `--page-token <value>`  | Pagination token returned from a previous list call to fetch the next page | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -43,4 +48,6 @@ pgbeam cache-rules list --database-id db_xxx --json
 
 ## Output
 
-Displays a table with columns: Hash, Query, Type, Cached, Calls, Avg (ms), and Recommendation. If more pages are available, prints the `--page-token` value for the next page. With `--json`, returns the full paginated response.
+Displays a table with columns: Hash, Query, Type, Cached, Calls, Avg (ms), and
+Recommendation. If more pages are available, prints the `--page-token` value for
+the next page. With `--json`, returns the full paginated response.

@@ -43,8 +43,8 @@ Each client connection gets a **dedicated** upstream connection for its entire
 lifetime. No connection sharing happens between clients.
 
 **How it works:** When a client connects, PgBeam dials an upstream connection
-(or reuses an idle one from the same user's pool). That upstream connection stays
-assigned to the client until it disconnects.
+(or reuses an idle one from the same user's pool). That upstream connection
+stays assigned to the client until it disconnects.
 
 **Best for:**
 
@@ -54,8 +54,8 @@ assigned to the client until it disconnects.
 - `SET` parameters that must persist across queries
 - Prepared statements created with `PREPARE`
 
-**Tradeoff:** Every concurrent client requires its own upstream connection.
-If you have 100 concurrent clients, you need 100 upstream connections.
+**Tradeoff:** Every concurrent client requires its own upstream connection. If
+you have 100 concurrent clients, you need 100 upstream connections.
 
 ### Transaction mode
 
@@ -63,10 +63,10 @@ The upstream connection is held only for the **duration of a transaction**.
 After `COMMIT` or `ROLLBACK`, the connection is reset with `DISCARD ALL` and
 returned to the pool. Other clients can reuse it immediately.
 
-**How it works:** When a client starts a transaction (explicitly or
-implicitly via a query), PgBeam acquires an upstream connection. When the
-transaction ends, the connection goes back to the pool. Between transactions,
-the client holds no upstream connection.
+**How it works:** When a client starts a transaction (explicitly or implicitly
+via a query), PgBeam acquires an upstream connection. When the transaction ends,
+the connection goes back to the pool. Between transactions, the client holds no
+upstream connection.
 
 **Best for:**
 
@@ -93,8 +93,8 @@ the client holds no upstream connection.
 The upstream connection is acquired and released **per SQL statement**. This
 provides the finest-grained sharing.
 
-**How it works:** Each individual SQL statement gets an upstream connection
-for its execution. After the statement completes, the connection is immediately
+**How it works:** Each individual SQL statement gets an upstream connection for
+its execution. After the statement completes, the connection is immediately
 returned.
 
 **Best for:**
@@ -134,8 +134,8 @@ if you have a purely read-only workload.
 ## Pool sizing guidance
 
 Since PgBeam handles upstream pooling, your application's client-side pool
-should be smaller than you might be used to. The goal is to let PgBeam
-multiplex — having a large client pool defeats the purpose.
+should be smaller than you might be used to. The goal is to let PgBeam multiplex
+— having a large client pool defeats the purpose.
 
 | Deployment type           | Recommended client pool size |
 | ------------------------- | ---------------------------- |
@@ -151,8 +151,8 @@ in-use connections. Once the limit is reached, new requests wait in a queue
 until a connection is released.
 
 The default is **200**, which works well for most managed PostgreSQL providers.
-Lower it if your upstream database has strict connection limits (e.g., small
-RDS instances), or raise it for high-throughput workloads with headroom on the
+Lower it if your upstream database has strict connection limits (e.g., small RDS
+instances), or raise it for high-throughput workloads with headroom on the
 upstream.
 
 Configure via the dashboard pool settings, the API (`pool_config.max_active`),
@@ -166,16 +166,16 @@ With 4 app servers each running a pool of 20, you need the upstream database to
 handle 80 connections.
 
 **With PgBeam (transaction mode):** Those same 4 servers can each use a pool
-of 5. PgBeam multiplexes 20 client connections into a smaller number of
-upstream connections, because most connections are idle between transactions.
+of 5. PgBeam multiplexes 20 client connections into a smaller number of upstream
+connections, because most connections are idle between transactions.
 
 ## Connection lifecycle
 
 ### Pool acquire
 
-When a client connects, PgBeam looks for an idle upstream connection in the
-pool keyed by the client's username. If one is available, it is assigned
-immediately. If not, PgBeam dials a new connection to the upstream database.
+When a client connects, PgBeam looks for an idle upstream connection in the pool
+keyed by the client's username. If one is available, it is assigned immediately.
+If not, PgBeam dials a new connection to the upstream database.
 
 Your credentials are forwarded to the upstream for authentication. PgBeam does
 **not** store user passwords — credentials are passed through transparently.
@@ -191,9 +191,9 @@ When the client disconnects (or the transaction ends, in transaction mode):
 
 ### Idle connection cleanup
 
-Idle upstream connections are held for a period before being closed. This
-avoids the overhead of re-establishing connections for workloads with regular
-traffic patterns, while freeing resources during quiet periods.
+Idle upstream connections are held for a period before being closed. This avoids
+the overhead of re-establishing connections for workloads with regular traffic
+patterns, while freeing resources during quiet periods.
 
 ## Changing pool mode
 
@@ -243,7 +243,9 @@ const pool = new Pool({
 });
 
 export async function handler(event) {
-  const result = await pool.query("SELECT * FROM users WHERE id = $1", [event.userId]);
+  const result = await pool.query("SELECT * FROM users WHERE id = $1", [
+    event.userId,
+  ]);
   return result.rows[0];
 }
 ```
@@ -269,5 +271,7 @@ DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx prisma migrat
 ## Further reading
 
 - [Plans & Limits](/docs/plans) — Connection limits per plan tier
-- [Troubleshooting](/docs/troubleshooting) — Debugging `53300` (too many connections)
-- [Resilience](/docs/resilience) — Connection reset, circuit breakers, and recovery
+- [Troubleshooting](/docs/troubleshooting) — Debugging `53300` (too many
+  connections)
+- [Resilience](/docs/resilience) — Connection reset, circuit breakers, and
+  recovery

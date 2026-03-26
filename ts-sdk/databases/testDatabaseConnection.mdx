@@ -5,22 +5,23 @@ description: Test database connection
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Attempts to connect to the upstream database using the stored credentials and returns the result.
+Attempts to connect to the upstream database using the stored credentials and
+returns the result.
 
 ## Usage
 
 ```typescript
 const result = await api.databases.testDatabaseConnection({
-    pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
-  });
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                          |
-| ----------------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.project\_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj\_xxx). |
-| pathParams.database\_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
+| Parameter              | Type     | Required | Description                                         |
+| ---------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.database_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
 
 ## Response
 

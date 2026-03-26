@@ -1,7 +1,9 @@
 ---
 title: Organizations
 icon: Building2
-description: Manage teams, invite members, assign roles, and control access across projects.
+description:
+  Manage teams, invite members, assign roles, and control access across
+  projects.
 ---
 
 Organizations are the top-level container in PgBeam. Every project, database,
@@ -16,9 +18,13 @@ and one for staging, or separate organizations for different clients.
 
 Each organization has:
 
-- A **slug** that appears in dashboard URLs (e.g., `dash.pgbeam.com/my-team/projects`). The slug is set at creation and cannot be changed.
-- A **billing subscription** — each organization has its own plan, payment method, and invoice history.
-- **Shared quotas** — all projects within the organization share the same query, connection, and data transfer limits.
+- A **slug** that appears in dashboard URLs (e.g.,
+  `dash.pgbeam.com/my-team/projects`). The slug is set at creation and cannot be
+  changed.
+- A **billing subscription** — each organization has its own plan, payment
+  method, and invoice history.
+- **Shared quotas** — all projects within the organization share the same query,
+  connection, and data transfer limits.
 
 ## Create an organization
 
@@ -42,6 +48,7 @@ Each organization has:
     ### Open member settings
 
     Go to **Settings > Members** in the dashboard.
+
   </Step>
 
   <Step>
@@ -49,6 +56,7 @@ Each organization has:
 
     Click **Invite**, enter the recipient's email address, and select a role. The
     invited user receives an email with a link to accept and join the organization.
+
   </Step>
 
   <Step>
@@ -56,6 +64,7 @@ Each organization has:
 
     Pending invitations appear in the Members list. You can resend or revoke an
     invitation at any time before it is accepted.
+
   </Step>
 </Steps>
 
@@ -113,8 +122,7 @@ pool.
 | **Databases**     | Maximum number of database registrations                 |
 | **Query shapes**  | Maximum number of distinct query fingerprints tracked    |
 
-Monitor usage from **Settings > Billing** in the dashboard, or
-programmatically:
+Monitor usage from **Settings > Billing** in the dashboard, or programmatically:
 
 <Tabs items={["CLI", "API"]}>
   <Tab value="CLI">
@@ -179,6 +187,7 @@ Only owners can delete an organization. Deleting an organization:
 
 ## Further reading
 
-- [Plans & Limits](/docs/plans) — Quota details and overage billing for each tier
+- [Plans & Limits](/docs/plans) — Quota details and overage billing for each
+  tier
 - [API Keys](/docs/api-keys) — Organization-scoped keys for CI/CD and automation
 - [SSO](/docs/sso) — Enterprise single sign-on for organization authentication

@@ -11,16 +11,16 @@ Removes a read replica from a database.
 
 ```typescript
 const result = await api.projects.deleteReplica({
-    pathParams: { database_id: "db_xxx", replica_id: "rep_xxx" },
-  });
+  pathParams: { database_id: "db_xxx", replica_id: "rep_xxx" },
+});
 ```
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                          |
-| ----------------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.database\_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db\_xxx). |
-| pathParams.replica\_id  | `string` | Yes      | Unique replica identifier (prefixed, e.g. rep\_xxx). |
+| Parameter              | Type     | Required | Description                                         |
+| ---------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.database_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
+| pathParams.replica_id  | `string` | Yes      | Unique replica identifier (prefixed, e.g. rep_xxx). |
 
 ## Response
 

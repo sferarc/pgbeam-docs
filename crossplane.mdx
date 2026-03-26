@@ -3,8 +3,8 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
-  Kubernetes custom resources using the Crossplane provider.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
+  spend limits as Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
@@ -14,102 +14,107 @@ projects, databases, replicas, custom domains, cache rules, and spend limits.
 ## Setup
 
 <Steps>
-  <Step>
-    ### Install the provider
+<Step>
 
-    <Callout type="info">
-      The Crossplane provider is coming soon. Registry publishing is on the roadmap.
-    </Callout>
+### Install the provider
 
-    ```yaml title="provider.yaml"
-    apiVersion: pkg.crossplane.io/v1
-    kind: Provider
-    metadata:
-      name: provider-pgbeam
-    spec:
-      package: ghcr.io/pgbeam/provider-pgbeam:latest
-    ```
+<Callout type="info">
+  The Crossplane provider is coming soon. Registry publishing is on the roadmap.
+</Callout>
 
-    ```bash
-    kubectl apply -f provider.yaml
-    ```
-  </Step>
+```yaml title="provider.yaml"
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-pgbeam
+spec:
+  package: ghcr.io/pgbeam/provider-pgbeam:latest
+```
 
-  <Step>
-    ### Configure credentials
+```bash
+kubectl apply -f provider.yaml
+```
 
-    Create a Secret with your PgBeam API key, then reference it in a ProviderConfig:
+</Step>
+<Step>
 
-    ```yaml title="secret.yaml"
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: pgbeam-credentials
-      namespace: crossplane-system
-    type: Opaque
-    stringData:
-      api-key: pgb_your_api_key
-    ```
+### Configure credentials
 
-    ```yaml title="provider-config.yaml"
-    apiVersion: pgbeam.io/v1alpha1
-    kind: ProviderConfig
-    metadata:
-      name: default
-    spec:
-      apiKeySecretRef:
-        name: pgbeam-credentials
-        namespace: crossplane-system
-        key: api-key
-      baseURL: https://api.pgbeam.com  # optional
-    ```
+Create a Secret with your PgBeam API key, then reference it in a ProviderConfig:
 
-    ```bash
-    kubectl apply -f secret.yaml -f provider-config.yaml
-    ```
-  </Step>
+```yaml title="secret.yaml"
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgbeam-credentials
+  namespace: crossplane-system
+type: Opaque
+stringData:
+  api-key: pgb_your_api_key
+```
 
-  <Step>
-    ### Create a project
+```yaml title="provider-config.yaml"
+apiVersion: pgbeam.io/v1alpha1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  apiKeySecretRef:
+    name: pgbeam-credentials
+    namespace: crossplane-system
+    key: api-key
+  baseURL: https://api.pgbeam.com # optional
+```
 
-    ```yaml title="project.yaml"
-    apiVersion: pgbeam.io/v1alpha1
-    kind: Project
-    metadata:
-      name: my-app
-    spec:
-      forProvider:
-        orgId: org_abc123
-        name: my-app
-        database:
-          host: my-rds.us-east-1.rds.amazonaws.com
-          port: 5432
-          name: mydb
-          username: pgbeam
-          passwordSecretRef:
-            name: db-credentials
-            namespace: default
-            key: password
-      providerConfigRef:
-        name: default
-    ```
-  </Step>
+```bash
+kubectl apply -f secret.yaml -f provider-config.yaml
+```
 
-  <Step>
-    ### Apply
+</Step>
+<Step>
 
-    ```bash
-    kubectl apply -f project.yaml
-    ```
+### Create a project
 
-    Crossplane creates the PgBeam project and its primary database atomically.
-    The proxy hostname is available in `status.atProvider.proxyHost` and
-    published to the connection secret.
+```yaml title="project.yaml"
+apiVersion: pgbeam.io/v1alpha1
+kind: Project
+metadata:
+  name: my-app
+spec:
+  forProvider:
+    orgId: org_abc123
+    name: my-app
+    database:
+      host: my-rds.us-east-1.rds.amazonaws.com
+      port: 5432
+      name: mydb
+      username: pgbeam
+      passwordSecretRef:
+        name: db-credentials
+        namespace: default
+        key: password
+  providerConfigRef:
+    name: default
+```
 
-    ```bash
-    kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
-    ```
-  </Step>
+</Step>
+<Step>
+
+### Apply
+
+```bash
+kubectl apply -f project.yaml
+```
+
+Crossplane creates the PgBeam project and its primary database atomically. The
+proxy hostname is available in `status.atProvider.proxyHost` and published to
+the connection secret.
+
+```bash
+kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
+```
+
+</Step>
 </Steps>
 
 ## Resources
@@ -135,7 +140,9 @@ spec:
     name: default
 ```
 
-**Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseID`
+**Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`,
+`databaseCount`, `activeConnections`, `createdAt`, `updatedAt`,
+`primaryDatabaseID`
 
 ### Database
 
@@ -220,7 +227,8 @@ spec:
     name: default
 ```
 
-**Status:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
+**Status:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`,
+`dnsInstructions`, `createdAt`, `updatedAt`
 
 ### CacheRule
 
@@ -243,7 +251,9 @@ spec:
     name: default
 ```
 
-**Status:** `queryHash`, `normalizedSQL`, `queryType`, `callCount`, `avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`, `recommendation`, `firstSeenAt`, `lastSeenAt`
+**Status:** `queryHash`, `normalizedSQL`, `queryType`, `callCount`,
+`avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`,
+`recommendation`, `firstSeenAt`, `lastSeenAt`
 
 ### SpendLimit
 
@@ -262,7 +272,9 @@ spec:
     name: default
 ```
 
-**Status:** `orgID`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
+**Status:** `orgID`, `plan`, `billingProvider`, `subscriptionStatus`,
+`currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`,
+`updatedAt`
 
 ## Configuration
 

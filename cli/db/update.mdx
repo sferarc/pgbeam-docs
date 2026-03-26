@@ -5,7 +5,10 @@ description: Update database settings
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Update the configuration of an existing database connection. Supports changing the display name, cache settings (enable/disable, TTL), and connection pool settings (mode, size). At least one update flag must be provided. Current settings are preserved for any flag not specified.
+Update the configuration of an existing database connection. Supports changing
+the display name, cache settings (enable/disable, TTL), and connection pool
+settings (mode, size). At least one update flag must be provided. Current
+settings are preserved for any flag not specified.
 
 ## Usage
 
@@ -26,7 +29,9 @@ pgbeam db update <id> [flags]
 | `--min-pool-size <value>` | Minimum number of idle connections maintained in the pool (default: 1) | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -47,4 +52,5 @@ pgbeam db update db_xxx --name production-primary
 
 ## Output
 
-Prints a success message confirming the database was updated. With `--json`, returns the updated database object.
+Prints a success message confirming the database was updated. With `--json`,
+returns the updated database object.

@@ -5,7 +5,10 @@ description: Create a new project
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Create a new PgBeam project in your organization. A project groups one or more database connections under a single proxy endpoint. Without flags, the command runs interactively and prompts for all required values including the upstream database connection details and SSL mode.
+Create a new PgBeam project in your organization. A project groups one or more
+database connections under a single proxy endpoint. Without flags, the command
+runs interactively and prompts for all required values including the upstream
+database connection details and SSL mode.
 
 ## Usage
 
@@ -26,7 +29,9 @@ pgbeam projects create [flags]
 | `--ssl-mode <value>` | SSL connection mode: disable, require, verify-ca, or verify-full | No       | -       |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
 </Callout>
 
 ## Examples
@@ -44,4 +49,6 @@ PROJECT_ID=$(pgbeam projects create --name my-app --host db.example.com --databa
 
 ## Output
 
-Prints the new project ID, name, and database host. Suggests running `pgbeam link` as a next step. With `--json`, returns the full project and database objects.
+Prints the new project ID, name, and database host. Suggests running
+`pgbeam link` as a next step. With `--json`, returns the full project and
+database objects.
