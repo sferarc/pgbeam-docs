@@ -3,13 +3,12 @@ title: Pulumi
 icon: Blocks
 tag: TypeScript
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
-  spend limits as infrastructure using Pulumi and the @pgbeam/pulumi package.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
+  infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
 Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas,
-custom domains, cache rules, and spend limits.
+package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
 
 ## Setup
 
@@ -87,8 +86,8 @@ export const proxyHost = project.proxyHost;
 pulumi up
 ```
 
-Pulumi creates the PgBeam project and its primary database atomically. The
-`proxyHost` output gives you the PgBeam proxy endpoint to use in your
+Pulumi creates the PgBeam project and its primary database atomically.
+The `proxyHost` output gives you the PgBeam proxy endpoint to use in your
 application connection string.
 
 </Step>
@@ -111,9 +110,7 @@ const res = new pgbeam.Project("example", {
 });
 ```
 
-**Outputs:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`,
-`databaseCount`, `activeConnections`, `createdAt`, `updatedAt`,
-`primaryDatabaseId`
+**Outputs:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseId`
 
 ### Database
 
@@ -179,8 +176,7 @@ const res = new pgbeam.CustomDomain("example", {
 });
 ```
 
-**Outputs:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`,
-`dnsInstructions`, `createdAt`, `updatedAt`
+**Outputs:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
 
 ### CacheRule
 
@@ -197,9 +193,7 @@ const res = new pgbeam.CacheRule("example", {
 });
 ```
 
-**Outputs:** `queryHash`, `normalizedSql`, `queryType`, `callCount`,
-`avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`,
-`recommendation`, `firstSeenAt`, `lastSeenAt`
+**Outputs:** `queryHash`, `normalizedSql`, `queryType`, `callCount`, `avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`, `recommendation`, `firstSeenAt`, `lastSeenAt`
 
 ### SpendLimit
 
@@ -212,9 +206,7 @@ const res = new pgbeam.SpendLimit("example", {
 });
 ```
 
-**Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`,
-`currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`,
-`updatedAt`
+**Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
 
 ## Configuration
 
@@ -230,8 +222,8 @@ variables.
 
 ## Replacement vs update
 
-Some property changes trigger resource replacement (delete + create) rather than
-in-place updates:
+Some property changes trigger resource replacement (delete + create) rather
+than in-place updates:
 
 | Resource     | Replacement triggers                   |
 | ------------ | -------------------------------------- |

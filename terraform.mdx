@@ -3,13 +3,12 @@ title: Terraform
 icon: Blocks
 tag: HCL
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
-  spend limits as infrastructure using Terraform and the pgbeam provider.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
+  infrastructure using Terraform and the pgbeam provider.
 ---
 
-Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider
-offers native resources for projects, databases, replicas, custom domains, cache
-rules, and spend limits.
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
+provider offers native resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
 
 ## Setup
 
@@ -52,7 +51,9 @@ variable "pgbeam_api_key" {
   sensitive = true
 }
 
-provider "pgbeam" { api_key = var.pgbeam_api_key }
+provider "pgbeam" {
+api_key = var.pgbeam_api_key
+}
 
 ````
 </Tab>
@@ -97,8 +98,8 @@ output "proxy_host" {
 terraform apply
 ```
 
-Terraform creates the PgBeam project and its primary database atomically. The
-`proxy_host` output gives you the PgBeam proxy endpoint to use in your
+Terraform creates the PgBeam project and its primary database atomically.
+The `proxy_host` output gives you the PgBeam proxy endpoint to use in your
 application connection string.
 
 </Step>
@@ -121,9 +122,7 @@ resource "pgbeam_project" "example" {
 }
 ```
 
-**Computed:** `proxy_host`, `queries_per_second`, `burst_size`,
-`max_connections`, `database_count`, `active_connections`, `created_at`,
-`updated_at`, `primary_database_id`
+**Computed:** `proxy_host`, `queries_per_second`, `burst_size`, `max_connections`, `database_count`, `active_connections`, `created_at`, `updated_at`, `primary_database_id`
 
 **Import:** `terraform import pgbeam_project.example <id>`
 
@@ -195,8 +194,7 @@ resource "pgbeam_custom_domain" "example" {
 }
 ```
 
-**Computed:** `verified`, `verified_at`, `tls_cert_expiry`,
-`dns_verification_token`, `dns_instructions`, `created_at`, `updated_at`
+**Computed:** `verified`, `verified_at`, `tls_cert_expiry`, `dns_verification_token`, `dns_instructions`, `created_at`, `updated_at`
 
 **Import:** `terraform import pgbeam_custom_domain.example <project_id>/<id>`
 
@@ -215,12 +213,9 @@ resource "pgbeam_cache_rule" "example" {
 }
 ```
 
-**Computed:** `query_hash`, `normalized_sql`, `query_type`, `call_count`,
-`avg_latency_ms`, `p95_latency_ms`, `avg_response_bytes`, `stability_rate`,
-`recommendation`, `first_seen_at`, `last_seen_at`
+**Computed:** `query_hash`, `normalized_sql`, `query_type`, `call_count`, `avg_latency_ms`, `p95_latency_ms`, `avg_response_bytes`, `stability_rate`, `recommendation`, `first_seen_at`, `last_seen_at`
 
-**Import:**
-`terraform import pgbeam_cache_rule.example <project_id>/<database_id>/<query_hash>`
+**Import:** `terraform import pgbeam_cache_rule.example <project_id>/<database_id>/<query_hash>`
 
 ### pgbeam_spend_limit
 
@@ -233,9 +228,7 @@ resource "pgbeam_spend_limit" "example" {
 }
 ```
 
-**Computed:** `org_id`, `plan`, `billing_provider`, `subscription_status`,
-`current_period_end`, `enabled`, `custom_pricing`, `limits`, `created_at`,
-`updated_at`
+**Computed:** `org_id`, `plan`, `billing_provider`, `subscription_status`, `current_period_end`, `enabled`, `custom_pricing`, `limits`, `created_at`, `updated_at`
 
 **Import:** `terraform import pgbeam_spend_limit.example <org_id>`
 

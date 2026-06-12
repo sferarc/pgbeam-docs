@@ -5,10 +5,7 @@ description: Add a database connection
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Add a new database connection to the linked project. PgBeam will use these
-credentials to connect to your upstream PostgreSQL server. Without flags, the
-command runs interactively and prompts for all required values. After adding,
-use `pgbeam db test` to verify connectivity.
+Add a new database connection to the linked project. PgBeam will use these credentials to connect to your upstream PostgreSQL server. Without flags, the command runs interactively and prompts for all required values. After adding, use `pgbeam db test` to verify connectivity.
 
 ## Usage
 
@@ -48,6 +45,4 @@ pgbeam db add --host db.example.com --name mydb --username admin --password secr
 
 ## Output
 
-Prints the new database ID, name, and host:port. Suggests running
-`pgbeam db test <id>` to verify the connection. With `--json`, returns the full
-database object.
+Prints the new database ID, name, and host:port. Suggests running `pgbeam db test <id>` to verify the connection. With `--json`, returns the full database object.

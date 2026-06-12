@@ -5,9 +5,7 @@ description: Verify domain ownership
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Verify ownership of a custom domain by checking the DNS records configured with
-your provider. On success, PgBeam provisions a TLS certificate for the domain.
-Run this after adding the CNAME and TXT records shown by `pgbeam domains add`.
+Verify ownership of a custom domain by checking the DNS records configured with your provider. On success, PgBeam provisions a TLS certificate for the domain. Run this after adding the CNAME and TXT records shown by `pgbeam domains add`.
 
 ## Usage
 
@@ -39,6 +37,4 @@ pgbeam domains verify dom_xxx --json
 
 ## Output
 
-On success, prints a confirmation that the domain is verified. On failure,
-prints an error asking you to check your DNS records and exits with a non-zero
-code.
+On success, prints a confirmation that the domain is verified. On failure, prints an error asking you to check your DNS records and exits with a non-zero code.

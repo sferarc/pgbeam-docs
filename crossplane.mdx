@@ -3,8 +3,8 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and
-  spend limits as Kubernetes custom resources using the Crossplane provider.
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
+  Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
@@ -106,9 +106,9 @@ spec:
 kubectl apply -f project.yaml
 ```
 
-Crossplane creates the PgBeam project and its primary database atomically. The
-proxy hostname is available in `status.atProvider.proxyHost` and published to
-the connection secret.
+Crossplane creates the PgBeam project and its primary database atomically.
+The proxy hostname is available in `status.atProvider.proxyHost` and
+published to the connection secret.
 
 ```bash
 kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
@@ -140,9 +140,7 @@ spec:
     name: default
 ```
 
-**Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`,
-`databaseCount`, `activeConnections`, `createdAt`, `updatedAt`,
-`primaryDatabaseID`
+**Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseID`
 
 ### Database
 
@@ -227,8 +225,7 @@ spec:
     name: default
 ```
 
-**Status:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`,
-`dnsInstructions`, `createdAt`, `updatedAt`
+**Status:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
 
 ### CacheRule
 
@@ -251,9 +248,7 @@ spec:
     name: default
 ```
 
-**Status:** `queryHash`, `normalizedSQL`, `queryType`, `callCount`,
-`avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`,
-`recommendation`, `firstSeenAt`, `lastSeenAt`
+**Status:** `queryHash`, `normalizedSQL`, `queryType`, `callCount`, `avgLatencyMs`, `p95LatencyMs`, `avgResponseBytes`, `stabilityRate`, `recommendation`, `firstSeenAt`, `lastSeenAt`
 
 ### SpendLimit
 
@@ -272,9 +267,7 @@ spec:
     name: default
 ```
 
-**Status:** `orgID`, `plan`, `billingProvider`, `subscriptionStatus`,
-`currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`,
-`updatedAt`
+**Status:** `orgID`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
 
 ## Configuration
 
