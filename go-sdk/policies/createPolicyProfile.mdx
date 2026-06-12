@@ -1,0 +1,72 @@
+---
+title: CreatePolicyProfile
+description: Create a policy profile
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a policy profile that can be attached to agent credentials.
+
+## Usage
+
+```go
+result, err := client.Policies.CreatePolicyProfile(ctx, "prj_xxx", &pgbeam.PolicyProfileInput{
+    Name: "...",
+  })
+```
+
+## Parameters
+
+| Parameter                | Type                         | Required | Description                                                                |
+| ------------------------ | ---------------------------- | -------- | -------------------------------------------------------------------------- |
+| ctx                      | `context.Context`            | Yes      | Request context                                                            |
+| projectID                | `string`                     | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                        |
+| req                      | `*pgbeam.PolicyProfileInput` | Yes      | Request body                                                               |
+| req.Name                 | `string`                     | Yes      | Human-readable name for the policy profile.                                |
+| req.AccessMode           | `*string`                    | No       | read_only blocks all data and schema mutations.                            |
+| req.StatementRules       | `*pgbeam.StatementRules`     | No       |                                                                            |
+| req.TableAllowlist       | `*[]string`                  | No       | If non-empty, only these relations are reachable.                          |
+| req.TableDenylist        | `*[]string`                  | No       | Relations explicitly blocked.                                              |
+| req.MaskingRules         | `*[]pgbeam.MaskingRule`      | No       | Column masking rules applied to query results.                             |
+| req.BudgetQueriesPerHour | `*int`                       | No       | Max queries per rolling hour window. 0 means unlimited.                    |
+| req.BudgetQueriesPerDay  | `*int`                       | No       | Max queries per day window. 0 means unlimited.                             |
+| req.MaxRows              | `*int`                       | No       | Max rows returned per query. 0 means unlimited.                            |
+| req.StatementTimeoutMs   | `*int`                       | No       | Upstream statement timeout for agent sessions. 0 uses the project default. |
+
+## Response
+
+`(*pgbeam.PolicyProfile, error)` — policy profile created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Policies.CreatePolicyProfile(ctx, "prj_xxx", &pgbeam.PolicyProfileInput{
+    Name: "...",
+    AccessMode: "read_only",
+    StatementRules: pgbeam.StatementRules{ /* ... */ },
+    TableAllowlist: nil,
+    TableDenylist: nil,
+    MaskingRules: nil,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

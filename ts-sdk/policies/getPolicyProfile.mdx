@@ -1,0 +1,51 @@
+---
+title: getPolicyProfile
+description: Get a policy profile
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns a single policy profile by ID.
+
+## Usage
+
+```typescript
+const result = await api.policies.getPolicyProfile({
+  pathParams: { project_id: "prj_xxx", policy_id: "pol_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                |
+| --------------------- | -------- | -------- | ---------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).        |
+| pathParams.policy_id  | `string` | Yes      | Unique policy profile identifier (prefixed, e.g. pol_xxx). |
+
+## Response
+
+`Promise<PolicyProfile>` — the policy profile.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.policies.getPolicyProfile({
+  pathParams: { project_id: "prj_xxx", policy_id: "pol_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

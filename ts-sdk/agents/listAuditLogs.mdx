@@ -1,0 +1,62 @@
+---
+title: listAuditLogs
+description: List agent audit logs
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns agent statement audit entries for the project, newest first, with
+optional credential and event filters.
+
+## Usage
+
+```typescript
+const result = await api.agents.listAuditLogs({
+  pathParams: { project_id: "prj_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter                 | Type     | Required | Description                                                 |
+| ------------------------- | -------- | -------- | ----------------------------------------------------------- |
+| pathParams.project_id     | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).         |
+| queryParams.credential_id | `string` | No       | Filter to a single agent credential.                        |
+| queryParams.event         | `string` | No       | Filter to a single event type (e.g. blocked).               |
+| queryParams.before        | `string` | No       | Return entries strictly older than this timestamp (cursor). |
+| queryParams.page_size     | `number` | No       | Maximum number of items to return (1-100, default 20).      |
+
+## Response
+
+`Promise<ListAuditLogsResponse>` — page of audit entries.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.agents.listAuditLogs({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: {
+    credential_id: "...",
+    event: "blocked",
+    before: "...",
+    page_size: 20,
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

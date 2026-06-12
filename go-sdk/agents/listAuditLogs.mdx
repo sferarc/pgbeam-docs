@@ -1,0 +1,62 @@
+---
+title: ListAuditLogs
+description: List agent audit logs
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns agent statement audit entries for the project, newest first, with
+optional credential and event filters.
+
+## Usage
+
+```go
+result, err := client.Agents.ListAuditLogs(ctx, "prj_xxx", nil)
+```
+
+## Parameters
+
+| Parameter           | Type                          | Required | Description                                                 |
+| ------------------- | ----------------------------- | -------- | ----------------------------------------------------------- |
+| ctx                 | `context.Context`             | Yes      | Request context                                             |
+| projectID           | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).         |
+| params              | `*pgbeam.ListAuditLogsParams` | No       | Query parameters                                            |
+| params.CredentialID | `string`                      | No       | Filter to a single agent credential.                        |
+| params.Event        | `string`                      | No       | Filter to a single event type (e.g. blocked).               |
+| params.Before       | `string`                      | No       | Return entries strictly older than this timestamp (cursor). |
+| params.PageSize     | `int`                         | No       | Maximum number of items to return (1-100, default 20).      |
+
+## Response
+
+`(*pgbeam.ListAuditLogsResponse, error)` — page of audit entries.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Agents.ListAuditLogs(ctx, "prj_xxx", &pgbeam.ListAuditLogsParams{
+    CredentialID: "...",
+    Event: "blocked",
+    Before: "...",
+    PageSize: 20,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

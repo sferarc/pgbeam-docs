@@ -1,0 +1,52 @@
+---
+title: deletePolicyProfile
+description: Delete a policy profile
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Deletes a policy profile. Fails if agent credentials still reference it.
+
+## Usage
+
+```typescript
+const result = await api.policies.deletePolicyProfile({
+  pathParams: { project_id: "prj_xxx", policy_id: "pol_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                |
+| --------------------- | -------- | -------- | ---------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).        |
+| pathParams.policy_id  | `string` | Yes      | Unique policy profile identifier (prefixed, e.g. pol_xxx). |
+
+## Response
+
+`Promise<void>` — no content.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.policies.deletePolicyProfile({
+  pathParams: { project_id: "prj_xxx", policy_id: "pol_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Policy profile is still referenced by agent credentials. |
