@@ -1,0 +1,58 @@
+---
+title: ApproveApprovalRequest
+description: Approve a held statement
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Approves a pending approval request, releasing the held statement.
+
+## Usage
+
+```go
+result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", &pgbeam.ApprovalDecisionRequest{
+
+  })
+```
+
+## Parameters
+
+| Parameter  | Type                              | Required | Description                                                  |
+| ---------- | --------------------------------- | -------- | ------------------------------------------------------------ |
+| ctx        | `context.Context`                 | Yes      | Request context                                              |
+| projectID  | `string`                          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| approvalID | `string`                          | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
+| req        | `*pgbeam.ApprovalDecisionRequest` | Yes      | Request body                                                 |
+| req.Reason | `*string`                         | No       | Human-readable note explaining the decision.                 |
+
+## Response
+
+`(*pgbeam.ApprovalRequest, error)` — the updated approval request.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", &pgbeam.ApprovalDecisionRequest{
+    Reason: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |

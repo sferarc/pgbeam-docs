@@ -118,6 +118,7 @@ resource "pgbeam_project" "example" {
   description = "Production database proxy"
   tags = ["production", "us-east-1"]
   allowed_cidrs = [[object Object], [object Object]]
+  default_policy_profile_id = "pol_01h455vb4pex5vsknk084sn02q"
   status = "active"
 }
 ```

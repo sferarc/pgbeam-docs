@@ -1,0 +1,63 @@
+---
+title: createWebhookEndpoint
+description: Create a webhook endpoint
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a webhook endpoint that receives project event deliveries.
+
+## Usage
+
+```typescript
+const result = await api.webhooks.createWebhookEndpoint({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    url: "https://example.com/hooks/pgbeam",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type                                               | Required | Description                                               |
+| --------------------- | -------------------------------------------------- | -------- | --------------------------------------------------------- |
+| pathParams.project_id | `string`                                           | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| body.url              | `string`                                           | Yes      | HTTPS endpoint that receives event deliveries.            |
+| body.secret           | `string`                                           | No       | Shared secret used to sign delivery payloads. Write-only. |
+| body.format           | `"json" \| "splunk_hec" \| "datadog" \| "elastic"` | No       | Payload format for delivered events.                      |
+| body.event_types      | `string[]`                                         | No       | Event types to deliver. Empty means all events.           |
+| body.enabled          | `boolean`                                          | No       | Whether deliveries are active for this endpoint.          |
+| body.description      | `string`                                           | No       | Human-readable label for the endpoint.                    |
+
+## Response
+
+`Promise<WebhookEndpoint>` — webhook endpoint created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.webhooks.createWebhookEndpoint({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    url: "https://example.com/hooks/pgbeam",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

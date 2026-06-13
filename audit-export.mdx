@@ -1,0 +1,145 @@
+---
+title: Audit Export
+icon: Send
+description:
+  Stream audit events to your own systems. HMAC-signed webhooks for any endpoint,
+  plus native formats for Splunk HEC, Datadog, and Elastic.
+---
+
+Audit export pushes PgBeam events to your systems as they happen. Point it at a
+webhook endpoint and PgBeam delivers a signed JSON payload for each event. Point
+it at a SIEM and PgBeam formats the events the way that SIEM expects. The
+[audit log](/docs/audit-log) keeps the full history for querying; export is for
+getting events out in real time.
+
+## Event types
+
+| Event                | Fires when                                                                        |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `query_blocked`      | A statement is rejected by policy (allowlist, read-only, etc.).                   |
+| `budget_exhausted`   | A credential hits its query or row budget.                                        |
+| `kill_switch`        | A credential or project kill-switch is tripped.                                   |
+| `masked`             | A result is returned with one or more masked columns.                             |
+| `migration_flagged`  | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
+| `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
+| `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
+
+## Create a webhook endpoint
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    pgbeam webhooks create \
+      --url https://hooks.example.com/pgbeam \
+      --events query_blocked,kill_switch,anomaly_alert
+    ```
+  </Tab>
+
+<Tab value="Dashboard">
+  Open **Webhooks**, add an endpoint URL, pick the events to send, and copy the
+  signing secret. Use **Send test event** to verify your receiver before you
+  rely on it.
+</Tab>
+
+  <Tab value="API">
+    ```json title="Create endpoint"
+    {
+      "url": "https://hooks.example.com/pgbeam",
+      "events": ["query_blocked", "kill_switch", "anomaly_alert"],
+      "format": "webhook"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+The response includes a signing secret (`whsec_...`). Store it. It is shown once
+and is used to verify every delivery.
+
+## Webhook payload
+
+Each delivery is a JSON body with the event, the project, the credential, and the
+event-specific detail:
+
+```json title="query_blocked delivery"
+{
+  "id": "evt_2a9f1c",
+  "type": "query_blocked",
+  "created_at": "2026-06-13T09:24:11Z",
+  "project_id": "prj_abc",
+  "credential": "agent_4f2c",
+  "data": {
+    "sql": "DELETE FROM users",
+    "decision": "blocked",
+    "reason": "policy is read-only: DELETE is not allowed",
+    "region": "us-east-1"
+  }
+}
+```
+
+PgBeam signs every delivery. The signature is sent in the `PgBeam-Signature`
+header as `t=<timestamp>,v1=<hex>`, where the value is the HMAC-SHA-256 of
+`<timestamp>.<raw-body>` keyed with your signing secret.
+
+```ts title="Verify a delivery (Node.js)"
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+export function verify(
+  rawBody: string,
+  header: string,
+  secret: string,
+): boolean {
+  const parts = Object.fromEntries(
+    header.split(",").map((kv) => kv.split("=") as [string, string]),
+  );
+  const timestamp = parts.t;
+  const signature = parts.v1;
+  if (!timestamp || !signature) return false;
+
+  // Reject deliveries older than five minutes to stop replays.
+  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
+
+  const expected = createHmac("sha256", secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("hex");
+
+  const a = Buffer.from(signature);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+```
+
+Verify against the raw request body, before any JSON parsing reserializes it.
+Compare with a constant-time function, and reject deliveries whose timestamp is
+too old.
+
+<Callout type="info" title="Delivery and retries">
+  PgBeam expects a `2xx` within a few seconds. A non-`2xx` or a timeout is
+  retried with exponential backoff. Make your receiver idempotent by keying on
+  the event `id`, which is stable across retries.
+</Callout>
+
+## SIEM formats
+
+For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that
+product ingests it. The signing and retry behavior is the same.
+
+| Format    | Sends                                                                           |
+| --------- | ------------------------------------------------------------------------------- |
+| `splunk`  | Splunk HTTP Event Collector (HEC) envelope. Set your HEC token on the endpoint. |
+| `datadog` | Datadog Logs intake payload with `ddsource: pgbeam` and event tags.             |
+| `elastic` | Elastic / OpenSearch bulk-friendly JSON documents with an ECS-style shape.      |
+
+```bash title="Export to Splunk HEC"
+pgbeam webhooks create \
+  --url https://splunk.example.com:8088/services/collector \
+  --format splunk \
+  --auth-token "$SPLUNK_HEC_TOKEN" \
+  --events query_blocked,budget_exhausted,kill_switch,anomaly_alert
+```
+
+## Related
+
+- [Audit log](/docs/audit-log): the queryable history these events come from.
+- [Anomaly detection](/docs/anomaly-detection): source of `anomaly_alert` events.
+- [Approvals](/docs/approvals): source of `approval_requested` events.
+- [Safe migrations](/docs/safe-migrations): source of `migration_flagged` events.

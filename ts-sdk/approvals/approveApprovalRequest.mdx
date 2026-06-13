@@ -1,0 +1,59 @@
+---
+title: approveApprovalRequest
+description: Approve a held statement
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Approves a pending approval request, releasing the held statement.
+
+## Usage
+
+```typescript
+const result = await api.approvals.approveApprovalRequest({
+    pathParams: { project_id: "prj_xxx", approval_id: "apr_xxx" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter              | Type     | Required | Description                                                  |
+| ---------------------- | -------- | -------- | ------------------------------------------------------------ |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| pathParams.approval_id | `string` | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
+| body.reason            | `string` | No       | Human-readable note explaining the decision.                 |
+
+## Response
+
+`Promise<ApprovalRequest>` — the updated approval request.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.approvals.approveApprovalRequest({
+  pathParams: { project_id: "prj_xxx", approval_id: "apr_xxx" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |

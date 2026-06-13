@@ -12,6 +12,11 @@
 		"databases",
 		"policies",
 		"agents",
+		"approvals",
+		"webhooks",
+		"anomalies",
+		"branches",
+		"migrations",
 		"analytics",
 		"platform",
 		"account"

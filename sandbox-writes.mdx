@@ -1,0 +1,123 @@
+---
+title: Sandbox Writes
+icon: GitBranch
+description:
+  Let an agent write freely against an instant, isolated branch of your database,
+  or run every write in always-rollback dry-run mode. Production is never touched.
+---
+
+Read-only enforcement keeps an agent off your data by refusing every write. That
+is the right default. It is also too strict when the agent's job is to write: a
+migration, a backfill, a generated `UPDATE` you want to test before you trust it.
+Sandbox writes are the safe-write counterpart. The agent writes for real, just
+not against production.
+
+PgBeam offers two modes: an instant branch the agent can write to and you can
+inspect, and an always-rollback mode where writes execute and then disappear.
+
+## Instant branches
+
+A branch is an isolated, copy-on-write copy of your database. It starts from
+production's current state, spins up in seconds, and costs nothing while idle. The
+agent connects with its scoped credential or the hosted MCP endpoint exactly as
+before. The only difference is the target: a branch credential routes the session
+to a fresh branch instead of production.
+
+- **Isolated**: writes land on the branch, never on production.
+- **Instant**: the branch is ready in seconds, on demand.
+- **Copy-on-write**: a branch only stores what it changes, so it is cheap to
+  create and cheap to keep.
+- **Scale-to-zero**: an idle branch costs nothing; a discarded branch is gone.
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    # Make a credential write to a fresh branch instead of production
+    pgbeam policies create migrator-sandbox \
+      --mode read-write \
+      --sandbox branch
+
+    pgbeam agents attach migration-bot --policy migrator-sandbox
+
+    # Inspect and discard branches
+    pgbeam branches list --project my-project
+    pgbeam branches discard brn_7f3a
+    ```
+
+  </Tab>
+
+<Tab value="Dashboard">
+  On the policy profile, set **Write target** to **Branch**. Live branches show
+  up on the **Branches** tab with the statements that ran against them and a
+  summary of what changed. Discard a branch there when you are done.
+</Tab>
+
+  <Tab value="API">
+    ```json title="Sandbox policy"
+    {
+      "name": "migrator-sandbox",
+      "mode": "read-write",
+      "sandbox": { "target": "branch" }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### The workflow
+
+1. Attach a sandbox policy to an agent credential, targeting a branch.
+2. The agent opens a session. PgBeam provisions a branch from the database's
+   current state and pins the session to it.
+3. The agent writes freely: `INSERT`, `UPDATE`, `DELETE`, and DDL, all against the
+   branch.
+4. You inspect what changed in the dashboard: which statements ran and the full
+   [audit trail](/docs/audit-log) for the session.
+5. You discard the branch. Nothing merges back to production unless you explicitly
+   promote it.
+
+## Always-rollback dry-run
+
+When you want to see whether a write _would_ work without keeping anything,
+always-rollback mode runs each of the agent's transactions and then rolls it back.
+The statement executes against production, so the agent gets real errors, real row
+counts, and a real plan, but the transaction never commits. Nothing persists.
+
+```bash title="Dry-run: writes execute, then roll back"
+pgbeam policies create writer-dryrun \
+  --mode read-write \
+  --sandbox dry-run
+```
+
+Use dry-run to validate a generated `UPDATE` against live data and constraints
+without a branch. Use a branch when the agent needs its writes to stick around for
+a multi-step task or for you to review.
+
+| Situation                                         | Use                                 |
+| ------------------------------------------------- | ----------------------------------- |
+| Agent should only read                            | [Read-only](/docs/read-only)        |
+| Agent should write, but never persist             | Always-rollback dry-run (this page) |
+| Agent needs a writable copy for a multi-step task | Instant branch (this page)          |
+| A human should sign off before a write lands      | [Approvals](/docs/approvals)        |
+
+## How it works
+
+A branch is a real Postgres endpoint backed by copy-on-write storage: it shares
+unchanged pages with its parent and only materializes what the session writes. The
+agent's session reaches it through the same wire-protocol proxy that enforces
+every other policy, so audit capture, budgets, masking, and row filters still
+apply on the branch. Read-only enforcement is relaxed for the branch and only the
+branch, because there is nothing on it worth protecting.
+
+Always-rollback mode wraps the agent's work in a transaction the proxy refuses to
+commit. The database does the real work, then the proxy issues the rollback, so
+the agent observes the true outcome while production stays untouched.
+
+Either way the core guarantee holds: an agent with a sandbox credential cannot
+change production data. The worst case is a discarded branch.
+
+## Related
+
+- [Read-only enforcement](/docs/read-only): block writes entirely.
+- [Approvals](/docs/approvals): hold a production write for human sign-off.
+- [Policies](/docs/policies): how the sandbox target binds to a credential.
+- [Audit log](/docs/audit-log): every statement, branch or production.

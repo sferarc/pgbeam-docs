@@ -1,0 +1,102 @@
+---
+title: Safe Migrations
+icon: FileCog
+description:
+  PgBeam lints DDL for the changes that lock tables or lose data. Table rewrites,
+  ACCESS EXCLUSIVE locks, missing CONCURRENTLY, unsafe drops and type changes,
+  NOT NULL without a default. Warn or block.
+---
+
+A generated migration is one of the most dangerous things an agent can run. The
+syntax is valid, the statement succeeds, and it takes an `ACCESS EXCLUSIVE` lock
+on a hot table for the duration of a full rewrite. Safe migrations catch that
+before it reaches your database. PgBeam parses every DDL statement, checks it
+against a set of known-dangerous patterns, and either warns or blocks based on
+your policy.
+
+This runs for agent credentials and human credentials. A platform engineer's
+hand-written `ALTER TABLE` gets the same lint as an agent's generated one.
+
+## What the linter flags
+
+| Pattern                                | Why it is risky                                                           |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| Table rewrite                          | Rewrites every row and holds a lock for the whole operation.              |
+| `ACCESS EXCLUSIVE` lock on a hot table | Blocks all reads and writes to the table while it runs.                   |
+| Missing `CONCURRENTLY`                 | `CREATE INDEX` without `CONCURRENTLY` locks the table for writes.         |
+| Unsafe drop                            | `DROP COLUMN` / `DROP TABLE` destroys data with no undo.                  |
+| Unsafe type change                     | `ALTER COLUMN ... TYPE` that forces a rewrite or can lose data.           |
+| `NOT NULL` without a default           | Adding `NOT NULL` to an existing column rewrites and can fail mid-flight. |
+
+## Lint a migration before you run it
+
+`migrations:lint` checks a DDL script and returns findings without touching your
+database. Use it in CI, in a pre-commit hook, or as a tool the agent calls before
+it proposes a change.
+
+```bash title="Lint a migration"
+curl -X POST \
+  "https://api.pgbeam.com/v1/projects/{projectId}/migrations:lint" \
+  -H "Authorization: Bearer $PGBEAM_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "sql": "ALTER TABLE orders ADD COLUMN status text NOT NULL DEFAULT '\''new'\'';\nCREATE INDEX ON orders (status);"
+  }'
+```
+
+```json title="Response"
+{
+  "findings": [
+    {
+      "rule": "missing_concurrently",
+      "severity": "warn",
+      "statement": "CREATE INDEX ON orders (status)",
+      "message": "CREATE INDEX without CONCURRENTLY locks the table for writes. Use CREATE INDEX CONCURRENTLY.",
+      "suggestion": "CREATE INDEX CONCURRENTLY ON orders (status)"
+    }
+  ],
+  "verdict": "warn"
+}
+```
+
+From the CLI:
+
+```bash title="CLI"
+pgbeam migrations lint --file migration.sql
+```
+
+## Warn or block at the wire
+
+The lint also runs inline when an agent or analyst issues DDL through PgBeam. Set
+the policy's enforcement level for migrations:
+
+- **Warn**: the statement runs, the finding is recorded, and a
+  [`migration_flagged`](/docs/audit-export) event fires. Use this once you trust
+  the workflow and want a record.
+- **Block**: a statement with a finding at or above the threshold is refused on
+  the wire, with the rule and suggestion in the error so the agent can fix it.
+
+```bash title="Block dangerous DDL on a policy"
+pgbeam policies create migrator \
+  --mode read-write \
+  --migrations block
+```
+
+```text
+ERROR: migration blocked: unsafe_drop. DROP COLUMN destroys data with no undo.
+Hint: deprecate the column first, then drop it in a later release.
+```
+
+<Callout type="info" title="Pair with approvals and branches">
+  Blocking is the strict end. To let risky DDL through under supervision, hold
+  it for [approval](/docs/approvals). To let an agent iterate on DDL with no
+  risk at all, point it at a [branch](/docs/sandbox-writes), where a table
+  rewrite affects only the throwaway copy.
+</Callout>
+
+## Related
+
+- [Sandbox writes](/docs/sandbox-writes): run DDL against a throwaway branch.
+- [Approvals](/docs/approvals): hold flagged DDL for human sign-off.
+- [Audit export](/docs/audit-export): forward `migration_flagged` events.
+- [Policies](/docs/policies): set the migration enforcement level.

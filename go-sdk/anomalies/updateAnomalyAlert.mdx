@@ -1,0 +1,57 @@
+---
+title: UpdateAnomalyAlert
+description: Triage an anomaly alert
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Updates the triage status of an anomaly alert (acknowledge or resolve).
+
+## Usage
+
+```go
+result, err := client.Anomalies.UpdateAnomalyAlert(ctx, "prj_xxx", "ano_xxx", &pgbeam.UpdateAnomalyAlertRequest{
+    Status: "...",
+  })
+```
+
+## Parameters
+
+| Parameter  | Type                                | Required | Description                                               |
+| ---------- | ----------------------------------- | -------- | --------------------------------------------------------- |
+| ctx        | `context.Context`                   | Yes      | Request context                                           |
+| projectID  | `string`                            | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| anomalyID  | `string`                            | Yes      | Unique anomaly alert identifier (prefixed, e.g. ano_xxx). |
+| req        | `*pgbeam.UpdateAnomalyAlertRequest` | Yes      | Request body                                              |
+| req.Status | `string`                            | Yes      | New triage state for the alert.                           |
+
+## Response
+
+`(*pgbeam.AnomalyAlert, error)` — the updated anomaly alert.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Anomalies.UpdateAnomalyAlert(ctx, "prj_xxx", "ano_xxx", &pgbeam.UpdateAnomalyAlertRequest{
+    Status: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

@@ -1,0 +1,58 @@
+---
+title: lintMigration
+description: Lint a migration
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Analyzes a migration script for unsafe schema changes and returns findings.
+
+## Usage
+
+```typescript
+const result = await api.migrations.lintMigration({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    sql: "...",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                    |
+| --------------------- | -------- | -------- | -------------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).            |
+| body.sql              | `string` | Yes      | The migration SQL to analyze. May contain multiple statements. |
+| body.database_id      | `string` | No       | Optional database to scope the lint to.                        |
+
+## Response
+
+`Promise<MigrationLintResponse>` — lint results.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.migrations.lintMigration({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    sql: "...",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

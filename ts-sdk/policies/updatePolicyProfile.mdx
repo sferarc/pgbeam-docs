@@ -20,20 +20,27 @@ const result = await api.policies.updatePolicyProfile({
 
 ## Parameters
 
-| Parameter                    | Type                          | Required | Description                                                                |
-| ---------------------------- | ----------------------------- | -------- | -------------------------------------------------------------------------- |
-| pathParams.project_id        | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                        |
-| pathParams.policy_id         | `string`                      | Yes      | Unique policy profile identifier (prefixed, e.g. pol_xxx).                 |
-| body.name                    | `string`                      | Yes      | Human-readable name for the policy profile.                                |
-| body.access_mode             | `"read_only" \| "read_write"` | No       | read_only blocks all data and schema mutations.                            |
-| body.statement_rules         | `StatementRules`              | No       |                                                                            |
-| body.table_allowlist         | `string[]`                    | No       | If non-empty, only these relations are reachable.                          |
-| body.table_denylist          | `string[]`                    | No       | Relations explicitly blocked.                                              |
-| body.masking_rules           | `MaskingRule[]`               | No       | Column masking rules applied to query results.                             |
-| body.budget_queries_per_hour | `number`                      | No       | Max queries per rolling hour window. 0 means unlimited.                    |
-| body.budget_queries_per_day  | `number`                      | No       | Max queries per day window. 0 means unlimited.                             |
-| body.max_rows                | `number`                      | No       | Max rows returned per query. 0 means unlimited.                            |
-| body.statement_timeout_ms    | `number`                      | No       | Upstream statement timeout for agent sessions. 0 uses the project default. |
+| Parameter                     | Type                                  | Required | Description                                                                                              |
+| ----------------------------- | ------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| pathParams.project_id         | `string`                              | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                      |
+| pathParams.policy_id          | `string`                              | Yes      | Unique policy profile identifier (prefixed, e.g. pol_xxx).                                               |
+| body.name                     | `string`                              | Yes      | Human-readable name for the policy profile.                                                              |
+| body.access_mode              | `"read_only" \| "read_write"`         | No       | read_only blocks all data and schema mutations.                                                          |
+| body.statement_rules          | `StatementRules`                      | No       |                                                                                                          |
+| body.table_allowlist          | `string[]`                            | No       | If non-empty, only these relations are reachable.                                                        |
+| body.table_denylist           | `string[]`                            | No       | Relations explicitly blocked.                                                                            |
+| body.masking_rules            | `MaskingRule[]`                       | No       | Column masking rules applied to query results.                                                           |
+| body.budget_queries_per_hour  | `number`                              | No       | Max queries per rolling hour window. 0 means unlimited.                                                  |
+| body.budget_queries_per_day   | `number`                              | No       | Max queries per day window. 0 means unlimited.                                                           |
+| body.max_rows                 | `number`                              | No       | Max rows returned per query. 0 means unlimited.                                                          |
+| body.statement_timeout_ms     | `number`                              | No       | Upstream statement timeout for agent sessions. 0 uses the project default.                               |
+| body.row_filters              | `RowFilter[]`                         | No       | Per-relation row filters ANDed into agent reads.                                                         |
+| body.write_mode               | `"normal" \| "rollback" \| "sandbox"` | No       | How writes are handled. normal commits, rollback auto-rolls back, sandbox routes to an ephemeral branch. |
+| body.approval_mode            | `"off" \| "writes" \| "ddl" \| "all"` | No       | Which statement classes require human approval before execution.                                         |
+| body.approval_auto_max_rows   | `number`                              | No       | Statements touching at most this many rows are auto-approved. 0 means none.                              |
+| body.approval_timeout_seconds | `number`                              | No       | How long a held statement waits for a decision before expiring.                                          |
+| body.migration_safety         | `"off" \| "warn" \| "block"`          | No       | Migration safety mode. warn surfaces findings, block refuses unsafe DDL.                                 |
+| body.egress_bytes_per_day     | `number`                              | No       | Per-day egress budget in bytes. 0 means unlimited.                                                       |
 
 ## Response
 

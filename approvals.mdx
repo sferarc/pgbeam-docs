@@ -1,0 +1,132 @@
+---
+title: Human-in-the-Loop Approvals
+icon: UserCheck
+description:
+  Hold an agent's writes and DDL until a human approves them. Approve or reject
+  in the dashboard, set auto-approve rules for safe changes, and auto-expire
+  stale requests.
+---
+
+Approvals hold a statement before it reaches your database and wait for a human
+to say yes. Turn it on for a credential, and every write or DDL statement it runs
+is parked as an approval request instead of executing. A reviewer approves or
+rejects it in the dashboard, the agent's session blocks until then, and the
+statement runs only on approval.
+
+This is the middle ground between read-only (no writes ever) and read-write (any
+write, immediately). The agent stays productive: it can draft a change and hand
+it to a person, rather than being told no.
+
+Approvals apply to agent credentials and to human credentials. A junior analyst's
+write can be held for a senior reviewer the same way an agent's is.
+
+## Turn it on
+
+Add an approval rule to a policy. It names which statement kinds are held.
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    pgbeam policies create writer-supervised \
+      --mode read-write \
+      --allow public.orders \
+      --hold writes,ddl \
+      --approval-expiry 1h
+    ```
+  </Tab>
+
+<Tab value="Dashboard">
+  On the policy profile, open **Approvals**, choose which statement kinds to
+  hold (writes, DDL, or both), and set an expiry. Pending requests show up on
+  the **Approvals** tab with the SQL, the credential, and a diff of what the
+  statement would change.
+</Tab>
+
+  <Tab value="API">
+    ```json title="Policy with an approval rule"
+    {
+      "name": "writer-supervised",
+      "mode": "read-write",
+      "allow": ["public.orders"],
+      "approvals": {
+        "hold": ["writes", "ddl"],
+        "expiry_seconds": 3600,
+        "auto_approve": [
+          { "table": "public.orders", "max_rows": 10 }
+        ]
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## What the agent sees
+
+When a held statement is parked, the agent gets an LLM-readable notice on the
+wire and the session waits:
+
+```text
+NOTICE: statement held for approval (request apr_7f3a). Waiting for a reviewer.
+```
+
+If the request is approved, the statement runs and the agent gets its result. If
+it is rejected or expires, the agent gets an error explaining why, so it can move
+on instead of hanging.
+
+```text
+ERROR: statement rejected by reviewer (request apr_7f3a)
+ERROR: approval request apr_7f3a expired after 1h
+```
+
+## Approve or reject a request
+
+Reviewers act in the dashboard, or from the API for automation:
+
+```bash title="Approve or reject"
+# Approve
+curl -X POST \
+  "https://api.pgbeam.com/v1/projects/{projectId}/approvals/{approvalId}/approve" \
+  -H "Authorization: Bearer $PGBEAM_TOKEN"
+
+# Reject with a reason
+curl -X POST \
+  "https://api.pgbeam.com/v1/projects/{projectId}/approvals/{approvalId}/reject" \
+  -H "Authorization: Bearer $PGBEAM_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"reason": "touches too many rows, scope it down"}'
+```
+
+## Auto-approve rules
+
+Holding every write on a busy credential is noise. Auto-approve rules let the safe
+changes through and reserve human attention for the rest. A rule matches on the
+table and a row ceiling: a write that touches fewer rows than the ceiling is
+approved automatically; anything larger is held.
+
+```json title="Auto-approve small writes, hold the rest"
+"auto_approve": [
+  { "table": "public.orders", "max_rows": 10 },
+  { "table": "public.tags", "max_rows": 100 }
+]
+```
+
+PgBeam counts the rows a write would affect before it commits. A write under the
+ceiling is approved and recorded; a write over it is parked for a person. DDL is
+never auto-approved.
+
+## Auto-expire
+
+A held request that no one acts on expires after the policy's expiry window. The
+statement is rejected, the agent is told, and the request closes. This keeps a
+forgotten request from holding an agent session open forever. Every approval,
+rejection, and expiry is written to the [audit log](/docs/audit-log) and can fire
+an [`approval_requested`](/docs/audit-export) webhook.
+
+## Related
+
+- [Read-only enforcement](/docs/read-only): block writes entirely instead of
+  holding them.
+- [Sandbox writes](/docs/sandbox-writes): let an agent write freely against a
+  throwaway branch.
+- [Audit log](/docs/audit-log): every approval decision is recorded.
+- [Audit export](/docs/audit-export): fire a webhook when a request is created.

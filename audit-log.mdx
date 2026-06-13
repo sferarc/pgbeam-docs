@@ -6,11 +6,16 @@ description:
   reason, rows, bytes, latency, and credential.
 ---
 
-The audit log records every statement an agent runs through PgBeam, whether it
-was allowed, masked, blocked, or throttled. Each entry captures the SQL, the
+The audit log records every statement a credential runs through PgBeam, whether
+it was allowed, masked, blocked, or throttled. Each entry captures the SQL, the
 decision and the reason for it, the rows and bytes returned, the latency, and the
 credential that ran it. Recent entries are queryable in the control plane;
 older entries are archived for retention.
+
+It covers agent and human credentials, and records each credential's
+`principal_type` so you can tell agent traffic from people. To stream events to
+your own systems in real time, see [audit export](/docs/audit-export); to flag
+unusual behavior automatically, see [anomaly detection](/docs/anomaly-detection).
 
 ## What is recorded
 
@@ -61,6 +66,9 @@ retention.
 
 ## Related
 
+- [Audit export](/docs/audit-export): HMAC-signed webhooks and SIEM formats.
+- [Anomaly detection](/docs/anomaly-detection): alert on drift from baseline.
+- [Approvals](/docs/approvals): every approval decision is recorded here.
 - [Policies](/docs/policies)
 - [Kill-switch](/docs/kill-switch)
 - [Plans](/docs/plans)

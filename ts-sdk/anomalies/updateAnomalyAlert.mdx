@@ -1,0 +1,58 @@
+---
+title: updateAnomalyAlert
+description: Triage an anomaly alert
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Updates the triage status of an anomaly alert (acknowledge or resolve).
+
+## Usage
+
+```typescript
+const result = await api.anomalies.updateAnomalyAlert({
+  pathParams: { project_id: "prj_xxx", anomaly_id: "ano_xxx" },
+  body: {
+    status: "acknowledged",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type                           | Required | Description                                               |
+| --------------------- | ------------------------------ | -------- | --------------------------------------------------------- |
+| pathParams.project_id | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| pathParams.anomaly_id | `string`                       | Yes      | Unique anomaly alert identifier (prefixed, e.g. ano_xxx). |
+| body.status           | `"acknowledged" \| "resolved"` | Yes      | New triage state for the alert.                           |
+
+## Response
+
+`Promise<AnomalyAlert>` — the updated anomaly alert.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.anomalies.updateAnomalyAlert({
+  pathParams: { project_id: "prj_xxx", anomaly_id: "ano_xxx" },
+  body: {
+    status: "acknowledged",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

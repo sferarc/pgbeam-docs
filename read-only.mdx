@@ -49,9 +49,10 @@ agent from slipping a write past the parser.
 
 <Callout type="info" title="Need writes sometimes?">
   Read-only is the right default. When an agent genuinely needs to write,
-  read-write mode with a tight [allowlist](/docs/allowlists) is one option. An
-  isolated, throwaway database copy is on the [roadmap](/docs/sandbox) for
-  letting an agent write freely without touching production.
+  read-write mode with a tight [allowlist](/docs/allowlists) is one option.
+  [Sandbox writes](/docs/sandbox-writes) let an agent write freely against an
+  isolated, throwaway branch without touching production, and
+  [approvals](/docs/approvals) hold a production write until a human signs off.
 </Callout>
 
 ## Related

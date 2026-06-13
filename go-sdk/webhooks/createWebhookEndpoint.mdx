@@ -1,0 +1,67 @@
+---
+title: CreateWebhookEndpoint
+description: Create a webhook endpoint
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a webhook endpoint that receives project event deliveries.
+
+## Usage
+
+```go
+result, err := client.Webhooks.CreateWebhookEndpoint(ctx, "prj_xxx", &pgbeam.WebhookEndpointInput{
+    URL: "https://example.com/hooks/pgbeam",
+  })
+```
+
+## Parameters
+
+| Parameter       | Type                           | Required | Description                                               |
+| --------------- | ------------------------------ | -------- | --------------------------------------------------------- |
+| ctx             | `context.Context`              | Yes      | Request context                                           |
+| projectID       | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
+| req             | `*pgbeam.WebhookEndpointInput` | Yes      | Request body                                              |
+| req.URL         | `string`                       | Yes      | HTTPS endpoint that receives event deliveries.            |
+| req.Secret      | `*string`                      | No       | Shared secret used to sign delivery payloads. Write-only. |
+| req.Format      | `*string`                      | No       | Payload format for delivered events.                      |
+| req.EventTypes  | `*[]string`                    | No       | Event types to deliver. Empty means all events.           |
+| req.Enabled     | `*bool`                        | No       | Whether deliveries are active for this endpoint.          |
+| req.Description | `*string`                      | No       | Human-readable label for the endpoint.                    |
+
+## Response
+
+`(*pgbeam.WebhookEndpoint, error)` — webhook endpoint created.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Webhooks.CreateWebhookEndpoint(ctx, "prj_xxx", &pgbeam.WebhookEndpointInput{
+    URL: "https://example.com/hooks/pgbeam",
+    Secret: "...",
+    Format: "json",
+    EventTypes: nil,
+    Enabled: true,
+    Description: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

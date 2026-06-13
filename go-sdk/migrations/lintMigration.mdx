@@ -1,0 +1,58 @@
+---
+title: LintMigration
+description: Lint a migration
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Analyzes a migration script for unsafe schema changes and returns findings.
+
+## Usage
+
+```go
+result, err := client.Migrations.LintMigration(ctx, "prj_xxx", &pgbeam.MigrationLintRequest{
+    SQL: "...",
+  })
+```
+
+## Parameters
+
+| Parameter      | Type                           | Required | Description                                                    |
+| -------------- | ------------------------------ | -------- | -------------------------------------------------------------- |
+| ctx            | `context.Context`              | Yes      | Request context                                                |
+| projectID      | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).            |
+| req            | `*pgbeam.MigrationLintRequest` | Yes      | Request body                                                   |
+| req.SQL        | `string`                       | Yes      | The migration SQL to analyze. May contain multiple statements. |
+| req.DatabaseID | `*string`                      | No       | Optional database to scope the lint to.                        |
+
+## Response
+
+`(*pgbeam.MigrationLintResponse, error)` — lint results.
+
+## Example
+
+```go
+import pgbeam "github.com/pgbeam/pgbeam-go"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Migrations.LintMigration(ctx, "prj_xxx", &pgbeam.MigrationLintRequest{
+    SQL: "...",
+    DatabaseID: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
