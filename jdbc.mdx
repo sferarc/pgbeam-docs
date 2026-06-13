@@ -16,7 +16,7 @@ configuration.
 <Tabs items={["Plain JDBC", "HikariCP", "Spring Boot"]}>
   <Tab value="Plain JDBC">
     ```java title="Application.java"
-    String url = "jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb";
+    String url = "jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb";
     String user = "user";
     String password = "pass";
 
@@ -33,7 +33,7 @@ configuration.
   <Tab value="HikariCP">
     ```java title="DatabaseConfig.java"
     HikariConfig config = new HikariConfig();
-    config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
+    config.setJdbcUrl("jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb");
     config.setUsername("user");
     config.setPassword("pass");
     config.setMaximumPoolSize(5); // PgBeam handles upstream pooling
@@ -45,7 +45,7 @@ configuration.
 
   <Tab value="Spring Boot">
     ```properties title="application.properties"
-    spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb
+    spring.datasource.url=jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb
     spring.datasource.username=user
     spring.datasource.password=pass
     spring.datasource.hikari.maximum-pool-size=5
@@ -73,7 +73,7 @@ PgBeam manages upstream connection pooling, so keep HikariCP's pool small:
 
 ```java title="Optimized HikariCP config"
 HikariConfig config = new HikariConfig();
-config.setJdbcUrl("jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb");
+config.setJdbcUrl("jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb");
 config.setUsername("user");
 config.setPassword("pass");
 
@@ -97,13 +97,13 @@ publicly trusted and works with all standard Java TLS configurations.
 To explicitly enable SSL:
 
 ```
-jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb?ssl=true&sslmode=require
+jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb?ssl=true&sslmode=require
 ```
 
 For Spring Boot:
 
 ```properties title="application.properties"
-spring.datasource.url=jdbc:postgresql://abc.aws.pgbeam.app:5432/mydb?ssl=true&sslmode=require
+spring.datasource.url=jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb?ssl=true&sslmode=require
 ```
 
 ## Caching

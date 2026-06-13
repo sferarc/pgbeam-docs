@@ -13,7 +13,7 @@ agent credential, and every statement is enforced against that credential's
 policy before it reaches your database.
 
 ```bash title="Scoped connection string"
-postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app
+postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app
 ```
 
 ## Use it like any Postgres URL
@@ -21,7 +21,7 @@ postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app
 <Tabs items={["psql", "Python", "Node.js", "Go"]}>
   <Tab value="psql">
     ```bash
-    psql "postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app"
+    psql "postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app"
     ```
   </Tab>
 
@@ -65,7 +65,7 @@ Masked columns come back redacted, hashed, or nulled in the result, depending on
 the rule. See [Masking](/docs/masking).
 
 <Callout type="warn" title="TLS is required">
-  Agent connections must use TLS. The hostname (`<id>.aws.pgbeam.app`) carries the
+  Agent connections must use TLS. The hostname (`<id>.proxy.pgbeam.app`) carries the
   SNI used for routing, so use the full connection string PgBeam issued, with
   `sslmode=require` or stronger.
 </Callout>

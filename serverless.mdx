@@ -61,7 +61,7 @@ using the Neon serverless driver.
     ```ts title="query.ts"
     import { neon } from "@neondatabase/serverless";
 
-    const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+    const sql = neon("postgresql://user:pass@abc.proxy.pgbeam.app/mydb");
     const rows = await sql`SELECT * FROM users WHERE active = true`;
     ```
 
@@ -79,7 +79,7 @@ using the Neon serverless driver.
         import { Pool } from "@neondatabase/serverless";
 
         const pool = new Pool({
-          connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+          connectionString: "postgresql://user:pass@abc.proxy.pgbeam.app/mydb",
         });
         const { rows } = await pool.query("SELECT * FROM users");
         ```
@@ -93,7 +93,7 @@ using the Neon serverless driver.
         neonConfig.webSocketConstructor = ws;
 
         const pool = new Pool({
-          connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+          connectionString: "postgresql://user:pass@abc.proxy.pgbeam.app/mydb",
         });
         const { rows } = await pool.query("SELECT * FROM users");
         ```
@@ -149,7 +149,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
     import { neon } from "@neondatabase/serverless";
     import { drizzle } from "drizzle-orm/neon-http";
 
-    const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+    const sql = neon("postgresql://user:pass@abc.proxy.pgbeam.app/mydb");
     const db = drizzle(sql);
 
     const users = await db.select().from(usersTable);
@@ -163,7 +163,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
     import { drizzle } from "drizzle-orm/neon-serverless";
 
     const pool = new Pool({
-      connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+      connectionString: "postgresql://user:pass@abc.proxy.pgbeam.app/mydb",
     });
     const db = drizzle(pool);
 
@@ -182,7 +182,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
     ```ts title="HTTP transactions"
     import { neon } from "@neondatabase/serverless";
 
-    const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+    const sql = neon("postgresql://user:pass@abc.proxy.pgbeam.app/mydb");
 
     const results = await sql.transaction([
       sql`UPDATE accounts SET balance = balance - 100 WHERE id = 1`,
@@ -199,7 +199,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
     import { Pool } from "@neondatabase/serverless";
 
     const pool = new Pool({
-      connectionString: "postgresql://user:pass@abc.aws.pgbeam.app/mydb",
+      connectionString: "postgresql://user:pass@abc.proxy.pgbeam.app/mydb",
     });
 
     const client = await pool.connect();
@@ -226,7 +226,7 @@ SQL annotations work the same with the serverless driver:
 ```ts title="Cache and replica annotations"
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon("postgresql://user:pass@abc.aws.pgbeam.app/mydb");
+const sql = neon("postgresql://user:pass@abc.proxy.pgbeam.app/mydb");
 
 // Cache for 5 minutes
 const categories =

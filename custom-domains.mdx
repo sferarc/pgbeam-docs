@@ -6,9 +6,9 @@ description:
   certificate provisioning and renewal. Scale plan only.
 ---
 
-Replace the default `*.aws.pgbeam.app` hostname in your connection string with
+Replace the default `*.proxy.pgbeam.app` hostname in your connection string with
 your own domain. Your applications connect to `db.yourcompany.com` instead of
-`abc.aws.pgbeam.app`, while PgBeam handles TLS certificates automatically.
+`abc.proxy.pgbeam.app`, while PgBeam handles TLS certificates automatically.
 
 <Callout type="warn" title="Scale plan required">
   Custom domains are available on the **Scale plan** only. See [Plans &
@@ -70,9 +70,9 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 
     | Record  | Host                             | Value                                | Purpose                     |
     | ------- | -------------------------------- | ------------------------------------ | --------------------------- |
-    | `CNAME` | `db.example.com`                 | `abc.aws.pgbeam.app`                 | Routes traffic to PgBeam    |
+    | `CNAME` | `db.example.com`                 | `abc.proxy.pgbeam.app`                 | Routes traffic to PgBeam    |
     | `TXT`   | `_pgbeam-verify.db.example.com`  | `pgbeam-verify=<token>`              | Proves domain ownership     |
-    | `CNAME` | `_acme-challenge.db.example.com` | `_acme-challenge.abc.aws.pgbeam.app` | Delegates TLS cert issuance |
+    | `CNAME` | `_acme-challenge.db.example.com` | `_acme-challenge.abc.proxy.pgbeam.app` | Delegates TLS cert issuance |
 
     Replace `abc` with your project's subdomain and `<token>` with the verification
     token from the previous step.
@@ -187,7 +187,7 @@ After removal:
 
 - The TLS certificate is revoked
 - Connections to the custom domain stop working
-- The default `abc.aws.pgbeam.app` hostname continues to work
+- The default `abc.proxy.pgbeam.app` hostname continues to work
 - You should remove the DNS records from your DNS provider
 
 ## Troubleshooting
@@ -197,8 +197,8 @@ After removal:
 | Issue                | Likely cause                              | Fix                                                                |
 | -------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
 | TXT record not found | DNS propagation delay                     | Wait and retry. Check with `dig TXT _pgbeam-verify.db.example.com` |
-| CNAME mismatch       | Target is not the exact project subdomain | Verify the CNAME points to `abc.aws.pgbeam.app` exactly            |
-| CNAME lookup failed  | Missing trailing dot at some providers    | Try `abc.aws.pgbeam.app.` (with trailing dot)                      |
+| CNAME mismatch       | Target is not the exact project subdomain | Verify the CNAME points to `abc.proxy.pgbeam.app` exactly          |
+| CNAME lookup failed  | Missing trailing dot at some providers    | Try `abc.proxy.pgbeam.app.` (with trailing dot)                    |
 
 ### Certificate issues
 

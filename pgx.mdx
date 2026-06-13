@@ -18,7 +18,7 @@ code changes.
     ### Set the connection string
 
     ```bash title="Environment variable"
-    export DATABASE_URL=postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb
+    export DATABASE_URL=postgresql://user:pass@abc.proxy.pgbeam.app:5432/mydb
     ```
 
   </Step>
@@ -92,7 +92,7 @@ Since PgBeam manages upstream connections, keep your client-side pool small:
 ## TLS
 
 pgx uses TLS by default when connecting to PgBeam. No additional configuration
-is needed — PgBeam's `*.aws.pgbeam.app` certificate is publicly trusted and
+is needed — PgBeam's `*.proxy.pgbeam.app` certificate is publicly trusted and
 works with all standard Go TLS configurations.
 
 If you need to verify the TLS connection explicitly:

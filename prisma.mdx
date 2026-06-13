@@ -20,7 +20,7 @@ code are required.
     Point `DATABASE_URL` at your PgBeam project hostname:
 
     ```bash title=".env"
-    DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb"
+    DATABASE_URL="postgresql://user:pass@abc.proxy.pgbeam.app:5432/mydb"
     ```
 
   </Step>
@@ -46,7 +46,7 @@ code are required.
     a large local pool. Append `connection_limit` to your connection string:
 
     ```bash title=".env"
-    DATABASE_URL="postgresql://user:pass@abc.aws.pgbeam.app:5432/mydb?connection_limit=5"
+    DATABASE_URL="postgresql://user:pass@abc.proxy.pgbeam.app:5432/mydb?connection_limit=5"
     ```
 
   </Step>

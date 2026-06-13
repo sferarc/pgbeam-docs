@@ -37,7 +37,7 @@ Disable it again with `SET pgbeam.debug = off`.
 
 **Checklist:**
 
-1. **Verify the hostname.** It should be `<project-id>.aws.pgbeam.app` on port
+1. **Verify the hostname.** It should be `<project-id>.proxy.pgbeam.app` on port
    `5432`. Check for typos.
 2. **Verify TLS is enabled.** PgBeam requires TLS. Most PostgreSQL drivers
    enable it by default, but check your connection string for `sslmode=disable`
@@ -54,7 +54,7 @@ Disable it again with `SET pgbeam.debug = off`.
 ### `08004`: Project not found
 
 ```
-FATAL: project not found for hostname "xyz.aws.pgbeam.app"
+FATAL: project not found for hostname "xyz.proxy.pgbeam.app"
 ```
 
 The hostname does not match any project. Common causes:
@@ -287,7 +287,7 @@ A low cache hit rate means the cache is not saving much upstream load.
 1. **Update your CA bundle.** PgBeam uses publicly trusted certificates that
    work with all modern systems. If your client is running on an old OS or
    container image, the CA bundle may be outdated.
-2. **Check the hostname.** The certificate matches `*.aws.pgbeam.app`. If you
+2. **Check the hostname.** The certificate matches `*.proxy.pgbeam.app`. If you
    are using an IP address or a hostname that does not match, TLS validation
    will fail.
 3. **Custom domains:** If using a custom domain, verify the ACME challenge CNAME
