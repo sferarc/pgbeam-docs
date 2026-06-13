@@ -1,0 +1,87 @@
+---
+title: Connection String
+icon: Link
+description:
+  Give an AI agent a scoped Postgres connection string. Every driver, ORM, and
+  agent framework works unchanged, with policy enforced in the wire protocol.
+---
+
+A scoped connection string is the second front door for an agent. It looks like
+an ordinary PostgreSQL URL, so every driver, ORM, and agent framework works
+unchanged. The difference is that the username and password belong to a PgBeam
+agent credential, and every statement is enforced against that credential's
+policy before it reaches your database.
+
+```bash title="Scoped connection string"
+postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app
+```
+
+## Use it like any Postgres URL
+
+<Tabs items={["psql", "Python", "Node.js", "Go"]}>
+  <Tab value="psql">
+    ```bash
+    psql "postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app"
+    ```
+  </Tab>
+
+  <Tab value="Python">
+    ```python
+    import psycopg
+
+    conn = psycopg.connect(os.environ["AGENT_DATABASE_URL"])
+    ```
+
+  </Tab>
+
+  <Tab value="Node.js">
+    ```ts
+    import { Pool } from "pg";
+    const pool = new Pool({ connectionString: process.env.AGENT_DATABASE_URL });
+    ```
+  </Tab>
+
+  <Tab value="Go">
+    ```go
+    pool, err := pgxpool.New(ctx, os.Getenv("AGENT_DATABASE_URL"))
+    ```
+  </Tab>
+</Tabs>
+
+The agent framework does not need a PgBeam SDK. Set the agent's `DATABASE_URL` to
+the scoped connection string and it is enforced from the first query.
+
+## What enforcement looks like to the agent
+
+A blocked statement returns a PostgreSQL `ErrorResponse` with an LLM-readable
+reason, so an agent reading the error can correct itself:
+
+```text
+ERROR: policy is read-only: UPDATE is not allowed
+ERROR: table internal_api_keys is not in the allowlist
+```
+
+Masked columns come back redacted, hashed, or nulled in the result, depending on
+the rule. See [Masking](/docs/masking).
+
+<Callout type="warn" title="TLS is required">
+  Agent connections must use TLS. The hostname (`<id>.aws.pgbeam.app`) carries the
+  SNI used for routing, so use the full connection string PgBeam issued, with
+  `sslmode=require` or stronger.
+</Callout>
+
+## Connection string vs hosted MCP
+
+| Use the connection string when…           | Use the hosted MCP endpoint when…             |
+| ----------------------------------------- | --------------------------------------------- |
+| The agent already uses a Postgres driver. | The client speaks MCP (Claude Code, Cursor).  |
+| You want ORM and framework compatibility. | You want ready-made `query`/`describe` tools. |
+| You run your own query loop.              | You want a paste-one-URL setup.               |
+
+Both are backed by the same policy engine. See [Hosted MCP](/docs/mcp).
+
+## Related
+
+- [Agent credentials](/docs/agent-credentials): issue and revoke the credential.
+- [Policies](/docs/policies): the rules enforced on every statement.
+- [Serverless](/docs/serverless): pooling for short-lived agent connections.

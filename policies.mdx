@@ -1,0 +1,82 @@
+---
+title: Policies
+icon: ShieldCheck
+description:
+  A policy profile is the named bundle of rules PgBeam enforces for an agent
+  credential. Access mode, allowlists, masking, budgets, and timeouts.
+---
+
+A policy profile is a named bundle of rules attached to one or more agent
+credentials. It is the single place you decide what an agent can do: read-only or
+read-write, which tables and columns it can touch, which columns are masked, and
+how much it can run. Policies stream to the data planes and hot-reload, so a
+change takes effect on the next query without restarting anything.
+
+## What a policy contains
+
+| Rule             | What it controls                                            | Page                           |
+| ---------------- | ----------------------------------------------------------- | ------------------------------ |
+| Access mode      | Read-only or read-write, plus per-statement-type rules.     | [Read-only](/docs/read-only)   |
+| Table allowlist  | The schemas and tables the agent may read or write.         | [Allowlists](/docs/allowlists) |
+| Column allowlist | The columns within an allowed table the agent may select.   | [Allowlists](/docs/allowlists) |
+| Masking rules    | Columns redacted, nulled, or hashed in flight.              | [Masking](/docs/masking)       |
+| Query budgets    | Queries per window, max rows per result, statement timeout. | [Budgets](/docs/budgets)       |
+
+## Create and attach a policy
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    pgbeam policies create analytics-readonly \
+      --mode read-only \
+      --allow public.orders,public.users \
+      --mask users.email=hash \
+      --budget 5000/day --max-rows 1000
+
+    pgbeam agents attach analytics-bot --policy analytics-readonly
+    ```
+
+  </Tab>
+
+<Tab value="Dashboard">
+  Go to **Policies**, create a profile, set the rules, then attach it to one or
+  more agents from the **Agents** tab.
+</Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/policies \
+      -H "X-API-Key: pbo_..." \
+      -d '{
+        "name": "analytics-readonly",
+        "mode": "read-only",
+        "allow": ["public.orders", "public.users"],
+        "mask": [{"column": "users.email", "kind": "hash"}],
+        "budget": {"queries_per_day": 5000, "max_rows": 1000}
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+## Enforcement model
+
+PgBeam parses every statement an agent sends and checks it against the attached
+policy before forwarding it. Enforcement fails closed: unparseable SQL, unknown
+statement types, `COPY`, and multi-statement batches containing any blocked
+statement are rejected with an LLM-readable reason.
+
+Policies bind to agent credentials only. Your own application's passthrough
+connections are not affected.
+
+<Callout type="info" title="Hot reload">
+  Policy changes stream to the data planes and apply on the next query. You do
+  not need to rotate the credential or reconnect the agent.
+</Callout>
+
+## Related
+
+- [Read-only enforcement](/docs/read-only)
+- [Table and column allowlists](/docs/allowlists)
+- [PII masking](/docs/masking)
+- [Query budgets](/docs/budgets)
+- [Kill-switch](/docs/kill-switch)

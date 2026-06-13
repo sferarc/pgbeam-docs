@@ -1,0 +1,61 @@
+---
+title: Read-only Enforcement
+icon: Eye
+description:
+  Block every write and DDL statement for an agent credential. Reads pass,
+  writes are rejected in the wire protocol before they reach your database.
+---
+
+Read-only is the safest access mode for an agent. With it, PgBeam allows reads
+and rejects every `INSERT`, `UPDATE`, `DELETE`, and DDL statement before it
+reaches your database. The agent receives an LLM-readable reason, so it can
+adjust instead of failing blind.
+
+## Turn it on
+
+```bash title="Read-only policy"
+pgbeam policies create read-only --mode read-only
+pgbeam agents attach analytics-bot --policy read-only
+```
+
+In the dashboard, set **Access mode** to **Read-only** on the policy profile.
+
+## What is allowed and blocked
+
+| Statement                                | Read-only |
+| ---------------------------------------- | --------- |
+| `SELECT`                                 | Allowed   |
+| `WITH … SELECT` (read-only CTE)          | Allowed   |
+| `EXPLAIN` of a read                      | Allowed   |
+| `INSERT` / `UPDATE` / `DELETE`           | Blocked   |
+| `CREATE` / `ALTER` / `DROP` / `TRUNCATE` | Blocked   |
+| `COPY`                                   | Blocked   |
+| Data-modifying CTE (`WITH … UPDATE`)     | Blocked   |
+
+## What the agent sees
+
+```text
+ERROR: policy is read-only: UPDATE is not allowed
+```
+
+The error is written to be read by an LLM, so an agent can correct its plan and
+retry within the rules.
+
+## Fails closed
+
+A multi-statement batch is rejected if any statement in it would be blocked.
+Unparseable SQL and unknown statement types are rejected too. This prevents an
+agent from slipping a write past the parser.
+
+<Callout type="info" title="Need writes sometimes?">
+  Read-only is the right default. When an agent genuinely needs to write,
+  read-write mode with a tight [allowlist](/docs/allowlists) is one option. An
+  isolated, throwaway database copy is on the [roadmap](/docs/sandbox) for
+  letting an agent write freely without touching production.
+</Callout>
+
+## Related
+
+- [Policies](/docs/policies)
+- [Allowlists](/docs/allowlists)
+- [Audit log](/docs/audit-log)

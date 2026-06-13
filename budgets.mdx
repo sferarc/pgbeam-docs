@@ -1,0 +1,53 @@
+---
+title: Query Budgets
+icon: Gauge
+description:
+  Cap queries per window and rows per result for an agent credential. Runaway
+  loops and full-table scans hit a ceiling instead of your database.
+---
+
+A budget caps how much an agent can run. You set queries per window, a maximum
+number of rows per result, and a statement timeout. When an agent loops or asks
+for too much, the budget stops it at the wire instead of letting it hammer your
+database.
+
+## Set a budget
+
+```bash title="Budget on a policy"
+pgbeam policies create analytics \
+  --budget 5000/day \
+  --max-rows 1000 \
+  --statement-timeout 10s
+```
+
+In the dashboard, set the budget on the policy profile under **Budgets**.
+
+## What you can cap
+
+| Limit              | Effect                                                                                                |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| Queries per window | Cap statements per hour or per day. The next query past the cap is throttled until the window resets. |
+| Max rows           | Truncate any result to at most this many rows.                                                        |
+| Statement timeout  | Cancel a statement that runs longer than this.                                                        |
+
+## What the agent sees
+
+```text
+ERROR: query budget reached: 5,000 / day. Throttled until reset
+```
+
+The message names the limit and the window, so an agent can back off rather than
+retry blindly.
+
+<Callout type="info" title="Per-region windows">
+  Budget counters are kept per data plane and per region, like the rate limiter.
+  GeoDNS pins an agent to one region in practice, so the window it sees is
+  consistent. The control plane aggregates usage across regions and can trip the
+  [kill-switch](/docs/kill-switch) if an organization-level ceiling is breached.
+</Callout>
+
+## Related
+
+- [Policies](/docs/policies)
+- [Kill-switch](/docs/kill-switch)
+- [Query timeout](/docs/query-timeout)

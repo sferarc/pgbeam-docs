@@ -1,0 +1,66 @@
+---
+title: Kill-switch
+icon: Ban
+description:
+  Stop one agent or every agent on a project instantly. The next statement is
+  refused, with no credential rotation.
+---
+
+The kill-switch stops an agent now. Trip it on a single credential to cut off one
+agent, or at the project level to stop every agent at once. The next statement on
+a killed credential is refused. There is no credential rotation and no change to
+your database.
+
+## Trip the kill-switch
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    # Stop one agent
+    pgbeam agents kill analytics-bot
+
+    # Stop every agent on the project
+    pgbeam projects kill my-project --agents
+    ```
+
+  </Tab>
+
+<Tab value="Dashboard">
+  On the **Agents** tab, select an agent and choose **Kill**. To stop every
+  agent, use the project-level kill control.
+</Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/agents/{agentId}/kill \
+      -H "X-API-Key: pbo_..."
+    ```
+  </Tab>
+</Tabs>
+
+## How it takes effect
+
+The kill state streams to the data planes and applies on the next statement. A
+killed agent gets a clear error over a connection string, and a `401` over the
+[hosted MCP endpoint](/docs/mcp).
+
+## Kill-switch vs revoke
+
+| Action      | Effect                                                          | Reversible |
+| ----------- | --------------------------------------------------------------- | ---------- |
+| Kill-switch | Pauses access immediately. Credential and policy are preserved. | Yes        |
+| Revoke      | Removes the credential entirely.                                | No         |
+
+Use the kill-switch when you want to stop an agent now and decide later. Use
+[revoke](/docs/agent-credentials) when the credential should be gone for good.
+
+<Callout type="info" title="Org-level safety net">
+  When an organization-level budget ceiling is breached, the control plane can
+  trip the kill-switch automatically. See [Budgets](/docs/budgets).
+</Callout>
+
+## Related
+
+- [Agent credentials](/docs/agent-credentials)
+- [Budgets](/docs/budgets)
+- [Audit log](/docs/audit-log)

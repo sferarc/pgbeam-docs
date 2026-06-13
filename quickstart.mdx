@@ -1,0 +1,103 @@
+---
+title: Quickstart
+icon: Rocket
+description:
+  Connect an AI agent to your Postgres safely in two minutes. Issue a scoped
+  credential, attach a read-only policy, and watch the audit log.
+---
+
+This guide gives an AI agent safe, read-only access to your database through
+PgBeam. The agent gets a scoped credential and a hosted MCP URL. It never sees
+your real database credentials, and you can revoke its access with one click.
+
+<Callout title="Prerequisites" type="info">
+  You need a PostgreSQL database reachable from the internet and its connection
+  details (host, port, user, password, database name). Sign up at
+  [dash.pgbeam.com](https://dash.pgbeam.com); new accounts start on a 14-day
+  trial.
+</Callout>
+
+<Steps>
+  <Step>
+    ### Add your database
+
+    Create a project and add your origin database in the dashboard, or use the CLI:
+
+    ```bash title="Add a database"
+    pgbeam auth login
+    pgbeam projects create --name my-project
+    pgbeam db add --host db.example.com --port 5432 --database app --ssl-mode verify-full
+    ```
+
+    PgBeam stores these credentials and uses them to reach your database upstream.
+    The agent never receives them.
+
+  </Step>
+
+  <Step>
+    ### Issue a scoped agent credential
+
+    ```bash title="Create an agent credential"
+    pgbeam agents create --name analytics-bot --policy read-only
+    ```
+
+    This returns two things the agent can use:
+
+    ```bash
+    # Scoped Postgres connection string
+    postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app
+
+    # Hosted MCP endpoint (Bearer pba_…)
+    https://mcp.pgbeam.app/a1b2c3
+    ```
+
+    See [Agent credentials](/docs/agent-credentials) for the full surface.
+
+  </Step>
+
+  <Step>
+    ### Connect the agent over MCP
+
+    Paste the MCP URL into any MCP client. For Claude Code:
+
+    ```json title=".mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "url": "https://mcp.pgbeam.app/a1b2c3",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+    The agent now has `query`, `list_tables`, `describe_table`, and `explain`
+    tools, every call enforced against the policy. Prefer a connection string?
+    See [Connection string](/docs/connection-string).
+
+  </Step>
+
+  <Step>
+    ### Watch the audit log
+
+    Every statement the agent runs is recorded with its decision, rows, bytes,
+    and latency. Open the **Audit** tab in the dashboard, or:
+
+    ```bash title="Tail the audit log"
+    pgbeam audit tail --agent analytics-bot
+    ```
+
+    A read-only policy blocks writes and DDL automatically. The blocked statement
+    never reaches your database, and the agent receives an LLM-readable reason.
+
+  </Step>
+</Steps>
+
+## What to tighten next
+
+The read-only policy is a safe default. Narrow it further as you go:
+
+- [Allowlists](/docs/allowlists): restrict to the exact tables and columns.
+- [Masking](/docs/masking): hash or redact PII the agent should never read.
+- [Budgets](/docs/budgets): cap queries per window and rows per result.
+- [Kill-switch](/docs/kill-switch): cut an agent off mid-session.

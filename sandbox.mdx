@@ -1,0 +1,108 @@
+---
+title: Sandbox Writes
+icon: GitBranch
+description:
+  Hand an agent an instant, isolated branch of your database so it can write
+  freely against a throwaway copy, then discard it. A roadmap preview, not yet
+  available.
+---
+
+<Callout type="warn">
+  Sandbox writes are on the PgBeam roadmap and are not available yet. This page
+  is a preview of the planned behavior. The APIs, flags, and screenshots below
+  are illustrative and may change before release.
+</Callout>
+
+Read-only enforcement keeps an agent off your data by refusing every write. That
+is the right default for most agents. It is also too restrictive when the agent's
+job _is_ to write: running a migration, backfilling a column, or testing a
+generated `UPDATE` before you trust it against production.
+
+Sandbox writes are the safe-write counterpart to read-only enforcement. Instead
+of blocking the write or letting it touch production, PgBeam hands the agent an
+instant, isolated branch: a throwaway copy of your database. The agent writes
+against the branch as if it were production. When the agent is done, you discard
+the branch. Production is never touched.
+
+## What it does
+
+A sandbox is an ephemeral, writable branch of a database, scoped to an agent
+credential.
+
+- **Isolated**: writes land on the branch, never on production.
+- **Instant**: the branch spins up in seconds, ready for the agent to use.
+- **Throwaway**: discard the branch when the session ends. Nothing merges back
+  unless you explicitly promote it.
+- **Ephemeral**: an idle branch costs nothing to keep around, and a discarded
+  branch is gone.
+
+The agent connects the same way it connects today: a scoped PgBeam credential or
+the hosted MCP endpoint. The difference is the target. A sandbox credential
+routes the agent's session to a fresh branch instead of the production upstream.
+
+## How you'll use it
+
+<Callout type="info">
+  The workflow below describes the planned experience. Commands and field names
+  are not final.
+</Callout>
+
+1. Create a sandbox policy on an agent credential, marking it write-capable
+   against a branch instead of production.
+2. The agent opens a session. PgBeam provisions a fresh branch from the
+   database's current state and pins the session to it.
+3. The agent writes freely: `INSERT`, `UPDATE`, `DELETE`, even DDL, all against
+   the branch.
+4. You inspect what the branch changed in the dashboard: which rows moved, which
+   statements ran, and the full audit trail for the session.
+5. You discard the branch, or promote its changes to production after review.
+
+<Callout type="info">
+  **TODO (deep content, pending release):** a worked example of the
+  create-sandbox API call, CLI command, and MCP tool. Agent runs a backfill
+  `UPDATE`, operator reviews the changes, operator discards.
+</Callout>
+
+<Callout type="info">
+  **TODO (deep content, pending release):** branch lifecycle and limits. Max
+  branch age, max concurrent branches per project, what happens to an idle
+  session, and retention of discarded-branch audit logs.
+</Callout>
+
+## How it works
+
+When an agent opens a session under a sandbox policy, PgBeam provisions an
+isolated branch of the target database. The branch starts from production's
+current state and spins up in seconds.
+
+The branch is a real Postgres endpoint. The agent's session connects to it
+through the same wire-protocol proxy that enforces every other policy, so audit
+capture, query budgets, and masking still apply on the branch. Read-only
+enforcement is relaxed for the branch and only the branch: the agent can write,
+because there is nothing on the branch worth protecting.
+
+Branches are ephemeral by design. An idle branch costs nothing to keep, and a
+discarded branch is torn down. Promotion to production is an explicit,
+operator-driven step, never automatic. If you never promote, the agent's writes
+disappear with the branch.
+
+This keeps the core guarantee intact: an agent with a sandbox credential cannot
+change production data. The worst case is a wasted branch.
+
+## When to reach for it
+
+| Situation                                        | Use                                      |
+| ------------------------------------------------ | ---------------------------------------- |
+| Agent should only read                           | [Read-only enforcement](/docs/read-only) |
+| Agent should read, with sensitive columns hidden | [PII masking](/docs/masking)             |
+| Agent needs to write, but not against prod       | Sandbox writes (this page)               |
+
+## Related pages
+
+- [Read-only enforcement](/docs/read-only): block writes entirely for an agent
+  credential.
+- [PII masking](/docs/masking): redact, null, or hash sensitive columns in
+  flight.
+- [Policies](/docs/policies): how rules bind to agent credentials.
+- [Audit log](/docs/audit-log): every statement an agent runs, branch or
+  production.

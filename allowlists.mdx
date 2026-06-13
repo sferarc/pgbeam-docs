@@ -1,0 +1,56 @@
+---
+title: Table and Column Allowlists
+icon: ListChecks
+description:
+  Allow the exact schemas, tables, and columns an agent may touch. Anything off
+  the list is blocked in the wire protocol.
+---
+
+An allowlist names the schemas, tables, and columns an agent is allowed to
+touch. PgBeam parses each statement, resolves the relations and columns it
+references, and blocks the statement if any of them is not on the list. The
+default is deny: an agent reaches only what you explicitly allow.
+
+## Define an allowlist
+
+```bash title="Allow specific relations"
+pgbeam policies create analytics \
+  --mode read-only \
+  --allow public.orders,public.users \
+  --allow-columns public.users=id,created_at,country
+```
+
+In the dashboard, add tables and columns on the policy profile under
+**Allowlist**.
+
+## How matching works
+
+- **Tables**: a statement is allowed only if every relation it reads (or writes,
+  in read-write mode) is on the table allowlist.
+- **Columns**: when a column allowlist is set for a table, a `SELECT` may only
+  reference the allowed columns. `SELECT *` expands to the allowed set.
+- **Catalog**: reads of `pg_catalog` and `information_schema` are always
+  permitted, so the agent can introspect the schema it is allowed to query.
+
+```text
+ERROR: table internal_api_keys is not in the allowlist
+ERROR: column users.ssn is not in the allowlist
+```
+
+## Honest limits
+
+<Callout type="warn" title="Views and search_path">
+  Relation allowlists do not see through views. If you want an agent to read a
+  view, allowlist the view explicitly. `SET search_path` is blocked for agent
+  credentials to prevent allowlist evasion through unqualified names.
+</Callout>
+
+For columns that exist but should never leave the database in cleartext, combine
+the allowlist with [masking](/docs/masking): allow the column for joins and
+grouping, but hash or redact its values in flight.
+
+## Related
+
+- [Policies](/docs/policies)
+- [Read-only enforcement](/docs/read-only)
+- [PII masking](/docs/masking)

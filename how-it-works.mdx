@@ -1,0 +1,80 @@
+---
+title: How It Works
+icon: Workflow
+description:
+  How PgBeam enforces agent policy in the PostgreSQL wire protocol, between an
+  AI agent and your database, with no code changes and any Postgres host.
+---
+
+PgBeam sits in the wire between an AI agent and your database. The agent
+connects to PgBeam, not to Postgres directly. Every statement the agent sends is
+parsed, checked against the policy attached to its credential, and only
+forwarded if it is allowed. Enforcement happens at the PostgreSQL wire protocol,
+so it works with RDS, Aurora, self-hosted Postgres, or any managed provider,
+with no extension to install and no change to your schema.
+
+## The path of a query
+
+1. The agent sends a statement over its scoped connection string or the hosted
+   MCP endpoint.
+2. PgBeam authenticates the agent credential and resolves the policy attached to
+   it.
+3. PgBeam parses the statement and checks it: access mode (read-only or
+   read-write), table and column allowlists, and statement type.
+4. If the statement is blocked, PgBeam returns a PostgreSQL `ErrorResponse` with
+   an LLM-readable reason. The query never reaches your database.
+5. If the statement is allowed, PgBeam forwards it upstream using your stored
+   database credentials, applies masking to the result, counts it against the
+   budget, and records it in the audit log.
+
+```
+AI agent ──▶ PgBeam (parse · policy · mask · budget · audit) ──▶ your Postgres
+```
+
+## Why the wire, not the database
+
+Role grants and row-level security live inside one database. They cannot mask a
+column on the way out, return an LLM-readable reason, cap a query budget, or give
+you a single audit trail across every database. PgBeam enforces in the wire
+protocol, so the same policy engine reaches every Postgres host you connect,
+including ones a database vendor cannot reach because they only guard their own
+hosting.
+
+## Two front doors, one policy engine
+
+You can hand an agent either surface. Both are backed by the same policy.
+
+- A **scoped connection string** for any PostgreSQL driver, ORM, or framework.
+  See [Connection string](/docs/connection-string).
+- A **hosted MCP endpoint** for Claude Code, Cursor, or any MCP client. See
+  [Hosted MCP](/docs/mcp).
+
+## What you control per credential
+
+| Control                 | What it does                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------ |
+| Access mode             | Read-only or read-write. See [Read-only](/docs/read-only).                     |
+| Table/column allowlists | Allow the exact relations and columns. See [Allowlists](/docs/allowlists).     |
+| PII masking             | Redact, null, or hash columns in flight. See [Masking](/docs/masking).         |
+| Query budgets           | Cap queries per window and rows per result. See [Budgets](/docs/budgets).      |
+| Kill-switch             | Stop one agent or every agent instantly. See [Kill-switch](/docs/kill-switch). |
+| Audit trail             | Record every statement and decision. See [Audit log](/docs/audit-log).         |
+
+## Honest limits
+
+PgBeam fails closed for agent credentials. Unparseable SQL, unknown statement
+types, `COPY`, and multi-statement batches containing any blocked statement are
+rejected.
+
+- Relation allowlists do not see through views. Allowlist the views you want the
+  agent to read.
+- `SET search_path` is blocked for agent credentials to prevent allowlist
+  evasion.
+- Binary-format result columns are masked to `NULL`; text-format columns get a
+  redaction token. See [Masking](/docs/masking) for the semantics.
+
+## Next
+
+- [Quickstart](/docs/quickstart): connect an agent in two minutes.
+- [Policies](/docs/policies): the full policy model.
+- [Agent credentials](/docs/agent-credentials): scoped, revocable access.

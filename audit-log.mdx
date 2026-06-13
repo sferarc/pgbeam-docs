@@ -1,0 +1,66 @@
+---
+title: Audit Log
+icon: ScrollText
+description:
+  Every statement an agent runs, allowed or blocked, recorded with its decision,
+  reason, rows, bytes, latency, and credential.
+---
+
+The audit log records every statement an agent runs through PgBeam, whether it
+was allowed, masked, blocked, or throttled. Each entry captures the SQL, the
+decision and the reason for it, the rows and bytes returned, the latency, and the
+credential that ran it. Recent entries are queryable in the control plane;
+older entries are archived for retention.
+
+## What is recorded
+
+| Field      | Description                                              |
+| ---------- | -------------------------------------------------------- |
+| Time       | When the statement ran.                                  |
+| Credential | The agent credential that ran it.                        |
+| SQL        | The statement, as parsed.                                |
+| Decision   | `allowed`, `masked`, `blocked`, or `throttled`.          |
+| Reason     | Why it was blocked, masked, or throttled.                |
+| Rows       | Rows returned to the agent (after masking and row caps). |
+| Bytes      | Bytes returned.                                          |
+| Latency    | Time to serve the statement.                             |
+| Source     | Connection string or hosted MCP.                         |
+
+## Read the log
+
+Open the **Audit** tab in the dashboard to filter by agent, decision, or time
+range and export the result. From the terminal or API:
+
+```bash title="Read the audit log"
+# CLI
+pgbeam audit list --decision blocked --since 24h
+
+# API
+curl "https://api.pgbeam.com/v1/projects/{projectId}/audit?decision=blocked" \
+  -H "X-API-Key: pbo_..."
+```
+
+## How the pipeline works
+
+Each data plane captures the decision for every agent statement and ships it to
+the control plane. Recent entries are stored in control-plane Postgres for fast
+querying, and batched archives are written to object storage for long-term
+retention.
+
+<Callout type="info" title="Retention by plan">
+  Audit retention depends on your plan: 7 days on Starter, 30 days on Pro, and
+  90 days on Scale. See [Plans](/docs/plans). Archived entries remain available
+  for export within your retention window.
+</Callout>
+
+## What it is good for
+
+- Answer "what did this agent do" with the exact statements and decisions.
+- Show a reviewer or security owner that an agent was held to its policy.
+- Spot an agent that is hitting blocks or budgets and needs its policy adjusted.
+
+## Related
+
+- [Policies](/docs/policies)
+- [Kill-switch](/docs/kill-switch)
+- [Plans](/docs/plans)

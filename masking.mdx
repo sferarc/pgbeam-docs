@@ -1,0 +1,61 @@
+---
+title: PII Masking
+icon: EyeOff
+description:
+  Redact, null, or hash sensitive columns in agent results. Applied in flight,
+  so your app sees real values and the agent never does.
+---
+
+Masking rewrites sensitive column values in an agent's results before they leave
+the wire. You name the columns to protect and choose how to mask each one. Your
+application keeps reading the real values on its own connection. The agent
+receives masked data it can still join and group on, but never the raw value.
+
+## Define masking rules
+
+```bash title="Mask columns by schema.table.column"
+pgbeam policies create analytics \
+  --mask users.email=hash \
+  --mask users.ssn=redact \
+  --mask users.phone=null
+```
+
+In the dashboard, add masking rules on the policy profile under **Masking**.
+
+## Mask kinds
+
+| Kind     | Text-format result               | Binary-format result | Use it for                                |
+| -------- | -------------------------------- | -------------------- | ----------------------------------------- |
+| `redact` | A fixed token, e.g. `[redacted]` | `NULL`               | Free-text fields the agent must not read. |
+| `hash`   | SHA-256 hex of the value         | `NULL`               | Joinable identifiers (email, user key).   |
+| `null`   | Empty / `NULL`                   | `NULL`               | Columns the agent should ignore entirely. |
+
+`hash` keeps the same input mapping to the same output, so an agent can still
+join and group on the column without ever seeing the cleartext.
+
+## When masking applies
+
+Masking is applied at serve time on the result path, for agent sessions only. It
+runs whether the result comes from your database or from PgBeam's cache: the
+cache keeps raw bytes, and each connection's policy decides what it sees. Your
+application's passthrough connection is never masked.
+
+<Callout type="warn" title="Masking semantics">
+  Binary-format result columns are masked to `NULL` to stay type-safe;
+  text-format columns get a redaction token or hash. When a query computes an
+  expression over a masked column (for example `lower(email)`), PgBeam masks by
+  the output column name as a conservative extra net. Allowlist the columns you
+  expose and mask the ones you must protect.
+</Callout>
+
+## Combine with allowlists
+
+Masking and [allowlists](/docs/allowlists) work together. Allow a column so the
+agent can join and group on it, and mask it so the agent never reads the raw
+value.
+
+## Related
+
+- [Policies](/docs/policies)
+- [Allowlists](/docs/allowlists)
+- [Audit log](/docs/audit-log)

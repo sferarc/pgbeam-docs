@@ -1,0 +1,81 @@
+---
+title: Hosted MCP
+icon: Plug
+description:
+  A hosted MCP endpoint that gives AI agents policy-enforced database tools.
+  Paste one URL into Claude Code, Cursor, or any MCP client. No server to run.
+---
+
+The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
+server that exposes policy-enforced database tools to an AI agent. You paste one
+URL into your MCP client, and the agent gets `query`, `list_tables`,
+`describe_table`, and `explain`. Every call runs through the same policy engine
+as a scoped connection string, so the agent is held to the same guardrails. There
+is nothing to install and no server to run.
+
+## Connect a client
+
+Each agent credential has its own MCP URL and bearer token. Find them in the
+**Agents** tab or in the credential create response.
+
+<Tabs items={["Claude Code", "Cursor", "MCP Inspector"]}>
+  <Tab value="Claude Code">
+    ```json title=".mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "url": "https://mcp.pgbeam.app/a1b2c3",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+  </Tab>
+
+<Tab value="Cursor">
+  Add the server URL and bearer token in **Settings → MCP**. The four tools
+  appear once the connection is established.
+</Tab>
+
+  <Tab value="MCP Inspector">
+    ```bash
+    npx @modelcontextprotocol/inspector
+    # Connect to https://mcp.pgbeam.app/a1b2c3 with the Bearer token
+    ```
+  </Tab>
+</Tabs>
+
+## Tools
+
+| Tool             | Purpose                                                                   |
+| ---------------- | ------------------------------------------------------------------------- |
+| `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.      |
+| `list_tables`    | List tables in a schema, shaped for an LLM.                               |
+| `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count. |
+| `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                  |
+
+Catalog introspection (`list_tables`, `describe_table`) always works: reads of
+`pg_catalog` and `information_schema` are permitted regardless of the allowlist,
+so an agent can discover the schema it is allowed to query.
+
+## Enforcement is identical to the connection string
+
+The MCP endpoint executes SQL as a PostgreSQL wire client through the nearest
+data plane, using the agent credential. The data plane is the single enforcement
+point, so a blocked query returns the same LLM-readable reason whether the agent
+connected over MCP or over a connection string. Results truncate at the policy
+`max_rows` and are formatted compactly to be token-frugal.
+
+## Errors an agent will see
+
+- A blocked statement returns the policy reason in the tool result, so the agent
+  can correct itself and retry within the rules.
+- A revoked or killed credential returns `401`.
+- An exhausted [budget](/docs/budgets) returns a clear throttle message with the
+  window.
+
+## Related
+
+- [Connection string](/docs/connection-string): the other front door.
+- [Policies](/docs/policies): what the tools are enforced against.
+- [Agent credentials](/docs/agent-credentials): issue and revoke MCP tokens.
