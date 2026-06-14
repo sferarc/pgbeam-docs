@@ -6,7 +6,7 @@ icon: Bot
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Start a Model Context Protocol (MCP) server using stdio transport. This allows AI coding assistants like Claude Code, Cursor, and other MCP-compatible clients to manage PgBeam projects, databases, and cache rules directly. The server exposes PgBeam API operations as MCP tools.
+Start a Model Context Protocol (MCP) server using stdio transport. This allows AI coding assistants like Claude Code, Cursor, and other MCP-compatible clients to manage PgBeam projects, databases, and cache rules directly. Rather than one tool per endpoint, the server exposes three meta-tools — search_endpoints, describe_endpoint, and call_endpoint — so the agent discovers and invokes the API it needs without loading dozens of tool schemas up front.
 
 ## Usage
 
@@ -184,14 +184,14 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
     }
   }'
 
-# List tools
+# List tools (returns the three meta-tools)
 curl -X POST https://api.pgbeam.com/v1/mcp \
   -H "Authorization: Bearer pbk_..." \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -d '{"jsonrpc": "2.0", "id": 2, "method": "tools/list"}'
 
-# Call a tool
+# 1. Find the operation you need
 curl -X POST https://api.pgbeam.com/v1/mcp \
   -H "Authorization: Bearer pbk_..." \
   -H "Content-Type: application/json" \
@@ -201,17 +201,49 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
     "id": 3,
     "method": "tools/call",
     "params": {
-      "name": "listProjects",
-      "arguments": { "org_id": "org_abc123" }
+      "name": "search_endpoints",
+      "arguments": { "query": "projects" }
+    }
+  }'
+
+# 2. Invoke it by operation id
+curl -X POST https://api.pgbeam.com/v1/mcp \
+  -H "Authorization: Bearer pbk_..." \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 4,
+    "method": "tools/call",
+    "params": {
+      "name": "call_endpoint",
+      "arguments": {
+        "operation_id": "listProjects",
+        "query_params": { "org_id": "org_abc123" }
+      }
     }
   }'
 ```
 
 ## Available tools
 
-Tools are auto-generated from the [OpenAPI spec](/docs/api). Every public
-endpoint becomes an MCP tool named after its `operationId`. Path and query
-parameters become tool arguments; mutating methods (`POST`, `PATCH`, `PUT`)
-accept a `body` object.
+The management API has dozens of endpoints. Exposing each as its own MCP tool
+floods the agent's context with schemas it will never use, so the server
+instead exposes three meta-tools and lets the agent discover what it needs:
 
-Both transports expose the same set of tools.
+| Tool                | Purpose                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `search_endpoints`  | Find operations by intent. Returns a compact list (`operation_id`, `method`, `path`, `tag`). Optional `query` and `limit`. |
+| `describe_endpoint` | Return one operation's full schema: parameters and request body. Takes `operation_id`.                                     |
+| `call_endpoint`     | Invoke an operation. Takes `operation_id`, plus `path_params`, `query_params`, and `body` as needed.                       |
+
+The operation ids and shapes come from the [OpenAPI spec](/docs/api). The
+typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.
+Both transports expose the same three meta-tools.
+
+<Callout type="info" title="This is the management MCP">
+  This server manages your PgBeam account (projects, databases, policies,
+  credentials). To give an agent **query access to a database**, use the [hosted
+  agent-database MCP](/docs/mcp) instead — a separate endpoint with `query`,
+  `list_tables`, `describe_table`, and `explain` tools, held to your policies.
+</Callout>

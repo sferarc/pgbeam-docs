@@ -6,11 +6,19 @@ icon: Bot
 
 `POST /v1/mcp` is a remote
 [Model Context Protocol](https://modelcontextprotocol.io) server using the
-Streamable HTTP transport. It exposes every public API operation as an MCP tool
-so AI assistants can manage PgBeam resources directly.
+Streamable HTTP transport. It lets AI assistants manage PgBeam resources
+(projects, databases, policies, agent credentials) through three meta-tools
+rather than one tool per endpoint.
 
 See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering
 both the CLI (stdio) and remote (HTTP) transports.
+
+<Callout type="info" title="Two different MCP servers">
+  This is the **management** MCP — it administers your account. To give an agent
+  **query access to a database**, use the [hosted agent-database
+  MCP](/docs/mcp), a separate endpoint with `query`, `list_tables`,
+  `describe_table`, and `explain` tools enforced by your policies.
+</Callout>
 
 ## Quick start
 
@@ -48,8 +56,15 @@ token or API key in the `Authorization` header. See
 
 ## Tools
 
-Tools are auto-generated from the OpenAPI spec. Each public endpoint becomes a
-tool named after its `operationId`. Arguments map to path parameters, query
-parameters, and an optional `body` object for mutating methods.
+`tools/list` returns three meta-tools that wrap the whole API. This keeps the
+agent's context small — it discovers operations on demand instead of loading a
+schema for every endpoint up front.
 
-Call `tools/list` to discover all available tools and their input schemas.
+| Tool                | Purpose                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| `search_endpoints`  | Find operations by intent (`query`, `limit`). Returns `operation_id`, `method`, `path`, `tag`. |
+| `describe_endpoint` | Full schema for one operation (`operation_id`): parameters and request body.                   |
+| `call_endpoint`     | Invoke an operation: `operation_id`, plus `path_params`, `query_params`, and `body` as needed. |
+
+The operation ids and shapes mirror the [OpenAPI spec](/docs/api). A typical
+flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.

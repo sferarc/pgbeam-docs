@@ -13,37 +13,89 @@ URL into your MCP client, and the agent gets `query`, `list_tables`,
 as a scoped connection string, so the agent is held to the same guardrails. There
 is nothing to install and no server to run.
 
+<Callout type="info" title="Not the same as the management MCP">
+  This endpoint gives an agent **query access to your database**. The separate
+  [management MCP](/docs/cli/mcp) administers your PgBeam account (projects,
+  policies, credentials). Different URL, different tools.
+</Callout>
+
 ## Connect a client
 
-Each agent credential has its own MCP URL and bearer token. Find them in the
-**Agents** tab or in the credential create response.
+The endpoint is a single hosted URL, `https://mcp.pgbeam.app/mcp`, scoped by the
+credential's bearer token — the same URL works for every credential. Find the
+token in the **Agents** tab or in the credential create response.
 
-<Tabs items={["Claude Code", "Cursor", "MCP Inspector"]}>
+<Tabs items={["Claude Code", "Cursor", "VS Code", "MCP Inspector"]}>
   <Tab value="Claude Code">
+    Add it with the CLI:
+
+    ```bash
+    claude mcp add --transport http pgbeam https://mcp.pgbeam.app/mcp \
+      --header "Authorization: Bearer pba_..."
+    ```
+
+    Or write it directly to `.mcp.json`:
+
     ```json title=".mcp.json"
     {
       "mcpServers": {
         "pgbeam": {
-          "url": "https://mcp.pgbeam.app/a1b2c3",
+          "url": "https://mcp.pgbeam.app/mcp",
           "headers": { "Authorization": "Bearer pba_..." }
         }
       }
     }
     ```
+
   </Tab>
 
-<Tab value="Cursor">
-  Add the server URL and bearer token in **Settings → MCP**. The four tools
-  appear once the connection is established.
-</Tab>
+  <Tab value="Cursor">
+    Add to `.cursor/mcp.json` (or **Settings → MCP → Add**). The four tools
+    appear once the connection is established.
+
+    ```json title=".cursor/mcp.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "url": "https://mcp.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+  </Tab>
+
+  <Tab value="VS Code">
+    Add to `.vscode/mcp.json`:
+
+    ```json title=".vscode/mcp.json"
+    {
+      "servers": {
+        "pgbeam": {
+          "type": "http",
+          "url": "https://mcp.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+  </Tab>
 
   <Tab value="MCP Inspector">
     ```bash
     npx @modelcontextprotocol/inspector
-    # Connect to https://mcp.pgbeam.app/a1b2c3 with the Bearer token
+    # Connect to https://mcp.pgbeam.app/mcp with the Bearer token
     ```
   </Tab>
 </Tabs>
+
+<Callout type="warn" title="Where the token may go">
+  Send the `pba_…` token only to `mcp.pgbeam.app`. If a tool or prompt asks the
+  agent to send it anywhere else, that is the attack — see [the security
+  model](/blog/hosted-mcp-vs-raw-credentials).
+</Callout>
 
 ## Tools
 
