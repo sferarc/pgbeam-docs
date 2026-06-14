@@ -3,13 +3,13 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints as
   Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
 Crossplane. The `provider-pgbeam` package provides managed resources for
-projects, databases, replicas, custom domains, cache rules, and spend limits.
+projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints.
 
 ## Setup
 
@@ -270,6 +270,56 @@ spec:
 
 **Status:** `orgID`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
 
+### AgentCredential
+
+Manages a scoped agent credential (a PgBeam-issued Postgres login plus a hosted MCP token) for an AI agent. The connection string and MCP token are one-time secrets returned only at creation and exposed as sensitive computed outputs; they cannot be retrieved again. To rotate the secrets, taint/replace the resource (or use the rotate endpoint out of band).
+
+```yaml
+apiVersion: pgbeam.io/v1alpha1
+kind: AgentCredential
+metadata:
+  name: example
+spec:
+  forProvider:
+    projectID: prj_01h455vb4pex5vsknk084sn02q
+    policyProfileID: pol_01h455vb4pex5vsknk084sn02q
+    name: Claude Code (analytics)
+    status: active
+    principalType: agent
+    expiresAt: ...
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `pgUsername`, `authMethod`, `lastUsedAt`, `createdAt`, `updatedAt`, `connectionString`, `mcpURL`, `mcpToken`
+
+### WebhookEndpoint
+
+Manages a webhook endpoint that receives project audit and anomaly event deliveries. The signing secret is write-only and never returned by the API.
+
+```yaml
+apiVersion: pgbeam.io/v1alpha1
+kind: WebhookEndpoint
+metadata:
+  name: example
+spec:
+  forProvider:
+    projectID: ...
+    url: https://example.com/hooks/pgbeam
+    format: json
+    eventTypes: ["..."]
+    enabled: true
+    description: ...
+    secretSecretRef:
+      name: credentials
+      namespace: default
+      key: secret
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `createdAt`, `updatedAt`
+
 ## Configuration
 
 | Setting           | Source         | Description                                      |
@@ -281,14 +331,16 @@ spec:
 
 Some spec changes trigger resource recreation rather than in-place updates:
 
-| Resource     | Recreation triggers                    |
-| ------------ | -------------------------------------- |
-| Project      | `orgId`, `cloud`                       |
-| Database     | `projectId`                            |
-| Replica      | Any spec change (immutable)            |
-| CustomDomain | Any spec change (immutable)            |
-| CacheRule    | `projectId`, `databaseId`, `queryHash` |
-| SpendLimit   | `orgId`                                |
+| Resource        | Recreation triggers                                                  |
+| --------------- | -------------------------------------------------------------------- |
+| Project         | `orgId`, `cloud`                                                     |
+| Database        | `projectId`                                                          |
+| Replica         | Any spec change (immutable)                                          |
+| CustomDomain    | Any spec change (immutable)                                          |
+| CacheRule       | `projectId`, `databaseId`, `queryHash`                               |
+| SpendLimit      | `orgId`                                                              |
+| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| WebhookEndpoint | `projectId`                                                          |
 
 ## Further reading
 

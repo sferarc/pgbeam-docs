@@ -3,12 +3,12 @@ title: Pulumi
 icon: Blocks
 tag: TypeScript
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, and spend limits as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints as
   infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
 Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, and spend limits.
+package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints.
 
 ## Setup
 
@@ -209,6 +209,41 @@ const res = new pgbeam.SpendLimit("example", {
 
 **Outputs:** `orgId`, `plan`, `billingProvider`, `subscriptionStatus`, `currentPeriodEnd`, `enabled`, `customPricing`, `limits`, `createdAt`, `updatedAt`
 
+### AgentCredential
+
+Manages a scoped agent credential (a PgBeam-issued Postgres login plus a hosted MCP token) for an AI agent. The connection string and MCP token are one-time secrets returned only at creation and exposed as sensitive computed outputs; they cannot be retrieved again. To rotate the secrets, taint/replace the resource (or use the rotate endpoint out of band).
+
+```ts
+const res = new pgbeam.AgentCredential("example", {
+  projectId: "prj_01h455vb4pex5vsknk084sn02q",
+  policyProfileId: "pol_01h455vb4pex5vsknk084sn02q",
+  name: "Claude Code (analytics)",
+  status: "active",
+  principalType: "agent",
+  expiresAt: "...",
+});
+```
+
+**Outputs:** `pgUsername`, `authMethod`, `lastUsedAt`, `createdAt`, `updatedAt`, `connectionString`, `mcpUrl`, `mcpToken`
+
+### WebhookEndpoint
+
+Manages a webhook endpoint that receives project audit and anomaly event deliveries. The signing secret is write-only and never returned by the API.
+
+```ts
+const res = new pgbeam.WebhookEndpoint("example", {
+  projectId: "...",
+  url: "https://example.com/hooks/pgbeam",
+  format: "json",
+  eventTypes: ["..."],
+  enabled: true,
+  description: "...",
+  secret: secret.value,
+});
+```
+
+**Outputs:** `createdAt`, `updatedAt`
+
 ## Configuration
 
 | Setting          | Source        | Description                                      |
@@ -226,14 +261,16 @@ variables.
 Some property changes trigger resource replacement (delete + create) rather
 than in-place updates:
 
-| Resource     | Replacement triggers                   |
-| ------------ | -------------------------------------- |
-| Project      | `orgId`, `cloud`                       |
-| Database     | `projectId`                            |
-| Replica      | Any property change (immutable)        |
-| CustomDomain | Any property change (immutable)        |
-| CacheRule    | `projectId`, `databaseId`, `queryHash` |
-| SpendLimit   | `orgId`                                |
+| Resource        | Replacement triggers                                                 |
+| --------------- | -------------------------------------------------------------------- |
+| Project         | `orgId`, `cloud`                                                     |
+| Database        | `projectId`                                                          |
+| Replica         | Any property change (immutable)                                      |
+| CustomDomain    | Any property change (immutable)                                      |
+| CacheRule       | `projectId`, `databaseId`, `queryHash`                               |
+| SpendLimit      | `orgId`                                                              |
+| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| WebhookEndpoint | `projectId`                                                          |
 
 ## Further reading
 
