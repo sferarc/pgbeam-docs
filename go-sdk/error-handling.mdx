@@ -10,7 +10,7 @@ All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for
 `*pgbeam.APIError`.
 
 ```go
-import pgbeam "github.com/pgbeam/pgbeam-go"
+import pgbeam "go.pgbeam.com/sdk"
 
 project, err := client.Projects.Get(ctx, "proj_missing")
 if err != nil {
@@ -70,7 +70,7 @@ backoff formula and retry behavior details.
 ### Retry configuration
 
 ```go
-import pgbeam "github.com/pgbeam/pgbeam-go"
+import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
     APIKey: "your-api-key",
