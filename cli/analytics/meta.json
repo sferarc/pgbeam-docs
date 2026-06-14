@@ -2,5 +2,10 @@
 	"defaultOpen": false,
 	"title": "analytics",
 	"icon": "ChartLine",
-	"pages": ["metrics", "insights", "plans"]
+	"pages": [
+		"metrics",
+		"insights",
+		"plans",
+		"spend-limit"
+	]
 }

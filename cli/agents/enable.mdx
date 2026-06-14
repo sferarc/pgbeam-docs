@@ -1,0 +1,37 @@
+---
+title: agents enable
+description: Re-enable a disabled agent credential
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Re-enable an agent credential that was previously disabled with `pgbeam agents disable`. New connections using it are accepted again, subject to its policy profile.
+
+## Usage
+
+```bash
+pgbeam agents enable <id>
+```
+
+## Options
+
+| Option | Description         | Required | Default |
+| ------ | ------------------- | -------- | ------- |
+| `<id>` | Agent credential ID | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Re-enable a credential
+pgbeam agents enable agt_xxx
+```
+
+## Output
+
+Confirms the credential was enabled.

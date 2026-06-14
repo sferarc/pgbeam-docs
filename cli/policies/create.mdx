@@ -1,0 +1,42 @@
+---
+title: policies create
+description: Create a policy profile
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Create a policy profile. Provide a name and access mode, or pass a JSON file describing the full profile (statement rules, allow/deny lists, masking, budgets).
+
+## Usage
+
+```bash
+pgbeam policies create [flags]
+```
+
+## Options
+
+| Option           | Description                                    | Required | Default |
+| ---------------- | ---------------------------------------------- | -------- | ------- |
+| `--name <value>` | Policy profile name                            | Yes      | -       |
+| `--mode <value>` | Access mode: read_only or read_write           | No       | -       |
+| `--file <value>` | Path to a JSON file with the full profile body | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Create a read-only profile
+pgbeam policies create --name "read-only" --mode read_only
+
+# Create from a JSON file
+pgbeam policies create --name analytics --file ./policy.json
+```
+
+## Output
+
+Prints the created policy profile.

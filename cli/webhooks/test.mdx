@@ -1,0 +1,40 @@
+---
+title: webhooks test
+description: Send a test delivery to a webhook endpoint
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Trigger a test delivery to a webhook endpoint to verify its URL, format, and signing secret are configured correctly. PgBeam sends a sample payload and reports the result.
+
+## Usage
+
+```bash
+pgbeam webhooks test <id>
+```
+
+## Options
+
+| Option | Description                        | Required | Default |
+| ------ | ---------------------------------- | -------- | ------- |
+| `<id>` | ID of the webhook endpoint to test | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Send a test delivery
+pgbeam webhooks test wh_xxx
+
+# Send a test delivery and get the result as JSON
+pgbeam webhooks test wh_xxx --json
+```
+
+## Output
+
+Prints a success message confirming the test delivery was sent. With `--json`, returns the test result from the API.

@@ -1,0 +1,45 @@
+---
+title: audit list
+description: List agent audit log entries
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List agent statement audit entries for the linked project, newest first. Filter by credential or event type (e.g. blocked) to focus on policy violations.
+
+## Usage
+
+```bash
+pgbeam audit list [flags]
+```
+
+## Options
+
+| Option                 | Description                             | Required | Default |
+| ---------------------- | --------------------------------------- | -------- | ------- |
+| `--credential <value>` | Filter to one agent credential ID       | No       | -       |
+| `--event <value>`      | Filter to one event type (e.g. blocked) | No       | -       |
+| `--limit <value>`      | Maximum entries to return (default 20)  | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Recent audit entries
+pgbeam audit list
+
+# Only blocked statements
+pgbeam audit list --event blocked
+
+# Entries for one credential
+pgbeam audit list --credential agt_xxx
+```
+
+## Output
+
+Displays a table with columns: Time, Event, Kind, Rule, and SQL.

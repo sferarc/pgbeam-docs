@@ -1,0 +1,48 @@
+---
+title: migrations lint
+description: Lint a migration for unsafe DDL
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Lint migration SQL for unsafe DDL patterns before applying it. Detects operations that can lock tables, break replication, or cause downtime (such as adding NOT NULL columns without a default, dropping columns, or rewriting large tables) and reports findings with severity, the offending statement, and a remediation hint. Provide SQL inline as an argument or from a file with --file.
+
+## Usage
+
+```bash
+pgbeam migrations lint [sql] [flags]
+```
+
+## Options
+
+| Option               | Description                      | Required | Default |
+| -------------------- | -------------------------------- | -------- | ------- |
+| `<sql>`              | Inline SQL to lint               | No       | -       |
+| `--file <value>`     | Path to a .sql file to lint      | No       | -       |
+| `--database <value>` | Database ID to scope the lint to | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Lint inline SQL
+pgbeam migrations lint "ALTER TABLE users ADD COLUMN age int NOT NULL;"
+
+# Lint a migration file
+pgbeam migrations lint --file ./0001.sql
+
+# Lint against a specific database
+pgbeam migrations lint --file ./0001.sql --database db_xxx
+
+# Get findings as JSON
+pgbeam migrations lint --file ./0001.sql --json
+```
+
+## Output
+
+Prints whether the migration is safe and lists any findings with their severity, rule, message, hint, and offending statement. With `--json`, returns an object with `safe` and `findings`.

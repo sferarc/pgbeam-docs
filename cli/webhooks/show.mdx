@@ -1,0 +1,40 @@
+---
+title: webhooks show
+description: Show a webhook endpoint
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Display the full configuration of a single webhook endpoint, including its URL, delivery format, subscribed event types, enabled state, description, and timestamps.
+
+## Usage
+
+```bash
+pgbeam webhooks show <id>
+```
+
+## Options
+
+| Option | Description                        | Required | Default |
+| ------ | ---------------------------------- | -------- | ------- |
+| `<id>` | ID of the webhook endpoint to show | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Show a webhook endpoint
+pgbeam webhooks show wh_xxx
+
+# Show a webhook endpoint as JSON
+pgbeam webhooks show wh_xxx --json
+```
+
+## Output
+
+Prints each field of the webhook endpoint on its own line. With `--json`, returns the full webhook object from the API.

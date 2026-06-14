@@ -1,0 +1,44 @@
+---
+title: analytics spend-limit
+description: Set or remove the organization monthly spend cap
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Set a monthly USD spend cap for the active organization, or remove it with `--remove`. When the cap is reached, usage-based features are paused until the next billing period. Pass the amount in dollars (e.g. 250 for $250/mo).
+
+## Usage
+
+```bash
+pgbeam analytics spend-limit [amount] [flags]
+```
+
+## Options
+
+| Option     | Description                                                    | Required | Default |
+| ---------- | -------------------------------------------------------------- | -------- | ------- |
+| `<amount>` | Monthly spend cap in USD (e.g. 250). Omit when using --remove. | No       | -       |
+| `--remove` | Remove the spend cap entirely                                  | No       | `false` |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Set the cap to $250/mo
+pgbeam analytics spend-limit 250
+
+# Set the cap for a specific org
+pgbeam analytics spend-limit 500 --org org_xxx
+
+# Remove the cap
+pgbeam analytics spend-limit --remove
+```
+
+## Output
+
+Confirms the new spend cap (or its removal) and prints the current value. With `--json`, returns the updated organization plan object.

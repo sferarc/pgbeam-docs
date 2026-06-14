@@ -1,0 +1,11 @@
+{
+	"defaultOpen": false,
+	"title": "policies",
+	"icon": "ShieldCheck",
+	"pages": [
+		"list",
+		"show",
+		"create",
+		"delete"
+	]
+}

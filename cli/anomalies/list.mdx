@@ -1,0 +1,43 @@
+---
+title: anomalies list
+description: List anomaly-detection alerts for a project
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List anomaly-detection alerts for the linked project. Shows each alert's ID, severity, kind, title, status, and creation time. Use `--status` to filter by open, acknowledged, or resolved alerts.
+
+## Usage
+
+```bash
+pgbeam anomalies list [flags]
+```
+
+## Options
+
+| Option             | Description                                       | Required | Default |
+| ------------------ | ------------------------------------------------- | -------- | ------- |
+| `--status <value>` | Filter by status: open, acknowledged, or resolved | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# List anomaly alerts
+pgbeam anomalies list
+
+# List only open alerts
+pgbeam anomalies list --status open
+
+# List as JSON
+pgbeam anomalies list --json
+```
+
+## Output
+
+Displays a table with columns: ID, Severity, Kind, Title, Status, and Created. With `--json`, returns the full list of anomaly alerts.

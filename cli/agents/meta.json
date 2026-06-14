@@ -1,0 +1,12 @@
+{
+	"defaultOpen": false,
+	"title": "agents",
+	"icon": "Bot",
+	"pages": [
+		"list",
+		"create",
+		"revoke",
+		"disable",
+		"enable"
+	]
+}

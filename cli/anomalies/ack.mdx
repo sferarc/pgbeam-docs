@@ -1,0 +1,37 @@
+---
+title: anomalies ack
+description: Acknowledge an anomaly alert
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Acknowledge an anomaly-detection alert by ID. Marks the alert as acknowledged, indicating it has been seen and is being handled.
+
+## Usage
+
+```bash
+pgbeam anomalies ack <id>
+```
+
+## Options
+
+| Option | Description      | Required | Default |
+| ------ | ---------------- | -------- | ------- |
+| `<id>` | Anomaly alert ID | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Acknowledge an anomaly
+pgbeam anomalies ack anom_xxx
+```
+
+## Output
+
+Confirms the anomaly was acknowledged.

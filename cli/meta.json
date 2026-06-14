@@ -16,6 +16,16 @@
 		"account",
 		"api",
 		"platform",
+		"---Agent gateway---",
+		"agents",
+		"policies",
+		"approvals",
+		"anomalies",
+		"audit",
+		"webhooks",
+		"branches",
+		"migrations",
+		"---Other---",
 		"mcp",
 		"update"
 	]

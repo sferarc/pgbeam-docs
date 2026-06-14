@@ -1,0 +1,41 @@
+---
+title: approvals reject
+description: Reject a held statement
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Reject a held statement approval request by ID. The statement is denied and will not execute. Optionally attach a reason recorded in the audit trail.
+
+## Usage
+
+```bash
+pgbeam approvals reject <id> [flags]
+```
+
+## Options
+
+| Option             | Description                        | Required | Default |
+| ------------------ | ---------------------------------- | -------- | ------- |
+| `<id>`             | Approval request ID                | Yes      | -       |
+| `--reason <value>` | Reason recorded in the audit trail | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Reject a statement
+pgbeam approvals reject apr_xxx
+
+# Reject with a reason
+pgbeam approvals reject apr_xxx --reason "writes to prod"
+```
+
+## Output
+
+Confirms the statement was rejected.

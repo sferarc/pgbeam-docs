@@ -1,0 +1,40 @@
+---
+title: branches list
+description: List ephemeral database sandbox branches
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List ephemeral database sandbox branches for the linked project. By default only active (non-discarded) branches are shown; pass `--all` to include discarded ones. Shows each branch's ID, name, source database, status, and creation time.
+
+## Usage
+
+```bash
+pgbeam branches list [flags]
+```
+
+## Options
+
+| Option  | Description                | Required | Default |
+| ------- | -------------------------- | -------- | ------- |
+| `--all` | Include discarded branches | No       | `false` |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# List active branches
+pgbeam branches list
+
+# Include discarded branches
+pgbeam branches list --all
+```
+
+## Output
+
+Displays a table with columns: ID, Name, Database, Status, and Created.

@@ -1,0 +1,10 @@
+{
+	"defaultOpen": false,
+	"title": "approvals",
+	"icon": "CheckCheck",
+	"pages": [
+		"list",
+		"approve",
+		"reject"
+	]
+}

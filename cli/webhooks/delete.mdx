@@ -1,0 +1,41 @@
+---
+title: webhooks delete
+description: Delete a webhook endpoint
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Delete a webhook endpoint from the linked project. PgBeam stops delivering events to it immediately. This action cannot be undone. A confirmation prompt is shown unless `--yes` is passed.
+
+## Usage
+
+```bash
+pgbeam webhooks delete <id> [flags]
+```
+
+## Options
+
+| Option        | Description                          | Required | Default |
+| ------------- | ------------------------------------ | -------- | ------- |
+| `<id>`        | ID of the webhook endpoint to delete | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt         | No       | `false` |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Delete a webhook (with confirmation)
+pgbeam webhooks delete wh_xxx
+
+# Delete without confirmation
+pgbeam webhooks delete wh_xxx --yes
+```
+
+## Output
+
+Prints a success message confirming the webhook was deleted.

@@ -1,0 +1,9 @@
+{
+	"defaultOpen": false,
+	"title": "branches",
+	"icon": "GitBranch",
+	"pages": [
+		"list",
+		"discard"
+	]
+}

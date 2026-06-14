@@ -1,0 +1,40 @@
+---
+title: approvals list
+description: List statement approval requests for a project
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List human-in-the-loop statement approval requests for the linked project. Optionally filter by status. Shows each request's ID, statement kind, status, request time, and a truncated SQL preview.
+
+## Usage
+
+```bash
+pgbeam approvals list [flags]
+```
+
+## Options
+
+| Option             | Description                                                                       | Required | Default |
+| ------------------ | --------------------------------------------------------------------------------- | -------- | ------- |
+| `--status <value>` | Filter by status (one of: pending, approved, rejected, expired, executed, failed) | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# List approval requests
+pgbeam approvals list
+
+# List only pending requests
+pgbeam approvals list --status pending
+```
+
+## Output
+
+Displays a table with columns: ID, Kind, Status, Requested, and SQL.

@@ -1,0 +1,37 @@
+---
+title: anomalies resolve
+description: Resolve an anomaly alert
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Resolve an anomaly-detection alert by ID. Marks the alert as resolved, indicating the underlying issue has been addressed.
+
+## Usage
+
+```bash
+pgbeam anomalies resolve <id>
+```
+
+## Options
+
+| Option | Description      | Required | Default |
+| ------ | ---------------- | -------- | ------- |
+| `<id>` | Anomaly alert ID | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Resolve an anomaly
+pgbeam anomalies resolve anom_xxx
+```
+
+## Output
+
+Confirms the anomaly was resolved.

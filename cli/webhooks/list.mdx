@@ -1,0 +1,34 @@
+---
+title: webhooks list
+description: List webhook endpoints
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+List all webhook endpoints configured for the linked project. Shows each endpoint's ID, URL, delivery format, enabled state, and subscribed event types.
+
+## Usage
+
+```bash
+pgbeam webhooks list
+```
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# List all webhook endpoints
+pgbeam webhooks list
+
+# List webhook endpoints as JSON
+pgbeam webhooks list --json
+```
+
+## Output
+
+Displays a table with columns: ID, URL, Format, Enabled (yes/no), and Events ('all' when no specific event types are set). With `--json`, returns the full webhook list from the API.

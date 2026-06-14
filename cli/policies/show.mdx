@@ -1,0 +1,37 @@
+---
+title: policies show
+description: Show a policy profile in detail
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Show the full configuration of a policy profile: access mode, statement rules, table allow/deny lists, masking rules, budgets, and limits.
+
+## Usage
+
+```bash
+pgbeam policies show <id>
+```
+
+## Options
+
+| Option | Description       | Required | Default |
+| ------ | ----------------- | -------- | ------- |
+| `<id>` | Policy profile ID | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Show a policy profile
+pgbeam policies show pol_xxx
+```
+
+## Output
+
+Prints the policy profile. Use --json for the raw object.
