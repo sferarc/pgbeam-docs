@@ -1,0 +1,59 @@
+---
+title: ListSupportCases
+description: List support cases
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists support cases for the organization with optional status and search filters.
+
+## Usage
+
+```go
+result, err := client.Support.ListSupportCases(ctx, "org_abc123", nil)
+```
+
+## Parameters
+
+| Parameter       | Type                             | Required | Description                                     |
+| --------------- | -------------------------------- | -------- | ----------------------------------------------- |
+| ctx             | `context.Context`                | Yes      | Request context                                 |
+| orgID           | `string`                         | Yes      | Unique organization identifier.                 |
+| params          | `*pgbeam.ListSupportCasesParams` | No       | Query parameters                                |
+| params.Status   | `pgbeam.SupportCaseStatus`       | No       | Filter by case status.                          |
+| params.Search   | `string`                         | No       | Search cases by title.                          |
+| params.PageSize | `int`                            | No       | Number of results per page (1-100, default 20). |
+| params.Page     | `int`                            | No       | Page number (1-based, default 1).               |
+
+## Response
+
+`(*pgbeam.ListSupportCasesResponse, error)` — list of support cases.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Support.ListSupportCases(ctx, "org_abc123", &pgbeam.ListSupportCasesParams{
+    Status: "open",
+    Search: "...",
+    PageSize: 20,
+    Page: 20,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |

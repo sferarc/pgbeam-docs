@@ -1,0 +1,50 @@
+---
+title: getSupportCase
+description: Get a support case
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns a support case with all its messages.
+
+## Usage
+
+```typescript
+const result = await api.support.getSupportCase({
+  pathParams: { org_id: "org_abc123", case_id: "sc_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter          | Type     | Required | Description                                             |
+| ------------------ | -------- | -------- | ------------------------------------------------------- |
+| pathParams.org_id  | `string` | Yes      | Unique organization identifier.                         |
+| pathParams.case_id | `string` | Yes      | Unique support case identifier (prefixed, e.g. sc_xxx). |
+
+## Response
+
+`Promise<GetSupportCaseResponse>` — support case with messages.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.support.getSupportCase({
+  pathParams: { org_id: "org_abc123", case_id: "sc_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

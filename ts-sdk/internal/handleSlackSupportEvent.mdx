@@ -1,0 +1,62 @@
+---
+title: handleSlackSupportEvent
+description: Handle a Slack support event
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Receives a forwarded Slack event from the dashboard webhook handler and creates a support message.
+
+## Usage
+
+```typescript
+const result = await api.internal.handleSlackSupportEvent({
+  body: {
+    channel_id: "...",
+    thread_ts: "...",
+    user_id: "...",
+    text: "...",
+  },
+});
+```
+
+## Parameters
+
+| Parameter       | Type     | Required | Description                                                 |
+| --------------- | -------- | -------- | ----------------------------------------------------------- |
+| body.channel_id | `string` | Yes      | Slack channel ID where the message was posted.              |
+| body.thread_ts  | `string` | Yes      | Slack thread timestamp identifying the support case thread. |
+| body.user_id    | `string` | Yes      | Slack user ID of the message author.                        |
+| body.text       | `string` | Yes      | Message text from Slack.                                    |
+
+## Response
+
+`Promise<unknown>` — the result.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.internal.handleSlackSupportEvent({
+  body: {
+    channel_id: "...",
+    thread_ts: "...",
+    user_id: "...",
+    text: "...",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |

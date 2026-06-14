@@ -1,0 +1,63 @@
+---
+title: HandleSlackSupportEvent
+description: Handle a Slack support event
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Receives a forwarded Slack event from the dashboard webhook handler and creates a support message.
+
+## Usage
+
+```go
+result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
+    ChannelID: "...",
+    ThreadTs: "...",
+    UserID: "...",
+    Text: "...",
+  })
+```
+
+## Parameters
+
+| Parameter     | Type                       | Required | Description                                                 |
+| ------------- | -------------------------- | -------- | ----------------------------------------------------------- |
+| ctx           | `context.Context`          | Yes      | Request context                                             |
+| req           | `pgbeam.SlackEventPayload` | Yes      | Request body                                                |
+| req.ChannelID | `string`                   | Yes      | Slack channel ID where the message was posted.              |
+| req.ThreadTs  | `string`                   | Yes      | Slack thread timestamp identifying the support case thread. |
+| req.UserID    | `string`                   | Yes      | Slack user ID of the message author.                        |
+| req.Text      | `string`                   | Yes      | Message text from Slack.                                    |
+
+## Response
+
+`(*pgbeam.unknown, error)` — the result.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
+    ChannelID: "...",
+    ThreadTs: "...",
+    UserID: "...",
+    Text: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                        |
+| ------ | ---------------------------------- |
+| 400    | Invalid request parameters.        |
+| 401    | Missing or invalid authentication. |
+| 404    | Resource not found.                |

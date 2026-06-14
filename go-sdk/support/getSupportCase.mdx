@@ -1,0 +1,50 @@
+---
+title: GetSupportCase
+description: Get a support case
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns a support case with all its messages.
+
+## Usage
+
+```go
+result, err := client.Support.GetSupportCase(ctx, "org_abc123", "sc_xxx")
+```
+
+## Parameters
+
+| Parameter | Type              | Required | Description                                             |
+| --------- | ----------------- | -------- | ------------------------------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                                         |
+| orgID     | `string`          | Yes      | Unique organization identifier.                         |
+| caseID    | `string`          | Yes      | Unique support case identifier (prefixed, e.g. sc_xxx). |
+
+## Response
+
+`(*pgbeam.GetSupportCaseResponse, error)` — support case with messages.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Support.GetSupportCase(ctx, "org_abc123", "sc_xxx")
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

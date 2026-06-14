@@ -1,0 +1,63 @@
+---
+title: createSupportCase
+description: Create a support case
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a new support case with an initial message.
+
+## Usage
+
+```typescript
+const result = await api.support.createSupportCase({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+    org_id: "...",
+    title: "...",
+    body: "...",
+  },
+});
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                                          |
+| ----------------- | -------- | -------- | ---------------------------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier.                      |
+| body.org_id       | `string` | Yes      | Organization ID.                                     |
+| body.title        | `string` | Yes      | Brief summary of the issue.                          |
+| body.severity     | `number` | No       | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
+| body.body         | `string` | Yes      | Initial message body.                                |
+
+## Response
+
+`Promise<SupportCase>` — support case created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.support.createSupportCase({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+    org_id: "...",
+    title: "...",
+    body: "...",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |

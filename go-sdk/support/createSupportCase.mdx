@@ -1,0 +1,63 @@
+---
+title: CreateSupportCase
+description: Create a support case
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates a new support case with an initial message.
+
+## Usage
+
+```go
+result, err := client.Support.CreateSupportCase(ctx, "org_abc123", pgbeam.CreateSupportCaseRequest{
+    OrgID: "...",
+    Title: "...",
+    Body: "...",
+  })
+```
+
+## Parameters
+
+| Parameter    | Type                              | Required | Description                                          |
+| ------------ | --------------------------------- | -------- | ---------------------------------------------------- |
+| ctx          | `context.Context`                 | Yes      | Request context                                      |
+| orgID        | `string`                          | Yes      | Unique organization identifier.                      |
+| req          | `pgbeam.CreateSupportCaseRequest` | Yes      | Request body                                         |
+| req.OrgID    | `string`                          | Yes      | Organization ID.                                     |
+| req.Title    | `string`                          | Yes      | Brief summary of the issue.                          |
+| req.Severity | `*int`                            | No       | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
+| req.Body     | `string`                          | Yes      | Initial message body.                                |
+
+## Response
+
+`(*pgbeam.SupportCase, error)` — support case created.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Support.CreateSupportCase(ctx, "org_abc123", pgbeam.CreateSupportCaseRequest{
+    OrgID: "...",
+    Title: "...",
+    Severity: 4,
+    Body: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |

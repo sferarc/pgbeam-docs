@@ -19,6 +19,8 @@
 		"migrations",
 		"analytics",
 		"platform",
-		"account"
+		"account",
+		"support",
+		"internal"
 	]
 }

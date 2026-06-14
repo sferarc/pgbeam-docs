@@ -1,0 +1,54 @@
+---
+title: listSupportCases
+description: List support cases
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists support cases for the organization with optional status and search filters.
+
+## Usage
+
+```typescript
+const result = await api.support.listSupportCases({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Parameters
+
+| Parameter             | Type                | Required | Description                                     |
+| --------------------- | ------------------- | -------- | ----------------------------------------------- |
+| pathParams.org_id     | `string`            | Yes      | Unique organization identifier.                 |
+| queryParams.status    | `SupportCaseStatus` | No       | Filter by case status.                          |
+| queryParams.search    | `string`            | No       | Search cases by title.                          |
+| queryParams.page_size | `number`            | No       | Number of results per page (1-100, default 20). |
+| queryParams.page      | `number`            | No       | Page number (1-based, default 1).               |
+
+## Response
+
+`Promise<ListSupportCasesResponse>` — list of support cases.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.support.listSupportCases({
+  pathParams: { org_id: "org_abc123" },
+  queryParams: { status: "open", search: "...", page_size: 20, page: 20 },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
