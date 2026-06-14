@@ -12,7 +12,7 @@ All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for
 ```go
 import pgbeam "go.pgbeam.com/sdk"
 
-project, err := client.Projects.Get(ctx, "proj_missing")
+project, err := client.Projects.GetProject(ctx, "prj_missing")
 if err != nil {
     if pgbeam.IsNotFound(err) {
         fmt.Println("Project not found")
@@ -44,7 +44,7 @@ response. It uses `errors.As` internally, so it works even when the error is
 wrapped with `fmt.Errorf("...: %w", err)`.
 
 ```go
-_, err := client.Projects.Get(ctx, "proj_missing")
+_, err := client.Projects.GetProject(ctx, "prj_missing")
 if pgbeam.IsNotFound(err) {
     // Resource does not exist
 }
@@ -106,7 +106,7 @@ deadline expires, the SDK stops retrying and returns the context error.
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 defer cancel()
 
-project, err := client.Projects.Get(ctx, "proj_abc123")
+project, err := client.Projects.GetProject(ctx, "prj_abc123")
 ```
 
 ## Idempotency

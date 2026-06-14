@@ -1,14 +1,28 @@
 ---
 title: Installation & Setup
 description:
-  Install the pgbeam-go package, configure the client, authenticate, and learn
-  the service-based access pattern.
+  Install the pgbeam-go SDK, configure the client, authenticate, and learn the
+  service-based access pattern with a full agent-gateway quickstart.
 ---
+
+The PgBeam Go SDK is the official client for the PgBeam control-plane API. It
+covers every API resource — projects and databases, plus the agent gateway:
+agent credentials, policy profiles, approvals, webhooks, anomalies, and audit
+logs — so you can provision safe, scoped Postgres access for AI agents from Go.
+
+The module path is `go.pgbeam.com/sdk` (a vanity import that resolves to the
+public mirror). The package name is `pgbeam`.
 
 ## Installation
 
 ```bash
 go get go.pgbeam.com/sdk
+```
+
+Requires Go 1.24 or newer. Import it as:
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
 ```
 
 ## Client setup
@@ -60,27 +74,164 @@ The Go SDK uses service-based access, matching the TypeScript SDK's tag-based
 `api.projects.*`, `api.databases.*` pattern:
 
 ```go
-// Projects
-resp, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{...})
-project, err := client.Projects.GetProject(ctx, "prj_xxx")
+// Projects — note request bodies are passed by value
+project, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
+    OrgId: "org_xxx",
+    Name:  "production",
+    Database: pgbeam.CreateDatabaseRequest{
+        Host: "db.internal", Port: 5432, Name: "app",
+    },
+})
+project, err = client.Projects.GetProject(ctx, "prj_xxx")
 
 // Databases
 db, err := client.Databases.GetDatabase(ctx, "prj_xxx", "db_xxx")
 
-// Analytics
-plan, err := client.Analytics.GetOrganizationPlan(ctx, "org_xxx")
+// Agent gateway
+profiles, err := client.Policies.ListPolicyProfiles(ctx, "prj_xxx", nil)
+cred, err := client.Agents.CreateAgentCredential(ctx, "prj_xxx", pgbeam.CreateAgentCredentialRequest{...})
 
 // Platform
 health, err := client.Platform.GetHealth(ctx)
-
-// Account
-data, err := client.Account.ExportAccountData(ctx)
 ```
 
-| Service   | Go                 | TypeScript equivalent |
-| --------- | ------------------ | --------------------- |
-| Projects  | `client.Projects`  | `api.projects`        |
-| Databases | `client.Databases` | `api.databases`       |
-| Analytics | `client.Analytics` | `api.analytics`       |
-| Platform  | `client.Platform`  | `api.platform`        |
-| Account   | `client.Account`   | `api.account`         |
+Each service field on the client maps to an API tag:
+
+| Service      | Go                  | Covers                                           |
+| ------------ | ------------------- | ------------------------------------------------ |
+| `Projects`   | `client.Projects`   | Projects, replicas, custom domains, cache rules  |
+| `Databases`  | `client.Databases`  | Upstream database connections                    |
+| `Policies`   | `client.Policies`   | Policy profiles (read-only, allowlists, masking) |
+| `Agents`     | `client.Agents`     | Agent credentials, rotation, audit logs          |
+| `Approvals`  | `client.Approvals`  | Held-statement approval requests                 |
+| `Webhooks`   | `client.Webhooks`   | Webhook endpoints for gateway events             |
+| `Anomalies`  | `client.Anomalies`  | Anomaly alerts                                   |
+| `Branches`   | `client.Branches`   | Database branches                                |
+| `Migrations` | `client.Migrations` | Migration safety linting                         |
+| `Analytics`  | `client.Analytics`  | Plans, usage, spend limits, insights             |
+| `Platform`   | `client.Platform`   | Health, regions                                  |
+| `Account`    | `client.Account`    | Account export, onboarding                       |
+
+## Quickstart: provision an agent credential
+
+This end-to-end example creates a read-only policy profile and issues a scoped
+agent credential against it. The connection string and MCP token are returned
+**once** — capture them immediately.
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "os"
+
+    pgbeam "go.pgbeam.com/sdk"
+)
+
+func main() {
+    ctx := context.Background()
+    client := pgbeam.NewClient(&pgbeam.ClientOptions{
+        APIKey: os.Getenv("PGBEAM_API_KEY"),
+    })
+
+    projectID := "prj_xxx"
+
+    // 1. Create a read-only policy profile capped at 1000 rows per query.
+    accessMode := pgbeam.PolicyProfileInputAccessModeReadOnly
+    maxRows := 1000
+    profile, err := client.Policies.CreatePolicyProfile(ctx, projectID, pgbeam.PolicyProfileInput{
+        Name:       "analytics-readonly",
+        AccessMode: &accessMode,
+        MaxRows:    &maxRows,
+    })
+    if err != nil {
+        log.Fatalf("create policy: %v", err)
+    }
+
+    // 2. Issue an agent credential enforced against that profile.
+    principal := pgbeam.CreateAgentCredentialRequestPrincipalTypeAgent
+    secrets, err := client.Agents.CreateAgentCredential(ctx, projectID, pgbeam.CreateAgentCredentialRequest{
+        Name:            "claude-analytics",
+        PolicyProfileId: profile.Id,
+        PrincipalType:   &principal,
+    })
+    if err != nil {
+        log.Fatalf("create credential: %v", err)
+    }
+
+    // Shown once — hand these to the agent now.
+    fmt.Println("Connection string:", secrets.ConnectionString)
+    fmt.Println("MCP URL:          ", secrets.McpUrl)
+    fmt.Println("MCP token:        ", secrets.McpToken)
+}
+```
+
+## Examples across the surface
+
+### List and inspect policy profiles
+
+```go
+profiles, err := client.Policies.ListPolicyProfiles(ctx, projectID, nil)
+if err != nil {
+    log.Fatal(err)
+}
+for _, p := range profiles.Policies {
+    fmt.Printf("%s (%s): access=%s\n", p.Name, p.Id, p.AccessMode)
+}
+```
+
+### Rotate or revoke an agent credential
+
+```go
+// Rotate — returns fresh secrets, old credential stops working.
+rotated, err := client.Agents.RotateAgentCredential(ctx, projectID, "agt_xxx")
+
+// Revoke — immediate kill-switch.
+err = client.Agents.RevokeAgentCredential(ctx, projectID, "agt_xxx")
+```
+
+### Approve a held statement
+
+When a policy holds a write for approval, decide on it from the approvals
+service:
+
+```go
+reason := "verified against ticket OPS-1234"
+approved, err := client.Approvals.ApproveApprovalRequest(ctx, projectID, "apr_xxx",
+    pgbeam.ApprovalDecisionRequest{Reason: &reason})
+```
+
+### Register a webhook endpoint
+
+```go
+enabled := true
+secret := "whsec_..." // signs delivery payloads
+events := []string{"approval.requested", "anomaly.detected"}
+hook, err := client.Webhooks.CreateWebhookEndpoint(ctx, projectID, pgbeam.WebhookEndpointInput{
+    Url:        "https://example.com/pgbeam/events",
+    Enabled:    &enabled,
+    EventTypes: &events,
+    Secret:     &secret,
+})
+```
+
+### Page through the audit log
+
+```go
+event := "blocked"
+logs, err := client.Agents.ListAuditLogs(ctx, projectID, &pgbeam.ListAuditLogsParams{
+    Event: &event,
+})
+if err != nil {
+    log.Fatal(err)
+}
+for _, e := range logs.Entries {
+    fmt.Printf("%s %s rule=%v\n", e.Event, e.Id, e.DecisionRule)
+}
+```
+
+For per-method reference — every parameter, response type, and error code — see
+the service pages in the sidebar. For error handling, retries, and idempotency,
+see [Error Handling](/docs/go-sdk/error-handling).
