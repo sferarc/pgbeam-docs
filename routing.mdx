@@ -2,12 +2,12 @@
 title: Routing & Regions
 icon: Route
 description:
-  How PgBeam routes connections across 6 global regions using GeoDNS, peer
-  relay, and edge caching — and what happens when things fail.
+  How PgBeam routes connections across global regions using peer relay and edge
+  caching — and what happens when things fail.
 ---
 
-PgBeam is a globally distributed proxy. When a client connects, GeoDNS
-automatically directs it to the nearest data plane region. From there, PgBeam
+PgBeam is a globally distributed proxy. When a client connects, it is
+automatically routed to the nearest data plane region. From there, PgBeam
 handles everything — TLS termination, project lookup, connection pooling,
 caching, and upstream relay.
 
@@ -17,7 +17,7 @@ database.
 
 ## Regions
 
-PgBeam operates data planes in 6 regions worldwide:
+PgBeam operates data planes in regions worldwide:
 
 | Region         | Location    | Identifier       |
 | -------------- | ----------- | ---------------- |
@@ -28,7 +28,7 @@ PgBeam operates data planes in 6 regions worldwide:
 | Southeast Asia | Singapore   | `ap-southeast-1` |
 | Northeast Asia | Tokyo       | `ap-northeast-1` |
 
-All 6 regions are interconnected over a private network. Inter-region traffic
+All regions are interconnected over a private network. Inter-region traffic
 never crosses the public internet.
 
 ## How a connection is routed
@@ -39,9 +39,9 @@ Every client connection follows the same lifecycle:
   <Step>
     ### DNS resolution
 
-    The client resolves `abc.proxy.pgbeam.app`. GeoDNS returns the IP of the nearest
-    data plane based on the client's geographic location. This happens at the DNS
-    layer — no application-level routing is involved.
+    The client resolves `abc.proxy.pgbeam.app`. The connection is directed to the
+    nearest data plane region automatically, based on the client's location — no
+    application-level routing is involved.
 
   </Step>
 
@@ -106,7 +106,7 @@ Every client connection follows the same lifecycle:
 Client (Oregon)
      │
      ▼
-GeoDNS → nearest data plane
+Nearest data plane
      │
      ▼
 ┌─────────────────────────────────────┐
@@ -139,7 +139,7 @@ still serving clients from the nearest edge.
 4. The home data plane manages the connection pool and upstream connections
 
 ```
-Client (Mumbai)  →  Edge (ap-south-1)  →  Relay  →  Home (us-east-1)  →  Database
+Client (Singapore)  →  Edge (ap-southeast-1)  →  Relay  →  Home (us-east-1)  →  Database
 ```
 
 ### Why relay instead of direct connection
@@ -161,7 +161,7 @@ This is the key performance benefit:
 - **Cache miss:** The query is relayed to the home region, executed against the
   upstream, and the result is cached at the edge for future requests.
 
-This means a client in Mumbai querying a database in Virginia can get
+This means a client in Singapore querying a database in Virginia can get
 sub-millisecond response times for cached queries, despite the database being
 halfway around the world.
 
@@ -221,13 +221,13 @@ upstream query and any relay overhead.
 
 ## Failure scenarios
 
-| Failure                       | PgBeam behavior                                  |
-| ----------------------------- | ------------------------------------------------ |
-| Edge data plane goes down     | GeoDNS removes it; clients route to next nearest |
-| Relay to home region fails    | Fallback to direct connection from edge          |
-| Upstream database unreachable | Circuit breaker opens after 3 failures           |
-| Shared cache goes down        | Queries fall through to upstream (fail-open)     |
-| All replicas unhealthy        | Replica-annotated queries fall back to primary   |
+| Failure                       | PgBeam behavior                                             |
+| ----------------------------- | ----------------------------------------------------------- |
+| Edge data plane goes down     | Clients are automatically routed to the next nearest region |
+| Relay to home region fails    | Fallback to direct connection from edge                     |
+| Upstream database unreachable | Circuit breaker opens after 3 failures                      |
+| Shared cache goes down        | Queries fall through to upstream (fail-open)                |
+| All replicas unhealthy        | Replica-annotated queries fall back to primary              |
 
 See [Resilience](/docs/resilience) for detailed circuit breaker behavior and
 recovery.

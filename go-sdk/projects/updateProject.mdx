@@ -10,26 +10,26 @@ Partially updates a project. Only provided fields are modified.
 ## Usage
 
 ```go
-result, err := client.Projects.UpdateProject(ctx, "prj_xxx", &pgbeam.UpdateProjectRequest{
+result, err := client.Projects.UpdateProject(ctx, "prj_xxx", pgbeam.UpdateProjectRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter                  | Type                           | Required | Description                                                                                                                          |
-| -------------------------- | ------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ctx                        | `context.Context`              | Yes      | Request context                                                                                                                      |
-| projectID                  | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                  |
-| req                        | `*pgbeam.UpdateProjectRequest` | Yes      | Request body                                                                                                                         |
-| req.Name                   | `*string`                      | No       | Updated project name.                                                                                                                |
-| req.Description            | `*string`                      | No       | Updated project description.                                                                                                         |
-| req.Tags                   | `*[]string`                    | No       | Replacement set of user-defined project labels.                                                                                      |
-| req.Status                 | `*pgbeam.ProjectStatus`        | No       |                                                                                                                                      |
-| req.AllowedCidrs           | `*[]pgbeam.CidrEntry`          | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
-|                            |
-| req.DefaultPolicyProfileID | `*string`                      | No       | When set, passthrough/human connections are enforced against this policy profile. Send an empty string to clear.                     |
-|                            |
+| Parameter                  | Type                          | Required | Description                                                                                                                          |
+| -------------------------- | ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ctx                        | `context.Context`             | Yes      | Request context                                                                                                                      |
+| projectID                  | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                  |
+| req                        | `pgbeam.UpdateProjectRequest` | Yes      | Request body                                                                                                                         |
+| req.Name                   | `*string`                     | No       | Updated project name.                                                                                                                |
+| req.Description            | `*string`                     | No       | Updated project description.                                                                                                         |
+| req.Tags                   | `*[]string`                   | No       | Replacement set of user-defined project labels.                                                                                      |
+| req.Status                 | `*pgbeam.ProjectStatus`       | No       |                                                                                                                                      |
+| req.AllowedCidrs           | `*[]pgbeam.CidrEntry`         | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported. |
+|  |
+| req.DefaultPolicyProfileID | `*string`                     | No       | When set, passthrough/human connections are enforced against this policy profile. Send an empty string to clear.                     |
+|  |
 
 ## Response
 
@@ -44,7 +44,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Projects.UpdateProject(ctx, "prj_xxx", &pgbeam.UpdateProjectRequest{
+result, err := client.Projects.UpdateProject(ctx, "prj_xxx", pgbeam.UpdateProjectRequest{
     Name: "my-app",
     Description: "Production database proxy",
     Tags: production,us-east-1,

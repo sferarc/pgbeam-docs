@@ -10,7 +10,7 @@ Creates a new project within the specified organization.
 ## Usage
 
 ```go
-result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
+result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Name: "my-app",
     OrgID: "org_abc123",
     Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
@@ -22,7 +22,7 @@ result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
 | Parameter       | Type                           | Required | Description                                            |
 | --------------- | ------------------------------ | -------- | ------------------------------------------------------ |
 | ctx             | `context.Context`              | Yes      | Request context                                        |
-| req             | `*pgbeam.CreateProjectRequest` | Yes      | Request body                                           |
+| req             | `pgbeam.CreateProjectRequest`  | Yes      | Request body                                           |
 | req.Name        | `string`                       | Yes      | Human-readable project name.                           |
 | req.OrgID       | `string`                       | Yes      | Better Auth organization ID.                           |
 | req.Description | `*string`                      | No       | Optional project description.                          |
@@ -43,7 +43,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Projects.CreateProject(ctx, &pgbeam.CreateProjectRequest{
+result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Name: "my-app",
     OrgID: "org_abc123",
     Description: "Production database proxy",

@@ -1,41 +1,54 @@
 ---
-title: Table and Column Allowlists
+title: Table Allowlists
 icon: ListChecks
 description:
-  Allow the exact schemas, tables, and columns an agent may touch. Anything off
-  the list is blocked in the wire protocol.
+  Allow the exact schemas and tables an agent may touch. Anything off the list
+  is blocked in the wire protocol.
 ---
 
-An allowlist names the schemas, tables, and columns an agent is allowed to
-touch. PgBeam parses each statement, resolves the relations and columns it
-references, and blocks the statement if any of them is not on the list. The
+A table allowlist names the schemas and tables an agent is allowed to touch.
+PgBeam parses each statement, resolves the relations it references, and blocks
+the statement if any of them is not on the list. When an allowlist is set the
 default is deny: an agent reaches only what you explicitly allow.
+
+A table **denylist** does the opposite — it names relations that are always
+blocked, and it takes precedence over the allowlist.
 
 ## Define an allowlist
 
-```bash title="Allow specific relations"
-pgbeam policies create analytics \
-  --mode read-only \
-  --allow public.orders,public.users \
-  --allow-columns public.users=id,created_at,country
+Set the allowlist and denylist on a policy profile. In the dashboard, edit the
+profile under **Allowlist**. From the CLI, pass a JSON profile file:
+
+```json title="analytics.json"
+{
+  "access_mode": "read_only",
+  "table_allowlist": ["public.orders", "public.users"],
+  "table_denylist": ["public.internal_api_keys"]
+}
 ```
 
-In the dashboard, add tables and columns on the policy profile under
-**Allowlist**.
+```bash
+pgbeam policies create --name analytics --mode read_only --file analytics.json
+```
 
 ## How matching works
 
 - **Tables**: a statement is allowed only if every relation it reads (or writes,
-  in read-write mode) is on the table allowlist.
-- **Columns**: when a column allowlist is set for a table, a `SELECT` may only
-  reference the allowed columns. `SELECT *` expands to the allowed set.
+  in read-write mode) is on the table allowlist and none is on the denylist.
 - **Catalog**: reads of `pg_catalog` and `information_schema` are always
   permitted, so the agent can introspect the schema it is allowed to query.
+- **Columns**: there is no column allowlist. To restrict what individual columns
+  return, use [masking](/docs/masking) (redact, null, or hash a column's values
+  in flight).
+
+A blocked statement comes back as a Postgres error (SQLSTATE `42501`):
 
 ```text
-ERROR: table internal_api_keys is not in the allowlist
-ERROR: column users.ssn is not in the allowlist
+ERROR:  blocked by PgBeam agent policy: table "public.internal_api_keys" is not in this credential's allowlist; allowed tables: public.orders, public.users
 ```
+
+The message is written to be read by an LLM, so an agent can correct its plan
+and retry within the rules.
 
 ## Honest limits
 
@@ -45,9 +58,9 @@ ERROR: column users.ssn is not in the allowlist
   credentials to prevent allowlist evasion through unqualified names.
 </Callout>
 
-For columns that exist but should never leave the database in cleartext, combine
-the allowlist with [masking](/docs/masking): allow the column for joins and
-grouping, but hash or redact its values in flight.
+For columns that exist but should never leave the database in cleartext, reach
+for [masking](/docs/masking): the column stays usable for joins and grouping,
+but its values are hashed or redacted in flight.
 
 ## Related
 

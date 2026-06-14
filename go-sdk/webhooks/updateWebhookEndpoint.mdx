@@ -10,25 +10,25 @@ Updates a webhook endpoint.
 ## Usage
 
 ```go
-result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", &pgbeam.WebhookEndpointInput{
+result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", pgbeam.WebhookEndpointInput{
     URL: "https://example.com/hooks/pgbeam",
   })
 ```
 
 ## Parameters
 
-| Parameter       | Type                           | Required | Description                                                  |
-| --------------- | ------------------------------ | -------- | ------------------------------------------------------------ |
-| ctx             | `context.Context`              | Yes      | Request context                                              |
-| projectID       | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| webhookID       | `string`                       | Yes      | Unique webhook endpoint identifier (prefixed, e.g. whk_xxx). |
-| req             | `*pgbeam.WebhookEndpointInput` | Yes      | Request body                                                 |
-| req.URL         | `string`                       | Yes      | HTTPS endpoint that receives event deliveries.               |
-| req.Secret      | `*string`                      | No       | Shared secret used to sign delivery payloads. Write-only.    |
-| req.Format      | `*string`                      | No       | Payload format for delivered events.                         |
-| req.EventTypes  | `*[]string`                    | No       | Event types to deliver. Empty means all events.              |
-| req.Enabled     | `*bool`                        | No       | Whether deliveries are active for this endpoint.             |
-| req.Description | `*string`                      | No       | Human-readable label for the endpoint.                       |
+| Parameter       | Type                          | Required | Description                                                  |
+| --------------- | ----------------------------- | -------- | ------------------------------------------------------------ |
+| ctx             | `context.Context`             | Yes      | Request context                                              |
+| projectID       | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| webhookID       | `string`                      | Yes      | Unique webhook endpoint identifier (prefixed, e.g. whk_xxx). |
+| req             | `pgbeam.WebhookEndpointInput` | Yes      | Request body                                                 |
+| req.URL         | `string`                      | Yes      | HTTPS endpoint that receives event deliveries.               |
+| req.Secret      | `*string`                     | No       | Shared secret used to sign delivery payloads. Write-only.    |
+| req.Format      | `*string`                     | No       | Payload format for delivered events.                         |
+| req.EventTypes  | `*[]string`                   | No       | Event types to deliver. Empty means all events.              |
+| req.Enabled     | `*bool`                       | No       | Whether deliveries are active for this endpoint.             |
+| req.Description | `*string`                     | No       | Human-readable label for the endpoint.                       |
 
 ## Response
 
@@ -43,7 +43,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", &pgbeam.WebhookEndpointInput{
+result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", pgbeam.WebhookEndpointInput{
     URL: "https://example.com/hooks/pgbeam",
     Secret: "...",
     Format: "json",

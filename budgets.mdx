@@ -24,24 +24,27 @@ In the dashboard, set the budget on the policy profile under **Budgets**.
 
 ## What you can cap
 
-| Limit              | Effect                                                                                                |
-| ------------------ | ----------------------------------------------------------------------------------------------------- |
-| Queries per window | Cap statements per hour or per day. The next query past the cap is throttled until the window resets. |
-| Max rows           | Truncate any result to at most this many rows.                                                        |
-| Statement timeout  | Cancel a statement that runs longer than this.                                                        |
+| Limit              | Effect                                                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Queries per window | Cap statements per hour or per day. The next query past the cap is blocked with an error until the window resets. |
+| Max rows           | Truncate any result to at most this many rows.                                                                    |
+| Statement timeout  | Cancel a statement that runs longer than this.                                                                    |
 
 ## What the agent sees
 
+A query past the cap comes back as a Postgres error (SQLSTATE `53400`):
+
 ```text
-ERROR: query budget reached: 5,000 / day. Throttled until reset
+ERROR:  PgBeam agent day query budget exhausted; resets at 2026-06-15T00:00:00Z; ask your operator to raise the limit
 ```
 
-The message names the limit and the window, so an agent can back off rather than
-retry blindly.
+The message names the window and the exact reset time, so an agent can back off
+rather than retry blindly. A per-day egress (bytes) budget produces a similar
+message when exceeded.
 
 <Callout type="info" title="Per-region windows">
   Budget counters are kept per data plane and per region, like the rate limiter.
-  GeoDNS pins an agent to one region in practice, so the window it sees is
+  An agent connects to one region in practice, so the window it sees is
   consistent. The control plane aggregates usage across regions and can trip the
   [kill-switch](/docs/kill-switch) if an organization-level ceiling is breached.
 </Callout>

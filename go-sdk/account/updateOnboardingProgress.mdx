@@ -10,20 +10,20 @@ Mark an onboarding step as complete or dismiss the checklist.
 ## Usage
 
 ```go
-result, err := client.Account.UpdateOnboardingProgress(ctx, "org_abc123", &pgbeam.UpdateOnboardingRequest{
+result, err := client.Account.UpdateOnboardingProgress(ctx, "org_abc123", pgbeam.UpdateOnboardingRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter   | Type                              | Required | Description                                      |
-| ----------- | --------------------------------- | -------- | ------------------------------------------------ |
-| ctx         | `context.Context`                 | Yes      | Request context                                  |
-| orgID       | `string`                          | Yes      | Unique organization identifier.                  |
-| req         | `*pgbeam.UpdateOnboardingRequest` | Yes      | Request body                                     |
-| req.Step    | `*string`                         | No       | The onboarding step to mark as complete.         |
-| req.Dismiss | `*bool`                           | No       | Set to true to dismiss the onboarding checklist. |
+| Parameter   | Type                             | Required | Description                                      |
+| ----------- | -------------------------------- | -------- | ------------------------------------------------ |
+| ctx         | `context.Context`                | Yes      | Request context                                  |
+| orgID       | `string`                         | Yes      | Unique organization identifier.                  |
+| req         | `pgbeam.UpdateOnboardingRequest` | Yes      | Request body                                     |
+| req.Step    | `*string`                        | No       | The onboarding step to mark as complete.         |
+| req.Dismiss | `*bool`                          | No       | Set to true to dismiss the onboarding checklist. |
 
 ## Response
 
@@ -38,7 +38,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Account.UpdateOnboardingProgress(ctx, "org_abc123", &pgbeam.UpdateOnboardingRequest{
+result, err := client.Account.UpdateOnboardingProgress(ctx, "org_abc123", pgbeam.UpdateOnboardingRequest{
     Step: "project_created",
     Dismiss: true,
   })

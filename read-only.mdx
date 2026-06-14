@@ -34,8 +34,10 @@ In the dashboard, set **Access mode** to **Read-only** on the policy profile.
 
 ## What the agent sees
 
+A blocked write comes back as a Postgres error (SQLSTATE `42501`):
+
 ```text
-ERROR: policy is read-only: UPDATE is not allowed
+ERROR:  blocked by PgBeam agent policy: this credential is read-only; update is not permitted; only SELECT, SHOW, and EXPLAIN are allowed
 ```
 
 The error is written to be read by an LLM, so an agent can correct its plan and

@@ -15,19 +15,17 @@ pgbeam webhooks create [url] [flags]
 
 ## Options
 
-| Option                  | Description                                                                 | Required | Default |
-| ----------------------- | --------------------------------------------------------------------------- | -------- | ------- |
-| `<url>`                 | Destination URL for webhook deliveries. If omitted, you will be prompted.   | No       | -       |
-| `--format <value>`      | Delivery format: json, splunk_hec, datadog, or elastic.                     | No       | `json`  |
-| `--event <value>`       | Event type(s) to subscribe to. Comma-separated. Omit to receive all events. | No       | -       |
-| `--secret <value>`      | Shared secret used to sign webhook payloads.                                | No       | -       |
-| `--description <value>` | Human-readable description for the webhook endpoint.                        | No       | -       |
-| `--disabled`            | Create the webhook in a disabled state.                                     | No       | `false` |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<url>` | Destination URL for webhook deliveries. If omitted, you will be prompted. | No | - |
+| `--format <value>` | Delivery format: json, splunk_hec, datadog, or elastic. | No | `json` |
+| `--event <value>` | Event type(s) to subscribe to. Comma-separated. Omit to receive all events. | No | - |
+| `--secret <value>` | Shared secret used to sign webhook payloads. | No | - |
+| `--description <value>` | Human-readable description for the webhook endpoint. | No | - |
+| `--disabled` | Create the webhook in a disabled state. | No | `false` |
 
 <Callout type="info" title="Global options">
-  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
-  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
-  this command.
+All [global options](/docs/cli/global-options) (`--token`, `--profile`, `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on this command.
 </Callout>
 
 ## Examples

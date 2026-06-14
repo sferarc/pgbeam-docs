@@ -120,11 +120,16 @@ connected over MCP or over a connection string. Results truncate at the policy
 
 ## Errors an agent will see
 
+All of these come back as **tool-result errors** (the MCP endpoint authenticates
+each tool call, so failures are reported in the result rather than as an HTTP
+status):
+
 - A blocked statement returns the policy reason in the tool result, so the agent
   can correct itself and retry within the rules.
-- A revoked or killed credential returns `401`.
-- An exhausted [budget](/docs/budgets) returns a clear throttle message with the
-  window.
+- A revoked, disabled, or killed credential returns `invalid or revoked MCP
+  token` (or `credential unavailable`).
+- An exhausted [budget](/docs/budgets) returns a clear message naming the window
+  and reset time.
 
 ## Related
 

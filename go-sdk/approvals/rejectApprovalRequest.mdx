@@ -10,20 +10,20 @@ Rejects a pending approval request, denying the held statement.
 ## Usage
 
 ```go
-result, err := client.Approvals.RejectApprovalRequest(ctx, "prj_xxx", "apr_xxx", &pgbeam.ApprovalDecisionRequest{
+result, err := client.Approvals.RejectApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{
 
   })
 ```
 
 ## Parameters
 
-| Parameter  | Type                              | Required | Description                                                  |
-| ---------- | --------------------------------- | -------- | ------------------------------------------------------------ |
-| ctx        | `context.Context`                 | Yes      | Request context                                              |
-| projectID  | `string`                          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| approvalID | `string`                          | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
-| req        | `*pgbeam.ApprovalDecisionRequest` | Yes      | Request body                                                 |
-| req.Reason | `*string`                         | No       | Human-readable note explaining the decision.                 |
+| Parameter  | Type                             | Required | Description                                                  |
+| ---------- | -------------------------------- | -------- | ------------------------------------------------------------ |
+| ctx        | `context.Context`                | Yes      | Request context                                              |
+| projectID  | `string`                         | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| approvalID | `string`                         | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
+| req        | `pgbeam.ApprovalDecisionRequest` | Yes      | Request body                                                 |
+| req.Reason | `*string`                        | No       | Human-readable note explaining the decision.                 |
 
 ## Response
 
@@ -38,7 +38,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Approvals.RejectApprovalRequest(ctx, "prj_xxx", "apr_xxx", &pgbeam.ApprovalDecisionRequest{
+result, err := client.Approvals.RejectApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{
     Reason: "...",
   })
 if err != nil {
