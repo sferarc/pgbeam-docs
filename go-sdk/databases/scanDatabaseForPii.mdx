@@ -1,0 +1,52 @@
+---
+title: ScanDatabaseForPii
+description: Scan a database for likely-PII columns
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Connects to the upstream database read-only, inspects information_schema and samples column values against PII heuristics, and returns ranked masking suggestions. Suggestions are advisory — the operator reviews them and applies the ones they want into a policy profile's masking rules. Nothing is auto-applied.
+
+## Usage
+
+```go
+result, err := client.Databases.ScanDatabaseForPii(ctx, "prj_xxx", "db_xxx")
+```
+
+## Parameters
+
+| Parameter  | Type              | Required | Description                                         |
+| ---------- | ----------------- | -------- | --------------------------------------------------- |
+| ctx        | `context.Context` | Yes      | Request context                                     |
+| projectID  | `string`          | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| databaseID | `string`          | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
+
+## Response
+
+`(*pgbeam.ScanPiiResult, error)` — pii scan result.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Databases.ScanDatabaseForPii(ctx, "prj_xxx", "db_xxx")
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

@@ -1,0 +1,52 @@
+---
+title: scanDatabaseForPii
+description: Scan a database for likely-PII columns
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Connects to the upstream database read-only, inspects information_schema and samples column values against PII heuristics, and returns ranked masking suggestions. Suggestions are advisory — the operator reviews them and applies the ones they want into a policy profile's masking rules. Nothing is auto-applied.
+
+## Usage
+
+```typescript
+const result = await api.databases.scanDatabaseForPii({
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter              | Type     | Required | Description                                         |
+| ---------------------- | -------- | -------- | --------------------------------------------------- |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.database_id | `string` | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
+
+## Response
+
+`Promise<ScanPiiResult>` — pii scan result.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.databases.scanDatabaseForPii({
+  pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
