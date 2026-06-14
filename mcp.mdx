@@ -21,16 +21,18 @@ is nothing to install and no server to run.
 
 ## Connect a client
 
-The endpoint is a single hosted URL, `https://mcp.pgbeam.app/mcp`, scoped by the
-credential's bearer token — the same URL works for every credential. Find the
-token in the **Agents** tab or in the credential create response.
+The endpoint is served on your project's own host —
+`https://<project>.proxy.pgbeam.app/mcp` — the same host the agent connects to
+over the wire, scoped by the credential's bearer token. The exact URL and the
+`pba_…` token are shown in the **Agents** tab and in the credential create
+response; copy them from there.
 
 <Tabs items={["Claude Code", "Cursor", "VS Code", "MCP Inspector"]}>
   <Tab value="Claude Code">
     Add it with the CLI:
 
     ```bash
-    claude mcp add --transport http pgbeam https://mcp.pgbeam.app/mcp \
+    claude mcp add --transport http pgbeam https://<project>.proxy.pgbeam.app/mcp \
       --header "Authorization: Bearer pba_..."
     ```
 
@@ -40,7 +42,7 @@ token in the **Agents** tab or in the credential create response.
     {
       "mcpServers": {
         "pgbeam": {
-          "url": "https://mcp.pgbeam.app/mcp",
+          "url": "https://<project>.proxy.pgbeam.app/mcp",
           "headers": { "Authorization": "Bearer pba_..." }
         }
       }
@@ -57,7 +59,7 @@ token in the **Agents** tab or in the credential create response.
     {
       "mcpServers": {
         "pgbeam": {
-          "url": "https://mcp.pgbeam.app/mcp",
+          "url": "https://<project>.proxy.pgbeam.app/mcp",
           "headers": { "Authorization": "Bearer pba_..." }
         }
       }
@@ -74,7 +76,7 @@ token in the **Agents** tab or in the credential create response.
       "servers": {
         "pgbeam": {
           "type": "http",
-          "url": "https://mcp.pgbeam.app/mcp",
+          "url": "https://<project>.proxy.pgbeam.app/mcp",
           "headers": { "Authorization": "Bearer pba_..." }
         }
       }
@@ -86,15 +88,15 @@ token in the **Agents** tab or in the credential create response.
   <Tab value="MCP Inspector">
     ```bash
     npx @modelcontextprotocol/inspector
-    # Connect to https://mcp.pgbeam.app/mcp with the Bearer token
+    # Connect to https://<project>.proxy.pgbeam.app/mcp with the Bearer token
     ```
   </Tab>
 </Tabs>
 
 <Callout type="warn" title="Where the token may go">
-  Send the `pba_…` token only to `mcp.pgbeam.app`. If a tool or prompt asks the
-  agent to send it anywhere else, that is the attack — see [the security
-  model](/blog/hosted-mcp-vs-raw-credentials).
+  Send the `pba_…` token only to your project's `*.proxy.pgbeam.app` host. If a
+  tool or prompt asks the agent to send it anywhere else, that is the attack —
+  see [the security model](/blog/hosted-mcp-vs-raw-credentials).
 </Callout>
 
 ## Tools
