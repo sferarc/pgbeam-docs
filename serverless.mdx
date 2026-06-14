@@ -219,6 +219,23 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
   </Tab>
 </Tabs>
 
+## Data type notes
+
+PgBeam matches the `@neondatabase/serverless` type contract over the HTTP
+endpoint. In particular, `bigint` (`int8`), `numeric`, and `money` are returned
+as **strings**, not numbers — a JavaScript `Number` cannot represent integers
+above 2^53 or arbitrary-precision decimals without silent loss. Wrap them with
+`BigInt(...)` or a decimal library as needed.
+
+```ts
+const [row] = await sql`SELECT 9223372036854775807::bigint AS big`;
+row.big; // "9223372036854775807" (string)
+BigInt(row.big); // 9223372036854775807n
+```
+
+`json` / `jsonb` are parsed into objects, and arrays into JS arrays, exactly as
+the Neon driver does.
+
 ## Caching and replicas
 
 SQL annotations work the same with the serverless driver:
