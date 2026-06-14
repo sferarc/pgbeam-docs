@@ -17,7 +17,7 @@ inspect, and an always-rollback mode where writes execute and then disappear.
 
 ## Instant branches
 
-A branch is an isolated, copy-on-write copy of your database. It starts from
+A branch is an isolated copy of your database. It starts from
 production's current state, spins up in seconds, and costs nothing while idle. The
 agent connects with its scoped credential or the hosted MCP endpoint exactly as
 before. The only difference is the target: a branch credential routes the session
@@ -25,7 +25,7 @@ to a fresh branch instead of production.
 
 - **Isolated**: writes land on the branch, never on production.
 - **Instant**: the branch is ready in seconds, on demand.
-- **Copy-on-write**: a branch only stores what it changes, so it is cheap to
+- **Lightweight**: a branch only stores what it changes, so it is cheap to
   create and cheap to keep.
 - **Scale-to-zero**: an idle branch costs nothing; a discarded branch is gone.
 
@@ -101,9 +101,10 @@ a multi-step task or for you to review.
 
 ## How it works
 
-A branch is a real Postgres endpoint backed by copy-on-write storage: it shares
-unchanged pages with its parent and only materializes what the session writes. The
-agent's session reaches it through the same wire-protocol proxy that enforces
+A branch is a real Postgres endpoint that starts from your database's current
+state and only stores what the session changes, so it stays cheap to spin up and
+keep around. The agent's session reaches it through the same wire-protocol proxy
+that enforces
 every other policy, so audit capture, budgets, masking, and row filters still
 apply on the branch. Read-only enforcement is relaxed for the branch and only the
 branch, because there is nothing on it worth protecting.
