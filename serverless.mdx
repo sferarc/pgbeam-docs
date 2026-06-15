@@ -9,8 +9,31 @@ description:
 
 Connect from edge runtimes and serverless functions using the
 `@neondatabase/serverless` driver. PgBeam supports both the HTTP query endpoint
-and the WebSocket wire protocol — no code changes required if you're already
-using the Neon serverless driver.
+and the WebSocket wire protocol — your `neon()` / `Pool` call sites and every
+query stay exactly as they are.
+
+<Callout type="warn" title="One required step: point the driver at PgBeam">
+  Changing the connection-string host is **not** enough on its own. By default
+  `@neondatabase/serverless` derives its endpoint by rewriting the host — it
+  replaces the first label with `api.`, so `abc.proxy.pgbeam.app` would resolve
+  to `https://api.proxy.pgbeam.app/sql`, dropping the `abc` subdomain PgBeam
+  needs to route your project. Point the driver at PgBeam once, globally, with
+  `neonConfig` before any query runs:
+
+```ts title="neon-config.ts — import once at startup"
+import { neonConfig } from "@neondatabase/serverless";
+
+// HTTP /sql endpoint: keep the project subdomain, append /sql
+neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
+// WebSocket /v2 endpoint (Pool / Client)
+neonConfig.wsProxy = (host) => `${host}/v2`;
+```
+
+These two lines are the only addition — your query call sites do not change.
+(On Neon's own `*.neon.tech` hosts the defaults work; PgBeam needs the override
+because its hostnames are not `*.neon.tech`.)
+
+</Callout>
 
 ## Setup
 
@@ -53,12 +76,32 @@ using the Neon serverless driver.
   </Step>
 
   <Step>
+    ### Point the driver at PgBeam
+
+    Set `neonConfig` once, before any query runs (see the warning above for why
+    this is required). In Node.js, also set the WebSocket constructor.
+
+    ```ts title="neon-config.ts"
+    import { neonConfig } from "@neondatabase/serverless";
+
+    neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
+    neonConfig.wsProxy = (host) => `${host}/v2`;
+
+    // Node.js only — provide a WebSocket implementation for the Pool/Client paths
+    // import ws from "ws";
+    // neonConfig.webSocketConstructor = ws;
+    ```
+
+  </Step>
+
+  <Step>
     ### HTTP transport — `neon()` tagged template
 
     Best for one-shot queries from edge/serverless functions. Each call is a single
     HTTP request — no persistent connection required.
 
     ```ts title="query.ts"
+    import "./neon-config"; // applies neonConfig.fetchEndpoint
     import { neon } from "@neondatabase/serverless";
 
     const sql = neon("postgresql://user:pass@abc.proxy.pgbeam.app/mydb");
@@ -76,6 +119,7 @@ using the Neon serverless driver.
     <Tabs items={["Edge runtime", "Node.js"]}>
       <Tab value="Edge runtime">
         ```ts title="db.ts"
+        import "./neon-config"; // applies neonConfig.wsProxy
         import { Pool } from "@neondatabase/serverless";
 
         const pool = new Pool({
@@ -90,6 +134,8 @@ using the Neon serverless driver.
         import { Pool, neonConfig } from "@neondatabase/serverless";
         import ws from "ws";
 
+        neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
+        neonConfig.wsProxy = (host) => `${host}/v2`;
         neonConfig.webSocketConstructor = ws;
 
         const pool = new Pool({
@@ -143,9 +189,13 @@ The serverless driver works in any runtime with `fetch` (for HTTP) or
 
 Use the serverless driver adapters with Drizzle for type-safe queries:
 
+The same `neonConfig` setup applies — Drizzle wraps the Neon driver, so once the
+endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
+
 <Tabs items={["HTTP (drizzle-orm/neon-http)", "WebSocket (drizzle-orm/neon-serverless)"]}>
   <Tab value="HTTP (drizzle-orm/neon-http)">
     ```ts title="db.ts"
+    import "./neon-config"; // applies neonConfig.fetchEndpoint
     import { neon } from "@neondatabase/serverless";
     import { drizzle } from "drizzle-orm/neon-http";
 
@@ -159,6 +209,7 @@ Use the serverless driver adapters with Drizzle for type-safe queries:
 
   <Tab value="WebSocket (drizzle-orm/neon-serverless)">
     ```ts title="db.ts"
+    import "./neon-config"; // applies neonConfig.wsProxy (+ webSocketConstructor on Node)
     import { Pool } from "@neondatabase/serverless";
     import { drizzle } from "drizzle-orm/neon-serverless";
 
@@ -261,12 +312,13 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 
 ## Common issues
 
-| Issue                           | Cause                                 | Fix                                                         |
-| ------------------------------- | ------------------------------------- | ----------------------------------------------------------- |
-| `WebSocket is not defined`      | Node.js missing WS constructor        | Install `ws` and set `neonConfig.webSocketConstructor = ws` |
-| `fetch failed` on HTTP endpoint | Network/firewall blocking HTTPS       | Verify the proxy hostname resolves and port 443 is open     |
-| Slow cold starts with WebSocket | TLS + WS handshake on each invocation | Use HTTP transport for stateless queries                    |
-| `connection terminated`         | Idle timeout exceeded                 | Use connection pooling or reconnect on error                |
+| Issue                                                     | Cause                                                                     | Fix                                                                                  |
+| --------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set — driver rewrote the host to `api.`    | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2) |
+| `WebSocket is not defined`                                | Node.js missing WS constructor                                            | Install `ws` and set `neonConfig.webSocketConstructor = ws`                          |
+| `fetch failed` on HTTP endpoint                           | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql` | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set     |
+| Slow cold starts with WebSocket                           | TLS + WS handshake on each invocation                                     | Use HTTP transport for stateless queries                                             |
+| `connection terminated`                                   | Idle timeout exceeded                                                     | Use connection pooling or reconnect on error                                         |
 
 ## Further reading
 

@@ -34,10 +34,12 @@ load on PostgreSQL without changing how your application authenticates.
 
 ## Pool modes
 
-Pool modes control how upstream connections are shared between clients. You
-configure the mode per-project from the dashboard, API, or CLI.
+Pool modes control how upstream connections are shared between clients. New
+databases default to **transaction mode** — the best balance of connection
+reuse and compatibility for most web and serverless workloads. You configure the
+mode per-project from the dashboard, API, or CLI.
 
-### Session mode (default)
+### Session mode
 
 Each client connection gets a **dedicated** upstream connection for its entire
 lifetime. No connection sharing happens between clients.
@@ -57,7 +59,7 @@ stays assigned to the client until it disconnects.
 **Tradeoff:** Every concurrent client requires its own upstream connection. If
 you have 100 concurrent clients, you need 100 upstream connections.
 
-### Transaction mode
+### Transaction mode (default)
 
 The upstream connection is held only for the **duration of a transaction**.
 After `COMMIT` or `ROLLBACK`, the connection is reset with `DISCARD ALL` and

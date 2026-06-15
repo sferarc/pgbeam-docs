@@ -225,7 +225,7 @@ Enable debug mode to see cache and routing details:
 ```python
 cur.execute("SET pgbeam.debug = on")
 cur.execute("SELECT * FROM users WHERE id = %s", [user_id])
-# NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+# NOTICE: pgbeam:cache hit age=12s ttl=1m0s swr=30s
 ```
 
 ## Common issues

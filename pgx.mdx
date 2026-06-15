@@ -187,7 +187,7 @@ Enable debug mode to see cache and routing details:
 _, err := pool.Exec(ctx, "SET pgbeam.debug = on")
 
 rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT 1")
-// NOTICE: pgbeam: cache=miss replica=true upstream=replica-host:5432
+// NOTICE: pgbeam:cache miss
 ```
 
 ## Common issues

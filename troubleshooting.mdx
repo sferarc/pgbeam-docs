@@ -18,7 +18,7 @@ Before diving into specific problems, enable PgBeam's debug output. This adds a
 ```sql title="Enable debug output"
 SET pgbeam.debug = on;
 SELECT * FROM users LIMIT 1;
--- NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+-- NOTICE: pgbeam:cache hit age=12s ttl=1m0s swr=30s
 ```
 
 Debug notices tell you:

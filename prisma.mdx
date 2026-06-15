@@ -81,6 +81,24 @@ unnecessary upstream connections:
   high concurrency.
 </Callout>
 
+<Callout type="warn" title="Transaction mode + Prisma prepared statements">
+  New PgBeam databases default to **transaction** pool mode, where session state
+  (including prepared statements) is reset between transactions. Prisma uses
+  prepared statements by default, which can surface as
+  `prepared statement "s0" already exists` / `does not exist` errors under a
+  transaction-mode pooler. Treat PgBeam like PgBouncer in transaction mode: tell
+  Prisma not to keep prepared statements across pooled connections by adding
+  `pgbouncer=true` to the connection string.
+
+```bash title=".env"
+DATABASE_URL="postgresql://user:pass@abc.proxy.pgbeam.app:5432/mydb?connection_limit=5&pgbouncer=true"
+```
+
+Or switch the project to **session** pool mode if you rely on session-level
+features. See [Connection Pooling](/docs/pooling).
+
+</Callout>
+
 ## Prisma Migrate
 
 <Callout type="warn" title="Run migrations against the origin">
@@ -155,7 +173,7 @@ Prisma:
 await prisma.$executeRaw`SET pgbeam.debug = on`;
 
 const result = await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
-// Check server logs for: NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+// Check server logs for: NOTICE: pgbeam:cache hit age=12s ttl=1m0s swr=30s
 ```
 
 ## Common issues

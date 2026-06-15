@@ -238,17 +238,15 @@ any upstream at all — not the primary and not the replica.
 
 Use debug mode to verify which upstream handled each query:
 
-```sql title="Verify replica routing"
+```sql title="Verify cache status"
 SET pgbeam.debug = on;
 /* @pgbeam:replica */ SELECT 1;
--- NOTICE: pgbeam: cache=miss replica=true upstream=replica-host:5432
+-- NOTICE: pgbeam:cache miss
 ```
 
-The `NOTICE` output tells you:
-
-- Whether the query was a cache hit, miss, or stale hit
-- Whether replica routing was used (`replica=true`)
-- Which upstream host handled the query
+The `NOTICE` output reports the cache status for the query — `hit`, `miss`, or
+a stale hit (with `age`, `ttl`, and `swr` on a hit). A replica-routed read is
+not cached, so it shows as a `miss`.
 
 ## Health checks and failover
 

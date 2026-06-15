@@ -159,7 +159,7 @@ import { sql } from "drizzle-orm";
 await db.execute(sql`SET pgbeam.debug = on`);
 
 const result = await db.execute(sql`SELECT * FROM users WHERE id = ${userId}`);
-// Check server logs for: NOTICE: pgbeam: cache=hit age=12s ttl=60s swr=30s
+// Check server logs for: NOTICE: pgbeam:cache hit age=12s ttl=1m0s swr=30s
 ```
 
 ## Common issues
