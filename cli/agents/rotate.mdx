@@ -5,19 +5,20 @@ description: Rotate an agent credential's secrets
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Generate a new Postgres password and MCP token for an existing credential, keeping its id, username, name, and policy. Connections using the old password are dropped within seconds. The new secrets are shown once and cannot be retrieved again — update your agent before its next call.
+Generate a new Postgres password and MCP token for an existing credential, keeping its id, username, name, and policy. Connections using the old password are dropped within seconds. The new secrets are shown once and cannot be retrieved again — update your agent before its next call. A ready-to-paste MCP client config is printed alongside the secrets.
 
 ## Usage
 
 ```bash
-pgbeam agents rotate <id>
+pgbeam agents rotate <id> [flags]
 ```
 
 ## Options
 
-| Option | Description         | Required | Default |
-| ------ | ------------------- | -------- | ------- |
-| `<id>` | Agent credential ID | Yes      | -       |
+| Option             | Description                                                             | Required | Default  |
+| ------------------ | ----------------------------------------------------------------------- | -------- | -------- |
+| `<id>`             | Agent credential ID                                                     | Yes      | -        |
+| `--client <value>` | MCP client to emit config for: claude (default), cursor, vscode, or all | No       | `claude` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -31,10 +32,13 @@ pgbeam agents rotate <id>
 # Rotate a credential's secrets
 pgbeam agents rotate agt_xxx
 
+# Rotate and emit a VS Code MCP config
+pgbeam agents rotate agt_xxx --client vscode
+
 # Rotate and capture secrets as JSON
 pgbeam agents rotate agt_xxx --json
 ```
 
 ## Output
 
-Prints the new connection string, MCP URL, and MCP token once. With --json, returns the full secrets object.
+Prints the new connection string, MCP URL, MCP token, and a ready-to-paste MCP client config once. With --json, returns the full secrets object.

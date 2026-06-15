@@ -5,19 +5,20 @@ description: Permanently revoke an agent credential
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Permanently revoke an agent credential. Any live connections using it are dropped within seconds. This cannot be undone.
+Permanently revoke an agent credential. Any live connections using it are dropped within seconds. This cannot be undone. A confirmation prompt is shown unless `--yes` is passed.
 
 ## Usage
 
 ```bash
-pgbeam agents revoke <id>
+pgbeam agents revoke <id> [flags]
 ```
 
 ## Options
 
-| Option | Description         | Required | Default |
-| ------ | ------------------- | -------- | ------- |
-| `<id>` | Agent credential ID | Yes      | -       |
+| Option        | Description                                                 | Required | Default |
+| ------------- | ----------------------------------------------------------- | -------- | ------- |
+| `<id>`        | Agent credential ID                                         | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,8 +29,11 @@ pgbeam agents revoke <id>
 ## Examples
 
 ```bash
-# Revoke a credential
+# Revoke a credential (with confirmation)
 pgbeam agents revoke agt_xxx
+
+# Revoke without confirmation (CI/CD)
+pgbeam agents revoke agt_xxx --yes
 ```
 
 ## Output

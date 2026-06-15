@@ -5,19 +5,20 @@ description: Kill-switch an agent credential (reversible)
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Disable an agent credential as a reversible kill-switch. Live connections using it are dropped within seconds and new connections are rejected until the credential is re-enabled with `pgbeam agents enable`. Unlike `revoke`, this does not permanently destroy the credential.
+Disable an agent credential as a reversible kill-switch. Live connections using it are dropped within seconds and new connections are rejected until the credential is re-enabled with `pgbeam agents enable`. Unlike `revoke`, this does not permanently destroy the credential. A confirmation prompt is shown unless `--yes` is passed.
 
 ## Usage
 
 ```bash
-pgbeam agents disable <id>
+pgbeam agents disable <id> [flags]
 ```
 
 ## Options
 
-| Option | Description         | Required | Default |
-| ------ | ------------------- | -------- | ------- |
-| `<id>` | Agent credential ID | Yes      | -       |
+| Option        | Description                                                 | Required | Default |
+| ------------- | ----------------------------------------------------------- | -------- | ------- |
+| `<id>`        | Agent credential ID                                         | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,8 +29,11 @@ pgbeam agents disable <id>
 ## Examples
 
 ```bash
-# Disable a credential
+# Disable a credential (with confirmation)
 pgbeam agents disable agt_xxx
+
+# Disable without confirmation (CI/CD)
+pgbeam agents disable agt_xxx --yes
 ```
 
 ## Output

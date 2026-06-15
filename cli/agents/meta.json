@@ -5,6 +5,8 @@
 	"pages": [
 		"list",
 		"create",
+		"mcp-config",
+		"rotate",
 		"revoke",
 		"disable",
 		"enable"

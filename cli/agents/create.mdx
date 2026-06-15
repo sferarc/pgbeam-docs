@@ -5,7 +5,7 @@ description: Issue a new agent credential
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Issue a scoped Postgres login and hosted MCP token for an AI agent. The connection string and MCP token are shown once and cannot be retrieved again. Store them securely.
+Issue a scoped Postgres login and hosted MCP token for an AI agent. The connection string and MCP token are shown once and cannot be retrieved again. Store them securely. A ready-to-paste MCP client config (Claude Code, Cursor, or VS Code) is printed alongside the secrets.
 
 ## Usage
 
@@ -15,10 +15,11 @@ pgbeam agents create [flags]
 
 ## Options
 
-| Option             | Description                             | Required | Default |
-| ------------------ | --------------------------------------- | -------- | ------- |
-| `--name <value>`   | Human-readable label for the credential | Yes      | -       |
-| `--policy <value>` | Policy profile ID to enforce            | Yes      | -       |
+| Option             | Description                                                             | Required | Default  |
+| ------------------ | ----------------------------------------------------------------------- | -------- | -------- |
+| `--name <value>`   | Human-readable label for the credential                                 | Yes      | -        |
+| `--policy <value>` | Policy profile ID to enforce                                            | Yes      | -        |
+| `--client <value>` | MCP client to emit config for: claude (default), cursor, vscode, or all | No       | `claude` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -32,10 +33,13 @@ pgbeam agents create [flags]
 # Create a credential bound to a policy profile
 pgbeam agents create --name "Claude Code" --policy pol_xxx
 
+# Create and emit a Cursor MCP config
+pgbeam agents create --name agent --policy pol_xxx --client cursor
+
 # Create and capture secrets as JSON
 pgbeam agents create --name ci --policy pol_xxx --json
 ```
 
 ## Output
 
-Prints the connection string, MCP URL, and MCP token once. With --json, returns the full secrets object.
+Prints the connection string, MCP URL, MCP token, and a ready-to-paste MCP client config once. With --json, returns the full secrets object.
