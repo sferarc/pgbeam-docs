@@ -1,0 +1,61 @@
+---
+title: DryEvalPolicy
+description: Dry-eval a policy against a SQL statement
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Evaluates a single SQL statement against a policy — either a draft policy supplied inline or an existing policy referenced by id — and returns the decision the proxy would make: allow, block, mask, or row-filter. The evaluation reuses the data plane's own policy engine (the same parser, allow/block rules, row-filter rewriter, and masking analysis enforced on live agent sessions), so a what-if verdict matches real enforcement. Stateful checks a single-statement preview cannot model — per-region query and egress budgets, human approvals, and rollback/sandbox write routing — are reported as informational notes, not verdicts. This is a pure compute endpoint; it does not connect to the upstream database and persists nothing.
+
+## Usage
+
+```go
+result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput{
+    SQL: "SELECT email FROM users WHERE id = 1",
+  })
+```
+
+## Parameters
+
+| Parameter    | Type                         | Required | Description                                                 |
+| ------------ | ---------------------------- | -------- | ----------------------------------------------------------- |
+| ctx          | `context.Context`            | Yes      | Request context                                             |
+| projectID    | `string`                     | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).         |
+| req          | `pgbeam.DryEvalInput`        | Yes      | Request body                                                |
+| req.SQL      | `string`                     | Yes      | The single SQL statement to evaluate.                       |
+| req.PolicyID | `*string`                    | No       | ID of an existing saved policy profile to evaluate against. |
+| req.Policy   | `*pgbeam.PolicyProfileInput` | No       |                                                             |
+
+## Response
+
+`(*pgbeam.DryEvalResult, error)` — the dry-eval decision.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput{
+    SQL: "SELECT email FROM users WHERE id = 1",
+    PolicyID: "pol_01h455vb4pex5vsknk084sn02q",
+    Policy: pgbeam.PolicyProfileInput{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

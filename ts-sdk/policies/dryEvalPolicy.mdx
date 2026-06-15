@@ -1,0 +1,60 @@
+---
+title: dryEvalPolicy
+description: Dry-eval a policy against a SQL statement
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Evaluates a single SQL statement against a policy — either a draft policy supplied inline or an existing policy referenced by id — and returns the decision the proxy would make: allow, block, mask, or row-filter. The evaluation reuses the data plane's own policy engine (the same parser, allow/block rules, row-filter rewriter, and masking analysis enforced on live agent sessions), so a what-if verdict matches real enforcement. Stateful checks a single-statement preview cannot model — per-region query and egress budgets, human approvals, and rollback/sandbox write routing — are reported as informational notes, not verdicts. This is a pure compute endpoint; it does not connect to the upstream database and persists nothing.
+
+## Usage
+
+```typescript
+const result = await api.policies.dryEvalPolicy({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    sql: "SELECT email FROM users WHERE id = 1",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type                 | Required | Description                                                 |
+| --------------------- | -------------------- | -------- | ----------------------------------------------------------- |
+| pathParams.project_id | `string`             | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).         |
+| body.sql              | `string`             | Yes      | The single SQL statement to evaluate.                       |
+| body.policy_id        | `string`             | No       | ID of an existing saved policy profile to evaluate against. |
+| body.policy           | `PolicyProfileInput` | No       |                                                             |
+
+## Response
+
+`Promise<DryEvalResult>` — the dry-eval decision.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.policies.dryEvalPolicy({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    sql: "SELECT email FROM users WHERE id = 1",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
