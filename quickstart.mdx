@@ -35,10 +35,25 @@ your real database credentials, and you can revoke its access with one click.
   </Step>
 
   <Step>
+    ### Create a read-only policy
+
+    A policy profile defines what the agent may do. Create a read-only one and
+    note the `pol_…` id it prints — you'll attach the credential to it next.
+
+    ```bash title="Create a read-only policy"
+    pgbeam policies create --name read-only --mode read_only
+    # → Policy profile created: pol_1a2b3c…
+    ```
+
+  </Step>
+
+  <Step>
     ### Issue a scoped agent credential
 
+    Pass the policy id from the previous step to `--policy`:
+
     ```bash title="Create an agent credential"
-    pgbeam agents create --name analytics-bot --policy read-only
+    pgbeam agents create --name analytics-bot --policy pol_1a2b3c…
     ```
 
     This returns two things the agent can use:
@@ -58,7 +73,9 @@ your real database credentials, and you can revoke its access with one click.
   <Step>
     ### Connect the agent over MCP
 
-    Paste the MCP URL into any MCP client. For Claude Code:
+    `agents create` already printed a ready-to-paste config for your client (pass
+    `--client cursor`, `--client vscode`, or `--client all` to pick the host).
+    For Claude Code it looks like this:
 
     ```json title=".mcp.json"
     {
@@ -71,9 +88,20 @@ your real database credentials, and you can revoke its access with one click.
     }
     ```
 
-    The agent now has `query`, `list_tables`, `describe_table`, and `explain`
-    tools, every call enforced against the policy. Prefer a connection string?
-    See [Connection string](/docs/connection-string).
+    Need to regenerate it later (e.g. after rotating the token), or write it
+    straight to the client's config file?
+
+    ```bash title="Regenerate and write the config"
+    pgbeam agents mcp-config \
+      --url https://<project>.proxy.pgbeam.app/mcp \
+      --mcp-token pba_... \
+      --client cursor --write
+    ```
+
+    The dashboard credential reveal renders the same blocks. The agent now has
+    `query`, `list_tables`, `describe_table`, and `explain` tools, every call
+    enforced against the policy. Prefer a connection string? See
+    [Connection string](/docs/connection-string).
 
   </Step>
 
@@ -83,8 +111,8 @@ your real database credentials, and you can revoke its access with one click.
     Every statement the agent runs is recorded with its decision, rows, bytes,
     and latency. Open the **Audit** tab in the dashboard, or:
 
-    ```bash title="Tail the audit log"
-    pgbeam audit tail --agent analytics-bot
+    ```bash title="List the audit log"
+    pgbeam audit list --credential agt_xxx
     ```
 
     A read-only policy blocks writes and DDL automatically. The blocked statement

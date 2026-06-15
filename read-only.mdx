@@ -14,9 +14,13 @@ adjust instead of failing blind.
 ## Turn it on
 
 ```bash title="Read-only policy"
-pgbeam policies create read-only --mode read-only
-pgbeam agents attach analytics-bot --policy read-only
+pgbeam policies create --name read-only --mode read_only
+# → Policy profile created: pol_1a2b3c…
+pgbeam agents create --name analytics-bot --policy pol_1a2b3c…
 ```
+
+A credential's policy is fixed at creation. To move an existing credential to a
+different policy, rotate or re-issue it against the new profile.
 
 In the dashboard, set **Access mode** to **Read-only** on the policy profile.
 
