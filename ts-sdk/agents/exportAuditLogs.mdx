@@ -1,16 +1,16 @@
 ---
-title: listAuditLogs
-description: List agent audit logs
+title: exportAuditLogs
+description: Export agent audit logs as CSV
 ---
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Returns agent statement audit entries for the project, newest first, with optional credential, event, decision, source and date-range filters.
+Streams the project's agent audit entries as a CSV file, newest first, honoring the same credential, event, decision, source and date-range filters as the list endpoint. The full filtered set is streamed (no pagination); the result is suitable for spreadsheets, SIEM ingestion, and compliance archives.
 
 ## Usage
 
 ```typescript
-const result = await api.agents.listAuditLogs({
+const result = await api.agents.exportAuditLogs({
   pathParams: { project_id: "prj_xxx" },
 });
 ```
@@ -26,12 +26,10 @@ const result = await api.agents.listAuditLogs({
 | queryParams.source        | `AuditSource`   | No       | Filter by statement origin (wire, mcp, or control).                                                                                                                       |
 | queryParams.start         | `string`        | No       | Return entries at or after this timestamp (inclusive lower bound).                                                                                                        |
 | queryParams.end           | `string`        | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                                                                 |
-| queryParams.before        | `string`        | No       | Return entries strictly older than this timestamp (keyset pagination cursor).                                                                                             |
-| queryParams.page_size     | `number`        | No       | Maximum number of items to return (1-100, default 20).                                                                                                                    |
 
 ## Response
 
-`Promise<ListAuditLogsResponse>` — page of audit entries.
+`Promise<unknown>` — the result.
 
 ## Example
 
@@ -43,7 +41,7 @@ const client = new PgBeamClient({
   baseUrl: "https://api.pgbeam.com",
 });
 
-const result = await client.api.agents.listAuditLogs({
+const result = await client.api.agents.exportAuditLogs({
   pathParams: { project_id: "prj_xxx" },
   queryParams: {
     credential_id: "...",
@@ -52,8 +50,6 @@ const result = await client.api.agents.listAuditLogs({
     source: "...",
     start: "...",
     end: "...",
-    before: "...",
-    page_size: 20,
   },
 });
 ```
