@@ -107,6 +107,17 @@ application connection string.
 
 ## Resources
 
+<Callout type="warn">
+  **Policy profiles are not yet managed as code.** Resources that reference a
+  policy (`policy_profile_id` on an agent credential,
+  `default_policy_profile_id` on a project) expect the ID of a profile created
+  out of band with `pgbeam policies create` or the dashboard. There is no
+  policy-profile resource in the providers yet, so the policy itself — the most
+  security-sensitive primitive — lives outside your reviewed IaC flow and is
+  invisible to drift detection. Track this before gating full adoption on
+  policy-as-code.
+</Callout>
+
 ### pgbeam_project
 
 Manages a PgBeam project with a primary database.
