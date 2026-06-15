@@ -3,12 +3,12 @@ title: Terraform
 icon: Blocks
 tag: HCL
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints as
   infrastructure using Terraform and the pgbeam provider.
 ---
 
 Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
-provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints.
+provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints.
 
 ## Setup
 
@@ -252,6 +252,40 @@ resource "pgbeam_agent_credential" "example" {
 
 **Import:** `terraform import pgbeam_agent_credential.example <project_id>/<id>`
 
+### pgbeam_policy_profile
+
+Manages a policy profile: a named bundle of agent-gateway enforcement rules (access mode, table allow/deny lists, statement-kind rules, PII masking rules, per-relation row filters, query/egress budgets, write mode, approvals, and migration safety) attached to agent credentials and enforced in the PG wire protocol. Nested-list fields (masking_rules, row_filters) and the nested statement_rules object are expressed as structured config.
+
+```hcl
+resource "pgbeam_policy_profile" "example" {
+  project_id = "prj_01h455vb4pex5vsknk084sn02q"
+  name = "Read-only analytics"
+  access_mode = "read_only"
+  statement_rules {
+    allow = ["..."]
+    deny = ["..."]
+  }
+  table_allowlist = ["..."]
+  table_denylist = ["..."]
+  masking_rules = ["..."]
+  budget_queries_per_hour = 0
+  budget_queries_per_day = 0
+  max_rows = 0
+  statement_timeout_ms = 0
+  row_filters = ["..."]
+  write_mode = "normal"
+  approval_mode = "off"
+  approval_auto_max_rows = 0
+  approval_timeout_seconds = 300
+  migration_safety = "off"
+  egress_bytes_per_day = 0
+}
+```
+
+**Computed:** `created_at`, `updated_at`
+
+**Import:** `terraform import pgbeam_policy_profile.example <project_id>/<id>`
+
 ### pgbeam_webhook_endpoint
 
 Manages a webhook endpoint that receives project audit and anomaly event deliveries. The signing secret is write-only and never returned by the API.
@@ -297,6 +331,7 @@ than in-place updates:
 | CacheRule       | `project_id`, `database_id`, `query_hash`                                 |
 | SpendLimit      | `org_id`                                                                  |
 | AgentCredential | `project_id`, `policy_profile_id`, `name`, `principal_type`, `expires_at` |
+| PolicyProfile   | `project_id`                                                              |
 | WebhookEndpoint | `project_id`                                                              |
 
 ## Further reading

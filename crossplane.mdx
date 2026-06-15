@@ -3,13 +3,13 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints as
   Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
 Crossplane. The `provider-pgbeam` package provides managed resources for
-projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, and webhook endpoints.
+projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints.
 
 ## Setup
 
@@ -293,6 +293,43 @@ spec:
 
 **Status:** `pgUsername`, `authMethod`, `lastUsedAt`, `createdAt`, `updatedAt`, `connectionString`, `mcpURL`, `mcpToken`
 
+### PolicyProfile
+
+Manages a policy profile: a named bundle of agent-gateway enforcement rules (access mode, table allow/deny lists, statement-kind rules, PII masking rules, per-relation row filters, query/egress budgets, write mode, approvals, and migration safety) attached to agent credentials and enforced in the PG wire protocol. Nested-list fields (masking_rules, row_filters) and the nested statement_rules object are expressed as structured config.
+
+```yaml
+apiVersion: pgbeam.io/v1alpha1
+kind: PolicyProfile
+metadata:
+  name: example
+spec:
+  forProvider:
+    projectID: prj_01h455vb4pex5vsknk084sn02q
+    name: Read-only analytics
+    accessMode: read_only
+    statementRules:
+      allow: ["..."]
+      deny: ["..."]
+    tableAllowlist: ["..."]
+    tableDenylist: ["..."]
+    maskingRules: ["..."]
+    budgetQueriesPerHour: 0
+    budgetQueriesPerDay: 0
+    maxRows: 0
+    statementTimeoutMs: 0
+    rowFilters: ["..."]
+    writeMode: normal
+    approvalMode: off
+    approvalAutoMaxRows: 0
+    approvalTimeoutSeconds: 300
+    migrationSafety: off
+    egressBytesPerDay: 0
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `createdAt`, `updatedAt`
+
 ### WebhookEndpoint
 
 Manages a webhook endpoint that receives project audit and anomaly event deliveries. The signing secret is write-only and never returned by the API.
@@ -340,6 +377,7 @@ Some spec changes trigger resource recreation rather than in-place updates:
 | CacheRule       | `projectId`, `databaseId`, `queryHash`                               |
 | SpendLimit      | `orgId`                                                              |
 | AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| PolicyProfile   | `projectId`                                                          |
 | WebhookEndpoint | `projectId`                                                          |
 
 ## Further reading
