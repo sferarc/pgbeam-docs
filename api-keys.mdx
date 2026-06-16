@@ -36,9 +36,9 @@ PgBeam supports two types of API keys:
 
     Click **Create Key** and configure:
 
-    - **Name** — A label to identify the key (e.g., "CI/CD", "monitoring",
+    - **Name**: A label to identify the key (e.g., "CI/CD", "monitoring",
       "staging deploy")
-    - **Expiry** — Optional. Choose 30 days, 90 days, 365 days, or no expiry.
+    - **Expiry**: Optional. Choose 30 days, 90 days, 365 days, or no expiry.
 
   </Step>
 
@@ -136,7 +136,7 @@ Pass the key in the `Authorization` header as a bearer token:
 
 ## Security best practices
 
-- **Store keys in environment variables** or a secret manager — never commit
+- **Store keys in environment variables** or a secret manager. Never commit
   them to source control.
 - **Set an expiry** for keys used in CI/CD or automation.
 - **Use separate keys** for different environments (production, staging,
@@ -144,5 +144,5 @@ Pass the key in the `Authorization` header as a bearer token:
 - **Use organization keys** for shared automation so revoking a team member's
   access does not break CI/CD.
 - **Revoke keys immediately** if they may have been exposed.
-- **Audit key usage** — review active keys periodically and revoke any that are
+- **Audit key usage**: review active keys periodically and revoke any that are
   no longer needed.

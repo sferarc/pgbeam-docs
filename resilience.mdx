@@ -7,7 +7,7 @@ description:
 ---
 
 PgBeam is designed to keep your application connected even when things go wrong
-upstream. Every resilience feature is automatic — there is nothing to configure
+upstream. Every resilience feature is automatic. There is nothing to configure
 or enable.
 
 ## Circuit breaker
@@ -56,14 +56,14 @@ backoff. See [Error Codes](/docs/error-codes) for handling guidance.
 ### Why circuit breakers matter
 
 Without a circuit breaker, a failing database receives a flood of connection
-attempts from every client. This makes recovery harder — the database has to
+attempts from every client. This makes recovery harder: the database has to
 handle both its existing problem and a thundering herd of reconnections. The
 circuit breaker gives the upstream breathing room to recover.
 
 ## Scale-to-zero
 
 Projects with no active connections for 5 minutes enter a **parked** state. This
-is transparent to your application — the first new connection triggers a cold
+is transparent to your application. The first new connection triggers a cold
 start that re-initializes the project.
 
 ### What gets suspended
@@ -95,7 +95,7 @@ Subsequent connections within the same session are unaffected.
 ## Health checks
 
 PgBeam runs background health checks against every configured upstream database
-and read replica. Health checks are separate from application traffic — they run
+and read replica. Health checks are separate from application traffic. They run
 on their own schedule regardless of query volume.
 
 ### Upstream database health
@@ -128,7 +128,7 @@ of failing.
 | **L2**      | Shared per region | On failure, queries bypass L2 and go to upstream |
 
 This means a shared cache outage results in higher upstream load (cache misses)
-but never in dropped queries. Your application continues to work — it just loses
+but never in dropped queries. Your application continues to work. It just loses
 the caching benefit temporarily.
 
 ## Upstream TLS and SNI
@@ -137,9 +137,9 @@ PgBeam connects to upstream databases over TLS and sets the TLS server name
 (SNI) to the upstream hostname. This is required for managed database providers
 that use SNI-based routing to identify the correct tenant:
 
-- **Neon** — Uses SNI to route to the correct compute endpoint
-- **Supabase** — Uses SNI for project-level routing
-- **PlanetScale** (MySQL proxy) — Similar SNI routing pattern
+- **Neon**: Uses SNI to route to the correct compute endpoint
+- **Supabase**: Uses SNI for project-level routing
+- **PlanetScale** (MySQL proxy): Similar SNI routing pattern
 
 The default SSL mode is `verify-full`, which validates the upstream certificate
 against the system CA bundle. Only relax this if your provider does not issue
@@ -170,6 +170,6 @@ To set expectations clearly:
   database level (RDS Multi-AZ, Cloud SQL HA, etc.) and point PgBeam at the
   failover endpoint.
 - **No cross-region cache replication.** Each region maintains its own cache.
-  This is deliberate — cross-region coherence would add latency to every read.
+  This is deliberate: cross-region coherence would add latency to every read.
 - **No query rewriting or retry.** If a query fails at the upstream, PgBeam
   returns the error to the client as-is. It does not retry failed queries.

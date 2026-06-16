@@ -92,7 +92,7 @@ Since PgBeam manages upstream connections, keep your client-side pool small:
 ## TLS
 
 pgx uses TLS by default when connecting to PgBeam. No additional configuration
-is needed — PgBeam's `*.proxy.pgbeam.app` certificate is publicly trusted and
+is needed. PgBeam's `*.proxy.pgbeam.app` certificate is publicly trusted and
 works with all standard Go TLS configurations.
 
 If you need to verify the TLS connection explicitly:
@@ -108,7 +108,7 @@ config, _ := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
 
 For standard queries, PgBeam tracks the SQL shapes flowing through your project.
 Enable caching for specific shapes through [Cache Rules](/docs/cache) in the
-dashboard — no code changes needed.
+dashboard. No code changes needed.
 
 ### SQL annotations for fine-grained control
 
@@ -154,11 +154,11 @@ if err != nil {
     if errors.As(err, &pgErr) {
         switch pgErr.Code {
         case "53400":
-            // Query rate limit exceeded — back off and retry
+            // Query rate limit exceeded: back off and retry
         case "53300":
-            // Connection limit exceeded — reduce pool size
+            // Connection limit exceeded: reduce pool size
         case "08006":
-            // Upstream unavailable (circuit breaker) — retry with backoff
+            // Upstream unavailable (circuit breaker): retry with backoff
         }
     }
 }
@@ -174,7 +174,7 @@ Run migrations directly against the origin database:
 DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" go run ./cmd/migrate
 ```
 
-This applies to all migration tools —
+This applies to all migration tools:
 [golang-migrate](https://github.com/golang-migrate/migrate),
 [goose](https://github.com/pressly/goose), [atlas](https://atlasgo.io/), or
 custom migration scripts.
@@ -196,10 +196,10 @@ rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT 1")
 | ----------------------------- | --------------------------- | ------------------------------------------- |
 | "too many connections"        | `MaxConns` too high         | Reduce to 3-5 per pod                       |
 | Prepared statement errors     | Using transaction pool mode | Use session pool mode, or avoid `Prepare()` |
-| Connection refused on startup | Cold start after inactivity | Normal — first connection is slower         |
+| Connection refused on startup | Cold start after inactivity | Normal: first connection is slower          |
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and lifecycle
-- [Caching](/docs/cache) — TTL, SWR, cache layers, and cache rules
-- [Error Codes](/docs/error-codes) — SQLSTATE reference for PgBeam errors
+- [Connection Pooling](/docs/pooling): Pool modes, sizing, and lifecycle
+- [Caching](/docs/cache): TTL, SWR, cache layers, and cache rules
+- [Error Codes](/docs/error-codes): SQLSTATE reference for PgBeam errors

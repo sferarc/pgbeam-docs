@@ -18,7 +18,7 @@ database registered in a project can have its own timeout value.
 
 | Setting             | Behavior                                                    |
 | ------------------- | ----------------------------------------------------------- |
-| `0` (default)       | Disabled — no timeout override, upstream default applies    |
+| `0` (default)       | Disabled: no timeout override, upstream default applies     |
 | `1` – `300000` (ms) | PgBeam sets `statement_timeout` on each upstream connection |
 
 When a query exceeds the timeout, PostgreSQL cancels it and returns:
@@ -28,7 +28,7 @@ ERROR: canceling statement due to statement timeout
 SQLSTATE: 57014
 ```
 
-This is a standard PostgreSQL error — your application handles it the same way
+This is a standard PostgreSQL error. Your application handles it the same way
 regardless of whether PgBeam or a direct connection set the timeout.
 
 ## Configure the timeout
@@ -83,6 +83,6 @@ first established for the client session.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes and connection lifecycle
-- [Error Codes](/docs/error-codes) — SQLSTATE reference
-- [Troubleshooting](/docs/troubleshooting) — Debug slow queries
+- [Connection Pooling](/docs/pooling): Pool modes and connection lifecycle
+- [Error Codes](/docs/error-codes): SQLSTATE reference
+- [Troubleshooting](/docs/troubleshooting): Debug slow queries

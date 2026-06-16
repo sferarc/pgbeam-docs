@@ -9,18 +9,18 @@ description:
 
 Connect from edge runtimes and serverless functions using the
 `@neondatabase/serverless` driver. PgBeam supports both the HTTP query endpoint
-and the WebSocket wire protocol — your `neon()` / `Pool` call sites and every
+and the WebSocket wire protocol. Your `neon()` / `Pool` call sites and every
 query stay exactly as they are.
 
 <Callout type="warn" title="One required step: point the driver at PgBeam">
   Changing the connection-string host is **not** enough on its own. By default
-  `@neondatabase/serverless` derives its endpoint by rewriting the host — it
+  `@neondatabase/serverless` derives its endpoint by rewriting the host: it
   replaces the first label with `api.`, so `abc.proxy.pgbeam.app` would resolve
   to `https://api.proxy.pgbeam.app/sql`, dropping the `abc` subdomain PgBeam
   needs to route your project. Point the driver at PgBeam once, globally, with
   `neonConfig` before any query runs:
 
-```ts title="neon-config.ts — import once at startup"
+```ts title="neon-config.ts (import once at startup)"
 import { neonConfig } from "@neondatabase/serverless";
 
 // HTTP /sql endpoint: keep the project subdomain, append /sql
@@ -29,7 +29,7 @@ neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
 neonConfig.wsProxy = (host) => `${host}/v2`;
 ```
 
-These two lines are the only addition — your query call sites do not change.
+These two lines are the only addition. Your query call sites do not change.
 (On Neon's own `*.neon.tech` hosts the defaults work; PgBeam needs the override
 because its hostnames are not `*.neon.tech`.)
 
@@ -87,7 +87,7 @@ because its hostnames are not `*.neon.tech`.)
     neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
     neonConfig.wsProxy = (host) => `${host}/v2`;
 
-    // Node.js only — provide a WebSocket implementation for the Pool/Client paths
+    // Node.js only: provide a WebSocket implementation for the Pool/Client paths
     // import ws from "ws";
     // neonConfig.webSocketConstructor = ws;
     ```
@@ -95,10 +95,10 @@ because its hostnames are not `*.neon.tech`.)
   </Step>
 
   <Step>
-    ### HTTP transport — `neon()` tagged template
+    ### HTTP transport: `neon()` tagged template
 
     Best for one-shot queries from edge/serverless functions. Each call is a single
-    HTTP request — no persistent connection required.
+    HTTP request. No persistent connection required.
 
     ```ts title="query.ts"
     import "./neon-config"; // applies neonConfig.fetchEndpoint
@@ -111,7 +111,7 @@ because its hostnames are not `*.neon.tech`.)
   </Step>
 
   <Step>
-    ### WebSocket transport — `Pool` / `Client`
+    ### WebSocket transport: `Pool` / `Client`
 
     Best for interactive transactions or session-level features. Uses the
     PostgreSQL wire protocol over WebSocket.
@@ -189,7 +189,7 @@ The serverless driver works in any runtime with `fetch` (for HTTP) or
 
 Use the serverless driver adapters with Drizzle for type-safe queries:
 
-The same `neonConfig` setup applies — Drizzle wraps the Neon driver, so once the
+The same `neonConfig` setup applies. Drizzle wraps the Neon driver, so once the
 endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
 
 <Tabs items={["HTTP (drizzle-orm/neon-http)", "WebSocket (drizzle-orm/neon-serverless)"]}>
@@ -274,7 +274,7 @@ endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
 
 PgBeam matches the `@neondatabase/serverless` type contract over the HTTP
 endpoint. In particular, `bigint` (`int8`), `numeric`, and `money` are returned
-as **strings**, not numbers — a JavaScript `Number` cannot represent integers
+as **strings**, not numbers: a JavaScript `Number` cannot represent integers
 above 2^53 or arbitrary-precision decimals without silent loss. Wrap them with
 `BigInt(...)` or a decimal library as needed.
 
@@ -314,7 +314,7 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 
 | Issue                                                     | Cause                                                                     | Fix                                                                                  |
 | --------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set — driver rewrote the host to `api.`    | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2) |
+| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set; driver rewrote the host to `api.`     | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2) |
 | `WebSocket is not defined`                                | Node.js missing WS constructor                                            | Install `ws` and set `neonConfig.webSocketConstructor = ws`                          |
 | `fetch failed` on HTTP endpoint                           | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql` | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set     |
 | Slow cold starts with WebSocket                           | TLS + WS handshake on each invocation                                     | Use HTTP transport for stateless queries                                             |
@@ -322,8 +322,8 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
-- [Caching](/docs/cache) — TTL, SWR, cache rules, and SQL annotations
-- [Read Replicas](/docs/replicas) — Replica setup and routing
-- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless)
-  — Driver documentation
+- [Connection Pooling](/docs/pooling): Pool modes and sizing guidance
+- [Caching](/docs/cache): TTL, SWR, cache rules, and SQL annotations
+- [Read Replicas](/docs/replicas): Replica setup and routing
+- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless):
+  Driver documentation

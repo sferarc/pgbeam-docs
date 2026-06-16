@@ -112,7 +112,7 @@ spring.datasource.url=jdbc:postgresql://abc.proxy.pgbeam.app:5432/mydb?ssl=true&
 
 For JPA/Hibernate queries and Spring Data repositories, PgBeam automatically
 tracks the generated SQL shapes. Enable caching for specific shapes through
-[Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+[Cache Rules](/docs/cache) in the dashboard, with no code changes needed.
 
 ### SQL annotations for fine-grained control
 
@@ -163,13 +163,13 @@ try {
 } catch (SQLException e) {
     switch (e.getSQLState()) {
         case "53400":
-            // Query rate limit exceeded — back off and retry
+            // Query rate limit exceeded: back off and retry
             break;
         case "53300":
-            // Connection limit exceeded — reduce pool size
+            // Connection limit exceeded: reduce pool size
             break;
         case "08006":
-            // Upstream unavailable (circuit breaker) — retry with backoff
+            // Upstream unavailable (circuit breaker): retry with backoff
             break;
     }
 }
@@ -220,6 +220,6 @@ check your logging framework's PostgreSQL driver output.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and lifecycle
-- [Caching](/docs/cache) — TTL, SWR, cache layers, and cache rules
-- [Error Codes](/docs/error-codes) — SQLSTATE reference for PgBeam errors
+- [Connection Pooling](/docs/pooling): Pool modes, sizing, and lifecycle
+- [Caching](/docs/cache): TTL, SWR, cache layers, and cache rules
+- [Error Codes](/docs/error-codes): SQLSTATE reference for PgBeam errors

@@ -53,7 +53,7 @@ integration.
     pool = ConnectionPool(
         conninfo=os.environ["DATABASE_URL"],
         min_size=1,
-        max_size=5,  # PgBeam handles upstream pooling — keep this low
+        max_size=5,  # PgBeam handles upstream pooling, keep this low
     )
 
     with pool.connection() as conn:
@@ -164,16 +164,16 @@ import psycopg
 try:
     cur.execute("SELECT 1")
 except psycopg.errors.TooManyConnections:
-    # SQLSTATE 53300 — connection limit exceeded
+    # SQLSTATE 53300: connection limit exceeded
     # Reduce pool size or upgrade plan
     pass
 except psycopg.errors.ConfigurationLimitExceeded:
-    # SQLSTATE 53400 — query rate limit exceeded
+    # SQLSTATE 53400: query rate limit exceeded
     # Enable caching or upgrade plan
     pass
 except psycopg.OperationalError as e:
     if "circuit breaker" in str(e):
-        # SQLSTATE 08006 — upstream unavailable
+        # SQLSTATE 08006: upstream unavailable
         # Retry with backoff
         pass
 ```
@@ -233,11 +233,11 @@ cur.execute("SELECT * FROM users WHERE id = %s", [user_id])
 | Issue                         | Cause                       | Fix                                    |
 | ----------------------------- | --------------------------- | -------------------------------------- |
 | "too many connections"        | Pool too large              | Set `max_size=5` in ConnectionPool     |
-| `OperationalError` on connect | Cold start after inactivity | Normal — first connection is slower    |
+| `OperationalError` on connect | Cold start after inactivity | Normal: first connection is slower     |
 | Stale data after writes       | Cache returning old results | Adjust TTL or use `noCache` annotation |
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and lifecycle
-- [Caching](/docs/cache) — TTL, SWR, cache layers, and cache rules
-- [Error Codes](/docs/error-codes) — SQLSTATE reference for PgBeam errors
+- [Connection Pooling](/docs/pooling): Pool modes, sizing, and lifecycle
+- [Caching](/docs/cache): TTL, SWR, cache layers, and cache rules
+- [Error Codes](/docs/error-codes): SQLSTATE reference for PgBeam errors

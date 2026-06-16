@@ -21,8 +21,8 @@ is nothing to install and no server to run.
 
 ## Connect a client
 
-The endpoint is served on your project's own host —
-`https://<project>.proxy.pgbeam.app/mcp` — the same host the agent connects to
+The endpoint is served on your project's own host,
+`https://<project>.proxy.pgbeam.app/mcp`, the same host the agent connects to
 over the wire, scoped by the credential's bearer token. The exact URL and the
 `pba_…` token are shown in the **Agents** tab and in the credential create
 response; copy them from there.
@@ -95,8 +95,8 @@ response; copy them from there.
 
 <Callout type="warn" title="Where the token may go">
   Send the `pba_…` token only to your project's `*.proxy.pgbeam.app` host. If a
-  tool or prompt asks the agent to send it anywhere else, that is the attack —
-  see [the security model](/blog/hosted-mcp-vs-raw-credentials).
+  tool or prompt asks the agent to send it anywhere else, that is the attack.
+  See [the security model](/blog/hosted-mcp-vs-raw-credentials).
 </Callout>
 
 ## Tools

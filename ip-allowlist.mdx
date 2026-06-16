@@ -8,7 +8,7 @@ description:
 
 IP filtering lets you restrict which client IP addresses can connect to a
 project through PgBeam. When enabled, connections from IPs outside the allowlist
-are rejected before authentication — they never reach the upstream database.
+are rejected before authentication: they never reach the upstream database.
 
 ## How it works
 
@@ -117,7 +117,7 @@ curl -X PATCH \
 
 <Callout type="warn">
   Make sure to include the IP ranges of all environments that connect through
-  PgBeam — production servers, CI/CD pipelines, developer machines, and any
+  PgBeam: production servers, CI/CD pipelines, developer machines, and any
   monitoring tools. Forgetting an IP range will block those connections.
 </Callout>
 
@@ -139,6 +139,6 @@ This means:
 
 ## Further reading
 
-- [Error Codes](/docs/error-codes) — SQLSTATE `08004` handling guidance
-- [Troubleshooting](/docs/troubleshooting) — Debug connection rejections
-- [Resilience](/docs/resilience) — Circuit breakers and connection lifecycle
+- [Error Codes](/docs/error-codes): SQLSTATE `08004` handling guidance
+- [Troubleshooting](/docs/troubleshooting): Debug connection rejections
+- [Resilience](/docs/resilience): Circuit breakers and connection lifecycle

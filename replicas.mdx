@@ -8,7 +8,7 @@ description:
 
 Read replicas let you distribute read traffic across multiple database
 instances. Instead of sending every query to a single primary, you can route
-eligible reads to replicas — reducing load on the primary and improving read
+eligible reads to replicas, reducing load on the primary and improving read
 throughput for heavy workloads.
 
 PgBeam supports two routing modes: **per-query annotations** and **auto read
@@ -36,7 +36,7 @@ Read replicas are **not** a good fit when:
 ## Add a replica
 
 Register one or more read replicas for a database. Each replica needs its own
-connection details — PgBeam will connect to it independently from the primary.
+connection details. PgBeam connects to it independently from the primary.
 
 <Tabs items={["Dashboard", "API", "CLI"]}>
   <Tab value="Dashboard">
@@ -168,7 +168,7 @@ It is **not** a good fit when:
 <Callout type="warn">
   With auto read routing enabled, a `SELECT` immediately after an `INSERT` may
   return stale data if the replica hasn't caught up. For read-after-write
-  consistency, wrap both statements in a transaction — queries inside
+  consistency, wrap both statements in a transaction. Queries inside
   transactions always go to the primary.
 </Callout>
 
@@ -232,7 +232,7 @@ The evaluation order is:
 3. The result is cached for future requests
 
 This means cache hits are served from the local data plane without contacting
-any upstream at all — not the primary and not the replica.
+any upstream at all: not the primary and not the replica.
 
 ## Testing and debugging
 
@@ -244,14 +244,14 @@ SET pgbeam.debug = on;
 -- NOTICE: pgbeam:cache miss
 ```
 
-The `NOTICE` output reports the cache status for the query — `hit`, `miss`, or
+The `NOTICE` output reports the cache status for the query: `hit`, `miss`, or
 a stale hit (with `age`, `ttl`, and `swr` on a hit). A replica-routed read is
 not cached, so it shows as a `miss`.
 
 ## Health checks and failover
 
 PgBeam runs background health checks against each replica independently. The
-health check system is automatic — there is nothing to configure.
+health check system is automatic. There is nothing to configure.
 
 | Event                      | What PgBeam does                                  |
 | -------------------------- | ------------------------------------------------- |
@@ -260,7 +260,7 @@ health check system is automatic — there is nothing to configure.
 | All replicas are unhealthy | Annotated reads fall back to the primary database |
 
 This means replica failures are transparent to your application. A
-`/* @pgbeam:replica */` query always succeeds — it just falls back to the
+`/* @pgbeam:replica */` query always succeeds. It just falls back to the
 primary if no healthy replica is available.
 
 ## Replication lag considerations
@@ -291,12 +291,12 @@ between a write on the primary and the same data appearing on a replica.
   transaction.
 - All replicas receive equal traffic via round-robin. Weighted routing is not
   supported.
-- PgBeam does not provision or manage replicas — you create them in your
+- PgBeam does not provision or manage replicas. You create them in your
   database provider and register them in PgBeam.
 
 ## Further reading
 
-- [Caching](/docs/cache) — Combine replica routing with query caching
-- [Routing & Regions](/docs/routing) — How global routing and peer relay interact
-  with replica routing
-- [Resilience](/docs/resilience) — Health check details and failover behavior
+- [Caching](/docs/cache): Combine replica routing with query caching
+- [Routing & Regions](/docs/routing): How global routing interacts with replica
+  routing
+- [Resilience](/docs/resilience): Health check details and failover behavior

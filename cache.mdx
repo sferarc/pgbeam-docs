@@ -12,7 +12,7 @@ This reduces upstream load, lowers read latency, and saves you money on database
 compute.
 
 Each region keeps its own independent cache. There is no cross-region coherence
-layer — that is a deliberate tradeoff. Synchronizing caches across regions would
+layer. That is a deliberate tradeoff. Synchronizing caches across regions would
 add latency to every read, which defeats the purpose of caching.
 
 <Callout type="info" title="Caching is opt-in">
@@ -75,12 +75,12 @@ Caching is **not** a good fit for:
 
     PgBeam checks the local cache and then the regional shared cache for a matching entry:
 
-    - **Hit** — A fresh cached result is returned immediately. The upstream
+    - **Hit**: A fresh cached result is returned immediately. The upstream
       database is never contacted.
-    - **Stale hit** — The cached result has passed its TTL but is within the
+    - **Stale hit**: The cached result has passed its TTL but is within the
       stale-while-revalidate (SWR) window. PgBeam returns the stale result
       immediately and refreshes the cache in the background.
-    - **Miss** — No cached result exists. The query goes to the upstream database,
+    - **Miss**: No cached result exists. The query goes to the upstream database,
       and the result is stored in the cache for future requests.
 
   </Step>
@@ -228,7 +228,7 @@ to the upstream database. Results from the upstream are written back to both
 layers.
 
 If the shared cache is unavailable, PgBeam falls through to the origin database.
-Your application continues working — it just loses the caching benefit until the
+Your application continues working. It just loses the caching benefit until the
 cache recovers.
 
 ## Cache rules
@@ -284,20 +284,20 @@ enable it from the dashboard or API:
 
 ### Recommended approach
 
-1. **Let traffic flow for a while** — PgBeam needs to see your query patterns
+1. **Let traffic flow for a while**: PgBeam needs to see your query patterns
    before you can make informed caching decisions.
-2. **Start with high-frequency, stable reads** — Look for queries that run
+2. **Start with high-frequency, stable reads**: Look for queries that run
    hundreds or thousands of times per day and return data that changes
    infrequently.
-3. **Avoid caching queries with volatile data** — If a query returns different
+3. **Avoid caching queries with volatile data**: If a query returns different
    results every time, caching wastes memory without saving upstream load.
-4. **Monitor cache hit rates** — Use the dashboard or
+4. **Monitor cache hit rates**: Use the dashboard or
    [Query Insights](/docs/api) to see whether caching is actually helping.
 
 ## Further reading
 
-- [Read Replicas](/docs/replicas) — Route reads to replicas for load
+- [Read Replicas](/docs/replicas): Route reads to replicas for load
   distribution
-- [Plans & Limits](/docs/plans) — Cache entry limits and defaults per plan tier
-- [Troubleshooting](/docs/troubleshooting) — Debugging "cache is not doing
+- [Plans & Limits](/docs/plans): Cache entry limits and defaults per plan tier
+- [Troubleshooting](/docs/troubleshooting): Debugging "cache is not doing
   anything"

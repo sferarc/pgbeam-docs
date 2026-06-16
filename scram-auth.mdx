@@ -23,7 +23,7 @@ SCRAM-SHA-256 (libpq 10+, and every driver built on it) negotiates it
 automatically. Connect with the scoped credential as usual:
 
 ```bash title="psql over SCRAM"
-psql "postgresql://agent_4f2c:****@a1b2c3.aws.pgbeam.app:5432/app?sslmode=require"
+psql "postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app?sslmode=require"
 ```
 
 PgBeam advertises SCRAM-SHA-256 in the authentication handshake. The client and
@@ -31,7 +31,7 @@ PgBeam exchange the SCRAM messages, and the connection is authenticated without
 the password ever appearing on the wire. You can confirm the negotiated method:
 
 ```text
-$ PGSSLMODE=require psql "host=a1b2c3.aws.pgbeam.app dbname=app user=agent_4f2c"
+$ PGSSLMODE=require psql "host=a1b2c3.proxy.pgbeam.app dbname=app user=agent_4f2c"
 Password for user agent_4f2c:
 psql (16.2)
 SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384)

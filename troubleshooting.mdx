@@ -12,7 +12,7 @@ This guide walks through the most common issues.
 
 ## Start with debug mode
 
-Before diving into specific problems, enable PgBeam's debug output. This adds a
+Before tackling specific problems, enable PgBeam's debug output. This adds a
 `NOTICE` to every query response with cache, routing, and timing information:
 
 ```sql title="Enable debug output"
@@ -40,8 +40,8 @@ Disable it again with `SET pgbeam.debug = off`.
 1. **Verify the hostname.** It should be `<project-id>.proxy.pgbeam.app` on port
    `5432`. Check for typos.
 2. **Verify TLS is enabled.** PgBeam requires TLS. Most PostgreSQL drivers
-   enable it by default, but check your connection string for `sslmode=disable`
-   — that will not work.
+   enable it by default, but check your connection string for `sslmode=disable`.
+   That will not work.
 3. **Check your firewall.** Confirm outbound TCP traffic on port 5432 is allowed
    from your environment. Corporate networks, VPNs, and cloud security groups
    sometimes block non-HTTP ports.
@@ -79,7 +79,7 @@ The project has an IP allowlist configured and your client's IP is not in it.
 1. **Check the allowlist.** Go to your project's **Settings > Security** to see
    which CIDR ranges are allowed.
 2. **Find your egress IP.** Your client's outbound IP may differ from what you
-   expect — cloud platforms, VPNs, and NAT gateways change the source IP. Run
+   expect: cloud platforms, VPNs, and NAT gateways change the source IP. Run
    `curl ifconfig.me` from the environment that connects to PgBeam.
 3. **Add the IP.** Add your IP (as `/32` for a single address) or CIDR range to
    the allowlist.
@@ -91,7 +91,7 @@ See [IP Allowlisting](/docs/ip-allowlist) for configuration details.
 ### `08004`: Organization suspended
 
 ```
-FATAL: organization suspended — update payment at dash.pgbeam.com
+FATAL: organization suspended; update payment at dash.pgbeam.com
 ```
 
 The organization's billing is inactive. This happens when:
@@ -169,7 +169,7 @@ recovery.
 ### Origin database is slow
 
 If queries are slow but connections work, PgBeam is passing traffic through
-correctly — the issue is upstream.
+correctly. The issue is upstream.
 
 **Checklist:**
 
@@ -316,12 +316,12 @@ scale-to-zero.
 ### Cross-region latency
 
 If your database is in one region but your application is in another, cache
-misses incur cross-region relay latency (30-150ms). Cache hits are served
+misses incur cross-region latency (30-150ms). Cache hits are served
 locally with sub-millisecond latency.
 
 **Mitigations:**
 
-- Enable caching for repeated reads to serve them from the local edge
+- Enable caching for repeated reads to serve them from the nearest region
 - Add read replicas in regions closer to your application
 - If latency is critical, consider deploying your database closer to your users
 

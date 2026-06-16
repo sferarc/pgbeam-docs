@@ -42,7 +42,7 @@ are required.
 
         const pool = new Pool({
           connectionString: process.env.DATABASE_URL,
-          max: 5, // PgBeam handles upstream pooling — keep this low
+          max: 5, // PgBeam handles upstream pooling; keep this low
         });
 
         const db = drizzle(pool);
@@ -106,7 +106,7 @@ DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx drizzle-kit p
 
 For standard Drizzle query builder queries (`db.select()`, `db.query`, etc.),
 PgBeam automatically tracks the generated SQL shapes. Enable caching for these
-through [Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+through [Cache Rules](/docs/cache) in the dashboard, with no code changes needed.
 
 ### Raw queries with annotations
 
@@ -172,6 +172,6 @@ const result = await db.execute(sql`SELECT * FROM users WHERE id = ${userId}`);
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
-- [Caching](/docs/cache) — TTL, SWR, cache rules, and SQL annotations
-- [Read Replicas](/docs/replicas) — Replica setup and routing
+- [Connection Pooling](/docs/pooling): Pool modes and sizing guidance
+- [Caching](/docs/cache): TTL, SWR, cache rules, and SQL annotations
+- [Read Replicas](/docs/replicas): Replica setup and routing

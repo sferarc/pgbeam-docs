@@ -2,22 +2,21 @@
 title: Routing & Regions
 icon: Route
 description:
-  How PgBeam routes connections across global regions using peer relay and edge
-  caching — and what happens when things fail.
+  How PgBeam routes connections across global regions and caches reads close to
+  the client, and what happens when things fail.
 ---
 
-PgBeam is a globally distributed proxy. When a client connects, it is
-automatically routed to the nearest data plane region. From there, PgBeam
-handles everything — TLS termination, project lookup, connection pooling,
-caching, and upstream relay.
+PgBeam is a globally distributed proxy. When a client connects, it is routed to
+the nearest PgBeam region automatically. From there, PgBeam handles everything:
+TLS termination, project lookup, connection pooling, caching, and the upstream
+query.
 
 You do not choose a region when creating a project. Every project is accessible
-from every region. The routing layer decides the best path to the upstream
-database.
+from every region. PgBeam picks the best path to the upstream database for you.
 
 ## Regions
 
-PgBeam operates data planes in regions worldwide:
+PgBeam operates in regions worldwide:
 
 | Region         | Location    | Identifier       |
 | -------------- | ----------- | ---------------- |
@@ -40,7 +39,7 @@ Every client connection follows the same lifecycle:
     ### DNS resolution
 
     The client resolves `abc.proxy.pgbeam.app`. The connection is directed to the
-    nearest data plane region automatically, based on the client's location — no
+    nearest PgBeam region automatically, based on the client's location. No
     application-level routing is involved.
 
   </Step>
@@ -48,28 +47,27 @@ Every client connection follows the same lifecycle:
   <Step>
     ### TLS handshake
 
-    The client connects over TLS to the resolved data plane. PgBeam uses **SNI
-    (Server Name Indication)** to extract the project identifier from the hostname
-    during the TLS handshake, before any PostgreSQL protocol traffic is exchanged.
+    The client connects over TLS. PgBeam uses **SNI (Server Name Indication)** to
+    extract the project identifier from the hostname during the TLS handshake,
+    before any PostgreSQL protocol traffic is exchanged.
 
   </Step>
 
   <Step>
     ### Project lookup
 
-    The data plane resolves the full project configuration from the control plane:
-    upstream host, pool mode, cache settings, connection limits, and rate limits.
-    Project configs are cached at the edge, so this lookup is fast after the first
-    connection.
+    PgBeam resolves the full project configuration: upstream host, pool mode,
+    cache settings, connection limits, and rate limits. Project configs are
+    cached locally, so this lookup is fast after the first connection.
 
   </Step>
 
   <Step>
     ### Cache check (for queries)
 
-    When caching is enabled, each incoming query is checked against the local edge
-    cache **before** any upstream communication. Cache hits are returned directly
-    from the data plane, with zero upstream latency.
+    When caching is enabled, each incoming query is checked against the local
+    cache **before** any upstream communication. Cache hits are returned directly,
+    with zero upstream latency.
 
   </Step>
 
@@ -78,15 +76,15 @@ Every client connection follows the same lifecycle:
 
     PgBeam acquires an upstream connection from the per-project pool (or dials a
     new one). Your credentials are forwarded to the upstream database for
-    authentication — PgBeam does not store user passwords.
+    authentication. PgBeam does not store user passwords.
 
   </Step>
 
   <Step>
-    ### Query relay
+    ### Query execution
 
-    Queries are relayed between the client and upstream. Results flow back through
-    the same path. When caching is enabled, eligible read results are stored in the
+    The query runs against the upstream database and results flow back to the
+    client. When caching is enabled, eligible read results are stored in the
     local cache for future requests.
 
   </Step>
@@ -100,81 +98,45 @@ Every client connection follows the same lifecycle:
   </Step>
 </Steps>
 
-## Architecture diagram
+## Routing across regions
 
-```
-Client (Oregon)
-     │
-     ▼
-Nearest data plane
-     │
-     ▼
-┌─────────────────────────────────────┐
-│  Data Plane (us-west-2)             │
-│                                     │
-│  TLS → SNI → Project Lookup        │
-│       │                             │
-│       ├→ Cache Hit? → Return        │
-│       │                             │
-│       ├→ Local pool? → Upstream     │
-│       │                             │
-│       └→ Relay to home region ─────────▶ Data Plane (us-east-1)
-│                                     │         │
-└─────────────────────────────────────┘         ▼
-                                           Pool → Database
-```
+When your database is in a different region from the connecting client, PgBeam
+keeps connection pools close to the database while still serving clients from the
+nearest region. Clients connect to the region nearest them; PgBeam routes the
+query to the region nearest your database, where the pool lives.
 
-## Peer relay
-
-When your database is hosted in a different region from the connecting client,
-PgBeam uses **peer relay** to keep connection pools close to the database while
-still serving clients from the nearest edge.
-
-### How relay works
-
-1. The client connects to the nearest data plane (the **edge**)
-2. The edge determines that the upstream database is in a different region
-3. The edge relays the connection to the data plane in the database's region
-   (the **home** region)
-4. The home data plane manages the connection pool and upstream connections
-
-```
-Client (Singapore)  →  Edge (ap-southeast-1)  →  Relay  →  Home (us-east-1)  →  Database
-```
-
-### Why relay instead of direct connection
-
-Keeping pools in the home region has two advantages:
+Keeping pools close to the database has two advantages:
 
 1. **Connection stability.** Long-lived upstream connections stay on the
    shortest, most stable network path to the database.
-2. **Pool efficiency.** All connections from all regions share the same pool in
-   the home region, maximizing connection reuse.
+2. **Pool efficiency.** Connections from every region share the same pool,
+   maximizing connection reuse.
 
-### Cache and relay interaction
+### Cache and routing interaction
 
-The cache check always happens at the **edge** data plane, before any relay.
-This is the key performance benefit:
+The cache check always happens in the region nearest the client, before any
+cross-region hop. This is the key performance benefit:
 
-- **Cache hit:** Served from the edge. No relay. No upstream query. The client
-  gets the result with local latency only.
-- **Cache miss:** The query is relayed to the home region, executed against the
-  upstream, and the result is cached at the edge for future requests.
+- **Cache hit:** Served from the nearest region. No cross-region hop. No upstream
+  query. The client gets the result with local latency only.
+- **Cache miss:** The query is routed to the region nearest the database,
+  executed against the upstream, and the result is cached near the client for
+  future requests.
 
 This means a client in Singapore querying a database in Virginia can get
 sub-millisecond response times for cached queries, despite the database being
 halfway around the world.
 
-### Relay fallback
+### Failover
 
-If the relay connection to the home region fails (network partition, home region
-outage), PgBeam falls back to a **direct connection** from the edge data plane
-to the upstream database. This is less efficient (no pool sharing with other
-regions) but maintains connectivity.
+If the path to the database's region is unavailable (network partition, region
+outage), PgBeam falls back to connecting to the upstream database directly from
+the client's region. This is less efficient (no pool sharing across regions) but
+maintains connectivity.
 
 <Callout type="info">
-  Relay fallback is automatic. Your application does not need to handle it — the
-  connection either works via relay or via direct path, transparently.
+  Failover is automatic. Your application does not need to handle it: the
+  connection works transparently either way.
 </Callout>
 
 ## Read replica routing
@@ -209,33 +171,33 @@ for setup instructions, ORM examples, and health check details.
 
 Understanding where latency comes from helps you optimize your setup:
 
-| Scenario                            | Typical latency | What determines it        |
-| ----------------------------------- | --------------- | ------------------------- |
-| Cache hit at edge                   | \< 1ms          | L1/L2 cache lookup        |
-| Cache miss, database in same region | 1-5ms           | Upstream query time       |
-| Cache miss, relay to another region | 30-150ms        | Inter-region RTT + query  |
-| Cold start (project was parked)     | Varies          | Pool re-init + first dial |
+| Scenario                               | Typical latency | What determines it        |
+| -------------------------------------- | --------------- | ------------------------- |
+| Cache hit near client                  | \< 1ms          | L1/L2 cache lookup        |
+| Cache miss, database in same region    | 1-5ms           | Upstream query time       |
+| Cache miss, database in another region | 30-150ms        | Inter-region RTT + query  |
+| Cold start (project was parked)        | Varies          | Pool re-init + first dial |
 
 The biggest latency win comes from caching. A cache hit eliminates both the
-upstream query and any relay overhead.
+upstream query and any cross-region hop.
 
 ## Failure scenarios
 
-| Failure                       | PgBeam behavior                                             |
-| ----------------------------- | ----------------------------------------------------------- |
-| Edge data plane goes down     | Clients are automatically routed to the next nearest region |
-| Relay to home region fails    | Fallback to direct connection from edge                     |
-| Upstream database unreachable | Circuit breaker opens after 3 failures                      |
-| Shared cache goes down        | Queries fall through to upstream (fail-open)                |
-| All replicas unhealthy        | Replica-annotated queries fall back to primary              |
+| Failure                             | PgBeam behavior                                             |
+| ----------------------------------- | ----------------------------------------------------------- |
+| A PgBeam region goes down           | Clients are automatically routed to the next nearest region |
+| Path to the database's region fails | Fallback to a direct connection from the client's region    |
+| Upstream database unreachable       | Circuit breaker opens after 3 failures                      |
+| Shared cache goes down              | Queries fall through to upstream (fail-open)                |
+| All replicas unhealthy              | Replica-annotated queries fall back to primary              |
 
 See [Resilience](/docs/resilience) for detailed circuit breaker behavior and
 recovery.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes, sizing, and connection
+- [Connection Pooling](/docs/pooling): Pool modes, sizing, and connection
   lifecycle
-- [Caching](/docs/cache) — How cache lookup interacts with routing
-- [Read Replicas](/docs/replicas) — Opt-in replica routing with SQL annotations
-- [Resilience](/docs/resilience) — Circuit breakers, health checks, and failover
+- [Caching](/docs/cache): How cache lookup interacts with routing
+- [Read Replicas](/docs/replicas): Opt-in replica routing with SQL annotations
+- [Resilience](/docs/resilience): Circuit breakers, health checks, and failover

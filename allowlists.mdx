@@ -11,7 +11,7 @@ PgBeam parses each statement, resolves the relations it references, and blocks
 the statement if any of them is not on the list. When an allowlist is set the
 default is deny: an agent reaches only what you explicitly allow.
 
-A table **denylist** does the opposite — it names relations that are always
+A table **denylist** does the opposite: it names relations that are always
 blocked, and it takes precedence over the allowlist.
 
 ## Define an allowlist

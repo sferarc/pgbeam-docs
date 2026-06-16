@@ -13,7 +13,7 @@ access shared resources through their organization membership.
 ## How organizations work
 
 When you sign up, PgBeam creates a default organization for you. You can create
-additional organizations to separate workloads — for example, one for production
+additional organizations to separate workloads. For example, one for production
 and one for staging, or separate organizations for different clients.
 
 Each organization has:
@@ -21,9 +21,9 @@ Each organization has:
 - A **slug** that appears in dashboard URLs (e.g.,
   `dash.pgbeam.com/my-team/projects`). The slug is set at creation and cannot be
   changed.
-- A **billing subscription** — each organization has its own plan, payment
+- A **billing subscription**: each organization has its own plan, payment
   method, and invoice history.
-- **Shared quotas** — all projects within the organization share the same query,
+- **Shared quotas**: all projects within the organization share the same query,
   connection, and data transfer limits.
 
 ## Create an organization
@@ -74,13 +74,13 @@ PgBeam uses three roles with progressively broader access:
 
 | Role       | Projects & databases | Members                           | Billing & plan | Delete org |
 | ---------- | -------------------- | --------------------------------- | -------------- | ---------- |
-| **Member** | View and use         | —                                 | —              | —          |
-| **Admin**  | Full CRUD            | Invite and remove (except owners) | View           | —          |
+| **Member** | View and use         | No                                | No             | No         |
+| **Admin**  | Full CRUD            | Invite and remove (except owners) | View           | No         |
 | **Owner**  | Full CRUD            | Full control                      | Full control   | Yes        |
 
 <Callout type="info">
   Every organization must have at least one owner. The last owner cannot be
-  removed or downgraded — transfer ownership to another member first.
+  removed or downgraded. Transfer ownership to another member first.
 </Callout>
 
 ### When to use each role
@@ -110,7 +110,7 @@ $10/month each.
 ## Shared quotas
 
 All projects within an organization share the organization's plan quota. There
-are no per-project sub-limits — usage from every project counts toward the same
+are no per-project sub-limits: usage from every project counts toward the same
 pool.
 
 | Quota             | What it covers                                           |
@@ -187,7 +187,7 @@ Only owners can delete an organization. Deleting an organization:
 
 ## Further reading
 
-- [Plans & Limits](/docs/plans) — Quota details and overage billing for each
+- [Plans & Limits](/docs/plans): Quota details and overage billing for each
   tier
-- [API Keys](/docs/api-keys) — Organization-scoped keys for CI/CD and automation
-- [SSO](/docs/sso) — Enterprise single sign-on for organization authentication
+- [API Keys](/docs/api-keys): Organization-scoped keys for CI/CD and automation
+- [SSO](/docs/sso): Enterprise single sign-on for organization authentication

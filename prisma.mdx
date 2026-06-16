@@ -28,7 +28,7 @@ code are required.
   <Step>
     ### Verify your schema
 
-    No changes needed to `schema.prisma` — the `postgresql` provider works as-is:
+    No changes needed to `schema.prisma`. The `postgresql` provider works as-is:
 
     ```prisma title="schema.prisma"
     datasource db {
@@ -122,7 +122,7 @@ This applies to both `prisma migrate deploy` (production) and
 
 For standard Prisma Client queries (`findMany`, `findUnique`, etc.), PgBeam
 automatically tracks the generated SQL shapes. Enable caching for these shapes
-through [Cache Rules](/docs/cache) in the dashboard — no code changes needed.
+through [Cache Rules](/docs/cache) in the dashboard. No code changes needed.
 
 ### Raw queries with annotations
 
@@ -187,6 +187,6 @@ const result = await prisma.$queryRaw`SELECT * FROM users WHERE id = ${userId}`;
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — Pool modes and sizing guidance
-- [Caching](/docs/cache) — How PgBeam caching works, TTL, and SWR
-- [Read Replicas](/docs/replicas) — Replica setup and routing
+- [Connection Pooling](/docs/pooling): Pool modes and sizing guidance
+- [Caching](/docs/cache): How PgBeam caching works, TTL, and SWR
+- [Read Replicas](/docs/replicas): Replica setup and routing

@@ -3,12 +3,12 @@ title: Connection Pooling
 icon: Waves
 description:
   How PgBeam pools upstream PostgreSQL connections per project, keyed by user
-  credentials — and how to choose the right pool mode for your workload.
+  credentials, and how to choose the right pool mode for your workload.
 ---
 
 PostgreSQL creates a new OS process for every client connection. Each process
 consumes memory (typically 5-10 MB), and the startup cost is non-trivial. At
-scale, this becomes the bottleneck — not query execution, but the cost of
+scale, this becomes the bottleneck: not query execution, but the cost of
 establishing and maintaining connections.
 
 PgBeam solves this by pooling upstream connections at the proxy layer. Your
@@ -19,7 +19,7 @@ connections, faster connection establishment, and better resource utilization.
 ## How PgBeam pooling works
 
 Each project gets its own connection pool. PgBeam uses **credential
-passthrough** — your application sends real database credentials, and PgBeam
+passthrough**: your application sends real database credentials, and PgBeam
 forwards them to the upstream. Different users connecting through the same
 project get separate pool entries keyed by username.
 
@@ -35,7 +35,7 @@ load on PostgreSQL without changing how your application authenticates.
 ## Pool modes
 
 Pool modes control how upstream connections are shared between clients. New
-databases default to **transaction mode** — the best balance of connection
+databases default to **transaction mode**, the best balance of connection
 reuse and compatibility for most web and serverless workloads. You configure the
 mode per-project from the dashboard, API, or CLI.
 
@@ -136,8 +136,8 @@ if you have a purely read-only workload.
 ## Pool sizing guidance
 
 Since PgBeam handles upstream pooling, your application's client-side pool
-should be smaller than you might be used to. The goal is to let PgBeam multiplex
-— having a large client pool defeats the purpose.
+should be smaller than you might be used to. The goal is to let PgBeam multiplex;
+having a large client pool defeats the purpose.
 
 | Deployment type           | Recommended client pool size |
 | ------------------------- | ---------------------------- |
@@ -180,7 +180,7 @@ keyed by the client's username. If one is available, it is assigned immediately.
 If not, PgBeam dials a new connection to the upstream database.
 
 Your credentials are forwarded to the upstream for authentication. PgBeam does
-**not** store user passwords — credentials are passed through transparently.
+**not** store user passwords. Credentials are passed through transparently.
 
 ### Pool release
 
@@ -233,7 +233,7 @@ patterns, while freeing resources during quiet periods.
 
 Serverless functions create a new database connection on every invocation. With
 PgBeam in transaction mode, these short-lived connections are efficiently
-multiplexed — each function invocation acquires an upstream connection only for
+multiplexed: each function invocation acquires an upstream connection only for
 the duration of its query, then releases it.
 
 ```ts title="Lambda handler with PgBeam"
@@ -272,8 +272,8 @@ DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx prisma migrat
 
 ## Further reading
 
-- [Plans & Limits](/docs/plans) — Connection limits per plan tier
-- [Troubleshooting](/docs/troubleshooting) — Debugging `53300` (too many
+- [Plans & Limits](/docs/plans): Connection limits per plan tier
+- [Troubleshooting](/docs/troubleshooting): Debugging `53300` (too many
   connections)
-- [Resilience](/docs/resilience) — Connection reset, circuit breakers, and
+- [Resilience](/docs/resilience): Connection reset, circuit breakers, and
   recovery
