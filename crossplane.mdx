@@ -119,13 +119,15 @@ kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
 
 ## Resources
 
-<Callout type="info">
-  Policy profiles are managed as code. The [`PolicyProfile`](#policyprofile)
-  resource defines the full policy (access mode, allow and deny lists, masking
-  rules, budgets, write mode) in the same reviewed IaC flow. Resources that
-  reference a policy (`defaultPolicyProfileID` on a project, `policyProfileID`
-  on an agent credential) take the ID of a `PolicyProfile` you manage in the
-  same manifest.
+<Callout type="warn">
+  **Policy profiles are not yet managed as code.** Resources that reference a
+  policy (`policy_profile_id` on an agent credential,
+  `default_policy_profile_id` on a project) expect the ID of a profile created
+  out of band with `pgbeam policies create` or the dashboard. There is no
+  policy-profile resource in the providers yet, so the policy itself — the most
+  security-sensitive primitive — lives outside your reviewed IaC flow and is
+  invisible to drift detection. Track this before gating full adoption on
+  policy-as-code.
 </Callout>
 
 ### Project
@@ -143,11 +145,7 @@ spec:
     name: my-app
     description: Production database proxy
     tags: ["production", "us-east-1"]
-    allowedCidrs:
-      - cidr: 203.0.113.0/24
-        label: Office
-      - cidr: 198.51.100.42/32
-        label: CI/CD
+    allowedCidrs: [[object Object], [object Object]]
     defaultPolicyProfileID: pol_01h455vb4pex5vsknk084sn02q
     agentsDisabled: false
     status: active
@@ -202,7 +200,7 @@ spec:
 
 Manages a read replica for a PgBeam database.
 
-Replicas are immutable: any spec change triggers recreation.
+Replicas are immutable — any spec change triggers recreation.
 
 ```yaml
 apiVersion: pgbeam.io/v1alpha1
@@ -225,7 +223,7 @@ spec:
 
 Manages a custom domain for a PgBeam project.
 
-CustomDomains are immutable: any spec change triggers recreation.
+CustomDomains are immutable — any spec change triggers recreation.
 
 ```yaml
 apiVersion: pgbeam.io/v1alpha1
@@ -396,9 +394,9 @@ Some spec changes trigger resource recreation rather than in-place updates:
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling): pool modes and sizing
-- [Caching](/docs/cache): query caching and SWR
-- [Read Replicas](/docs/replicas): replica routing
-- [Custom Domains](/docs/custom-domains): DNS setup and verification
-- [API Keys](/docs/api-keys): managing API credentials
-- [Plans](/docs/plans): plan limits and pricing
+- [Connection Pooling](/docs/pooling) — pool modes and sizing
+- [Caching](/docs/cache) — query caching and SWR
+- [Read Replicas](/docs/replicas) — replica routing
+- [Custom Domains](/docs/custom-domains) — DNS setup and verification
+- [API Keys](/docs/api-keys) — managing API credentials
+- [Plans](/docs/plans) — plan limits and pricing

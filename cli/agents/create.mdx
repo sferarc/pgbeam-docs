@@ -15,11 +15,12 @@ pgbeam agents create [flags]
 
 ## Options
 
-| Option             | Description                                                             | Required | Default  |
-| ------------------ | ----------------------------------------------------------------------- | -------- | -------- |
-| `--name <value>`   | Human-readable label for the credential                                 | Yes      | -        |
-| `--policy <value>` | Policy profile ID to enforce                                            | Yes      | -        |
-| `--client <value>` | MCP client to emit config for: claude (default), cursor, vscode, or all | No       | `claude` |
+| Option              | Description                                                                                              | Required | Default  |
+| ------------------- | -------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| `--name <value>`    | Human-readable label for the credential                                                                  | Yes      | -        |
+| `--policy <value>`  | Policy profile ID to enforce                                                                             | Yes      | -        |
+| `--client <value>`  | MCP client to emit config for: claude (default), cursor, vscode, or all                                  | No       | `claude` |
+| `--expires <value>` | Credential lifetime: a duration like 30d/12h/90m, or an absolute ISO 8601 timestamp. Omit for no expiry. | No       | -        |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -35,6 +36,9 @@ pgbeam agents create --name "Claude Code" --policy pol_xxx
 
 # Create and emit a Cursor MCP config
 pgbeam agents create --name agent --policy pol_xxx --client cursor
+
+# Create a credential that expires in 30 days
+pgbeam agents create --name agent --policy pol_xxx --expires 30d
 
 # Create and capture secrets as JSON
 pgbeam agents create --name ci --policy pol_xxx --json
