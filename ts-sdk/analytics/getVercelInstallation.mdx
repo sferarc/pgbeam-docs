@@ -1,0 +1,54 @@
+---
+title: getVercelInstallation
+description: Get Vercel Marketplace installation status
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns the Vercel Marketplace installation for the organization,
+including its provisioned resources and their current-period usage.
+Returns 404 when the organization was not provisioned through the
+Vercel Marketplace. Powers the dashboard's Vercel integration page.
+
+## Usage
+
+```typescript
+const result = await api.analytics.getVercelInstallation({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                     |
+| ----------------- | -------- | -------- | ------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier. |
+
+## Response
+
+`Promise<VercelInstallationStatus>` — vercel installation status.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.analytics.getVercelInstallation({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

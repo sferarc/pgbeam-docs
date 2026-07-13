@@ -27,11 +27,8 @@ result, err := client.Projects.UpdateProject(ctx, "prj_xxx", pgbeam.UpdateProjec
 | req.Tags                   | `*[]string`                   | No       | Replacement set of user-defined project labels.                                                                                                                                                                                                                                        |
 | req.Status                 | `*pgbeam.ProjectStatus`       | No       |                                                                                                                                                                                                                                                                                        |
 | req.AllowedCidrs           | `*[]pgbeam.CidrEntry`         | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported.                                                                                                                                                   |
-|                            |
 | req.DefaultPolicyProfileID | `*string`                     | No       | When set, passthrough/human connections are enforced against this policy profile. Send an empty string to clear.                                                                                                                                                                       |
-|                            |
 | req.AgentsDisabled         | `*bool`                       | No       | Project-level kill-switch. Set true to block ALL agent-credential connections to this project (live agent sessions are dropped within seconds); set false to re-enable them. Passthrough/human connections are unaffected. Engaging the kill-switch emits a kill_switch webhook event. |
-|                            |
 
 ## Response
 
@@ -49,9 +46,9 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 result, err := client.Projects.UpdateProject(ctx, "prj_xxx", pgbeam.UpdateProjectRequest{
     Name: "my-app",
     Description: "Production database proxy",
-    Tags: production,us-east-1,
+    Tags: []string{"production", "us-east-1"},
     Status: pgbeam.ProjectStatus{ /* ... */ },
-    AllowedCidrs: [object Object],[object Object],
+    AllowedCidrs: []pgbeam.CidrEntry{ /* ... */ },
     DefaultPolicyProfileID: "pol_01h455vb4pex5vsknk084sn02q",
   })
 if err != nil {

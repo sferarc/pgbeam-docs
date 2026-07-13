@@ -47,7 +47,7 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Name: "my-app",
     OrgID: "org_abc123",
     Description: "Production database proxy",
-    Tags: production,us-east-1,
+    Tags: []string{"production", "us-east-1"},
     Cloud: "aws",
     Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
   })

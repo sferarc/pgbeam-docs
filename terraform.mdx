@@ -112,8 +112,8 @@ application connection string.
   policy (`policy_profile_id` on an agent credential,
   `default_policy_profile_id` on a project) expect the ID of a profile created
   out of band with `pgbeam policies create` or the dashboard. There is no
-  policy-profile resource in the providers yet, so the policy itself — the most
-  security-sensitive primitive — lives outside your reviewed IaC flow and is
+  policy-profile resource in the providers yet, so the policy itself, the most
+  security-sensitive primitive, lives outside your reviewed IaC flow and is
   invisible to drift detection. Track this before gating full adoption on
   policy-as-code.
 </Callout>
@@ -128,7 +128,7 @@ resource "pgbeam_project" "example" {
   name = "my-app"
   description = "Production database proxy"
   tags = ["production", "us-east-1"]
-  allowed_cidrs = [[object Object], [object Object]]
+  allowed_cidrs = [{ cidr = "10.0.0.0/8", label = "VPC" }, { cidr = "2001:db8::/32", label = "IPv6 range" }]
   default_policy_profile_id = "pol_01h455vb4pex5vsknk084sn02q"
   agents_disabled = false
   status = "active"
@@ -179,7 +179,7 @@ resource "pgbeam_database" "example" {
 
 Manages a read replica for a PgBeam database.
 
-Replicas are immutable — any property change triggers replacement.
+Replicas are immutable; any property change triggers replacement.
 
 ```hcl
 resource "pgbeam_replica" "example" {
@@ -198,7 +198,7 @@ resource "pgbeam_replica" "example" {
 
 Manages a custom domain for a PgBeam project.
 
-CustomDomains are immutable — any property change triggers replacement.
+CustomDomains are immutable; any property change triggers replacement.
 
 ```hcl
 resource "pgbeam_custom_domain" "example" {
@@ -348,9 +348,9 @@ than in-place updates:
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling) — pool modes and sizing
-- [Caching](/docs/cache) — query caching and SWR
-- [Read Replicas](/docs/replicas) — replica routing
-- [Custom Domains](/docs/custom-domains) — DNS setup and verification
-- [API Keys](/docs/api-keys) — managing API credentials
-- [Plans](/docs/plans) — plan limits and pricing
+- [Connection Pooling](/docs/pooling): pool modes and sizing
+- [Caching](/docs/cache): query caching and SWR
+- [Read Replicas](/docs/replicas): replica routing
+- [Custom Domains](/docs/custom-domains): DNS setup and verification
+- [API Keys](/docs/api-keys): managing API credentials
+- [Plans](/docs/plans): plan limits and pricing

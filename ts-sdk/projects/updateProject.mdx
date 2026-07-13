@@ -28,11 +28,8 @@ const result = await api.projects.updateProject({
 | body.tags                      | `string[]`      | No       | Replacement set of user-defined project labels.                                                                                                                                                                                                                                        |
 | body.status                    | `ProjectStatus` | No       |                                                                                                                                                                                                                                                                                        |
 | body.allowed_cidrs             | `CidrEntry[]`   | No       | IP filtering rules as CIDR ranges with optional labels. Empty array means allow all. Both IPv4 and IPv6 CIDR notation are supported.                                                                                                                                                   |
-|                                |
 | body.default_policy_profile_id | `string`        | No       | When set, passthrough/human connections are enforced against this policy profile. Send an empty string to clear.                                                                                                                                                                       |
-|                                |
 | body.agents_disabled           | `boolean`       | No       | Project-level kill-switch. Set true to block ALL agent-credential connections to this project (live agent sessions are dropped within seconds); set false to re-enable them. Passthrough/human connections are unaffected. Engaging the kill-switch emits a kill_switch webhook event. |
-|                                |
 
 ## Response
 
