@@ -1,0 +1,174 @@
+---
+title: Webhook Events
+icon: Webhook
+description:
+  The full set of webhook event types PgBeam delivers, when each one fires, and
+  the payload shape you receive.
+---
+
+[Audit export](/docs/audit-export) delivers events to a webhook endpoint as they
+happen. This page enumerates every event type you can subscribe to, when each one
+fires, and the fields in its payload. Subscribe to a subset with `event_types`
+(the CLI `--event` flag), or omit it to receive all of them.
+
+## Event types
+
+| `event_type`         | Fires when                                                                        |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `query_blocked`      | A statement is rejected by policy (allowlist, read-only, and so on).              |
+| `budget_exhausted`   | A credential hits its query or row [budget](/docs/budgets).                       |
+| `kill_switch`        | A credential or project [kill-switch](/docs/kill-switch) is tripped.              |
+| `masked`             | A result is returned with one or more [masked](/docs/masking) columns.            |
+| `migration_flagged`  | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
+| `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
+| `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
+
+A separate `webhook.test` event is sent only when you use **Send test event** on
+an endpoint. You do not subscribe to it, and it never fires from live traffic.
+
+## Envelope
+
+Every delivery in the native `json` format shares the same envelope. The
+event-specific fields live under `data`.
+
+```json title="Envelope"
+{
+  "id": "whd_2a9f1c",
+  "type": "query_blocked",
+  "project_id": "prj_abc",
+  "occurred_at": "2026-06-13T09:24:11.512Z",
+  "data": {}
+}
+```
+
+| Field         | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| `id`          | Stable event id. Use it to de-duplicate retried deliveries. |
+| `type`        | The event type, one of the values above.                    |
+| `project_id`  | The project the event belongs to.                           |
+| `occurred_at` | When the underlying event happened (RFC 3339).              |
+| `data`        | Event-specific fields, documented per event type below.     |
+
+The [SIEM formats](/docs/audit-export#siem-formats) (`splunk_hec`, `datadog`,
+`elastic`) wrap these same fields in the shape that product expects.
+
+## Audit-derived events
+
+`query_blocked`, `budget_exhausted`, `masked`, `migration_flagged`, and
+`approval_requested` all come from the [audit log](/docs/audit-log). They share
+the same `data` shape; the `event` field inside `data` tells you which underlying
+audit event it was.
+
+```json title="query_blocked data"
+{
+  "audit_id": "aud_9f2c",
+  "credential_id": "agent_4f2c",
+  "region": "us-east-1",
+  "event": "blocked",
+  "sql": "DELETE FROM users",
+  "normalized_sql": "DELETE FROM users",
+  "query_hash": "8c1f0a2b3d4e5f60",
+  "statement_kind": "delete",
+  "decision_rule": "read_only",
+  "reason": "policy is read-only: DELETE is not allowed",
+  "rows_returned": 0,
+  "bytes_out": 0,
+  "latency_ms": 4.2,
+  "client_ip": "203.0.113.10",
+  "session_id": "sess_71ab",
+  "source": "mcp"
+}
+```
+
+| Field            | Description                                                   |
+| ---------------- | ------------------------------------------------------------- |
+| `audit_id`       | Id of the audit-log entry this event came from.               |
+| `credential_id`  | The credential that ran the statement.                        |
+| `region`         | Region that served the statement.                             |
+| `event`          | The underlying audit event (for example `blocked`, `masked`). |
+| `sql`            | The statement, as parsed.                                     |
+| `normalized_sql` | The statement with literals stripped.                         |
+| `query_hash`     | Hash of the normalized statement.                             |
+| `statement_kind` | The statement kind (for example `select`, `delete`).          |
+| `decision_rule`  | The rule that produced the decision.                          |
+| `reason`         | Why it was blocked, masked, or held.                          |
+| `rows_returned`  | Rows returned to the agent, after masking and row caps.       |
+| `bytes_out`      | Bytes returned.                                               |
+| `latency_ms`     | Time to serve the statement.                                  |
+| `client_ip`      | The agent's source IP.                                        |
+| `session_id`     | The wire session the statement ran in.                        |
+| `source`         | Where the statement came from: a connection string or MCP.    |
+
+The `kill_switch` type also fires from the audit stream when a statement is
+killed mid-flight, with the same `data` shape as above.
+
+## `kill_switch` (project)
+
+When a project kill-switch is engaged from the control plane, the event carries a
+compact payload rather than a per-statement one:
+
+```json title="kill_switch data (project engage)"
+{
+  "project_id": "prj_abc",
+  "agents_disabled": true,
+  "reason": "project_kill_switch_engaged"
+}
+```
+
+| Field             | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `project_id`      | The project whose kill-switch was engaged.  |
+| `agents_disabled` | `true` while agent connections are blocked. |
+| `reason`          | Why the kill-switch fired.                  |
+
+## `anomaly_alert`
+
+Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts
+from its baseline.
+
+```json title="anomaly_alert data"
+{
+  "id": "ano_5c7d",
+  "project_id": "prj_abc",
+  "credential_id": "agent_4f2c",
+  "kind": "egress_spike",
+  "severity": "high",
+  "title": "Egress well above baseline",
+  "details": {},
+  "window_start": "2026-06-13T08:00:00Z",
+  "window_end": "2026-06-13T09:00:00Z"
+}
+```
+
+| Field           | Description                                                                                                |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| `id`            | The anomaly alert id.                                                                                      |
+| `project_id`    | The project the alert belongs to.                                                                          |
+| `credential_id` | The credential the alert is about.                                                                         |
+| `kind`          | The signal that tripped: `volume_spike`, `egress_spike`, `new_query_shape`, `off_hours`, or `error_spike`. |
+| `severity`      | The alert severity.                                                                                        |
+| `title`         | A short human-readable summary.                                                                            |
+| `details`       | Signal-specific detail (varies by `kind`).                                                                 |
+| `window_start`  | Start of the window the alert was computed over (RFC 3339).                                                |
+| `window_end`    | End of that window (RFC 3339).                                                                             |
+
+## `webhook.test`
+
+Sent by **Send test event** so you can verify a receiver before relying on it.
+
+```json title="webhook.test data"
+{
+  "message": "PgBeam test event",
+  "endpoint_id": "whk_...",
+  "format": "json"
+}
+```
+
+## Related
+
+- [Audit export](/docs/audit-export): configure endpoints, signing, and SIEM
+  formats.
+- [Audit log](/docs/audit-log): the queryable history audit-derived events come
+  from.
+- [Anomaly detection](/docs/anomaly-detection): source of `anomaly_alert` events.
+- [Kill-switch](/docs/kill-switch): source of `kill_switch` events.

@@ -1,0 +1,166 @@
+---
+title: PII Auto-Detection
+icon: ScanSearch
+description:
+  Scan a database for likely-PII columns and get ranked masking suggestions.
+  Review them in the dashboard and add the ones you want in one click.
+---
+
+PII auto-detection scans a database and tells you which columns look like
+personal data, with a recommended [masking](/docs/masking) rule for each one. It
+connects read-only, reads the schema, samples column values, and returns ranked
+suggestions. Nothing is applied automatically: you review the suggestions and add
+the ones you want to a policy profile.
+
+Use it when you are setting up masking on a database you do not know column by
+column, or to catch new sensitive columns after a schema change. It finds the
+`email`, `ssn`, and `card_number` columns for you so you do not have to grep the
+schema by hand.
+
+## Run a scan
+
+<Tabs items={["Dashboard", "SDK", "API"]}>
+  <Tab value="Dashboard">
+    Open a policy profile, go to the **Masking** section, and click **Scan for
+    PII**. Pick the database to scan and click **Run scan**. PgBeam lists the
+    columns it flagged; review them and add the ones you want (see
+    [Review and apply](#review-and-apply) below).
+  </Tab>
+
+  <Tab value="SDK">
+    ```typescript title="Scan a database (TypeScript SDK)"
+    const result = await api.databases.scanDatabaseForPii({
+      pathParams: { project_id: "prj_xxx", database_id: "db_xxx" },
+    });
+
+    for (const s of result.suggestions) {
+      console.log(`${s.table}.${s.column}: ${s.pii_type} -> ${s.mask_kind} (${s.confidence})`);
+    }
+    ```
+
+  </Tab>
+
+  <Tab value="API">
+    ```bash title="Scan a database (REST)"
+    curl -X POST \
+      "https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId}/scan-pii" \
+      -H "Authorization: Bearer $PGBEAM_TOKEN"
+    ```
+  </Tab>
+</Tabs>
+
+There is no CLI command for the scan. It runs from the dashboard, the REST API,
+or the SDKs.
+
+## What the scan returns
+
+The scan reports how much it inspected and a list of ranked suggestions, highest
+confidence first:
+
+```json title="ScanPiiResult"
+{
+  "scanned_tables": 12,
+  "scanned_columns": 143,
+  "suggestions": [
+    {
+      "schema": "public",
+      "table": "users",
+      "column": "email",
+      "data_type": "text",
+      "pii_type": "email",
+      "mask_kind": "hash",
+      "confidence": 0.95,
+      "reasons": [
+        "column name matches 'email'",
+        "8/10 sampled values look like emails"
+      ],
+      "sample_match_count": 8,
+      "sample_size": 10
+    }
+  ]
+}
+```
+
+| Field             | Description                                                                |
+| ----------------- | -------------------------------------------------------------------------- |
+| `scanned_tables`  | Number of tables inspected.                                                |
+| `scanned_columns` | Number of columns inspected.                                               |
+| `suggestions`     | Ranked masking suggestions, highest confidence first. Empty if none found. |
+| `truncated`       | `true` when the scan stopped early at the column limit.                    |
+| `error`           | Present when the scan could not connect or read the schema.                |
+
+Each suggestion carries the column location, the kind of PII detected, a
+recommended mask kind, a confidence score, and the reasons behind it:
+
+| Field                | Description                                                                      |
+| -------------------- | -------------------------------------------------------------------------------- |
+| `schema`             | Schema the column belongs to (for example `public`).                             |
+| `table`              | Table the column belongs to.                                                     |
+| `column`             | The detected column.                                                             |
+| `data_type`          | PostgreSQL data type of the column.                                              |
+| `pii_type`           | The kind of PII detected (see the table below).                                  |
+| `mask_kind`          | The recommended mask kind: `redact`, `null`, or `hash`.                          |
+| `confidence`         | Score in `[0, 1]`. Combines the column-name signal and the sampled-value signal. |
+| `reasons`            | Human-readable explanations for why the column was flagged.                      |
+| `sample_match_count` | Number of sampled values that matched the PII pattern.                           |
+| `sample_size`        | Number of non-null values sampled from the column.                               |
+
+## How detection works
+
+Detection combines two signals per column:
+
+- **Name signal**: the column and table names are matched against curated
+  keyword and regex patterns for each PII type (for example a column named
+  `email` or `phone_number`).
+- **Value signal**: for columns that show a name signal, the scanner samples up
+  to 20 non-null values and matches them against value-shape patterns (for
+  example an email or SSN shape). A high match ratio strengthens the score; a low
+  one tempers it.
+
+The two signals fuse into a single confidence score in `[0, 1]`, and a column is
+only suggested when it clears the detection floor. The scan runs read-only and
+samples a small number of values per column, so it does not read your whole
+table.
+
+## PII types and recommended masks
+
+Each PII type maps to a recommended [mask kind](/docs/masking#mask-kinds).
+Identifiers you may still want to join or group on get `hash`; highly sensitive
+values get `null`; free-text personal data gets `redact`.
+
+| `pii_type`       | Recommended `mask_kind` |
+| ---------------- | ----------------------- |
+| `email`          | `hash`                  |
+| `ip_address`     | `hash`                  |
+| `phone`          | `redact`                |
+| `full_name`      | `redact`                |
+| `street_address` | `redact`                |
+| `date_of_birth`  | `redact`                |
+| `ssn`            | `null`                  |
+| `credit_card`    | `null`                  |
+| `bank_account`   | `null`                  |
+| `national_id`    | `null`                  |
+| `passport`       | `null`                  |
+| `api_secret`     | `null`                  |
+
+The recommendation is a starting point, not a rule. You can change the mask kind
+on any column before or after you add it.
+
+## Review and apply
+
+In the dashboard, the scan result lists one row per suggested column with a
+checkbox. High-confidence suggestions (confidence of `0.65` or higher) are
+pre-selected, but every suggestion is yours to review. Toggle the rows you want,
+then click the add button to write them into the policy profile's masking rules.
+Non-`public` schemas are qualified as `schema.table` so the rule is unambiguous.
+Suggestions are advisory: nothing changes on the profile until you add them.
+
+Once added, the rules behave like any masking rule you wrote by hand. See
+[PII masking](/docs/masking) for how each mask kind renders on the wire.
+
+## Related
+
+- [PII masking](/docs/masking): how masked columns are rendered for agents.
+- [Policies](/docs/policies): where masking rules live.
+- [Allowlists](/docs/allowlists): allow a column so an agent can join on it, then
+  mask it so the agent never reads the raw value.

@@ -24,14 +24,15 @@ getting events out in real time.
 | `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
 | `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
 
+For each event's full payload shape, see [webhook events](/docs/webhook-events).
+
 ## Create a webhook endpoint
 
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
     ```bash
-    pgbeam webhooks create \
-      --url https://hooks.example.com/pgbeam \
-      --events query_blocked,kill_switch,anomaly_alert
+    pgbeam webhooks create https://hooks.example.com/pgbeam \
+      --event query_blocked,kill_switch,anomaly_alert
     ```
   </Tab>
 
@@ -45,72 +46,73 @@ getting events out in real time.
     ```json title="Create endpoint"
     {
       "url": "https://hooks.example.com/pgbeam",
-      "events": ["query_blocked", "kill_switch", "anomaly_alert"],
-      "format": "webhook"
+      "event_types": ["query_blocked", "kill_switch", "anomaly_alert"],
+      "format": "json"
     }
     ```
   </Tab>
 </Tabs>
 
-The response includes a signing secret (`whsec_...`). Store it. It is shown once
-and is used to verify every delivery.
+You set the signing secret when you create the endpoint. It is write-only:
+PgBeam stores it to sign deliveries and never returns it, so keep your own copy.
+The same secret verifies every delivery.
 
 ## Webhook payload
 
-Each delivery is a JSON body with the event, the project, the credential, and the
-event-specific detail:
+Each delivery is a JSON body with the event, the project, and the event-specific
+detail under `data`. The [webhook events](/docs/webhook-events) page documents the
+`data` fields for every event type.
 
 ```json title="query_blocked delivery"
 {
-  "id": "evt_2a9f1c",
+  "id": "whd_2a9f1c",
   "type": "query_blocked",
-  "created_at": "2026-06-13T09:24:11Z",
   "project_id": "prj_abc",
-  "credential": "agent_4f2c",
+  "occurred_at": "2026-06-13T09:24:11.512Z",
   "data": {
+    "audit_id": "aud_9f2c",
+    "credential_id": "agent_4f2c",
+    "region": "us-east-1",
+    "event": "blocked",
     "sql": "DELETE FROM users",
-    "decision": "blocked",
-    "reason": "policy is read-only: DELETE is not allowed",
-    "region": "us-east-1"
+    "reason": "policy is read-only: DELETE is not allowed"
   }
 }
 ```
 
-PgBeam signs every delivery. The signature is sent in the `PgBeam-Signature`
-header as `t=<timestamp>,v1=<hex>`, where the value is the HMAC-SHA-256 of
-`<timestamp>.<raw-body>` keyed with your signing secret.
+PgBeam signs every native (`json`) and `elastic` delivery. The signature is sent
+in the `X-PgBeam-Signature` header as `sha256=<hex>`, where the value is the
+HMAC-SHA-256 of the raw request body keyed with your signing secret. Each delivery
+also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`, `X-PgBeam-Timestamp` (unix
+seconds), and `X-PgBeam-Delivery` (a per-attempt id for de-duplication).
 
 ```ts title="Verify a delivery (Node.js)"
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 export function verify(
   rawBody: string,
-  header: string,
+  signatureHeader: string,
   secret: string,
 ): boolean {
-  const parts = Object.fromEntries(
-    header.split(",").map((kv) => kv.split("=") as [string, string]),
-  );
-  const timestamp = parts.t;
-  const signature = parts.v1;
-  if (!timestamp || !signature) return false;
+  const expected =
+    "sha256=" + createHmac("sha256", secret).update(rawBody).digest("hex");
 
-  // Reject deliveries older than five minutes to stop replays.
-  if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 300) return false;
-
-  const expected = createHmac("sha256", secret)
-    .update(`${timestamp}.${rawBody}`)
-    .digest("hex");
-
-  const a = Buffer.from(signature);
+  const a = Buffer.from(signatureHeader);
   const b = Buffer.from(expected);
   return a.length === b.length && timingSafeEqual(a, b);
 }
 ```
 
 Verify against the raw request body, before any JSON parsing reserializes it.
-Compare with a constant-time function, and reject deliveries whose timestamp is
-too old.
+Compare with a constant-time function. To defend against replays, reject
+deliveries whose `X-PgBeam-Timestamp` is far from the current time.
+
+<Callout type="info" title="SIEM authentication">
+  Splunk HEC and Datadog deliveries are not HMAC-signed. They authenticate with
+  the destination's own token instead: Splunk uses an `Authorization: Splunk
+  <token>` header and Datadog uses `DD-API-KEY`. Set that token as the endpoint's
+  secret.
+</Callout>
 
 <Callout type="info" title="Delivery and retries">
   PgBeam expects a `2xx` within a few seconds. A non-`2xx` or a timeout is
@@ -123,22 +125,26 @@ too old.
 For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that
 product ingests it. The signing and retry behavior is the same.
 
-| Format    | Sends                                                                           |
-| --------- | ------------------------------------------------------------------------------- |
-| `splunk`  | Splunk HTTP Event Collector (HEC) envelope. Set your HEC token on the endpoint. |
-| `datadog` | Datadog Logs intake payload with `ddsource: pgbeam` and event tags.             |
-| `elastic` | Elastic / OpenSearch bulk-friendly JSON documents with an ECS-style shape.      |
+| Format       | Sends                                                                         |
+| ------------ | ----------------------------------------------------------------------------- |
+| `splunk_hec` | Splunk HTTP Event Collector (HEC) envelope. Set your HEC token as the secret. |
+| `datadog`    | Datadog Logs intake payload with `ddsource: pgbeam` and event tags.           |
+| `elastic`    | Elastic / OpenSearch JSON documents with an ECS-style shape.                  |
+
+For `splunk_hec` and `datadog`, the endpoint secret is the destination's own
+token (Splunk sends it as `Authorization: Splunk <token>`, Datadog as
+`DD-API-KEY`) rather than an HMAC signature.
 
 ```bash title="Export to Splunk HEC"
-pgbeam webhooks create \
-  --url https://splunk.example.com:8088/services/collector \
-  --format splunk \
-  --auth-token "$SPLUNK_HEC_TOKEN" \
-  --events query_blocked,budget_exhausted,kill_switch,anomaly_alert
+pgbeam webhooks create https://splunk.example.com:8088/services/collector \
+  --format splunk_hec \
+  --secret "$SPLUNK_HEC_TOKEN" \
+  --event query_blocked,budget_exhausted,kill_switch,anomaly_alert
 ```
 
 ## Related
 
+- [Webhook events](/docs/webhook-events): every event type and its payload shape.
 - [Audit log](/docs/audit-log): the queryable history these events come from.
 - [Anomaly detection](/docs/anomaly-detection): source of `anomaly_alert` events.
 - [Approvals](/docs/approvals): source of `approval_requested` events.
