@@ -1,0 +1,52 @@
+---
+title: audit export
+description: Export agent audit logs as CSV
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Stream the linked project's agent audit entries as a CSV file, newest first, honoring the same credential, event, decision, source, and date-range filters as `audit list`. The full filtered set is streamed (no pagination), suitable for spreadsheets, SIEM ingestion, and compliance archives. Writes to stdout by default, or to a file with `--output`. The API emits CSV only; the wire/mcp/control-formatted views are selected with `--source`, not a separate output format.
+
+## Usage
+
+```bash
+pgbeam audit export [flags]
+```
+
+## Options
+
+| Option                   | Description                                                                | Required | Default |
+| ------------------------ | -------------------------------------------------------------------------- | -------- | ------- |
+| `--credential <value>`   | Filter to one agent credential ID                                          | No       | -       |
+| `--event <value>`        | Filter to one event type (e.g. blocked, masked, query)                     | No       | -       |
+| `--decision <value>`     | Coarse outcome filter: allow, block, mask, or truncate                     | No       | -       |
+| `--source <value>`       | Filter by statement origin: wire, mcp, or control                          | No       | -       |
+| `--start <value>`        | Return entries at or after this ISO 8601 timestamp (inclusive lower bound) | No       | -       |
+| `--end <value>`          | Return entries strictly older than this ISO 8601 timestamp (upper bound)   | No       | -       |
+| `--output <value>`, `-o` | Write the CSV to this file instead of stdout                               | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Export all audit entries to stdout
+pgbeam audit export
+
+# Export blocked statements to a file
+pgbeam audit export --event blocked --output audit.csv
+
+# Export MCP-sourced entries in a date range
+pgbeam audit export --source mcp --start 2026-01-01T00:00:00Z --end 2026-02-01T00:00:00Z --output jan.csv
+
+# Export a single credential's masked events
+pgbeam audit export --credential agt_xxx --decision mask
+```
+
+## Output
+
+Writes CSV to stdout, or to the file named by --output (with a confirmation message). Columns include id, ts, event, source, credential_id, decision_rule, sql, and more.

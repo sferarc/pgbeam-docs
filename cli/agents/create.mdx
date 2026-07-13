@@ -15,12 +15,13 @@ pgbeam agents create [flags]
 
 ## Options
 
-| Option              | Description                                                                                              | Required | Default  |
-| ------------------- | -------------------------------------------------------------------------------------------------------- | -------- | -------- |
-| `--name <value>`    | Human-readable label for the credential                                                                  | Yes      | -        |
-| `--policy <value>`  | Policy profile ID to enforce                                                                             | Yes      | -        |
-| `--client <value>`  | MCP client to emit config for: claude (default), cursor, vscode, or all                                  | No       | `claude` |
-| `--expires <value>` | Credential lifetime: a duration like 30d/12h/90m, or an absolute ISO 8601 timestamp. Omit for no expiry. | No       | -        |
+| Option                     | Description                                                                                              | Required | Default  |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- | -------- | -------- |
+| `--name <value>`           | Human-readable label for the credential                                                                  | Yes      | -        |
+| `--policy <value>`         | Policy profile ID to enforce                                                                             | Yes      | -        |
+| `--client <value>`         | MCP client to emit config for: claude (default), cursor, vscode, or all                                  | No       | `claude` |
+| `--expires <value>`        | Credential lifetime: a duration like 30d/12h/90m, or an absolute ISO 8601 timestamp. Omit for no expiry. | No       | -        |
+| `--principal-type <value>` | Whether the credential represents an autonomous agent (default) or a human operator: agent or human      | No       | -        |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -39,6 +40,9 @@ pgbeam agents create --name agent --policy pol_xxx --client cursor
 
 # Create a credential that expires in 30 days
 pgbeam agents create --name agent --policy pol_xxx --expires 30d
+
+# Mint a human-operator credential
+pgbeam agents create --name "Data analyst" --policy pol_xxx --principal-type human
 
 # Create and capture secrets as JSON
 pgbeam agents create --name ci --policy pol_xxx --json

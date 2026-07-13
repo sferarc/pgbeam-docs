@@ -1,0 +1,45 @@
+---
+title: policies dry-eval
+description: Dry-eval a SQL statement against a policy
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Evaluate a single SQL statement against a policy and print the decision the proxy would make: allow, block, mask, or row-filter. Supply exactly one of `--policy` (an existing saved policy ID) or `--draft` (a JSON file describing an unsaved draft policy). The evaluation reuses the data plane's own policy engine, so a what-if verdict matches real enforcement. Stateful checks a single-statement preview cannot model (per-region budgets, approvals, write routing) are reported as informational notes.
+
+## Usage
+
+```bash
+pgbeam policies dry-eval [flags]
+```
+
+## Options
+
+| Option             | Description                                                      | Required | Default |
+| ------------------ | ---------------------------------------------------------------- | -------- | ------- |
+| `--sql <value>`    | The single SQL statement to evaluate                             | Yes      | -       |
+| `--policy <value>` | ID of an existing saved policy to evaluate against               | No       | -       |
+| `--draft <value>`  | Path to a JSON file with a draft policy body to evaluate against | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Evaluate against a saved policy
+pgbeam policies dry-eval --policy pol_xxx --sql "SELECT email FROM users"
+
+# Evaluate against a draft policy from a file
+pgbeam policies dry-eval --draft ./policy.json --sql "DELETE FROM users"
+
+# Get the full verdict as JSON
+pgbeam policies dry-eval --policy pol_xxx --sql "SELECT 1" --json
+```
+
+## Output
+
+Prints the verdict (allow/block/mask/row-filter), the rule, reason, any masked columns, injected row-filter predicate, and informational notes. With --json, returns the full result object.

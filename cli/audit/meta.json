@@ -3,6 +3,7 @@
 	"title": "audit",
 	"icon": "ScrollText",
 	"pages": [
-		"list"
+		"list",
+		"export"
 	]
 }

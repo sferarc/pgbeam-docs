@@ -1,0 +1,40 @@
+---
+title: db scan-pii
+description: Scan a database for likely-PII columns
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Connect to the upstream database read-only, inspect information_schema, and sample column values against PII heuristics to return ranked masking suggestions. Suggestions are advisory: review them and apply the ones you want into a policy profile's masking rules. Nothing is auto-applied.
+
+## Usage
+
+```bash
+pgbeam db scan-pii <id>
+```
+
+## Options
+
+| Option | Description         | Required | Default |
+| ------ | ------------------- | -------- | ------- |
+| `<id>` | Database ID to scan | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Scan a database for PII
+pgbeam db scan-pii db_xxx
+
+# Get the full scan result as JSON
+pgbeam db scan-pii db_xxx --json
+```
+
+## Output
+
+Displays a table of suggestions with columns: Table, Column, Type, PII, Mask, and Confidence. With --json, returns the full scan result including scanned counts.

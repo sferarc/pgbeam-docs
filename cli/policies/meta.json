@@ -6,6 +6,8 @@
 		"list",
 		"show",
 		"create",
+		"update",
+		"dry-eval",
 		"delete"
 	]
 }

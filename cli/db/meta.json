@@ -1,4 +1,4 @@
 {
 	"defaultOpen": false, "title": "db", "icon": "Database",
-	"pages": ["add", "list", "inspect", "update", "delete", "test"]
+	"pages": ["add", "list", "inspect", "update", "delete", "test", "scan-pii", "schema-catalog"]
 }

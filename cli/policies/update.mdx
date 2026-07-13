@@ -1,0 +1,61 @@
+---
+title: policies update
+description: Update a policy profile
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Update a policy profile. Changes hot-reload to active agent sessions. Pass individual flags to change specific fields, or `--file` to supply the full profile body as JSON. Because the API replaces the whole profile, unspecified fields are read from the current profile first so single-flag edits are non-destructive. Fields set via `--file` are overlaid by any individual flags.
+
+## Usage
+
+```bash
+pgbeam policies update <id> [flags]
+```
+
+## Options
+
+| Option                               | Description                                                                | Required | Default |
+| ------------------------------------ | -------------------------------------------------------------------------- | -------- | ------- |
+| `<id>`                               | Policy profile ID                                                          | Yes      | -       |
+| `--name <value>`                     | New policy profile name                                                    | No       | -       |
+| `--mode <value>`                     | Access mode: read_only or read_write                                       | No       | -       |
+| `--write-mode <value>`               | How writes are handled: normal, rollback, or sandbox                       | No       | -       |
+| `--approval-mode <value>`            | Which statements need approval: off, writes, ddl, or all                   | No       | -       |
+| `--approval-timeout-seconds <value>` | How long a held statement waits for a decision before expiring             | No       | -       |
+| `--approval-auto-max-rows <value>`   | Statements touching at most this many rows are auto-approved (0 disables)  | No       | -       |
+| `--migration-safety <value>`         | Migration safety mode: off, warn, or block                                 | No       | -       |
+| `--table-allowlist <value>`          | Comma-separated relations to allow (replaces the current list)             | No       | -       |
+| `--table-denylist <value>`           | Comma-separated relations to deny (replaces the current list)              | No       | -       |
+| `--max-rows <value>`                 | Max rows returned per query (0 means unlimited)                            | No       | -       |
+| `--budget-queries-per-hour <value>`  | Max queries per rolling hour (0 means unlimited)                           | No       | -       |
+| `--budget-queries-per-day <value>`   | Max queries per day (0 means unlimited)                                    | No       | -       |
+| `--egress-bytes-per-day <value>`     | Per-day egress budget in bytes (0 means unlimited)                         | No       | -       |
+| `--statement-timeout-ms <value>`     | Upstream statement timeout for agent sessions (0 uses the project default) | No       | -       |
+| `--file <value>`                     | Path to a JSON file with the full profile body                             | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Switch a profile to read-write
+pgbeam policies update pol_xxx --mode read_write
+
+# Restrict a profile to two tables
+pgbeam policies update pol_xxx --table-allowlist public.users,public.orders
+
+# Cap daily budget and rows per query
+pgbeam policies update pol_xxx --budget-queries-per-day 5000 --max-rows 1000
+
+# Replace the full profile from a JSON file
+pgbeam policies update pol_xxx --file ./policy.json
+```
+
+## Output
+
+Prints a success message. With --json, returns the updated policy profile.

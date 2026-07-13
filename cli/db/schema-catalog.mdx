@@ -1,0 +1,40 @@
+---
+title: db schema-catalog
+description: Read a database's schema catalog
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Connect to the upstream database read-only and return its user relations (tables and views) and columns. System schemas (pg_catalog, information_schema, pg_toast) are excluded and nothing is persisted. Relation kind distinguishes a view (whose masking/row-filters apply to the view itself, not its base tables) from a base table.
+
+## Usage
+
+```bash
+pgbeam db schema-catalog <id>
+```
+
+## Options
+
+| Option | Description               | Required | Default |
+| ------ | ------------------------- | -------- | ------- |
+| `<id>` | Database ID to introspect | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# List a database's relations
+pgbeam db schema-catalog db_xxx
+
+# Get the full catalog with columns as JSON
+pgbeam db schema-catalog db_xxx --json
+```
+
+## Output
+
+Displays a table of relations with columns: Relation, Kind, and Columns (count). With --json, returns the full catalog including every column and its data type.

@@ -4,6 +4,7 @@
 	"icon": "Bot",
 	"pages": [
 		"list",
+		"get",
 		"create",
 		"mcp-config",
 		"rotate",
