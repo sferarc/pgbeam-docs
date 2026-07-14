@@ -28,6 +28,7 @@ In the dashboard, set the budget on the policy profile under **Budgets**.
 | ------------------ | ----------------------------------------------------------------------------------------------------------------- |
 | Queries per window | Cap statements per hour or per day. The next query past the cap is blocked with an error until the window resets. |
 | Max rows           | Truncate any result to at most this many rows.                                                                    |
+| Write row cap      | Hard cap on rows a single write (INSERT/UPDATE/DELETE) may affect. Set with `--max-affected-rows`.                |
 | Statement timeout  | Cancel a statement that runs longer than this.                                                                    |
 
 ## What the agent sees
@@ -41,6 +42,14 @@ ERROR:  PgBeam agent day query budget exhausted; resets at 2026-06-15T00:00:00Z;
 The message names the window and the exact reset time, so an agent can back off
 rather than retry blindly. A per-day egress (bytes) budget produces a similar
 message when exceeded.
+
+## Write row cap
+
+`--max-affected-rows` bounds how many rows a single write may affect, separate
+from `--max-rows` (which truncates read results). A write whose affected-row
+count would exceed the cap runs inside a transaction, is checked, and is rolled
+back so nothing persists, then blocked. It applies to INSERT, UPDATE, and DELETE
+and is enforced independently of human approval. 0 means unlimited.
 
 <Callout type="info" title="Per-region windows">
   Budget counters are kept per data plane and per region, like the rate limiter.

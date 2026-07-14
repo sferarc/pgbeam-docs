@@ -20,17 +20,18 @@ applying policies beyond per-agent credentials.
 
 ## What a policy contains
 
-| Rule              | What it controls                                              | Page                                           |
-| ----------------- | ------------------------------------------------------------- | ---------------------------------------------- |
-| Access mode       | Read-only or read-write, plus per-statement-type rules.       | [Read-only](/docs/read-only)                   |
-| Table allowlist   | The schemas and tables the principal may read or write.       | [Allowlists](/docs/allowlists)                 |
-| Column allowlist  | The columns within an allowed table the principal may select. | [Allowlists](/docs/allowlists)                 |
-| Row filters       | A `WHERE` predicate that scopes a table to a slice of rows.   | [Row-level policies](/docs/row-level-policies) |
-| Masking rules     | Columns redacted, nulled, or hashed in flight.                | [Masking](/docs/masking)                       |
-| Query budgets     | Queries per window, max rows per result, statement timeout.   | [Budgets](/docs/budgets)                       |
-| Approvals         | Hold writes or DDL until a human approves them.               | [Approvals](/docs/approvals)                   |
-| Migration linting | Warn or block dangerous DDL (locks, rewrites, unsafe drops).  | [Safe migrations](/docs/safe-migrations)       |
-| Sandbox target    | Route writes to a throwaway branch or roll them back.         | [Sandbox writes](/docs/sandbox-writes)         |
+| Rule              | What it controls                                                                  | Page                                           |
+| ----------------- | --------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Access mode       | Read-only or read-write, plus per-statement-type rules.                           | [Read-only](/docs/read-only)                   |
+| Table allowlist   | The schemas and tables the principal may read or write.                           | [Allowlists](/docs/allowlists)                 |
+| Column allowlist  | The columns within an allowed table the principal may select.                     | [Allowlists](/docs/allowlists)                 |
+| Row filters       | A `WHERE` predicate that scopes a table to a slice of rows.                       | [Row-level policies](/docs/row-level-policies) |
+| Masking rules     | Columns redacted, nulled, or hashed in flight.                                    | [Masking](/docs/masking)                       |
+| Query budgets     | Queries per window, max rows per result, statement timeout.                       | [Budgets](/docs/budgets)                       |
+| Write row cap     | Hard cap on rows a single write may affect (over-cap writes roll back and block). | [Budgets](/docs/budgets)                       |
+| Approvals         | Hold writes or DDL until a human approves them.                                   | [Approvals](/docs/approvals)                   |
+| Migration linting | Warn or block dangerous DDL (locks, rewrites, unsafe drops).                      | [Safe migrations](/docs/safe-migrations)       |
+| Sandbox target    | Route writes to a throwaway branch or roll them back.                             | [Sandbox writes](/docs/sandbox-writes)         |
 
 ## Create and attach a policy
 

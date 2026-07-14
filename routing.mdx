@@ -16,19 +16,27 @@ from every region. PgBeam picks the best path to the upstream database for you.
 
 ## Regions
 
-PgBeam operates in regions worldwide:
+PgBeam runs the proxy on a global anycast network with a presence in metros
+worldwide. A single anycast address (`proxy.pgbeam.app`) routes each connection
+to the nearest metro automatically:
 
-| Region         | Location    | Identifier       |
-| -------------- | ----------- | ---------------- |
-| US East        | N. Virginia | `us-east-1`      |
-| US West        | Oregon      | `us-west-2`      |
-| EU West        | Ireland     | `eu-west-1`      |
-| Asia South     | Mumbai      | `ap-south-1`     |
-| Southeast Asia | Singapore   | `ap-southeast-1` |
-| Northeast Asia | Tokyo       | `ap-northeast-1` |
+| Location      | Metro |
+| ------------- | ----- |
+| Ashburn, US   | `iad` |
+| San Jose, US  | `sjc` |
+| Dallas, US    | `dfw` |
+| Toronto, CA   | `yyz` |
+| São Paulo, BR | `gru` |
+| London, GB    | `lhr` |
+| Frankfurt, DE | `fra` |
+| Amsterdam, NL | `ams` |
+| Stockholm, SE | `arn` |
+| Tokyo, JP     | `nrt` |
+| Singapore     | `sin` |
+| Sydney, AU    | `syd` |
 
-All regions are interconnected over a private network. Inter-region traffic
-never crosses the public internet.
+Anycast steers each client to the closest metro, so you do not pick one. The
+metro set can change as we add capacity.
 
 ## How a connection is routed
 
