@@ -291,6 +291,7 @@ resource "pgbeam_policy_profile" "example" {
   approval_timeout_seconds = 300
   migration_safety = "off"
   egress_bytes_per_day = 0
+  max_affected_rows = 0
 }
 ```
 

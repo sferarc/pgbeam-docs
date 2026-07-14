@@ -5,7 +5,7 @@ description: Dry-eval a policy against a SQL statement
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Evaluates a single SQL statement against a policy — either a draft policy supplied inline or an existing policy referenced by id — and returns the decision the proxy would make: allow, block, mask, or row-filter. The evaluation reuses the data plane's own policy engine (the same parser, allow/block rules, row-filter rewriter, and masking analysis enforced on live agent sessions), so a what-if verdict matches real enforcement. Stateful checks a single-statement preview cannot model — per-region query and egress budgets, human approvals, and rollback/sandbox write routing — are reported as informational notes, not verdicts. This is a pure compute endpoint; it does not connect to the upstream database and persists nothing.
+Evaluates a single SQL statement against a policy (either a draft policy supplied inline or an existing policy referenced by id) and returns the decision the proxy would make: allow, block, mask, or row-filter. The evaluation reuses the data plane's own policy engine (the same parser, allow/block rules, row-filter rewriter, and masking analysis enforced on live agent sessions), so a what-if verdict matches real enforcement. Stateful checks a single-statement preview cannot model (per-region query and egress budgets, human approvals, and rollback/sandbox write routing) are reported as informational notes, not verdicts. This is a pure compute endpoint; it does not connect to the upstream database and persists nothing.
 
 ## Usage
 
