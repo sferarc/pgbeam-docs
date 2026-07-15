@@ -130,6 +130,7 @@ resource "pgbeam_project" "example" {
   tags = ["production", "us-east-1"]
   allowed_cidrs = [{ cidr = "10.0.0.0/8", label = "VPC" }, { cidr = "2001:db8::/32", label = "IPv6 range" }]
   default_policy_profile_id = "pol_01h455vb4pex5vsknk084sn02q"
+  residency = "eu"
   agents_disabled = false
   status = "active"
 }
