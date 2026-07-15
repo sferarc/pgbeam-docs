@@ -1,0 +1,41 @@
+---
+title: audit verify
+description: Verify the tamper-evident audit chain
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Recomputes the project's audit hash chain over an optional time range and reports whether it is intact. Each audit entry is linked to its predecessor with a SHA-256 hash, so editing or deleting any row breaks the chain. On a break, the response reports the first sequence number where a tampered or deleted entry was detected. Requires the same audit:read permission as the list and export endpoints.
+
+## Usage
+
+```bash
+pgbeam audit verify [flags]
+```
+
+## Options
+
+| Option            | Description                                                               | Required | Default |
+| ----------------- | ------------------------------------------------------------------------- | -------- | ------- |
+| `--start <value>` | Return entries at or after this timestamp (inclusive lower bound).        | No       | -       |
+| `--end <value>`   | Return entries strictly older than this timestamp (cursor / upper bound). | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Verify the tamper-evident audit chain
+pgbeam audit verify
+
+# Output as JSON
+pgbeam audit verify --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

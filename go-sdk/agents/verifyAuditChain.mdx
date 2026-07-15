@@ -1,0 +1,57 @@
+---
+title: VerifyAuditChain
+description: Verify the tamper-evident audit chain
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Recomputes the project's audit hash chain over an optional time range and reports whether it is intact. Each audit entry is linked to its predecessor with a SHA-256 hash, so editing or deleting any row breaks the chain. On a break, the response reports the first sequence number where a tampered or deleted entry was detected. Requires the same audit:read permission as the list and export endpoints.
+
+## Usage
+
+```go
+result, err := client.Agents.VerifyAuditChain(ctx, "prj_xxx", nil)
+```
+
+## Parameters
+
+| Parameter    | Type                             | Required | Description                                                               |
+| ------------ | -------------------------------- | -------- | ------------------------------------------------------------------------- |
+| ctx          | `context.Context`                | Yes      | Request context                                                           |
+| projectID    | `string`                         | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                       |
+| params       | `*pgbeam.VerifyAuditChainParams` | No       | Query parameters                                                          |
+| params.Start | `string`                         | No       | Return entries at or after this timestamp (inclusive lower bound).        |
+| params.End   | `string`                         | No       | Return entries strictly older than this timestamp (cursor / upper bound). |
+
+## Response
+
+`(*pgbeam.AuditChainVerification, error)`: chain verification result.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Agents.VerifyAuditChain(ctx, "prj_xxx", &pgbeam.VerifyAuditChainParams{
+    Start: "...",
+    End: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

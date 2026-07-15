@@ -1,0 +1,54 @@
+---
+title: verifyAuditChain
+description: Verify the tamper-evident audit chain
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Recomputes the project's audit hash chain over an optional time range and reports whether it is intact. Each audit entry is linked to its predecessor with a SHA-256 hash, so editing or deleting any row breaks the chain. On a break, the response reports the first sequence number where a tampered or deleted entry was detected. Requires the same audit:read permission as the list and export endpoints.
+
+## Usage
+
+```typescript
+const result = await api.agents.verifyAuditChain({
+  pathParams: { project_id: "prj_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                               |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------- |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                       |
+| queryParams.start     | `string` | No       | Return entries at or after this timestamp (inclusive lower bound).        |
+| queryParams.end       | `string` | No       | Return entries strictly older than this timestamp (cursor / upper bound). |
+
+## Response
+
+`Promise<AuditChainVerification>`: chain verification result.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.agents.verifyAuditChain({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: { start: "...", end: "..." },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
