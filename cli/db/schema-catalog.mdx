@@ -5,7 +5,7 @@ description: Read a database's schema catalog
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Connect to the upstream database read-only and return its user relations (tables and views) and columns. System schemas (pg_catalog, information_schema, pg_toast) are excluded and nothing is persisted. Relation kind distinguishes a view (whose masking/row-filters apply to the view itself, not its base tables) from a base table.
+Connects to the upstream database read-only and returns its user relations (tables and views) and columns. Powers table/column autocomplete and view-aware warnings in the policy editor — relation kind distinguishes a view (whose masking/row-filters apply to the view itself, not its base tables) from a base table, and a per-column is_binary flag flags columns that mask to NULL. System schemas are excluded; nothing is persisted.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam db schema-catalog <id>
 
 ## Options
 
-| Option | Description               | Required | Default |
-| ------ | ------------------------- | -------- | ------- |
-| `<id>` | Database ID to introspect | Yes      | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,13 +28,13 @@ pgbeam db schema-catalog <id>
 ## Examples
 
 ```bash
-# List a database's relations
-pgbeam db schema-catalog db_xxx
+# Read a database's schema catalog
+pgbeam db schema-catalog
 
-# Get the full catalog with columns as JSON
-pgbeam db schema-catalog db_xxx --json
+# Output as JSON
+pgbeam db schema-catalog --json
 ```
 
 ## Output
 
-Displays a table of relations with columns: Relation, Kind, and Columns (count). With --json, returns the full catalog including every column and its data type.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

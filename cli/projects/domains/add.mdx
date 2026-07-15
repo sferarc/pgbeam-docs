@@ -5,19 +5,19 @@ description: Add a custom domain
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Register a custom domain for the linked project. After adding, PgBeam returns the DNS records (CNAME and TXT) you need to configure with your DNS provider to verify ownership. Once DNS records are in place, run `pgbeam domains verify` to complete verification and provision a TLS certificate.
+Registers a new custom domain for the project. Returns DNS verification instructions. Requires a Scale or Enterprise plan.
 
 ## Usage
 
 ```bash
-pgbeam domains add [domain]
+pgbeam domains add <domain>
 ```
 
 ## Options
 
-| Option     | Description                                                                          | Required | Default |
-| ---------- | ------------------------------------------------------------------------------------ | -------- | ------- |
-| `<domain>` | The domain name to register (e.g. pg.example.com). If omitted, you will be prompted. | No       | -       |
+| Option     | Description | Required | Default |
+| ---------- | ----------- | -------- | ------- |
+| `<domain>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,16 +28,13 @@ pgbeam domains add [domain]
 ## Examples
 
 ```bash
-# Add a domain interactively
+# Add a custom domain
 pgbeam domains add
 
-# Add a specific domain
-pgbeam domains add pg.example.com
-
-# Add a domain and get DNS instructions as JSON
-pgbeam domains add pg.example.com --json
+# Output as JSON
+pgbeam domains add --json
 ```
 
 ## Output
 
-Prints the domain name and the DNS records (CNAME and TXT) required for verification. Suggests running `pgbeam domains verify <id>` as the next step. With `--json`, returns the domain object including `dns_instructions`.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

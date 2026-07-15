@@ -5,13 +5,21 @@ description: List projects
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List all projects in the current organization. Shows each project's ID, name, status, and creation date. Requires an active organization set via `pgbeam orgs switch` or `--org`.
+Lists projects filtered by organization. Requires org_id query parameter.
 
 ## Usage
 
 ```bash
-pgbeam projects list
+pgbeam projects list [flags]
 ```
+
+## Options
+
+| Option              | Description                                                                 | Required | Default |
+| ------------------- | --------------------------------------------------------------------------- | -------- | ------- |
+| `--sort-by <value>` | Sort field for projects list. One of: name, created_at, active_connections. | No       | -       |
+| `--limit <value>`   | Maximum number of items (1-100)                                             | No       | -       |
+| `--all`             | Fetch every page                                                            | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -22,16 +30,13 @@ pgbeam projects list
 ## Examples
 
 ```bash
-# List projects in the active organization
+# List projects
 pgbeam projects list
 
-# List projects in a specific organization
-pgbeam projects list --org org_xxx
-
-# List projects as JSON
+# Output as JSON
 pgbeam projects list --json
 ```
 
 ## Output
 
-Displays a table with columns: ID, Name, Status, and Created. With `--json`, returns the full project list response from the API.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

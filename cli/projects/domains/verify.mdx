@@ -1,11 +1,11 @@
 ---
 title: domains verify
-description: Verify domain ownership
+description: Verify custom domain DNS
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Verify ownership of a custom domain by checking the DNS records configured with your provider. On success, PgBeam provisions a TLS certificate for the domain. Run this after adding the CNAME and TXT records shown by `pgbeam domains add`.
+Checks DNS TXT record to verify domain ownership. Updates domain status on success. Requires a Scale or Enterprise plan.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam domains verify <id>
 
 ## Options
 
-| Option | Description                | Required | Default |
-| ------ | -------------------------- | -------- | ------- |
-| `<id>` | ID of the domain to verify | Yes      | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,13 +28,13 @@ pgbeam domains verify <id>
 ## Examples
 
 ```bash
-# Verify a domain
-pgbeam domains verify dom_xxx
+# Verify custom domain DNS
+pgbeam domains verify
 
-# Verify and get result as JSON
-pgbeam domains verify dom_xxx --json
+# Output as JSON
+pgbeam domains verify --json
 ```
 
 ## Output
 
-On success, prints a confirmation that the domain is verified. On failure, prints an error asking you to check your DNS records and exits with a non-zero code.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

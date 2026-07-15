@@ -1,11 +1,11 @@
 ---
 title: domains delete
-description: Remove a custom domain
+description: Delete a custom domain
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Remove a custom domain from the linked project and revoke its TLS certificate. This action cannot be undone. A confirmation prompt is shown unless `--yes` is passed.
+Removes a custom domain from the project and revokes its TLS certificate.
 
 ## Usage
 
@@ -15,10 +15,10 @@ pgbeam domains delete <id> [flags]
 
 ## Options
 
-| Option        | Description                  | Required | Default |
-| ------------- | ---------------------------- | -------- | ------- |
-| `<id>`        | ID of the domain to remove   | Yes      | -       |
-| `--yes`, `-y` | Skip the confirmation prompt | No       | `false` |
+| Option        | Description                                                 | Required | Default |
+| ------------- | ----------------------------------------------------------- | -------- | ------- |
+| `<id>`        |                                                             | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -29,13 +29,13 @@ pgbeam domains delete <id> [flags]
 ## Examples
 
 ```bash
-# Delete a domain (with confirmation)
-pgbeam domains delete dom_xxx
+# Delete a custom domain
+pgbeam domains delete
 
-# Delete without confirmation
-pgbeam domains delete dom_xxx --yes
+# Output as JSON
+pgbeam domains delete --json
 ```
 
 ## Output
 
-Prints a success message confirming the domain was deleted.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

@@ -1,11 +1,11 @@
 ---
 title: agents get
-description: Show a single agent credential
+description: Get an agent credential
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Show one agent credential's metadata: name, Postgres username, policy profile, principal type, status, and timestamps. Secrets are never included; use `pgbeam agents rotate` to mint fresh secrets.
+Returns a single agent credential. Secrets are never included.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam agents get <id>
 
 ## Options
 
-| Option | Description         | Required | Default |
-| ------ | ------------------- | -------- | ------- |
-| `<id>` | Agent credential ID | Yes      | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,13 +28,13 @@ pgbeam agents get <id>
 ## Examples
 
 ```bash
-# Show an agent credential
-pgbeam agents get agt_xxx
+# Get an agent credential
+pgbeam agents get
 
-# Show as JSON
-pgbeam agents get agt_xxx --json
+# Output as JSON
+pgbeam agents get --json
 ```
 
 ## Output
 
-Prints the credential's ID, name, username, policy, principal type, status, and expiry. With --json, returns the raw credential object.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

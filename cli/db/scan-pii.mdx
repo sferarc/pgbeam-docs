@@ -5,7 +5,7 @@ description: Scan a database for likely-PII columns
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Connect to the upstream database read-only, inspect information_schema, and sample column values against PII heuristics to return ranked masking suggestions. Suggestions are advisory: review them and apply the ones you want into a policy profile's masking rules. Nothing is auto-applied.
+Connects to the upstream database read-only, inspects information_schema and samples column values against PII heuristics, and returns ranked masking suggestions. Suggestions are advisory — the operator reviews them and applies the ones they want into a policy profile's masking rules. Nothing is auto-applied.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam db scan-pii <id>
 
 ## Options
 
-| Option | Description         | Required | Default |
-| ------ | ------------------- | -------- | ------- |
-| `<id>` | Database ID to scan | Yes      | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,13 +28,13 @@ pgbeam db scan-pii <id>
 ## Examples
 
 ```bash
-# Scan a database for PII
-pgbeam db scan-pii db_xxx
+# Scan a database for likely-PII columns
+pgbeam db scan-pii
 
-# Get the full scan result as JSON
-pgbeam db scan-pii db_xxx --json
+# Output as JSON
+pgbeam db scan-pii --json
 ```
 
 ## Output
 
-Displays a table of suggestions with columns: Table, Column, Type, PII, Mask, and Confidence. With --json, returns the full scan result including scanned counts.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

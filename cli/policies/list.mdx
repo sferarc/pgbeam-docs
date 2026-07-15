@@ -1,17 +1,24 @@
 ---
 title: policies list
-description: List policy profiles for a project
+description: List policy profiles
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List all policy profiles for the linked project. Shows each profile's ID, name, access mode, and allowlist size.
+Lists all policy profiles for the project.
 
 ## Usage
 
 ```bash
-pgbeam policies list
+pgbeam policies list [flags]
 ```
+
+## Options
+
+| Option            | Description                     | Required | Default |
+| ----------------- | ------------------------------- | -------- | ------- |
+| `--limit <value>` | Maximum number of items (1-100) | No       | -       |
+| `--all`           | Fetch every page                | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -24,8 +31,11 @@ pgbeam policies list
 ```bash
 # List policy profiles
 pgbeam policies list
+
+# Output as JSON
+pgbeam policies list --json
 ```
 
 ## Output
 
-Displays a table with columns: ID, Name, Mode, and Tables.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

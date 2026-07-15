@@ -1,11 +1,11 @@
 ---
 title: branches list
-description: List ephemeral database sandbox branches
+description: List sandbox branches
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List ephemeral database sandbox branches for the linked project. By default only active (non-discarded) branches are shown; pass `--all` to include discarded ones. Shows each branch's ID, name, source database, status, and creation time.
+Lists ephemeral sandbox branches for the project's databases.
 
 ## Usage
 
@@ -15,9 +15,11 @@ pgbeam branches list [flags]
 
 ## Options
 
-| Option  | Description                | Required | Default |
-| ------- | -------------------------- | -------- | ------- |
-| `--all` | Include discarded branches | No       | `false` |
+| Option             | Description                                                          | Required | Default |
+| ------------------ | -------------------------------------------------------------------- | -------- | ------- |
+| `--status <value>` | Filter to a single status. One of: pending, ready, error, discarded. | No       | -       |
+| `--limit <value>`  | Maximum number of items (1-100)                                      | No       | -       |
+| `--all`            | Fetch every page                                                     | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,13 +30,13 @@ pgbeam branches list [flags]
 ## Examples
 
 ```bash
-# List active branches
+# List sandbox branches
 pgbeam branches list
 
-# Include discarded branches
-pgbeam branches list --all
+# Output as JSON
+pgbeam branches list --json
 ```
 
 ## Output
 
-Displays a table with columns: ID, Name, Database, Status, and Created.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

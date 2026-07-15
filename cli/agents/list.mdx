@@ -1,17 +1,24 @@
 ---
 title: agents list
-description: List agent credentials for a project
+description: List agent credentials
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List all AI agent credentials for the linked project. Shows each credential's ID, name, Postgres username, policy profile, status, and expiry. Secrets are never displayed.
+Lists agent credentials for the project. Secrets are never returned.
 
 ## Usage
 
 ```bash
-pgbeam agents list
+pgbeam agents list [flags]
 ```
+
+## Options
+
+| Option            | Description                     | Required | Default |
+| ----------------- | ------------------------------- | -------- | ------- |
+| `--limit <value>` | Maximum number of items (1-100) | No       | -       |
+| `--all`           | Fetch every page                | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -25,10 +32,10 @@ pgbeam agents list
 # List agent credentials
 pgbeam agents list
 
-# List as JSON
+# Output as JSON
 pgbeam agents list --json
 ```
 
 ## Output
 
-Displays a table with columns: ID, Name, Username, Policy, Status, and Expires.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

@@ -1,11 +1,11 @@
 ---
 title: policies show
-description: Show a policy profile in detail
+description: Get a policy profile
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Show the full configuration of a policy profile: access mode, statement rules, table allow/deny lists, masking rules, budgets, and limits.
+Returns a single policy profile by ID.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam policies show <id>
 
 ## Options
 
-| Option | Description       | Required | Default |
-| ------ | ----------------- | -------- | ------- |
-| `<id>` | Policy profile ID | Yes      | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,10 +28,13 @@ pgbeam policies show <id>
 ## Examples
 
 ```bash
-# Show a policy profile
-pgbeam policies show pol_xxx
+# Get a policy profile
+pgbeam policies show
+
+# Output as JSON
+pgbeam policies show --json
 ```
 
 ## Output
 
-Prints the policy profile. Use --json for the raw object.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

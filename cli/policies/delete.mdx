@@ -5,7 +5,7 @@ description: Delete a policy profile
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Permanently delete an agent policy profile. Agent credentials must not be using the profile. A confirmation prompt is shown unless `--yes` is passed.
+Deletes a policy profile. Fails if agent credentials still reference it.
 
 ## Usage
 
@@ -17,8 +17,8 @@ pgbeam policies delete <id> [flags]
 
 | Option        | Description                                                 | Required | Default |
 | ------------- | ----------------------------------------------------------- | -------- | ------- |
-| `<id>`        | Policy profile ID                                           | Yes      | -       |
-| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | `false` |
+| `<id>`        |                                                             | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -29,13 +29,13 @@ pgbeam policies delete <id> [flags]
 ## Examples
 
 ```bash
-# Delete a policy profile (with confirmation)
-pgbeam policies delete pol_xxx
+# Delete a policy profile
+pgbeam policies delete
 
-# Delete without confirmation (CI/CD)
-pgbeam policies delete pol_xxx --yes
+# Output as JSON
+pgbeam policies delete --json
 ```
 
 ## Output
 
-Confirms the policy profile was deleted. Exits with a non-zero code if the profile is not found or still in use.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

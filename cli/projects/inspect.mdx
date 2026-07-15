@@ -1,11 +1,11 @@
 ---
 title: projects inspect
-description: Show project details
+description: Get a project
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Display detailed information about a project including its ID, name, organization, status, proxy hostname, and creation date. If no project ID is provided, uses the linked project in the current directory.
+Returns a single project by ID.
 
 ## Usage
 
@@ -15,9 +15,9 @@ pgbeam projects inspect [id]
 
 ## Options
 
-| Option | Description                                                | Required | Default |
-| ------ | ---------------------------------------------------------- | -------- | ------- |
-| `<id>` | Project ID to inspect. Uses the linked project if omitted. | No       | -       |
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -28,16 +28,13 @@ pgbeam projects inspect [id]
 ## Examples
 
 ```bash
-# Inspect the linked project
+# Get a project
 pgbeam projects inspect
 
-# Inspect a specific project by ID
-pgbeam projects inspect prj_xxx
-
-# Get project details as JSON
+# Output as JSON
 pgbeam projects inspect --json
 ```
 
 ## Output
 
-Displays project ID, name, organization, status, proxy host, and creation timestamp. With `--json`, returns the full project object from the API.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

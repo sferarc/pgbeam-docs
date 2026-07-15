@@ -1,11 +1,11 @@
 ---
 title: branches discard
-description: Discard an ephemeral database sandbox branch
+description: Discard a sandbox branch
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Discard an ephemeral database sandbox branch, releasing its resources. This action cannot be undone. A confirmation prompt is shown unless `--yes` is passed.
+Marks an ephemeral sandbox branch as discarded for teardown.
 
 ## Usage
 
@@ -17,8 +17,8 @@ pgbeam branches discard <id> [flags]
 
 | Option        | Description                                                 | Required | Default |
 | ------------- | ----------------------------------------------------------- | -------- | ------- |
-| `<id>`        | Branch ID to discard                                        | Yes      | -       |
-| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | `false` |
+| `<id>`        |                                                             | Yes      | -       |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -29,13 +29,13 @@ pgbeam branches discard <id> [flags]
 ## Examples
 
 ```bash
-# Discard a branch (with confirmation)
-pgbeam branches discard brn_xxx
+# Discard a sandbox branch
+pgbeam branches discard
 
-# Discard without confirmation (CI/CD)
-pgbeam branches discard brn_xxx --yes
+# Output as JSON
+pgbeam branches discard --json
 ```
 
 ## Output
 
-Prints a success message confirming the branch was discarded. Exits with a non-zero code if the branch is not found.
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.
