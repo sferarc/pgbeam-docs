@@ -87,6 +87,12 @@ because its hostnames are not `*.neon.tech`.)
     neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
     neonConfig.wsProxy = (host) => `${host}/v2`;
 
+    // Required for the WebSocket Pool/Client paths against PgBeam: PgBeam
+    // authenticates with SCRAM, but the driver's default pipelining optimistically
+    // sends a cleartext password before it sees the auth challenge, which hangs the
+    // connection. Disabling pipelining makes the driver complete the SCRAM handshake.
+    neonConfig.pipelineConnect = false;
+
     // Node.js only: provide a WebSocket implementation for the Pool/Client paths
     // import ws from "ws";
     // neonConfig.webSocketConstructor = ws;
@@ -116,6 +122,17 @@ because its hostnames are not `*.neon.tech`.)
     Best for interactive transactions or session-level features. Uses the
     PostgreSQL wire protocol over WebSocket.
 
+    <Callout type="warn" title="Set neonConfig.pipelineConnect = false for WebSocket">
+      With the driver's default configuration, the WebSocket `Pool` / `Client`
+      connection **hangs** against PgBeam. PgBeam authenticates with SCRAM, and the
+      driver's default `pipelineConnect: "password"` optimistically pipelines a
+      cleartext password before it reads the server's auth challenge, so the SCRAM
+      handshake never completes. Set `neonConfig.pipelineConnect = false` (already
+      in the `neon-config.ts` above) so the driver waits for the challenge and
+      completes SCRAM. The HTTP `neon()` path is unaffected; if you only need
+      one-shot queries, it works with just `fetchEndpoint` set.
+    </Callout>
+
     <Tabs items={["Edge runtime", "Node.js"]}>
       <Tab value="Edge runtime">
         ```ts title="db.ts"
@@ -136,6 +153,7 @@ because its hostnames are not `*.neon.tech`.)
 
         neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
         neonConfig.wsProxy = (host) => `${host}/v2`;
+        neonConfig.pipelineConnect = false; // required for SCRAM (see callout above)
         neonConfig.webSocketConstructor = ws;
 
         const pool = new Pool({
@@ -312,13 +330,14 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 
 ## Common issues
 
-| Issue                                                     | Cause                                                                     | Fix                                                                                  |
-| --------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set; driver rewrote the host to `api.`     | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2) |
-| `WebSocket is not defined`                                | Node.js missing WS constructor                                            | Install `ws` and set `neonConfig.webSocketConstructor = ws`                          |
-| `fetch failed` on HTTP endpoint                           | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql` | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set     |
-| Slow cold starts with WebSocket                           | TLS + WS handshake on each invocation                                     | Use HTTP transport for stateless queries                                             |
-| `connection terminated`                                   | Idle timeout exceeded                                                     | Use connection pooling or reconnect on error                                         |
+| Issue                                                     | Cause                                                                                       | Fix                                                                                                             |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set; driver rewrote the host to `api.`                       | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2)                            |
+| `WebSocket is not defined`                                | Node.js missing WS constructor                                                              | Install `ws` and set `neonConfig.webSocketConstructor = ws`                                                     |
+| WebSocket `Pool` / `Client` connects then hangs, no error | Default `pipelineConnect: "password"` pipelines a cleartext password, but PgBeam uses SCRAM | Set `neonConfig.pipelineConnect = false`. If you only need one-shot queries, use the HTTP `neon()` path instead |
+| `fetch failed` on HTTP endpoint                           | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql`                   | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set                                |
+| Slow cold starts with WebSocket                           | TLS + WS handshake on each invocation                                                       | Use HTTP transport for stateless queries                                                                        |
+| `connection terminated`                                   | Idle timeout exceeded                                                                       | Use connection pooling or reconnect on error                                                                    |
 
 ## Further reading
 

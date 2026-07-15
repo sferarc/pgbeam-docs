@@ -147,6 +147,29 @@ maintains connectivity.
   connection works transparently either way.
 </Callout>
 
+### Verify the serving region
+
+On connect, PgBeam sends the serving region as a `pgbeam.region` startup
+parameter (a Postgres `ParameterStatus` message). Read it from whatever your
+client exposes for connection parameters. With `node-postgres` / the Neon
+driver:
+
+```ts
+await client.connect();
+const region = (client as unknown as { parameters: Record<string, string> })
+  .parameters["pgbeam.region"]; // e.g. "iad"
+```
+
+libpq-based clients expose the same value through `PQparameterStatus(conn,
+"pgbeam.region")`.
+
+<Callout type="info">
+  A `SHOW pgbeam.region` command that returns the region in any SQL client is
+  planned but not available yet, so do not rely on it: `pgbeam.region` is not a
+  real Postgres setting, so today the statement is forwarded upstream and
+  errors. Read the `pgbeam.region` startup parameter instead.
+</Callout>
+
 ## Read replica routing
 
 PgBeam supports two modes for routing queries to read replicas:

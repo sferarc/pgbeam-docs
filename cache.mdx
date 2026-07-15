@@ -114,6 +114,54 @@ TTL and SWR work together to balance freshness and performance:
 - After the SWR window, the entry is treated as a miss and the upstream is
   queried.
 
+## Invalidation: writes do not auto-clear the cache
+
+<Callout type="warn" title="Cached reads are cleared by TTL, not by writes">
+  PgBeam does **not** automatically invalidate cached results when a write flows
+  through the proxy. Writes are never cached, but a `SELECT` cached before the
+  write keeps being served until its TTL (and SWR window) expire. Plan for a
+  staleness window of up to `TTL + SWR` after any change.
+</Callout>
+
+If you need cached data cleared sooner than its TTL, opt in to event-based
+invalidation. PgBeam listens on the `pgbeam_invalidate` channel on your upstream
+database and evicts cached entries for a table when it receives a notification
+naming that table. You emit those notifications from triggers you install on the
+tables you cache:
+
+```sql title="Install invalidation triggers on your upstream"
+CREATE OR REPLACE FUNCTION pgbeam_notify_invalidate() RETURNS trigger AS $$
+BEGIN
+  PERFORM pg_notify('pgbeam_invalidate', TG_TABLE_NAME);
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER products_invalidate
+  AFTER INSERT OR UPDATE OR DELETE ON products
+  FOR EACH STATEMENT
+  EXECUTE FUNCTION pgbeam_notify_invalidate();
+```
+
+The `NOTIFY` payload is the table name (bare or schema-qualified). PgBeam evicts
+the cached entries that read from that table.
+
+<Callout type="warn" title="NOTIFY needs a direct upstream, not a pooler">
+  `LISTEN`/`NOTIFY` requires a session-level connection. PgBeam opens one direct
+  session connection to your upstream to listen on `pgbeam_invalidate`. If the
+  upstream connection details you gave PgBeam point at a PgBouncer-style
+  transaction pooler (PlanetScale, the Supabase pooler, RDS Proxy), the `LISTEN`
+  silently receives nothing and invalidation does nothing, with no error. Point
+  PgBeam's upstream at a direct, session-capable endpoint (not the pooler port)
+  if you want `NOTIFY` invalidation to work.
+</Callout>
+
+If a table changes often and must never be served stale, do not rely on
+invalidation timing. Either skip the cache for those reads with
+`/* @pgbeam:cache noCache */`, or give them a very short TTL (for example
+`/* @pgbeam:cache maxAge=1 */`) so the freshness window is bounded regardless of
+whether a notification arrives.
+
 ## Ways to control cache behavior
 
 PgBeam checks cache controls in priority order. The first match wins:
