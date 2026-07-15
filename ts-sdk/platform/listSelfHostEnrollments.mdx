@@ -1,0 +1,48 @@
+---
+title: listSelfHostEnrollments
+description: List self-host enrollments
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists an organization's self-host enrollments. Tokens are never returned.
+
+## Usage
+
+```typescript
+const result = await api.platform.listSelfHostEnrollments({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                     |
+| ----------------- | -------- | -------- | ------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier. |
+
+## Response
+
+`Promise<ListSelfHostEnrollmentsResponse>`: list of enrollments.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.platform.listSelfHostEnrollments({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |

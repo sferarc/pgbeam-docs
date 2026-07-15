@@ -1,0 +1,152 @@
+---
+title: Self-hosted data plane (BYOC)
+icon: Server
+description:
+  Run the PgBeam proxy inside your own VPC or cluster so the agent connection
+  and audit stream never leave your network, while the control plane, policy
+  engine, and dashboard stay hosted by PgBeam.
+---
+
+The self-hosted (BYOC, "bring your own cloud") data plane runs the same PgBeam
+proxy image inside your own network. Queries from your agents flow through a
+proxy you operate; the proxy only dials home to the PgBeam control plane over
+gRPC to fetch project config and to ship the audit trail back. Your database
+credentials and query traffic stay in your VPC.
+
+This is a Scale and enterprise capability. It sells the compliance story: your
+data plane, our policy engine.
+
+## What stays where
+
+| Component                       | Runs where                  |
+| ------------------------------- | --------------------------- |
+| Proxy (PG wire, policy, cache)  | Your VPC/cluster            |
+| Query traffic + DB credentials  | Your VPC/cluster            |
+| Control plane (config, billing) | PgBeam (hosted)             |
+| Dashboard, policy authoring     | PgBeam (hosted)             |
+| Audit trail                     | Shipped to PgBeam over gRPC |
+
+The proxy enforces every policy (read-only, allowlists, masking, budgets,
+approvals, kill-switch) locally in the PG wire protocol. It receives that policy
+from the control plane over the config stream, the same mechanism the hosted
+data plane uses.
+
+## How enrollment works
+
+A self-hosted proxy authenticates to the control plane with a self-host
+enrollment token. The token:
+
+- Is issued once per enrollment and shown a single time. Only its SHA-256 hash
+  is stored.
+- Scopes the proxy to your organization. A self-hosted proxy receives config for
+  your projects only, never another tenant's, and never the PgBeam platform TLS
+  key.
+- Is gated on entitlement. If your organization is not on a self-host-capable
+  plan (Scale or enterprise), the connection is rejected.
+- Can be revoked. A revoked token can no longer authenticate a proxy; connected
+  proxies keep their last-known config until they reconnect.
+
+Because the proxy runs in your network, you provide its TLS certificate for your
+proxy domain. The platform wildcard certificate is never streamed to a
+self-hosted proxy.
+
+## Issue an enrollment token
+
+Create an enrollment for your organization (owner or admin):
+
+```bash
+curl -X POST https://api.pgbeam.com/v1/organizations/$ORG_ID/self-host-enrollments \
+  -H "Authorization: Bearer $PGBEAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"region_label": "customer-vpc-us-east", "description": "prod cluster"}'
+```
+
+The response includes the plaintext token once:
+
+```json
+{
+  "enrollment": {
+    "id": "she_...",
+    "org_id": "org_...",
+    "region_label": "customer-vpc-us-east"
+  },
+  "token": "pbh_..."
+}
+```
+
+Store the `token` securely; it cannot be retrieved again. List and revoke
+enrollments with `GET` and `DELETE` on the same path.
+
+## Mark a project self-hosted
+
+Set `self_hosted` when creating a project so the control plane treats its data
+plane as customer-operated and does not provision hosted infrastructure for it:
+
+```bash
+curl -X POST https://api.pgbeam.com/v1/projects \
+  -H "Authorization: Bearer $PGBEAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-app", "org_id": "org_...", "self_hosted": true, "database": { "host": "db.internal", "name": "app", "username": "app" }}'
+```
+
+## Run the proxy
+
+Packaging for both Kubernetes and Docker Compose lives in `deploy/byoc/`.
+
+### Helm
+
+```bash
+helm install pgbeam-proxy ./deploy/byoc/helm/pgbeam-proxy \
+  --set controlPlane.url=https://grpc.pgbeam.com \
+  --set controlPlane.enrollmentToken=pbh_... \
+  --set proxy.domain=proxy.internal.example.com \
+  --set-file tls.cert=./tls.crt \
+  --set-file tls.key=./tls.key
+```
+
+### Docker Compose
+
+```bash
+cd deploy/byoc
+cp .env.example .env      # fill in PGBEAM_CONTROL_PLANE_URL and PGBEAM_ENROLLMENT_TOKEN
+docker compose up -d
+```
+
+## Connect your agents
+
+Route clients through the proxy using TLS SNI, exactly as with the hosted data
+plane, but against your proxy domain:
+
+```
+postgresql://user:pass@<project-subdomain>.proxy.internal.example.com:5432/db?sslmode=verify-full
+```
+
+The subdomain identifies the project. The proxy resolves it against the config
+streamed from the control plane.
+
+## Configuration reference
+
+The proxy is configured entirely with environment variables. The most relevant
+for BYOC:
+
+| Variable          | Purpose                                                       |
+| ----------------- | ------------------------------------------------------------- |
+| `AGENT_API_URL`   | Control-plane gRPC URL to dial home to                        |
+| `GRPC_AUTH_TOKEN` | Self-host enrollment token (pbh\_...)                         |
+| `AGENT_REGION`    | Region label reported to the control plane                    |
+| `AGENT_INSTANCE`  | Unique instance id for this proxy                             |
+| `PROXY_DOMAIN`    | Base domain for TLS SNI project routing                       |
+| `TLS_CERT_FILE`   | Path to your proxy TLS certificate                            |
+| `TLS_KEY_FILE`    | Path to your proxy TLS private key                            |
+| `SERVERLESS_ADDR` | Listen address for the Neon-compatible HTTP/WS + MCP endpoint |
+| `CACHE_ENABLED`   | Enable query caching (off by default)                         |
+
+## Limits and follow-ups
+
+- Config, audit, and hostname self-heal are scoped to the enrolling org. Metrics
+  and insights reporting from a self-hosted proxy are trusted at the org level;
+  fine-grained per-project scoping of those aggregate reports is a planned
+  follow-up.
+- Enrollment tokens are long-lived shared secrets. Rotate them by issuing a new
+  enrollment and revoking the old one. Short-lived/rotating credentials are a
+  planned follow-up.

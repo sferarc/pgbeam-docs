@@ -1,0 +1,58 @@
+---
+title: createSelfHostEnrollment
+description: Issue a self-host enrollment token
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Issues an enrollment token a self-hosted (BYOC) proxy uses to authenticate to the control plane's config/audit gRPC stream. The token is returned once and cannot be retrieved again. Requires the Scale or enterprise plan.
+
+## Usage
+
+```typescript
+const result = await api.platform.createSelfHostEnrollment({
+    pathParams: { org_id: "org_abc123" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                                       |
+| ----------------- | -------- | -------- | ------------------------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier.                   |
+| body.region_label | `string` | No       | Operator-supplied label for where the proxy runs. |
+| body.description  | `string` | No       | Optional human-readable note.                     |
+
+## Response
+
+`Promise<SelfHostEnrollmentSecret>`: enrollment created. token shown once.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.platform.createSelfHostEnrollment({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                           |
+| ------ | ----------------------------------------------------- |
+| 400    | Invalid request parameters.                           |
+| 401    | Missing or invalid authentication.                    |
+| 403    | The organization's plan is not entitled to self-host. |
+| 429    | Rate limited. Try again later.                        |

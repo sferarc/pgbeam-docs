@@ -1,0 +1,48 @@
+---
+title: ListSelfHostEnrollments
+description: List self-host enrollments
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists an organization's self-host enrollments. Tokens are never returned.
+
+## Usage
+
+```go
+result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123")
+```
+
+## Parameters
+
+| Parameter | Type              | Required | Description                     |
+| --------- | ----------------- | -------- | ------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                 |
+| orgID     | `string`          | Yes      | Unique organization identifier. |
+
+## Response
+
+`(*pgbeam.ListSelfHostEnrollmentsResponse, error)`: list of enrollments.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123")
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |

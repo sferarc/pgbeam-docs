@@ -1,0 +1,58 @@
+---
+title: CreateSelfHostEnrollment
+description: Issue a self-host enrollment token
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Issues an enrollment token a self-hosted (BYOC) proxy uses to authenticate to the control plane's config/audit gRPC stream. The token is returned once and cannot be retrieved again. Requires the Scale or enterprise plan.
+
+## Usage
+
+```go
+result, err := client.Platform.CreateSelfHostEnrollment(ctx, "org_abc123", pgbeam.CreateSelfHostEnrollmentRequest{
+
+  })
+```
+
+## Parameters
+
+| Parameter       | Type                                     | Required | Description                                       |
+| --------------- | ---------------------------------------- | -------- | ------------------------------------------------- |
+| ctx             | `context.Context`                        | Yes      | Request context                                   |
+| orgID           | `string`                                 | Yes      | Unique organization identifier.                   |
+| req             | `pgbeam.CreateSelfHostEnrollmentRequest` | Yes      | Request body                                      |
+| req.RegionLabel | `*string`                                | No       | Operator-supplied label for where the proxy runs. |
+| req.Description | `*string`                                | No       | Optional human-readable note.                     |
+
+## Response
+
+`(*pgbeam.SelfHostEnrollmentSecret, error)`: enrollment created. token shown once.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Platform.CreateSelfHostEnrollment(ctx, "org_abc123", pgbeam.CreateSelfHostEnrollmentRequest{
+    RegionLabel: "customer-vpc-us-east",
+    Description: "prod cluster",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                           |
+| ------ | ----------------------------------------------------- |
+| 400    | Invalid request parameters.                           |
+| 401    | Missing or invalid authentication.                    |
+| 403    | The organization's plan is not entitled to self-host. |
+| 429    | Rate limited. Try again later.                        |

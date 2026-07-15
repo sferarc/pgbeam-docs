@@ -46,6 +46,8 @@
 		"psycopg",
 		"pgx",
 		"jdbc",
+		"---Self-hosting---",
+		"self-hosted",
 		"---Infrastructure as Code---",
 		"pulumi",
 		"terraform",

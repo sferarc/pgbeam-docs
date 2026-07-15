@@ -19,16 +19,17 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
 
 ## Parameters
 
-| Parameter       | Type                           | Required | Description                                            |
-| --------------- | ------------------------------ | -------- | ------------------------------------------------------ |
-| ctx             | `context.Context`              | Yes      | Request context                                        |
-| req             | `pgbeam.CreateProjectRequest`  | Yes      | Request body                                           |
-| req.Name        | `string`                       | Yes      | Human-readable project name.                           |
-| req.OrgID       | `string`                       | Yes      | Better Auth organization ID.                           |
-| req.Description | `*string`                      | No       | Optional project description.                          |
-| req.Tags        | `*[]string`                    | No       | User-defined labels to attach to the project.          |
-| req.Cloud       | `*string`                      | No       | Cloud provider for the project.                        |
-| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      | Primary database. Created atomically with the project. |
+| Parameter       | Type                           | Required | Description                                                                                                                               |
+| --------------- | ------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ctx             | `context.Context`              | Yes      | Request context                                                                                                                           |
+| req             | `pgbeam.CreateProjectRequest`  | Yes      | Request body                                                                                                                              |
+| req.Name        | `string`                       | Yes      | Human-readable project name.                                                                                                              |
+| req.OrgID       | `string`                       | Yes      | Better Auth organization ID.                                                                                                              |
+| req.Description | `*string`                      | No       | Optional project description.                                                                                                             |
+| req.Tags        | `*[]string`                    | No       | User-defined labels to attach to the project.                                                                                             |
+| req.Cloud       | `*string`                      | No       | Cloud provider for the project.                                                                                                           |
+| req.SelfHosted  | `*bool`                        | No       | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
+| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      | Primary database. Created atomically with the project.                                                                                    |
 
 ## Response
 
@@ -49,7 +50,7 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Description: "Production database proxy",
     Tags: []string{"production", "us-east-1"},
     Cloud: "aws",
-    Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
+    SelfHosted: false,
   })
 if err != nil {
   log.Fatal(err)
