@@ -20,7 +20,7 @@ with no extension to install and no change to your schema.
 2. PgBeam authenticates the agent credential and resolves the policy attached to
    it.
 3. PgBeam parses the statement and checks it: access mode (read-only or
-   read-write), table and column allowlists, and statement type.
+   read-write), table allowlists, and statement type.
 4. If the statement is blocked, PgBeam returns a PostgreSQL `ErrorResponse` with
    an LLM-readable reason. The query never reaches your database.
 5. If the statement is allowed, PgBeam forwards it upstream using your stored
@@ -54,7 +54,7 @@ You can hand an agent either surface. Both are backed by the same policy.
 | Control                 | What it does                                                                   |
 | ----------------------- | ------------------------------------------------------------------------------ |
 | Access mode             | Read-only or read-write. See [Read-only](/docs/read-only).                     |
-| Table/column allowlists | Allow the exact relations and columns. See [Allowlists](/docs/allowlists).     |
+| Table allowlists        | Allow the exact relations. See [Allowlists](/docs/allowlists).                 |
 | PII masking             | Redact, null, or hash columns in flight. See [Masking](/docs/masking).         |
 | Query budgets           | Cap queries per window and rows per result. See [Budgets](/docs/budgets).      |
 | Kill-switch             | Stop one agent or every agent instantly. See [Kill-switch](/docs/kill-switch). |

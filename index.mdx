@@ -7,7 +7,7 @@ description:
 
 PgBeam is the safe Postgres gateway for AI agents. You hand an agent a scoped
 connection string or a hosted MCP endpoint instead of a superuser one, and PgBeam
-enforces what it can do: read-only access, table and column allowlists, PII
+enforces what it can do: read-only access, table allowlists, PII
 masking, query budgets, and a kill-switch. Every query is audited. Enforcement
 happens at the PostgreSQL wire protocol, so it works with RDS, Aurora,
 self-hosted, or any managed Postgres, with no extension to install and no change
@@ -49,7 +49,7 @@ to your schema.
   </Card>
 
 <Card title="Allowlists" href="/docs/allowlists" icon="✅">
-  Allow the exact schemas, tables, and columns the agent should touch.
+  Allow the exact schemas and tables the agent should touch.
 </Card>
 
 <Card title="PII masking" href="/docs/masking" icon="🕶️">

@@ -8,7 +8,7 @@ description:
 
 A policy profile is a named bundle of rules attached to one or more credentials.
 It is the single place you decide what a principal can do: read-only or
-read-write, which tables and columns it can touch, which rows it can see, which
+read-write, which tables it can touch, which rows it can see, which
 columns are masked, and how much it can run. Policies stream to the data planes
 and hot-reload, so a change takes effect on the next query without restarting
 anything.
@@ -24,7 +24,6 @@ applying policies beyond per-agent credentials.
 | ----------------- | --------------------------------------------------------------------------------- | ---------------------------------------------- |
 | Access mode       | Read-only or read-write, plus per-statement-type rules.                           | [Read-only](/docs/read-only)                   |
 | Table allowlist   | The schemas and tables the principal may read or write.                           | [Allowlists](/docs/allowlists)                 |
-| Column allowlist  | The columns within an allowed table the principal may select.                     | [Allowlists](/docs/allowlists)                 |
 | Row filters       | A `WHERE` predicate that scopes a table to a slice of rows.                       | [Row-level policies](/docs/row-level-policies) |
 | Masking rules     | Columns redacted, nulled, or hashed in flight.                                    | [Masking](/docs/masking)                       |
 | Query budgets     | Queries per window, max rows per result, statement timeout.                       | [Budgets](/docs/budgets)                       |
@@ -57,7 +56,7 @@ applying policies beyond per-agent credentials.
   <Tab value="API">
     ```bash
     curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/policies \
-      -H "X-API-Key: pbo_..." \
+      -H "Authorization: Bearer pbo_..." \
       -d '{
         "name": "analytics-readonly",
         "mode": "read-only",
@@ -113,7 +112,7 @@ individual credentials into policies one at a time.
 ## Related
 
 - [Read-only enforcement](/docs/read-only)
-- [Table and column allowlists](/docs/allowlists)
+- [Table allowlists](/docs/allowlists)
 - [Row-level policies](/docs/row-level-policies)
 - [PII masking](/docs/masking)
 - [Query budgets](/docs/budgets)

@@ -16,25 +16,38 @@ your database.
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
     ```bash
-    # Stop one agent
-    pgbeam agents kill analytics-bot
+    # Stop one agent (reversible; re-enable with `pgbeam agents enable`)
+    pgbeam agents disable agt_xxx
 
     # Stop every agent on the project
-    pgbeam projects kill my-project --agents
+    pgbeam projects update --agents-disabled true
     ```
 
   </Tab>
 
 <Tab value="Dashboard">
-  On the **Agents** tab, select an agent and choose **Kill**. To stop every
-  agent, use the project-level kill control.
+  On the **Agents** tab, select an agent and disable it. To stop every agent at
+  once, engage the project-level kill-switch in the project settings.
 </Tab>
 
   <Tab value="API">
     ```bash
-    curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/agents/{agentId}/kill \
-      -H "X-API-Key: pbo_..."
+    # Stop one agent: set its credential status to disabled
+    curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId}/agents/{agentId} \
+      -H "Authorization: Bearer pbo_..." \
+      -H "Content-Type: application/json" \
+      -d '{"status": "disabled"}'
+
+    # Stop every agent on the project: engage the project kill-switch
+    curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId} \
+      -H "Authorization: Bearer pbo_..." \
+      -H "Content-Type: application/json" \
+      -d '{"agents_disabled": true}'
     ```
+
+    Reverse either one by sending `{"status": "active"}` to the credential or
+    `{"agents_disabled": false}` to the project.
+
   </Tab>
 </Tabs>
 

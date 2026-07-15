@@ -13,8 +13,10 @@ your real database credentials, and you can revoke its access with one click.
 <Callout title="Prerequisites" type="info">
   You need a PostgreSQL database reachable from the internet and its connection
   details (host, port, user, password, database name). Sign up at
-  [dash.pgbeam.com](https://dash.pgbeam.com); new accounts start on a 14-day
-  trial.
+  [dash.pgbeam.com](https://dash.pgbeam.com) with email and password, or with
+  Google, GitHub, or Vercel; new accounts start on a 14-day trial. To use the
+  CLI, create an API key under **Settings > API Keys** and authenticate with it
+  (the CLI does not do browser sign-in).
 </Callout>
 
 <Steps>
@@ -26,7 +28,9 @@ your real database credentials, and you can revoke its access with one click.
     pass the connection details inline:
 
     ```bash title="Create a project with your database"
-    pgbeam auth login
+    # Authenticate the CLI with an API key from the dashboard (Settings > API Keys).
+    # `pgbeam auth login` prompts you to choose a method and paste the key.
+    pgbeam auth login --api-key
     pgbeam projects create \
       --name my-project \
       --host db.example.com --port 5432 \
@@ -133,7 +137,7 @@ your real database credentials, and you can revoke its access with one click.
 
 The read-only policy is a safe default. Narrow it further as you go:
 
-- [Allowlists](/docs/allowlists): restrict to the exact tables and columns.
+- [Allowlists](/docs/allowlists): restrict to the exact tables.
 - [Masking](/docs/masking): hash or redact PII the agent should never read.
 - [Budgets](/docs/budgets): cap queries per window and rows per result.
 - [Kill-switch](/docs/kill-switch): cut an agent off mid-session.

@@ -68,7 +68,7 @@ Pass the key in the `Authorization` header as a bearer token:
     ```ts
     const response = await fetch("https://api.pgbeam.com/v1/projects", {
       headers: {
-        "X-API-Key": process.env.PGBEAM_API_KEY!,
+        Authorization: `Bearer ${process.env.PGBEAM_API_KEY!}`,
       },
     });
     ```
@@ -81,7 +81,7 @@ Pass the key in the `Authorization` header as a bearer token:
 
     response = requests.get(
         "https://api.pgbeam.com/v1/projects",
-        headers={"X-API-Key": os.environ["PGBEAM_API_KEY"]},
+        headers={"Authorization": f"Bearer {os.environ['PGBEAM_API_KEY']}"},
     )
     ```
 

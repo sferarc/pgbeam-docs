@@ -208,7 +208,7 @@ patterns, while freeing resources during quiet periods.
   <Tab value="API">
     ```bash
     curl -X PATCH https://api.pgbeam.com/v1/projects/{projectId} \
-      -H "X-API-Key: pbo_..." \
+      -H "Authorization: Bearer pbo_..." \
       -d '{"pool_mode": "transaction"}'
     ```
   </Tab>
