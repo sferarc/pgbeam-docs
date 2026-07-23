@@ -1,0 +1,48 @@
+---
+title: policies replay
+description: Replay recorded agent traffic against a policy
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Replay the project's recorded agent audit traffic against a candidate policy and print what would change: which queries that ran would now be blocked, which blocked queries would now be permitted, and which results would be masked or row-filtered. Supply exactly one of `--policy` (an existing saved policy ID) or `--draft` (a JSON file describing an unsaved draft policy). Traffic is deduplicated by normalized query shape, newest first, and every statement is evaluated through the data plane's own policy engine, so verdicts match real enforcement. The replay reads only the audit log; it never connects to the upstream database.
+
+## Usage
+
+```bash
+pgbeam policies replay [flags]
+```
+
+## Options
+
+| Option                 | Description                                                           | Required | Default |
+| ---------------------- | --------------------------------------------------------------------- | -------- | ------- |
+| `--policy <value>`     | ID of an existing saved policy to replay against                      | No       | -       |
+| `--draft <value>`      | Path to a JSON file with a draft policy body to replay against        | No       | -       |
+| `--credential <value>` | Restrict the replay to traffic recorded for one agent credential      | No       | -       |
+| `--start <value>`      | Start of the traffic window (RFC3339; default 7 days before the end)  | No       | -       |
+| `--end <value>`        | End of the traffic window (RFC3339; default now)                      | No       | -       |
+| `--limit <value>`      | Maximum distinct queries to replay, newest first (1-500; default 200) | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
+  this command.
+</Callout>
+
+## Examples
+
+```bash
+# Replay the last 7 days of traffic against a saved policy
+pgbeam policies replay --policy pol_xxx
+
+# Replay one credential's traffic against a draft policy
+pgbeam policies replay --draft ./policy.json --credential cred_xxx
+
+# Replay a custom window and get the full result as JSON
+pgbeam policies replay --policy pol_xxx --start 2026-07-01T00:00:00Z --end 2026-07-08T00:00:00Z --json
+```
+
+## Output
+
+Prints a summary (queries replayed, would-block/mask/row-filter counts, newly blocked and newly allowed changes) followed by the changed queries. With --json, returns the full result object including every per-query decision.

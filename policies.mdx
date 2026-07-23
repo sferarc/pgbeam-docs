@@ -80,6 +80,41 @@ blocked statement are rejected with an LLM-readable reason.
   not need to rotate the credential or reconnect the principal.
 </Callout>
 
+## Test a policy before you roll it out
+
+Two preview tools evaluate statements through the same engine the proxy
+enforces, so their verdicts match production exactly. Neither one connects to
+your database.
+
+**What-if (single statement).** Paste a statement and see the decision this
+policy would make: allow, block, mask, or row-filter, with the rule, the
+reason, and any rewritten SQL. In the dashboard the what-if box sits inside the
+policy editor and evaluates your unsaved draft. From the CLI:
+
+```bash
+pgbeam policies dry-eval --policy pol_xxx --sql "SELECT email FROM users"
+```
+
+**Traffic replay (recorded history).** Replay your recent agent traffic from
+the [audit log](/docs/audit-log) against a draft or saved policy and see what
+would change before you save it: which queries that ran would now be blocked,
+which blocked queries would now be permitted, and which results would be masked
+or row-filtered. Traffic is deduplicated by normalized query shape, newest
+first, so one noisy query does not drown out the rest.
+
+```bash
+# Replay the last 7 days of traffic against a saved policy
+pgbeam policies replay --policy pol_xxx
+
+# Replay one credential's traffic against a draft, as JSON
+pgbeam policies replay --draft ./policy.json --credential cred_xxx --json
+```
+
+The replay summary counts newly blocked and newly allowed queries; those are
+the changes to review before rollout. Stateful checks a preview cannot model
+(per-region budgets, approvals, write-mode routing) are reported as
+informational notes on each result.
+
 ## Human and passthrough connections
 
 A policy can bind to more than a per-agent credential. Every credential carries a

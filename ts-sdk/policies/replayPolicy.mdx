@@ -1,0 +1,63 @@
+---
+title: replayPolicy
+description: Replay recorded agent traffic against a policy
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Replays the project's recorded agent audit traffic against a candidate policy (either a draft supplied inline or an existing policy referenced by id) and reports what would change: which queries that ran would now be blocked, which blocked queries would now be permitted, and which results would be masked or row-filtered. Traffic is deduplicated by normalized query shape, newest first, and every statement is evaluated through the data plane's own policy engine, so the verdicts match real enforcement. Stateful checks (budgets, approvals, write-mode routing) are reported as informational notes on each result, not verdicts. This endpoint reads only the audit log; it never connects to the upstream database and persists nothing.
+
+## Usage
+
+```typescript
+const result = await api.policies.replayPolicy({
+    pathParams: { project_id: "prj_xxx" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter             | Type                 | Required | Description                                                                                                                     |
+| --------------------- | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| pathParams.project_id | `string`             | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                             |
+| body.policy_id        | `string`             | No       | ID of an existing saved policy profile to replay against.                                                                       |
+| body.policy           | `PolicyProfileInput` | No       |                                                                                                                                 |
+| body.credential_id    | `string`             | No       | Restrict the replay to traffic recorded for one agent credential.                                                               |
+| body.start_ts         | `string`             | No       | Start of the traffic window (inclusive). Defaults to 7 days before end_ts.                                                      |
+| body.end_ts           | `string`             | No       | End of the traffic window (exclusive). Defaults to now.                                                                         |
+| body.limit            | `number`             | No       | Maximum number of distinct queries to replay, newest first. Traffic is deduplicated by normalized query hash before evaluation. |
+
+## Response
+
+`Promise<PolicyReplayResult>`: the replay summary and per-query decisions.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.policies.replayPolicy({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
