@@ -5,7 +5,7 @@ description: Export agent audit logs as CSV
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Stream the linked project's agent audit entries as a CSV file, newest first, honoring the same credential, event, decision, source, and date-range filters as `audit list`. The full filtered set is streamed (no pagination), suitable for spreadsheets, SIEM ingestion, and compliance archives. Writes to stdout by default, or to a file with `--output`. The API emits CSV only; the wire/mcp/control-formatted views are selected with `--source`, not a separate output format.
+Stream the linked project's agent audit entries as a CSV file, newest first, honoring the same credential, event, decision, source, and date-range filters as `audit list`. The full filtered set is streamed (no pagination), suitable for spreadsheets, SIEM ingestion, and compliance archives. Writes to stdout by default, or to a file with `--output`. The API emits CSV only; the wire/mcp/rest/control-formatted views are selected with `--source`, not a separate output format.
 
 ## Usage
 
@@ -20,7 +20,7 @@ pgbeam audit export [flags]
 | `--credential <value>`   | Filter to one agent credential ID                                          | No       | -       |
 | `--event <value>`        | Filter to one event type (e.g. blocked, masked, query)                     | No       | -       |
 | `--decision <value>`     | Coarse outcome filter: allow, block, mask, or truncate                     | No       | -       |
-| `--source <value>`       | Filter by statement origin: wire, mcp, or control                          | No       | -       |
+| `--source <value>`       | Filter by statement origin: wire, mcp, rest, or control                    | No       | -       |
 | `--start <value>`        | Return entries at or after this ISO 8601 timestamp (inclusive lower bound) | No       | -       |
 | `--end <value>`          | Return entries strictly older than this ISO 8601 timestamp (upper bound)   | No       | -       |
 | `--output <value>`, `-o` | Write the CSV to this file instead of stdout                               | No       | -       |

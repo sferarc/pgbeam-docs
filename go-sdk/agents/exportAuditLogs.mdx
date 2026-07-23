@@ -23,7 +23,7 @@ result, err := client.Agents.ExportAuditLogs(ctx, "prj_xxx", nil)
 | params.CredentialID | `string`                        | No       | Filter to a single agent credential.                                                                                                                                      |
 | params.Event        | `string`                        | No       | Filter to a single event type (e.g. blocked, masked, query).                                                                                                              |
 | params.Decision     | `pgbeam.AuditDecision`          | No       | Coarse outcome filter that groups events. `allow` = query; `block` = blocked, budget_exhausted, auth_failed, credential_expired; `mask` = masked; `truncate` = truncated. |
-| params.Source       | `pgbeam.AuditSource`            | No       | Filter by statement origin (wire, mcp, or control).                                                                                                                       |
+| params.Source       | `pgbeam.AuditSource`            | No       | Filter by statement origin (wire, mcp, rest, or control).                                                                                                                 |
 | params.Start        | `string`                        | No       | Return entries at or after this timestamp (inclusive lower bound).                                                                                                        |
 | params.End          | `string`                        | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                                                                 |
 

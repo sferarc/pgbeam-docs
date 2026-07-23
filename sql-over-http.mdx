@@ -1,0 +1,142 @@
+---
+title: SQL over HTTP
+icon: Braces
+description:
+  Run single-shot SQL queries over plain HTTPS with POST /v1/sql, with the full
+  policy pipeline and audit trail applied to every statement.
+---
+
+The REST SQL endpoint runs one SQL statement per HTTPS request, no driver
+required. It is built for edge and serverless agents that want a curl-friendly
+surface: post JSON, get rows back as JSON. Every statement goes through the
+same enforcement pipeline as a direct wire connection: table and column
+allowlists, PII masking, row filters, query budgets, the whereless-write
+safety floor, `max_affected_rows` caps, and the audit trail.
+
+```bash
+curl https://abc.proxy.pgbeam.app/v1/sql \
+  -H "Content-Type: application/json" \
+  -H "Connection-String: postgresql://agent_user:password@abc.proxy.pgbeam.app/mydb" \
+  -d '{"query": "SELECT id, email FROM users WHERE created_at > $1", "params": ["2026-01-01"]}'
+```
+
+If you use the `@neondatabase/serverless` driver, use the
+[Neon-compatible endpoints](/docs/serverless) instead; `/v1/sql` is the plain
+REST alternative for everything else.
+
+## Authentication
+
+The endpoint authenticates exactly like the [serverless driver](/docs/serverless)
+surface: pass a PgBeam connection string in the `Connection-String` header
+(`Neon-Connection-String` is also accepted). The hostname's subdomain routes
+the request to your project, and the credentials are verified by the proxy
+before the statement runs. [Agent credentials](/docs/agent-credentials) get
+their policy profile enforced; regular database credentials pass through.
+
+Project [IP filtering](/docs/ip-allowlist) applies to this endpoint the same
+way it does to `/sql`: when a project has an allowlist configured, requests
+from addresses outside it are rejected with `403` before any SQL runs.
+
+## Request
+
+`POST /v1/sql` with a JSON body:
+
+| Field    | Type   | Required | Description                                         |
+| -------- | ------ | -------- | --------------------------------------------------- |
+| `query`  | string | Yes      | A single SQL statement.                             |
+| `params` | array  | No       | Positional parameters bound to `$1`..`$N` in order. |
+
+Parameters are bound over the PostgreSQL extended query protocol. Values are
+never interpolated into the SQL text, so there is no injection surface in the
+binding step.
+
+One statement per request. Batch bodies (a `queries` array) are rejected with
+a clear error; if you need multi-statement transactions in one request, use
+the [Neon-compatible `/sql` endpoint](/docs/serverless) and
+`sql.transaction([...])`.
+
+## Response
+
+```json
+{
+  "columns": [
+    { "name": "id", "dataType": "int4", "dataTypeId": 23 },
+    { "name": "email", "dataType": "text", "dataTypeId": 25 }
+  ],
+  "rows": [
+    { "id": 1, "email": "a***@example.com" },
+    { "id": 2, "email": "b***@example.com" }
+  ],
+  "command": "SELECT",
+  "rowCount": 2
+}
+```
+
+| Field      | Description                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------ |
+| `columns`  | Result columns with the PostgreSQL type name and OID. Empty for statements without a result set. |
+| `rows`     | One JSON object per row, keyed by column name. Always present, `[]` when empty.                  |
+| `command`  | The completed command tag (`SELECT`, `INSERT`, `UPDATE`, ...).                                   |
+| `rowCount` | Rows returned (reads) or affected (writes). `null` when the command reports no count.            |
+
+Values are typed JSON: numbers for `int2`/`int4`/floats, booleans for `bool`,
+parsed objects for `json`/`jsonb`, arrays for array columns. `bigint` (`int8`),
+`numeric`, and `money` are returned as strings, matching the serverless driver
+contract: a JavaScript `Number` silently corrupts integers above 2^53 and
+arbitrary-precision decimals.
+
+## Errors
+
+Errors are JSON with the PostgreSQL SQLSTATE preserved, in the same shape as
+the serverless surface:
+
+```json
+{
+  "message": "permission denied for table payments",
+  "code": "42501",
+  "severity": "ERROR"
+}
+```
+
+HTTP status maps from the SQLSTATE class: authentication failures are `401`,
+syntax/access/policy errors (including policy blocks, `42501`) and constraint
+violations are `400`, resource exhaustion is `503`, upstream connection
+problems are `504`. See [error codes](/docs/error-codes) for the SQLSTATEs the
+policy engine emits.
+
+## Policy enforcement and audit
+
+The handler does not evaluate policy itself. It opens a loopback session to
+the local PG wire proxy, presenting your project's hostname as TLS SNI, so the
+statement takes the identical enforcement path as a `psql` connection: one
+pipeline, no REST-specific variant. Query caching, pooling, and read-replica
+routing also apply, and [cache annotations](/docs/cache) like
+`/* @pgbeam:cache maxAge=300 */` work unchanged.
+
+Statements run through `/v1/sql` are recorded in the [audit log](/docs/audit-log)
+with `source=rest`, so you can distinguish REST traffic from direct wire
+connections (`wire`) and MCP sessions (`mcp`) in the dashboard filter, the
+API, and CSV exports.
+
+## Limits
+
+- One statement per request; no batches and no cross-request transactions.
+  Each request runs in its own short-lived session, so session state (`SET`,
+  prepared statements, advisory locks) does not carry over.
+- Request bodies are capped at 10 MB, and a statement times out after 30
+  seconds.
+- Parameterized writes under a `max_affected_rows` cap are rejected fail-closed
+  with SQLSTATE `0A000` (the cap cannot count rows on the extended protocol).
+  Statements without `params` run over the simple query protocol, where the
+  cap is enforced normally, so either inline the values or lift them into the
+  statement. Reads are unaffected.
+- `LISTEN`/`NOTIFY` and `COPY` are not supported on this surface.
+
+## Further reading
+
+- [Serverless Driver](/docs/serverless): the Neon-compatible `/sql` and `/v2`
+  endpoints for `@neondatabase/serverless`
+- [Agent Credentials](/docs/agent-credentials): scoped credentials with policy
+  profiles
+- [Audit Log](/docs/audit-log): what is recorded for every statement
+- [Error Codes](/docs/error-codes): SQLSTATEs emitted by the policy engine
