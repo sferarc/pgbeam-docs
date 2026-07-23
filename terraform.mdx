@@ -3,12 +3,12 @@ title: Terraform
 icon: Blocks
 tag: HCL
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments as
   infrastructure using Terraform and the pgbeam provider.
 ---
 
 Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
-provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints.
+provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments.
 
 ## Setup
 
@@ -320,6 +320,24 @@ resource "pgbeam_webhook_endpoint" "example" {
 
 **Import:** `terraform import pgbeam_webhook_endpoint.example <project_id>/<id>`
 
+### pgbeam_self_host_enrollment
+
+Manages a self-host (BYOC) enrollment: a token a self-hosted proxy uses to authenticate to the control plane's config/audit stream. The token is a one-time secret returned only at creation and exposed as a sensitive computed output; it cannot be retrieved again. To rotate the token, replace the resource. Deletion revokes the enrollment.
+
+SelfHostEnrollments are immutable; any property change triggers replacement.
+
+```hcl
+resource "pgbeam_self_host_enrollment" "example" {
+  org_id = "org_abc123"
+  region_label = "customer-vpc-us-east"
+  description = "prod cluster"
+}
+```
+
+**Computed:** `created_by`, `created_at`, `last_seen_at`, `revoked_at`, `token`
+
+**Import:** `terraform import pgbeam_self_host_enrollment.example <org_id>/<id>`
+
 ## Configuration
 
 | Setting          | Source         | Description                                      |
@@ -336,17 +354,18 @@ Config resolution order: provider block > environment variables.
 Some property changes trigger resource replacement (destroy + create) rather
 than in-place updates:
 
-| Resource        | Replacement triggers                                                      |
-| --------------- | ------------------------------------------------------------------------- |
-| Project         | `org_id`, `cloud`, `self_hosted`                                          |
-| Database        | `project_id`                                                              |
-| Replica         | Any property change (immutable)                                           |
-| CustomDomain    | Any property change (immutable)                                           |
-| CacheRule       | `project_id`, `database_id`, `query_hash`                                 |
-| SpendLimit      | `org_id`                                                                  |
-| AgentCredential | `project_id`, `policy_profile_id`, `name`, `principal_type`, `expires_at` |
-| PolicyProfile   | `project_id`                                                              |
-| WebhookEndpoint | `project_id`                                                              |
+| Resource           | Replacement triggers                                                      |
+| ------------------ | ------------------------------------------------------------------------- |
+| Project            | `org_id`, `cloud`, `self_hosted`                                          |
+| Database           | `project_id`                                                              |
+| Replica            | Any property change (immutable)                                           |
+| CustomDomain       | Any property change (immutable)                                           |
+| CacheRule          | `project_id`, `database_id`, `query_hash`                                 |
+| SpendLimit         | `org_id`                                                                  |
+| AgentCredential    | `project_id`, `policy_profile_id`, `name`, `principal_type`, `expires_at` |
+| PolicyProfile      | `project_id`                                                              |
+| WebhookEndpoint    | `project_id`                                                              |
+| SelfHostEnrollment | Any property change (immutable)                                           |
 
 ## Further reading
 

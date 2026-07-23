@@ -3,13 +3,13 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments as
   Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
 Crossplane. The `provider-pgbeam` package provides managed resources for
-projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints.
+projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments.
 
 ## Setup
 
@@ -375,6 +375,28 @@ spec:
 
 **Status:** `createdAt`, `updatedAt`
 
+### SelfHostEnrollment
+
+Manages a self-host (BYOC) enrollment: a token a self-hosted proxy uses to authenticate to the control plane's config/audit stream. The token is a one-time secret returned only at creation and exposed as a sensitive computed output; it cannot be retrieved again. To rotate the token, replace the resource. Deletion revokes the enrollment.
+
+SelfHostEnrollments are immutable; any spec change triggers recreation.
+
+```yaml
+apiVersion: pgbeam.io/v1alpha1
+kind: SelfHostEnrollment
+metadata:
+  name: example
+spec:
+  forProvider:
+    orgID: org_abc123
+    regionLabel: customer-vpc-us-east
+    description: prod cluster
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `createdBy`, `createdAt`, `lastSeenAt`, `revokedAt`, `token`
+
 ## Configuration
 
 | Setting           | Source         | Description                                      |
@@ -386,17 +408,18 @@ spec:
 
 Some spec changes trigger resource recreation rather than in-place updates:
 
-| Resource        | Recreation triggers                                                  |
-| --------------- | -------------------------------------------------------------------- |
-| Project         | `orgId`, `cloud`, `selfHosted`                                       |
-| Database        | `projectId`                                                          |
-| Replica         | Any spec change (immutable)                                          |
-| CustomDomain    | Any spec change (immutable)                                          |
-| CacheRule       | `projectId`, `databaseId`, `queryHash`                               |
-| SpendLimit      | `orgId`                                                              |
-| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
-| PolicyProfile   | `projectId`                                                          |
-| WebhookEndpoint | `projectId`                                                          |
+| Resource           | Recreation triggers                                                  |
+| ------------------ | -------------------------------------------------------------------- |
+| Project            | `orgId`, `cloud`, `selfHosted`                                       |
+| Database           | `projectId`                                                          |
+| Replica            | Any spec change (immutable)                                          |
+| CustomDomain       | Any spec change (immutable)                                          |
+| CacheRule          | `projectId`, `databaseId`, `queryHash`                               |
+| SpendLimit         | `orgId`                                                              |
+| AgentCredential    | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| PolicyProfile      | `projectId`                                                          |
+| WebhookEndpoint    | `projectId`                                                          |
+| SelfHostEnrollment | Any spec change (immutable)                                          |
 
 ## Further reading
 

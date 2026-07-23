@@ -3,12 +3,12 @@ title: Pulumi
 icon: Blocks
 tag: TypeScript
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments as
   infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
 Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, and webhook endpoints.
+package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments.
 
 ## Setup
 
@@ -293,6 +293,22 @@ const res = new pgbeam.WebhookEndpoint("example", {
 
 **Outputs:** `createdAt`, `updatedAt`
 
+### SelfHostEnrollment
+
+Manages a self-host (BYOC) enrollment: a token a self-hosted proxy uses to authenticate to the control plane's config/audit stream. The token is a one-time secret returned only at creation and exposed as a sensitive computed output; it cannot be retrieved again. To rotate the token, replace the resource. Deletion revokes the enrollment.
+
+SelfHostEnrollments are immutable; any property change triggers replacement.
+
+```ts
+const res = new pgbeam.SelfHostEnrollment("example", {
+  orgId: "org_abc123",
+  regionLabel: "customer-vpc-us-east",
+  description: "prod cluster",
+});
+```
+
+**Outputs:** `createdBy`, `createdAt`, `lastSeenAt`, `revokedAt`, `token`
+
 ## Configuration
 
 | Setting          | Source        | Description                                      |
@@ -310,17 +326,18 @@ variables.
 Some property changes trigger resource replacement (delete + create) rather
 than in-place updates:
 
-| Resource        | Replacement triggers                                                 |
-| --------------- | -------------------------------------------------------------------- |
-| Project         | `orgId`, `cloud`, `selfHosted`                                       |
-| Database        | `projectId`                                                          |
-| Replica         | Any property change (immutable)                                      |
-| CustomDomain    | Any property change (immutable)                                      |
-| CacheRule       | `projectId`, `databaseId`, `queryHash`                               |
-| SpendLimit      | `orgId`                                                              |
-| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
-| PolicyProfile   | `projectId`                                                          |
-| WebhookEndpoint | `projectId`                                                          |
+| Resource           | Replacement triggers                                                 |
+| ------------------ | -------------------------------------------------------------------- |
+| Project            | `orgId`, `cloud`, `selfHosted`                                       |
+| Database           | `projectId`                                                          |
+| Replica            | Any property change (immutable)                                      |
+| CustomDomain       | Any property change (immutable)                                      |
+| CacheRule          | `projectId`, `databaseId`, `queryHash`                               |
+| SpendLimit         | `orgId`                                                              |
+| AgentCredential    | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| PolicyProfile      | `projectId`                                                          |
+| WebhookEndpoint    | `projectId`                                                          |
+| SelfHostEnrollment | Any property change (immutable)                                      |
 
 ## Further reading
 
