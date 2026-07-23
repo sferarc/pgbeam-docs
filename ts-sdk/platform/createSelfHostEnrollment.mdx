@@ -20,11 +20,12 @@ const result = await api.platform.createSelfHostEnrollment({
 
 ## Parameters
 
-| Parameter         | Type     | Required | Description                                       |
-| ----------------- | -------- | -------- | ------------------------------------------------- |
-| pathParams.org_id | `string` | Yes      | Unique organization identifier.                   |
-| body.region_label | `string` | No       | Operator-supplied label for where the proxy runs. |
-| body.description  | `string` | No       | Optional human-readable note.                     |
+| Parameter         | Type     | Required | Description                                                                                                                                                                       |
+| ----------------- | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier.                                                                                                                                                   |
+| body.region_label | `string` | No       | Operator-supplied label for where the proxy runs.                                                                                                                                 |
+| body.description  | `string` | No       | Optional human-readable note.                                                                                                                                                     |
+| body.expires_at   | `string` | No       | Optional expiry. When set, the enrollment token stops authenticating new proxy connections at this time (must be in the future). Omit or set null for a token that never expires. |
 
 ## Response
 

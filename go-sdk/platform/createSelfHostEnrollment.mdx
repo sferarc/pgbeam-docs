@@ -17,13 +17,14 @@ result, err := client.Platform.CreateSelfHostEnrollment(ctx, "org_abc123", pgbea
 
 ## Parameters
 
-| Parameter       | Type                                     | Required | Description                                       |
-| --------------- | ---------------------------------------- | -------- | ------------------------------------------------- |
-| ctx             | `context.Context`                        | Yes      | Request context                                   |
-| orgID           | `string`                                 | Yes      | Unique organization identifier.                   |
-| req             | `pgbeam.CreateSelfHostEnrollmentRequest` | Yes      | Request body                                      |
-| req.RegionLabel | `*string`                                | No       | Operator-supplied label for where the proxy runs. |
-| req.Description | `*string`                                | No       | Optional human-readable note.                     |
+| Parameter       | Type                                     | Required | Description                                                                                                                                                                       |
+| --------------- | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ctx             | `context.Context`                        | Yes      | Request context                                                                                                                                                                   |
+| orgID           | `string`                                 | Yes      | Unique organization identifier.                                                                                                                                                   |
+| req             | `pgbeam.CreateSelfHostEnrollmentRequest` | Yes      | Request body                                                                                                                                                                      |
+| req.RegionLabel | `*string`                                | No       | Operator-supplied label for where the proxy runs.                                                                                                                                 |
+| req.Description | `*string`                                | No       | Optional human-readable note.                                                                                                                                                     |
+| req.ExpiresAt   | `*string`                                | No       | Optional expiry. When set, the enrollment token stops authenticating new proxy connections at this time (must be in the future). Omit or set null for a token that never expires. |
 
 ## Response
 
@@ -41,6 +42,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 result, err := client.Platform.CreateSelfHostEnrollment(ctx, "org_abc123", pgbeam.CreateSelfHostEnrollmentRequest{
     RegionLabel: "customer-vpc-us-east",
     Description: "prod cluster",
+    ExpiresAt: "...",
   })
 if err != nil {
   log.Fatal(err)
