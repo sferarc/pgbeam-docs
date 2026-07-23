@@ -1,23 +1,24 @@
 ---
 title: anomalies ack
-description: Acknowledge an anomaly alert
+description: Acknowledge one or more anomaly alerts
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Acknowledge an anomaly-detection alert by ID. Marks the alert as acknowledged, indicating it has been seen and is being handled.
+Acknowledge anomaly-detection alerts. Pass one or more alert IDs, or use `--all` to acknowledge every open alert for the linked project (mirrors the dashboard's bulk acknowledge). Marks each alert as acknowledged, indicating it has been seen and is being handled.
 
 ## Usage
 
 ```bash
-pgbeam anomalies ack <id>
+pgbeam anomalies ack [id] [flags]
 ```
 
 ## Options
 
-| Option | Description      | Required | Default |
-| ------ | ---------------- | -------- | ------- |
-| `<id>` | Anomaly alert ID | Yes      | -       |
+| Option  | Description                                         | Required | Default |
+| ------- | --------------------------------------------------- | -------- | ------- |
+| `<id>`  | Anomaly alert ID(s)                                 | No       | -       |
+| `--all` | Acknowledge every open anomaly alert in the project | No       | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -30,8 +31,14 @@ pgbeam anomalies ack <id>
 ```bash
 # Acknowledge an anomaly
 pgbeam anomalies ack anom_xxx
+
+# Acknowledge several anomalies at once
+pgbeam anomalies ack anom_xxx anom_yyy
+
+# Acknowledge every open anomaly
+pgbeam anomalies ack --all
 ```
 
 ## Output
 
-Confirms the anomaly was acknowledged.
+Confirms each anomaly was acknowledged; bulk runs end with an acknowledged/failed summary and exit non-zero if any update failed.
