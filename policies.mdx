@@ -115,6 +115,10 @@ the changes to review before rollout. Stateful checks a preview cannot model
 (per-region budgets, approvals, write-mode routing) are reported as
 informational notes on each result.
 
+For testing against a local or dev database before anything reaches PgBeam at
+all, the `pgbeam-dev` tool evaluates a policy file offline and can run a local
+enforcing gateway. See [local policy testing](/docs/local-testing).
+
 ## Human and passthrough connections
 
 A policy can bind to more than a per-agent credential. Every credential carries a

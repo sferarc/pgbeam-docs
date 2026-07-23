@@ -1,0 +1,87 @@
+---
+title: Local policy testing
+icon: FlaskConical
+description:
+  Test allowlists, masking, row filters, and statement rules against a local
+  or dev database with the pgbeam-dev tool, before a policy reaches prod.
+---
+
+`pgbeam-dev` runs the PgBeam policy engine on your machine. Write a policy as
+a JSON or YAML file, evaluate statements against it offline, or stand up a
+local wire-protocol gateway in front of a dev database and point your agent at
+it. Nothing is deployed and no PgBeam account is involved; when the policy
+behaves the way you want, save the same file through the API, the dashboard,
+or the [IaC providers](/docs/terraform).
+
+The tool ships in the PgBeam repository as a Go program:
+
+```bash
+go run ./backend/tools/pgbeam-dev help
+```
+
+Both modes run the same code the platform runs. `check` uses the engine behind
+the [policy what-if](/docs/policies#test-a-policy-before-you-roll-it-out)
+endpoint, and `serve`
+runs the production proxy's wire path with a static local config. There is no
+separate local implementation that could drift from real enforcement.
+
+## Policy file
+
+The file shape is the API's `PolicyProfileInput` schema, the same body
+`POST /v1/projects/{id}/policies` accepts, validated with the same validators.
+Unknown fields are rejected.
+
+```yaml
+name: agent-readonly
+access_mode: read_only
+table_allowlist:
+  - public.users
+  - public.orders
+masking_rules:
+  - table: public.users
+    column: email
+    kind: redact
+row_filters:
+  - table: public.orders
+    predicate: tenant_id = 42
+```
+
+## Check statements offline
+
+```bash
+pgbeam-dev check -policy policy.yaml \
+  "SELECT id, email FROM users" \
+  "DELETE FROM users"
+```
+
+Prints a verdict per statement: `allow`, `block` with the rule and an
+actionable hint, `mask` with the masked output columns, or `row-filter` with
+the injected predicate and the rewritten SQL. Add `-json` for a machine
+readable report, or `-file queries.sql` (or `-file -` for stdin) to evaluate a
+whole file of statements.
+
+The exit code is 1 when any statement is blocked, which makes `check` a CI
+gate for policy-as-code repositories: keep the policy file and the queries
+your agent is expected to run in the repo, and fail the build when a policy
+change would break them.
+
+## Run a local gateway
+
+```bash
+pgbeam-dev serve -policy policy.yaml \
+  -dsn postgres://devuser:devpass@localhost:5432/mydb
+```
+
+The gateway listens on `127.0.0.1:6432` (change with `-listen`) and prints a
+connection string for a local `agent_dev` credential. Connect any client,
+ORM, or agent to it and every statement is enforced exactly like production:
+blocked statements get the same LLM-readable errors, masked columns come back
+redacted, row filters are injected before the statement reaches your dev
+database. Each decision is logged to stdout.
+
+Local limits, by design: no TLS (loopback only), approvals fail closed (no
+reviewer exists locally), `write_mode: sandbox` writes are rejected (no
+instant branches), budgets reset on restart, and the query cache is disabled
+so every statement hits the database. See the
+[tool README](https://github.com/pgbeam/pgbeam/tree/main/backend/tools/pgbeam-dev)
+for the full flag reference.

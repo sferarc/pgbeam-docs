@@ -18,6 +18,7 @@
 		"scan-pii",
 		"budgets",
 		"kill-switch",
+		"local-testing",
 		"---Write safety---",
 		"approvals",
 		"sandbox-writes",
