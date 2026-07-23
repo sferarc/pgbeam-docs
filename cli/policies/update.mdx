@@ -5,7 +5,7 @@ description: Update a policy profile
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Update a policy profile. Changes hot-reload to active agent sessions. Pass individual flags to change specific fields, or `--file` to supply the full profile body as JSON. Because the API replaces the whole profile, unspecified fields are read from the current profile first so single-flag edits are non-destructive. Fields set via `--file` are overlaid by any individual flags.
+Update a policy profile. Changes hot-reload to active agent sessions. Pass individual flags to change specific fields, or `--file` to supply the full profile body as JSON. Because the API replaces the whole profile, unspecified fields are read from the current profile first so single-flag edits are non-destructive. Fields set via `--file` are overlaid by any individual flags. The resolved profile is validated against the API schema before it is sent; `--dry-run` prints the resolved profile JSON without applying the update.
 
 ## Usage
 
@@ -15,30 +15,34 @@ pgbeam policies update <id> [flags]
 
 ## Options
 
-| Option                               | Description                                                                                                 | Required | Default |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| `<id>`                               | Policy profile ID                                                                                           | Yes      | -       |
-| `--name <value>`                     | New policy profile name                                                                                     | No       | -       |
-| `--mode <value>`                     | Access mode: read_only or read_write                                                                        | No       | -       |
-| `--write-mode <value>`               | How writes are handled: normal, rollback, or sandbox                                                        | No       | -       |
-| `--approval-mode <value>`            | Which statements need approval: off, writes, ddl, or all                                                    | No       | -       |
-| `--approval-timeout-seconds <value>` | How long a held statement waits for a decision before expiring                                              | No       | -       |
-| `--approval-auto-max-rows <value>`   | Statements touching at most this many rows are auto-approved (0 disables)                                   | No       | -       |
-| `--migration-safety <value>`         | Migration safety mode: off, warn, or block                                                                  | No       | -       |
-| `--table-allowlist <value>`          | Comma-separated relations to allow (replaces the current list)                                              | No       | -       |
-| `--table-denylist <value>`           | Comma-separated relations to deny (replaces the current list)                                               | No       | -       |
-| `--max-rows <value>`                 | Max rows returned per query (0 means unlimited)                                                             | No       | -       |
-| `--max-affected-rows <value>`        | Hard cap on rows a single write may affect; over-cap writes are rolled back and blocked (0 means unlimited) | No       | -       |
-| `--budget-queries-per-hour <value>`  | Max queries per rolling hour (0 means unlimited)                                                            | No       | -       |
-| `--budget-queries-per-day <value>`   | Max queries per day (0 means unlimited)                                                                     | No       | -       |
-| `--egress-bytes-per-day <value>`     | Per-day egress budget in bytes (0 means unlimited)                                                          | No       | -       |
-| `--statement-timeout-ms <value>`     | Upstream statement timeout for agent sessions (0 uses the project default)                                  | No       | -       |
-| `--file <value>`                     | Path to a JSON file with the full profile body                                                              | No       | -       |
+| Option                               | Description                                                                                                     | Required | Default |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| `<id>`                               | Policy profile ID                                                                                               | Yes      | -       |
+| `--name <value>`                     | New policy profile name                                                                                         | No       | -       |
+| `--mode <value>`                     | Access mode: read_only or read_write                                                                            | No       | -       |
+| `--write-mode <value>`               | How writes are handled: normal, rollback, or sandbox                                                            | No       | -       |
+| `--approval-mode <value>`            | Which statements need approval: off, writes, ddl, or all                                                        | No       | -       |
+| `--approval-timeout-seconds <value>` | How long a held statement waits for a decision before expiring                                                  | No       | -       |
+| `--approval-auto-max-rows <value>`   | Statements touching at most this many rows are auto-approved (0 disables)                                       | No       | -       |
+| `--migration-safety <value>`         | Migration safety mode: off, warn, or block                                                                      | No       | -       |
+| `--table-allowlist <value>`          | Comma-separated relations to allow (replaces the current list)                                                  | No       | -       |
+| `--table-denylist <value>`           | Comma-separated relations to deny (replaces the current list)                                                   | No       | -       |
+| `--allow <value>`                    | Relation to allowlist (repeatable, or comma-separated; replaces the current list)                               | No       | -       |
+| `--deny <value>`                     | Relation to denylist (repeatable, or comma-separated; replaces the current list)                                | No       | -       |
+| `--mask <value>`                     | Masking rule as table.column=kind, where kind is redact, null, or hash (repeatable; replaces the current rules) | No       | -       |
+| `--max-rows <value>`                 | Max rows returned per query (0 means unlimited)                                                                 | No       | -       |
+| `--max-affected-rows <value>`        | Hard cap on rows a single write may affect; over-cap writes are rolled back and blocked (0 means unlimited)     | No       | -       |
+| `--budget-queries-per-hour <value>`  | Max queries per rolling hour (0 means unlimited)                                                                | No       | -       |
+| `--budget-queries-per-day <value>`   | Max queries per day (0 means unlimited)                                                                         | No       | -       |
+| `--egress-bytes-per-day <value>`     | Per-day egress budget in bytes (0 means unlimited)                                                              | No       | -       |
+| `--statement-timeout-ms <value>`     | Upstream statement timeout for agent sessions (0 uses the project default)                                      | No       | -       |
+| `--file <value>`                     | Path to a JSON file with the full profile body                                                                  | No       | -       |
+| `--dry-run`                          | Print the resolved profile JSON that would be sent, without applying the update                                 | No       | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
-  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
-  this command.
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
 </Callout>
 
 ## Examples
@@ -48,7 +52,10 @@ pgbeam policies update <id> [flags]
 pgbeam policies update pol_xxx --mode read_write
 
 # Restrict a profile to two tables
-pgbeam policies update pol_xxx --table-allowlist public.users,public.orders
+pgbeam policies update pol_xxx --allow public.users --allow public.orders
+
+# Replace the masking rules and preview without applying
+pgbeam policies update pol_xxx --mask users.email=redact --dry-run
 
 # Cap daily budget and rows per query
 pgbeam policies update pol_xxx --budget-queries-per-day 5000 --max-rows 1000

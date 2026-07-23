@@ -1,5 +1,5 @@
 ---
-title: agents get
+title: agents show
 description: Get an agent credential
 ---
 
@@ -10,7 +10,7 @@ Returns a single agent credential. Secrets are never included.
 ## Usage
 
 ```bash
-pgbeam agents get <id>
+pgbeam agents show <id>
 ```
 
 ## Options
@@ -21,18 +21,18 @@ pgbeam agents get <id>
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
-  `--project`, `--org`, `--json`, `--no-color`, `--debug`) are also available on
-  this command.
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
 </Callout>
 
 ## Examples
 
 ```bash
 # Get an agent credential
-pgbeam agents get
+pgbeam agents show
 
 # Output as JSON
-pgbeam agents get --json
+pgbeam agents show --json
 ```
 
 ## Output
