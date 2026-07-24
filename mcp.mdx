@@ -8,9 +8,9 @@ description:
 
 The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes policy-enforced database tools to an AI agent. You paste one
-URL into your MCP client, and the agent gets `query`, `list_tables`,
-`describe_table`, `explain`, and `schema_catalog`, plus `search_docs` and
-`read_doc` for looking up how PgBeam works. Every database call runs through the
+URL into your MCP client, and the agent gets `query`, `validate_sql`,
+`list_tables`, `describe_table`, `explain`, and `schema_catalog`, plus
+`search_docs` and `read_doc` for looking up how PgBeam works. Every database call runs through the
 same policy engine as a scoped connection string, so the agent is held to the
 same guardrails. There is nothing to install and no server to run.
 
@@ -105,6 +105,7 @@ response; copy them from there.
 | Tool             | Purpose                                                                                                                                                           |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.                                                                                              |
+| `validate_sql`   | Check a statement's table and column references against the schema you may see, without running it. Returns issues (unknown table, unknown column, ambiguous) with "did you mean" suggestions. |
 | `list_tables`    | List tables in a schema, shaped for an LLM.                                                                                                                       |
 | `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                         |
 | `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                          |
