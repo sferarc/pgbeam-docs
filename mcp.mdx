@@ -9,9 +9,10 @@ description:
 The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes policy-enforced database tools to an AI agent. You paste one
 URL into your MCP client, and the agent gets `query`, `list_tables`,
-`describe_table`, `explain`, and `schema_catalog`. Every call runs through the same policy engine
-as a scoped connection string, so the agent is held to the same guardrails. There
-is nothing to install and no server to run.
+`describe_table`, `explain`, and `schema_catalog`, plus `search_docs` and
+`read_doc` for looking up how PgBeam works. Every database call runs through the
+same policy engine as a scoped connection string, so the agent is held to the
+same guardrails. There is nothing to install and no server to run.
 
 <Callout type="info" title="Not the same as the management MCP">
   This endpoint gives an agent **query access to your database**. The separate
@@ -24,7 +25,7 @@ is nothing to install and no server to run.
 The endpoint is served on your project's own host,
 `https://<project>.proxy.pgbeam.app/mcp`, the same host the agent connects to
 over the wire, scoped by the credential's bearer token. The exact URL and the
-`pba_…` token are shown in the **Agents** tab and in the credential create
+`pba_…` token are shown in the **Credentials** tab and in the credential create
 response; copy them from there.
 
 <Tabs items={["Claude Code", "Cursor", "VS Code", "MCP Inspector"]}>
@@ -52,8 +53,8 @@ response; copy them from there.
   </Tab>
 
   <Tab value="Cursor">
-    Add to `.cursor/mcp.json` (or **Settings → MCP → Add**). The four tools
-    appear once the connection is established.
+    Add to `.cursor/mcp.json` (or **Settings → MCP → Add**). The tools appear
+    once the connection is established.
 
     ```json title=".cursor/mcp.json"
     {
@@ -108,10 +109,17 @@ response; copy them from there.
 | `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                         |
 | `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                          |
 | `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see. |
+| `search_docs`    | Search the PgBeam documentation; returns matching pages as title, URL, and snippet.                                                                               |
+| `read_doc`       | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result.                                                                 |
 
 Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of
 `pg_catalog` and `information_schema` are permitted regardless of the allowlist,
 so an agent can discover the schema it is allowed to query.
+
+The docs tools (`search_docs`, `read_doc`) are read-only and not scoped to your
+database. They let the agent answer its own questions about PgBeam, for example
+why a query was blocked or how masking and budgets behave, without leaving the
+session.
 
 ## Enforcement is identical to the connection string
 

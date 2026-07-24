@@ -27,10 +27,6 @@
 		"migrations",
 		"---Other---",
 		"mcp",
-		"update",
-		"---Agent gateway---",
-		"agents",
-		"policies",
-		"audit"
+		"update"
 	]
 }

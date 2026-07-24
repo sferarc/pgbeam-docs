@@ -50,6 +50,11 @@ curl -X PATCH \
   --data '{"status": "acknowledged"}'
 ```
 
+The CLI does the same with [`pgbeam anomalies ack`](/docs/cli/anomalies/ack):
+pass one or more alert ids, or `--all` to acknowledge every open alert in the
+project. [`pgbeam anomalies resolve`](/docs/cli/anomalies/resolve) closes them
+out, and [`pgbeam anomalies list`](/docs/cli/anomalies/list) shows what is open.
+
 Every alert can also fire an [`anomaly_alert`](/docs/audit-export) webhook, so it
 lands in Slack, PagerDuty, or your SIEM the moment it is raised.
 

@@ -38,8 +38,7 @@ Add an approval rule to a policy. It names which statement kinds are held.
 <Tab value="Dashboard">
   On the policy profile, open **Approvals**, choose which statement kinds to
   hold (writes, DDL, or both), and set an expiry. Pending requests show up on
-  the **Approvals** tab with the SQL, the credential, and a diff of what the
-  statement would change.
+  the **Approvals** tab with the full context a reviewer needs (see below).
 </Tab>
 
   <Tab value="API">
@@ -77,6 +76,21 @@ on instead of hanging.
 ERROR: statement rejected by reviewer (request apr_7f3a)
 ERROR: approval request apr_7f3a expired after 1h
 ```
+
+## What reviewers see
+
+Each pending request on the **Approvals** tab carries the context needed to
+decide without opening a SQL console:
+
+- The full SQL of the held statement and the credential that ran it, shown by
+  its friendly name rather than an opaque `agt_…` id.
+- The statement kind (for example `update`, `delete`, or a DDL kind) as a badge.
+- The target tables the statement touches.
+- An affected-row estimate, always labeled estimated because the data can change
+  between the estimate and execution.
+- A warning when the estimate exceeds the policy's `max_affected_rows` cap: even
+  if the request is approved, the gateway still blocks a write that actually
+  affects more rows than the cap.
 
 ## Approve or reject a request
 

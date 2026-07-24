@@ -43,8 +43,9 @@ enrollment token. The token:
   key.
 - Is gated on entitlement. If your organization is not on a self-host-capable
   plan (Scale or enterprise), the connection is rejected.
-- Can be revoked. A revoked token can no longer authenticate a proxy; connected
-  proxies keep their last-known config until they reconnect.
+- Can expire, be rotated, and be revoked. All three take effect immediately,
+  including for proxies that are already connected. See the
+  [token lifecycle](#token-lifecycle) below.
 
 Because the proxy runs in your network, you provide its TLS certificate for your
 proxy domain. The platform wildcard certificate is never streamed to a
@@ -58,8 +59,11 @@ Create an enrollment for your organization (owner or admin):
 curl -X POST https://api.pgbeam.com/v1/organizations/$ORG_ID/self-host-enrollments \
   -H "Authorization: Bearer $PGBEAM_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"region_label": "customer-vpc-us-east", "description": "prod cluster"}'
+  -d '{"region_label": "customer-vpc-us-east", "description": "prod cluster", "expires_at": "2027-01-01T00:00:00Z"}'
 ```
+
+`expires_at` is optional; omit it for a token that never expires. Setting it
+gives the token a hard TTL, which keeps the blast radius of a leak small.
 
 The response includes the plaintext token once:
 
@@ -74,8 +78,37 @@ The response includes the plaintext token once:
 }
 ```
 
-Store the `token` securely; it cannot be retrieved again. List and revoke
-enrollments with `GET` and `DELETE` on the same path.
+Store the `token` securely; it cannot be retrieved again. List enrollments with
+`GET` on the same path.
+
+## Token lifecycle
+
+Treat an enrollment token like any other production secret, and use expiry and
+rotation to limit how long a leaked token stays useful.
+
+- **Expiry**: an expired token is rejected fail-closed at the control plane's
+  gRPC auth gate the instant its `expires_at` passes. Expiry is visible in the
+  list endpoint and the dashboard.
+- **Rotation**:
+  `POST /v1/organizations/{org_id}/self-host-enrollments/{enrollment_id}/rotate`
+  mints a new token for the same enrollment (same id, metadata, and expiry) and
+  returns it once. The swap is atomic: the old token stops authenticating new
+  connections the moment the call returns. Update the proxy's secret
+  (`controlPlane.enrollmentToken` in Helm, `PGBEAM_ENROLLMENT_TOKEN` in
+  compose) and restart or roll the proxy to pick up the new token.
+- **Revocation**: `DELETE .../self-host-enrollments/{enrollment_id}` cuts the
+  enrollment off permanently. Revoked enrollments cannot be rotated; issue a
+  new enrollment instead.
+
+Expiry, rotation, and revocation stop new gRPC connections and also terminate
+the streams a connected proxy already holds. On revoke or rotate, the control
+plane closes the proxy's live streams the moment the change commits; a stream
+opened before an expiry instant is closed when that instant passes. The proxy
+sees a `permission_denied` status naming the enrollment and the reason in its
+logs, then reconnects with backoff and fails auth until it presents a currently
+valid token. Rotate first, roll the proxy with the new token, and the old token
+is dead from the moment of rotation; there is no shared-secret overlap window to
+manage.
 
 ## Mark a project self-hosted
 
@@ -147,6 +180,3 @@ for BYOC:
   and insights reporting from a self-hosted proxy are trusted at the org level;
   fine-grained per-project scoping of those aggregate reports is a planned
   follow-up.
-- Enrollment tokens are long-lived shared secrets. Rotate them by issuing a new
-  enrollment and revoking the old one. Short-lived/rotating credentials are a
-  planned follow-up.

@@ -13,11 +13,22 @@ it. Nothing is deployed and no PgBeam account is involved; when the policy
 behaves the way you want, save the same file through the API, the dashboard,
 or the [IaC providers](/docs/terraform).
 
-The tool ships in the PgBeam repository as a Go program:
+## Who this is for
+
+`pgbeam-dev` lives in the PgBeam source tree, which is not public. It is a tool
+for teams working with that source: self-hosted and enterprise deployments set
+up with the PgBeam team, and contributors. If that is you, run it from the
+repository root as a Go program:
 
 ```bash
 go run ./backend/tools/pgbeam-dev help
 ```
+
+A prebuilt binary distribution is planned but not available yet. If you are on
+the hosted platform without source access, the
+[policy what-if and replay](/docs/policies#test-a-policy-before-you-roll-it-out)
+endpoints cover the same test-before-rollout need against your real traffic, no
+local tooling required.
 
 Both modes run the same code the platform runs. `check` uses the engine behind
 the [policy what-if](/docs/policies#test-a-policy-before-you-roll-it-out)
@@ -82,6 +93,6 @@ database. Each decision is logged to stdout.
 Local limits, by design: no TLS (loopback only), approvals fail closed (no
 reviewer exists locally), `write_mode: sandbox` writes are rejected (no
 instant branches), budgets reset on restart, and the query cache is disabled
-so every statement hits the database. See the
-[tool README](https://github.com/pgbeam/pgbeam/tree/main/backend/tools/pgbeam-dev)
-for the full flag reference.
+so every statement hits the database. The tool's README
+(`backend/tools/pgbeam-dev/README.md` in the source tree) has the full flag
+reference.
