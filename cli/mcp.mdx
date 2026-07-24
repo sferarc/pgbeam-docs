@@ -26,8 +26,8 @@ pgbeam mcp
 # Start the MCP server
 pgbeam mcp
 
-# Use with Claude Code (add to MCP config)
-pgbeam mcp
+# Register it in .mcp.json (Claude Code, Cursor, VS Code)
+{ "mcpServers": { "pgbeam": { "command": "pgbeam", "args": ["mcp"] } } }
 ```
 
 ## Output

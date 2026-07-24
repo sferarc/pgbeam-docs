@@ -5,7 +5,7 @@ description: Show current authentication status
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Display the currently authenticated user, active profile, authentication method, organization, and email. If not authenticated, prints a warning with instructions to log in. Also available as the `pgbeam whoami` alias.
+Display the credential the CLI would use (masked), where it came from (profile, flag, or environment), the authentication method, organization, and email. When the API is reachable, the credential is verified live with a cheap authenticated call; offline, the stored details are shown unverified. If not authenticated, prints a warning with instructions to log in. Also available as the `pgbeam whoami` alias.
 
 ## Usage
 
@@ -34,4 +34,4 @@ pgbeam auth status --json
 
 ## Output
 
-Displays profile name, authentication method, email, and organization ID. With `--json`, returns an object with `authenticated`, `profile`, `method`, `orgId`, and `email` fields.
+Displays profile name (or credential source), method, masked key, email, organization, and live verification result. With `--json`, returns an object with `authenticated`, `verified`, `profile`, `source`, `method`, `key`, `orgId`, `orgName`, and `email` fields. Exits non-zero when the credential is missing or rejected by the API.

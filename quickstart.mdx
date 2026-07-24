@@ -29,8 +29,9 @@ your real database credentials, and you can revoke its access with one click.
 
     ```bash title="Create a project with your database"
     # Authenticate the CLI with an API key from the dashboard (Settings > API Keys).
-    # `pgbeam auth login` prompts you to choose a method and paste the key.
-    pgbeam auth login --api-key
+    # `pgbeam auth login` prompts you to paste the key, verifies it, and selects
+    # your organization automatically (you pick one if you belong to several).
+    pgbeam auth login
     pgbeam projects create \
       --name my-project \
       --host db.example.com --port 5432 \

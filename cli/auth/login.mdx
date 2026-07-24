@@ -5,7 +5,7 @@ description: Authenticate with PgBeam
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Authenticate with PgBeam to access your projects and databases. Login uses an API key, which you generate from the PgBeam dashboard; running the command prompts you to paste it. Credentials are stored in a local profile on disk (`~/.config/pgbeam/`). You can maintain multiple profiles for different environments using the `--profile` flag.
+Authenticate with PgBeam to access your projects and databases. Login uses an API key, which you generate from the PgBeam dashboard under Settings > API Keys; running the command prompts you to paste it. The key is verified against the API before it is stored (an invalid key fails the login), and your organization is resolved automatically: a single visible organization is selected for you, multiple organizations prompt a pick. Credentials are stored in a local profile on disk (`~/.config/pgbeam/`). You can maintain multiple profiles for different environments using the `--profile` flag.
 
 ## Usage
 
@@ -37,4 +37,4 @@ pgbeam auth login --profile production
 
 ## Output
 
-On success, prints a confirmation message with the authenticated profile name. The token is stored locally and used for all subsequent commands.
+On success, prints a confirmation with the authenticated profile name and the selected organization, ready for `pgbeam projects list`. The token is stored locally and used for all subsequent commands. A key the API rejects (401) is not stored and the command exits non-zero.

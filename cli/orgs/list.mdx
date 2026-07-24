@@ -1,11 +1,11 @@
 ---
 title: orgs list
-description: List organizations from profiles
+description: List organizations visible to your credential
 ---
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-List all organizations associated with your saved authentication profiles. Shows the profile name, organization ID, and which profile is currently active. Organizations are extracted from stored profile credentials.
+List the organizations your credential can access, fetched live from the API. An organization-scoped key (pbo\_) shows exactly its own organization; an account key or session shows every organization you are a member of. The active organization is marked. When the API is unreachable, falls back to the organizations recorded in your locally saved profiles.
 
 ## Usage
 
@@ -22,7 +22,7 @@ pgbeam orgs list
 ## Examples
 
 ```bash
-# List all organizations
+# List your organizations
 pgbeam orgs list
 
 # List organizations as JSON
@@ -31,4 +31,4 @@ pgbeam orgs list --json
 
 ## Output
 
-Displays a table with columns: active indicator, profile name, and organization ID. With `--json`, returns an array of organization entries.
+Displays a table with columns: active indicator, organization ID, name, slug, and your role. With `--json`, returns an array of organization entries.
