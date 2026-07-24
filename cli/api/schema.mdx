@@ -5,7 +5,7 @@ description: Show operation schema
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Show the schema details for an API operation, including the HTTP method, path, tag, and operation ID. You can look up operations by their `tag.method` name (e.g. `projects.listProjects`), by operationId, or by route string.
+Show the contract schema for an API operation: HTTP method and path, every parameter (name, location, required, type), the request body shape, and the success response shape. You can look up operations by their `tag.method` name (e.g. `projects.listProjects`), by operationId, or by route string.
 
 ## Usage
 
@@ -40,4 +40,4 @@ pgbeam api schema projects.listProjects --json
 
 ## Output
 
-Displays the tag, operation name, HTTP method, and API path. With `--json`, returns the full operation metadata object.
+Displays the operation, tag, HTTP method, path, parameters (name, location, required, type), request body shape, and response shape. With `--json`, returns the full operation schema object.
