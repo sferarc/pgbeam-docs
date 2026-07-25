@@ -33,11 +33,12 @@ to a fresh branch instead of production.
   <Tab value="CLI">
     ```bash
     # Make a credential write to a fresh branch instead of production
-    pgbeam policies create migrator-sandbox \
-      --mode read-write \
-      --sandbox branch
+    pgbeam policies create --name migrator-sandbox \
+      --mode read_write \
+      --write-mode sandbox
+    # → Policy profile created: pol_1a2b3c…
 
-    pgbeam agents attach migration-bot --policy migrator-sandbox
+    pgbeam agents create --name migration-bot --policy pol_1a2b3c…
 
     # Inspect and discard branches
     pgbeam branches list --project my-project
@@ -83,9 +84,9 @@ The statement executes against production, so the agent gets real errors, real r
 counts, and a real plan, but the transaction never commits. Nothing persists.
 
 ```bash title="Dry-run: writes execute, then roll back"
-pgbeam policies create writer-dryrun \
-  --mode read-write \
-  --sandbox dry-run
+pgbeam policies create --name writer-dryrun \
+  --mode read_write \
+  --write-mode rollback
 ```
 
 Use dry-run to validate a generated `UPDATE` against live data and constraints

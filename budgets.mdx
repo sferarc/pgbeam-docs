@@ -14,10 +14,10 @@ database.
 ## Set a budget
 
 ```bash title="Budget on a policy"
-pgbeam policies create analytics \
-  --budget 5000/day \
+pgbeam policies create --name analytics \
+  --budget-queries-per-day 5000 \
   --max-rows 1000 \
-  --statement-timeout 10s
+  --statement-timeout-ms 10000
 ```
 
 In the dashboard, set the budget on the policy profile under **Budgets**.

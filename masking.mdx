@@ -14,7 +14,7 @@ receives masked data it can still join and group on, but never the raw value.
 ## Define masking rules
 
 ```bash title="Mask columns by schema.table.column"
-pgbeam policies create analytics \
+pgbeam policies create --name analytics \
   --mask users.email=hash \
   --mask users.ssn=redact \
   --mask users.phone=null

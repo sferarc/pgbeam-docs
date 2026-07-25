@@ -27,11 +27,11 @@ Add an approval rule to a policy. It names which statement kinds are held.
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
     ```bash
-    pgbeam policies create writer-supervised \
-      --mode read-write \
+    pgbeam policies create --name writer-supervised \
+      --mode read_write \
       --allow public.orders \
-      --hold writes,ddl \
-      --approval-expiry 1h
+      --approval-mode all \
+      --approval-timeout-seconds 3600
     ```
   </Tab>
 

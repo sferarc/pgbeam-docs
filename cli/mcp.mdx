@@ -244,6 +244,8 @@ Both transports expose the same three meta-tools.
 <Callout type="info" title="This is the management MCP">
   This server manages your PgBeam account (projects, databases, policies,
   credentials). To give an agent **query access to a database**, use the [hosted
-  agent-database MCP](/docs/mcp) instead — a separate endpoint with `query`,
-  `list_tables`, `describe_table`, and `explain` tools, held to your policies.
+  agent-database MCP](/docs/mcp) instead, a separate endpoint with `query`,
+  `validate_sql`, `list_tables`, `describe_table`, `explain`, and
+  `schema_catalog` tools held to your policies, plus `search_docs` and
+  `read_doc`.
 </Callout>

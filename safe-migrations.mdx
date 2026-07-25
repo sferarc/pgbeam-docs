@@ -77,9 +77,9 @@ the policy's enforcement level for migrations:
   the wire, with the rule and suggestion in the error so the agent can fix it.
 
 ```bash title="Block dangerous DDL on a policy"
-pgbeam policies create migrator \
-  --mode read-write \
-  --migrations block
+pgbeam policies create --name migrator \
+  --mode read_write \
+  --migration-safety block
 ```
 
 ```text

@@ -25,11 +25,19 @@ expression evaluated against that table's columns.
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
     ```bash
-    pgbeam policies create tenant-42 \
-      --mode read-only \
-      --allow public.orders,public.invoices \
-      --row-filter "public.orders=tenant_id = 42" \
-      --row-filter "public.invoices=tenant_id = 42"
+    # Row filters are authored in a JSON profile passed to --file.
+    cat > tenant-42.json <<'JSON'
+    {
+      "access_mode": "read_only",
+      "table_allowlist": ["public.orders", "public.invoices"],
+      "row_filters": [
+        { "table": "public.orders", "predicate": "tenant_id = 42" },
+        { "table": "public.invoices", "predicate": "tenant_id = 42" }
+      ]
+    }
+    JSON
+
+    pgbeam policies create --name tenant-42 --file tenant-42.json
     ```
   </Tab>
 

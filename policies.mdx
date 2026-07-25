@@ -37,13 +37,14 @@ applying policies beyond per-agent credentials.
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
     ```bash
-    pgbeam policies create analytics-readonly \
-      --mode read-only \
+    pgbeam policies create --name analytics-readonly \
+      --mode read_only \
       --allow public.orders,public.users \
       --mask users.email=hash \
-      --budget 5000/day --max-rows 1000
+      --budget-queries-per-day 5000 --max-rows 1000
+    # → Policy profile created: pol_1a2b3c…
 
-    pgbeam agents attach analytics-bot --policy analytics-readonly
+    pgbeam agents create --name analytics-bot --policy pol_1a2b3c…
     ```
 
   </Tab>
