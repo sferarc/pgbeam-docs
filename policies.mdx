@@ -152,6 +152,23 @@ For testing against a local or dev database before anything reaches PgBeam at
 all, the `pgbeam-dev` tool evaluates a policy file offline and can run a local
 enforcing gateway. See [local policy testing](/docs/local-testing).
 
+**Lint a policy for foot-guns.** What-if and replay check a policy against
+statements; the linter checks the policy's own shape. `pgbeam policies lint`
+runs offline over a saved policy or a draft file and flags risky combinations
+with a fix for each: read-write with no table allowlist, writes that commit with
+no `max_affected_rows` and no approval, no query budget, masking with no read
+ceiling, masking or row-filter rules on tables the policy makes unreachable, write
+settings that are inert under read-only, and redundant allow and deny overlaps.
+Use `--strict` to fail on any warning as a CI gate.
+
+```bash
+# Lint a saved policy
+pgbeam policies lint --policy pol_xxx
+
+# Lint a draft file and fail the build on any warning
+pgbeam policies lint --draft ./policy.json --strict --json
+```
+
 ## Human and passthrough connections
 
 A policy can bind to more than a per-agent credential. Every credential carries a
