@@ -1,0 +1,99 @@
+---
+title: Schema annotations
+icon: BookText
+description:
+  Attach human-written descriptions to your tables and columns and surface them
+  to connected agents through the MCP schema catalog, so an agent gets curated
+  context instead of guessing from names alone.
+---
+
+An agent reads your schema through the MCP `schema_catalog` and `describe_table`
+tools. By default the description it sees for a table or column is the DB-native
+comment (`COMMENT ON`, exposed as `pg_description`). Many databases have none, or
+have terse ones written for humans who already know the domain.
+
+A schema annotation is a description you write for a specific table or column.
+When one exists, PgBeam surfaces it in the catalog in place of the DB-native
+comment, so the agent gets your curated wording. When none exists, the catalog
+falls back to the DB comment exactly as before. Annotations never change what
+data the agent can read: policy, masking, allowlists, and budgets are unchanged.
+
+## Precedence
+
+For each table and column the catalog picks the description in this order:
+
+1. A schema-qualified annotation for that exact relation (for example
+   `public.users`).
+2. An unqualified annotation for the same table or column name (schema omitted).
+3. The DB-native comment (`obj_description` / `col_description`).
+
+The first one present wins. A qualified annotation always beats an unqualified
+one for the same relation.
+
+## Attach an annotation
+
+Annotations are keyed by `(schema_name, table_name, column_name)`. Omit
+`column_name` to describe the table itself. Omit `schema_name` to match the
+unqualified form. A `PUT` with an existing key replaces that annotation.
+
+Describe a table:
+
+```bash
+curl -X PUT https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
+  -H "Authorization: Bearer $PGBEAM_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "schema_name": "public",
+    "table_name": "users",
+    "description": "Primary customer account. One row per signed-up user."
+  }'
+```
+
+Describe a column:
+
+```bash
+curl -X PUT https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
+  -H "Authorization: Bearer $PGBEAM_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "schema_name": "public",
+    "table_name": "users",
+    "column_name": "lifecycle_stage",
+    "description": "Funnel stage: one of lead, trial, active, churned."
+  }'
+```
+
+## List and delete
+
+List every annotation for a project (cursor-paginated):
+
+```bash
+curl https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
+  -H "Authorization: Bearer $PGBEAM_TOKEN"
+```
+
+Delete one by its key. Pass the same `table_name`, plus `schema_name` and
+`column_name` when they were set:
+
+```bash
+curl -X DELETE "https://api.pgbeam.com/v1/projects/prj_123/schema-annotations?schema_name=public&table_name=users&column_name=lifecycle_stage" \
+  -H "Authorization: Bearer $PGBEAM_TOKEN"
+```
+
+## How it reaches the agent
+
+Annotations are project configuration, streamed to the edge proxies on the same
+channel as your policies and honeytokens. A change propagates within seconds, so
+the next `schema_catalog` call reflects it. The proxy applies the annotation
+after policy filtering, so an annotation on a table the credential cannot see is
+never surfaced.
+
+## Notes
+
+- Annotation names are matched case-insensitively, using the same normalization
+  as the relation allowlist.
+- Writing an annotation needs the `schema_annotation:write` permission (held by
+  owners, admins, security admins, and policy authors). Reading needs
+  `schema_annotation:read`.
+- The dashboard editor for annotations is a planned follow-up. For now they are
+  managed through the API.

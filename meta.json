@@ -8,6 +8,7 @@
 		"quickstart",
 		"agent-credentials",
 		"mcp",
+		"schema-annotations",
 		"connection-string",
 		"---Policies---",
 		"policies",

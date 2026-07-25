@@ -1,0 +1,54 @@
+---
+title: listSchemaAnnotations
+description: List schema annotations
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Lists the project's human-written table and column descriptions. These are surfaced to connected agents through the MCP schema catalog.
+
+## Usage
+
+```typescript
+const result = await api.schemaannotations.listSchemaAnnotations({
+  pathParams: { project_id: "prj_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter              | Type     | Required | Description                                            |
+| ---------------------- | -------- | -------- | ------------------------------------------------------ |
+| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
+| queryParams.page_size  | `number` | No       | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No       | Opaque token for cursor-based pagination.              |
+
+## Response
+
+`Promise<ListSchemaAnnotationsResponse>`: list of schema annotations.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.schemaannotations.listSchemaAnnotations({
+  pathParams: { project_id: "prj_xxx" },
+  queryParams: { page_size: 20, page_token: "..." },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

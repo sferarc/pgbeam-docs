@@ -15,6 +15,7 @@
 		"approvals",
 		"webhooks",
 		"honeytokens",
+		"schemaannotations",
 		"anomalies",
 		"branches",
 		"migrations",

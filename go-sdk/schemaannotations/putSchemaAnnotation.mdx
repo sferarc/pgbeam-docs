@@ -1,0 +1,64 @@
+---
+title: PutSchemaAnnotation
+description: Create or replace a schema annotation
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Attaches an operator-written description to a table (omit column_name) or a column. Keyed by (schema_name, table_name, column_name); an existing annotation with the same key is replaced.
+
+## Usage
+
+```go
+result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbeam.SchemaAnnotationInput{
+    TableName: "users",
+    Description: "Primary customer account. One row per signed-up user.",
+  })
+```
+
+## Parameters
+
+| Parameter       | Type                           | Required | Description                                                  |
+| --------------- | ------------------------------ | -------- | ------------------------------------------------------------ |
+| ctx             | `context.Context`              | Yes      | Request context                                              |
+| projectID       | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| req             | `pgbeam.SchemaAnnotationInput` | Yes      | Request body                                                 |
+| req.SchemaName  | `*string`                      | No       | Optional schema. Null or empty matches the unqualified form. |
+| req.TableName   | `string`                       | Yes      | Relation (table or view) the annotation describes.           |
+| req.ColumnName  | `*string`                      | No       | Optional column. Null describes the table itself.            |
+| req.Description | `string`                       | Yes      | The operator-written description text.                       |
+
+## Response
+
+`(*pgbeam.SchemaAnnotation, error)`: the created or updated annotation.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbeam.SchemaAnnotationInput{
+    SchemaName: "public",
+    TableName: "users",
+    ColumnName: "email",
+    Description: "Primary customer account. One row per signed-up user.",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

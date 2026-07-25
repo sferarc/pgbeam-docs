@@ -1,0 +1,63 @@
+---
+title: putSchemaAnnotation
+description: Create or replace a schema annotation
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Attaches an operator-written description to a table (omit column_name) or a column. Keyed by (schema_name, table_name, column_name); an existing annotation with the same key is replaced.
+
+## Usage
+
+```typescript
+const result = await api.schemaannotations.putSchemaAnnotation({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    table_name: "users",
+    description: "Primary customer account. One row per signed-up user.",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                  |
+| --------------------- | -------- | -------- | ------------------------------------------------------------ |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
+| body.schema_name      | `string` | No       | Optional schema. Null or empty matches the unqualified form. |
+| body.table_name       | `string` | Yes      | Relation (table or view) the annotation describes.           |
+| body.column_name      | `string` | No       | Optional column. Null describes the table itself.            |
+| body.description      | `string` | Yes      | The operator-written description text.                       |
+
+## Response
+
+`Promise<SchemaAnnotation>`: the created or updated annotation.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.schemaannotations.putSchemaAnnotation({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    table_name: "users",
+    description: "Primary customer account. One row per signed-up user.",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
