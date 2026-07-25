@@ -1,0 +1,60 @@
+---
+title: RecommendAgentPolicy
+description: Recommend a least-privilege policy from recorded traffic
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Derives the tightest policy that would still pass every statement this agent credential has legitimately run, using its recorded audit history over a lookback window (default 30 days). The candidate's table allowlist is the union of relations actually referenced, its statement-kind allow set is the observed set, it downgrades to read-only when no writes were seen, and its max_rows ceiling comes from an observed high-percentile row count. The candidate is proven safe by replaying it through the data plane's own policy engine against the same history: a good recommendation has replay.summary.newly_blocked == 0. This endpoint is advisory only. It reads the audit log, never connects to the upstream database, and never creates, updates, or mutates any policy or credential; the operator loads the candidate into the editor and saves it themselves.
+
+## Usage
+
+```go
+result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", pgbeam.PolicyRecommendationInput{
+
+  })
+```
+
+## Parameters
+
+| Parameter        | Type                               | Required | Description                                                                                                                    |
+| ---------------- | ---------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| ctx              | `context.Context`                  | Yes      | Request context                                                                                                                |
+| projectID        | `string`                           | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                            |
+| agentID          | `string`                           | Yes      | Unique agent credential identifier (prefixed, e.g. agt_xxx).                                                                   |
+| req              | `pgbeam.PolicyRecommendationInput` | Yes      | Request body                                                                                                                   |
+| req.LookbackDays | `*int`                             | No       | How many days of recorded audit history to analyze.                                                                            |
+| req.Limit        | `*int`                             | No       | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
+
+## Response
+
+`(*pgbeam.PolicyRecommendation, error)`: the recommended candidate policy and its replay proof.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", pgbeam.PolicyRecommendationInput{
+    LookbackDays: 30,
+    Limit: 200,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

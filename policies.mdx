@@ -115,6 +115,37 @@ the changes to review before rollout. Stateful checks a preview cannot model
 (per-region budgets, approvals, write-mode routing) are reported as
 informational notes on each result.
 
+**Right-size from traffic (recommend a policy).** Instead of writing a policy by
+hand, ask PgBeam to derive one from an agent credential's real
+[audit history](/docs/audit-log). It reads the statements the credential has
+actually run over a lookback window (30 days by default) and produces the
+tightest policy that still passes all of them:
+
+- a table allowlist that is the union of the relations actually referenced,
+- a statement-kind allow set limited to the kinds observed,
+- a downgrade to read-only when no write, sequence-mutating, or lock-taking
+  statement was seen, and
+- a `max_rows` ceiling sized from a high percentile (p95) of observed row
+  counts.
+
+The recommendation is derived only from statements that legitimately executed;
+blocked attempts are excluded, so it never widens access to something that was
+already refused. The candidate is then proven safe by replaying it against that
+same history: a good recommendation reports zero newly blocked statements.
+
+In the dashboard the "Right-size from traffic" box sits in the policy editor.
+Pick a credential and a window, and the candidate loads straight into the draft
+form for you to review and save. It never saves on its own and never changes an
+existing policy. From the CLI:
+
+```bash
+# Recommend a least-privilege policy from an agent's last 30 days of traffic
+pgbeam agents recommend-policy agt_xxx
+
+# Widen the window and print the candidate plus its replay proof as JSON
+pgbeam agents recommend-policy agt_xxx --lookback-days 90 --json
+```
+
 For testing against a local or dev database before anything reaches PgBeam at
 all, the `pgbeam-dev` tool evaluates a policy file offline and can run a local
 enforcing gateway. See [local policy testing](/docs/local-testing).

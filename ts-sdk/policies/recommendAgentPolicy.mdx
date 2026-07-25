@@ -1,0 +1,60 @@
+---
+title: recommendAgentPolicy
+description: Recommend a least-privilege policy from recorded traffic
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Derives the tightest policy that would still pass every statement this agent credential has legitimately run, using its recorded audit history over a lookback window (default 30 days). The candidate's table allowlist is the union of relations actually referenced, its statement-kind allow set is the observed set, it downgrades to read-only when no writes were seen, and its max_rows ceiling comes from an observed high-percentile row count. The candidate is proven safe by replaying it through the data plane's own policy engine against the same history: a good recommendation has replay.summary.newly_blocked == 0. This endpoint is advisory only. It reads the audit log, never connects to the upstream database, and never creates, updates, or mutates any policy or credential; the operator loads the candidate into the editor and saves it themselves.
+
+## Usage
+
+```typescript
+const result = await api.policies.recommendAgentPolicy({
+    pathParams: { project_id: "prj_xxx", agent_id: "agt_xxx" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                                                                                    |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                            |
+| pathParams.agent_id   | `string` | Yes      | Unique agent credential identifier (prefixed, e.g. agt_xxx).                                                                   |
+| body.lookback_days    | `number` | No       | How many days of recorded audit history to analyze.                                                                            |
+| body.limit            | `number` | No       | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
+
+## Response
+
+`Promise<PolicyRecommendation>`: the recommended candidate policy and its replay proof.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.policies.recommendAgentPolicy({
+  pathParams: { project_id: "prj_xxx", agent_id: "agt_xxx" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

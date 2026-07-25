@@ -1,0 +1,42 @@
+---
+title: agents recommend-policy
+description: Recommend a least-privilege policy from recorded traffic
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Derives the tightest policy that would still pass every statement this agent credential has legitimately run, using its recorded audit history over a lookback window (default 30 days). The candidate's table allowlist is the union of relations actually referenced, its statement-kind allow set is the observed set, it downgrades to read-only when no writes were seen, and its max_rows ceiling comes from an observed high-percentile row count. The candidate is proven safe by replaying it through the data plane's own policy engine against the same history: a good recommendation has replay.summary.newly_blocked == 0. This endpoint is advisory only. It reads the audit log, never connects to the upstream database, and never creates, updates, or mutates any policy or credential; the operator loads the candidate into the editor and saves it themselves.
+
+## Usage
+
+```bash
+pgbeam agents recommend-policy <id> [flags]
+```
+
+## Options
+
+| Option                    | Description                                                                                                                    | Required | Default |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
+| `<id>`                    |                                                                                                                                | Yes      | -       |
+| `--lookback-days <value>` | How many days of recorded audit history to analyze.                                                                            | No       | -       |
+| `--limit <value>`         | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Recommend a least-privilege policy from recorded traffic
+pgbeam agents recommend-policy
+
+# Output as JSON
+pgbeam agents recommend-policy --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

@@ -102,16 +102,16 @@ response; copy them from there.
 
 ## Tools
 
-| Tool             | Purpose                                                                                                                                                           |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.                                                                                              |
+| Tool             | Purpose                                                                                                                                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.                                                                                                                           |
 | `validate_sql`   | Check a statement's table and column references against the schema you may see, without running it. Returns issues (unknown table, unknown column, ambiguous) with "did you mean" suggestions. |
-| `list_tables`    | List tables in a schema, shaped for an LLM.                                                                                                                       |
-| `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                         |
-| `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                          |
-| `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see. |
-| `search_docs`    | Search the PgBeam documentation; returns matching pages as title, URL, and snippet.                                                                               |
-| `read_doc`       | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result.                                                                 |
+| `list_tables`    | List tables in a schema, shaped for an LLM.                                                                                                                                                    |
+| `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                                                      |
+| `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                                                       |
+| `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see.                              |
+| `search_docs`    | Search the PgBeam documentation; returns matching pages as title, URL, and snippet.                                                                                                            |
+| `read_doc`       | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result.                                                                                              |
 
 Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of
 `pg_catalog` and `information_schema` are permitted regardless of the allowlist,
