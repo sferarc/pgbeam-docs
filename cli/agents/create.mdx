@@ -5,7 +5,7 @@ description: Issue a new agent credential
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Issue a scoped Postgres login and hosted MCP token for an AI agent. The connection string and MCP token are shown once and cannot be retrieved again. Store them securely. A ready-to-paste MCP client config (Claude Code, Cursor, or VS Code) is printed alongside the secrets.
+Issue a scoped Postgres login and hosted MCP token for an AI agent. The connection string and MCP token are shown once and cannot be retrieved again. Store them securely. A ready-to-paste MCP client config (Claude Code, Claude Desktop, Cursor, VS Code, Cline, or Windsurf) is printed alongside the secrets.
 
 ## Usage
 
@@ -19,7 +19,7 @@ pgbeam agents create [flags]
 | -------------------------- | -------------------------------------------------------------------------------------------------------- | -------- | -------- |
 | `--name <value>`           | Human-readable label for the credential                                                                  | Yes      | -        |
 | `--policy <value>`         | Policy profile ID to enforce                                                                             | Yes      | -        |
-| `--client <value>`         | MCP client to emit config for: claude (default), cursor, vscode, or all                                  | No       | `claude` |
+| `--client <value>`         | MCP client to emit config for: claude (default), claude-desktop, cursor, vscode, cline, windsurf, or all | No       | `claude` |
 | `--expires <value>`        | Credential lifetime: a duration like 30d/12h/90m, or an absolute ISO 8601 timestamp. Omit for no expiry. | No       | -        |
 | `--principal-type <value>` | Whether the credential represents an autonomous agent (default) or a human operator: agent or human      | No       | -        |
 

@@ -5,7 +5,7 @@ description: Emit ready-to-paste MCP client config from a credential's secrets
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Render the per-client MCP configuration (Claude Code, Cursor, VS Code) for the hosted agent-database MCP endpoint, given a credential's MCP URL and token. Because secrets are shown only once at creation, pass the URL + token directly (--url/--mcp-token), pipe the JSON output of `agents create --json` / `agents rotate --json` with --from-json, or read it from a saved file with --from-file. The output matches the dashboard credential-reveal dialog exactly.
+Render the per-client MCP configuration (Claude Code, Claude Desktop, Cursor, VS Code, Cline, Windsurf) for the hosted agent-database MCP endpoint, given a credential's MCP URL and token. Because secrets are shown only once at creation, pass the URL + token directly (--url/--mcp-token), pipe the JSON output of `agents create --json` / `agents rotate --json` with --from-json, or read it from a saved file with --from-file. Claude Desktop, Cline and Windsurf each keep one config file per machine rather than one per project, so --write prints those with their per-OS path instead of overwriting them: merge the entry in by hand. Claude Desktop also cannot address a remote URL directly, so its config is an `mcp-remote` bridge.
 
 ## Usage
 
@@ -15,14 +15,14 @@ pgbeam agents mcp-config [flags]
 
 ## Options
 
-| Option                | Description                                                                      | Required | Default  |
-| --------------------- | -------------------------------------------------------------------------------- | -------- | -------- |
-| `--url <value>`       | Hosted MCP URL (the mcp_url from create/rotate)                                  | No       | -        |
-| `--mcp-token <value>` | Bearer token for the MCP endpoint (the mcp_token from create/rotate)             | No       | -        |
-| `--from-json`         | Read mcp_url + mcp_token from an `agents create --json` blob piped on stdin.     | No       | `false`  |
-| `--from-file <value>` | Read mcp_url + mcp_token from an `agents create --json` blob saved to this file. | No       | -        |
-| `--client <value>`    | MCP client: claude (default), cursor, vscode, or all                             | No       | `claude` |
-| `--write`             | Write each client's config to its conventional file path instead of stdout       | No       | `false`  |
+| Option                | Description                                                                           | Required | Default  |
+| --------------------- | ------------------------------------------------------------------------------------- | -------- | -------- |
+| `--url <value>`       | Hosted MCP URL (the mcp_url from create/rotate)                                       | No       | -        |
+| `--mcp-token <value>` | Bearer token for the MCP endpoint (the mcp_token from create/rotate)                  | No       | -        |
+| `--from-json`         | Read mcp_url + mcp_token from an `agents create --json` blob piped on stdin.          | No       | `false`  |
+| `--from-file <value>` | Read mcp_url + mcp_token from an `agents create --json` blob saved to this file.      | No       | -        |
+| `--client <value>`    | MCP client: claude (default), claude-desktop, cursor, vscode, cline, windsurf, or all | No       | `claude` |
+| `--write`             | Write each client's config to its conventional file path instead of stdout            | No       | `false`  |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -39,10 +39,13 @@ pgbeam agents mcp-config --url https://abc.proxy.pgbeam.app/mcp --mcp-token pba_
 # Emit config for all clients
 pgbeam agents mcp-config --url https://abc.proxy.pgbeam.app/mcp --mcp-token pba_xxx --client all
 
+# Emit the Claude Desktop bridge config
+pgbeam agents mcp-config --url https://abc.proxy.pgbeam.app/mcp --mcp-token pba_xxx --client claude-desktop
+
 # Pipe from create and write Cursor config to its file
 pgbeam agents create --name ci --policy pol_xxx --json | pgbeam agents mcp-config --from-json --write --client cursor
 ```
 
 ## Output
 
-Prints the MCP config block(s). With --json, returns a structured array of \{ client, file, config \}. With --write, writes each client's config to its conventional file path.
+Prints the MCP config block(s). With --json, returns a structured array of \{ client, file, config \}. With --write, writes each project-scoped client's config to its conventional file path; machine-wide files (Claude Desktop, Cline, Windsurf) are printed with their per-OS location instead of being overwritten.

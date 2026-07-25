@@ -89,8 +89,8 @@ your real database credentials, and you can revoke its access with one click.
     ### Connect the agent over MCP
 
     `agents create` already printed a ready-to-paste config for your client (pass
-    `--client cursor`, `--client vscode`, or `--client all` to pick the host).
-    For Claude Code it looks like this:
+    `--client claude-desktop`, `cursor`, `vscode`, `cline`, `windsurf`, or `all`
+    to pick the host). For Claude Code it looks like this:
 
     ```json title=".mcp.json"
     {
@@ -114,7 +114,14 @@ your real database credentials, and you can revoke its access with one click.
       --client cursor --write
     ```
 
-    The dashboard credential reveal renders the same blocks. The agent now has
+    Claude Desktop, Cline, and Windsurf keep one config file per machine instead
+    of one per project, so `--write` prints those with their per-OS path rather
+    than overwriting a file that holds your other MCP servers. Claude Desktop also
+    reaches a remote endpoint through an `mcp-remote` bridge. See
+    [Hosted MCP](/docs/mcp) for each config and where its file lives.
+
+    The dashboard credential reveal renders the same blocks for Claude Code,
+    Cursor, and VS Code. The agent now has
     eight tools: `query`, `validate_sql`, `list_tables`, `describe_table`,
     `explain`, and `schema_catalog`, every call enforced against the policy, plus
     `search_docs` and `read_doc` for looking up the PgBeam docs. Prefer a

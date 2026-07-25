@@ -28,7 +28,7 @@ over the wire, scoped by the credential's bearer token. The exact URL and the
 `pba_…` token are shown in the **Credentials** tab and in the credential create
 response; copy them from there.
 
-<Tabs items={["Claude Code", "Cursor", "VS Code", "MCP Inspector"]}>
+<Tabs items={["Claude Code", "Claude Desktop", "Cursor", "VS Code", "Cline", "Windsurf", "MCP Inspector"]}>
   <Tab value="Claude Code">
     Add it with the CLI:
 
@@ -50,6 +50,53 @@ response; copy them from there.
       }
     }
     ```
+
+  </Tab>
+
+  <Tab value="Claude Desktop">
+    Claude Desktop's config file takes local `command`/`args` servers only, so it
+    reaches a remote endpoint through the
+    [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge rather than a
+    `url` entry. Add this to `claude_desktop_config.json`, then restart Claude
+    Desktop:
+
+    ```json title="claude_desktop_config.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "mcp-remote",
+            "https://<project>.proxy.pgbeam.app/mcp",
+            "--header",
+            "Authorization:${PGBEAM_AUTH_HEADER}"
+          ],
+          "env": { "PGBEAM_AUTH_HEADER": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+    The file lives at one place per machine:
+
+    | OS      | Path                                                          |
+    | ------- | ------------------------------------------------------------- |
+    | macOS   | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+    | Windows | `%APPDATA%\Claude\claude_desktop_config.json`                  |
+
+    It holds every MCP server you have, so merge the `pgbeam` entry into the
+    existing `mcpServers` object instead of replacing the file. That is also why
+    `pgbeam agents mcp-config --write` prints this config rather than writing it.
+
+    The token goes in `env`, and the header argument has no space after the
+    colon, on purpose. Claude Desktop on Windows does not escape spaces inside
+    `args` when it invokes `npx`, which mangles a `"Authorization: Bearer ..."`
+    argument. `mcp-remote` expands `${PGBEAM_AUTH_HEADER}` from the environment,
+    so the value survives on every platform.
+
+    Requires Node.js, since `npx` runs the bridge. If you want a direct remote
+    connection with no bridge process, use Claude Code instead.
 
   </Tab>
 
@@ -84,6 +131,65 @@ response; copy them from there.
       }
     }
     ```
+
+  </Tab>
+
+  <Tab value="Cline">
+    Open **MCP Servers**, then **Configure MCP Servers**, and add the entry to
+    `cline_mcp_settings.json`:
+
+    ```json title="cline_mcp_settings.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "type": "streamableHttp",
+          "url": "https://<project>.proxy.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+    Set `type` to `streamableHttp`, spelled exactly that way. Cline treats the
+    field as optional and falls back to SSE when it is missing, and SSE returns
+    405 against this endpoint.
+
+    Cline has no per-project MCP config, so this file is machine-wide. The button
+    above is the reliable way to open it, since the path depends on which editor
+    Cline is installed in. For VS Code itself:
+
+    | OS      | Path                                                                                       |
+    | ------- | ------------------------------------------------------------------------------------------ |
+    | macOS   | `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` |
+    | Linux   | `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` |
+    | Windows | `%APPDATA%\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json` |
+
+  </Tab>
+
+  <Tab value="Windsurf">
+    Open Cascade, click the hammer icon, then **Configure**, and add the entry to
+    `mcp_config.json`:
+
+    ```json title="mcp_config.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "serverUrl": "https://<project>.proxy.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+    The key is `serverUrl`, not `url`. Windsurf infers the transport from it, so
+    there is no `type` field to set.
+
+    Windsurf has no per-project MCP config either, so this file is machine-wide:
+
+    | OS             | Path                                            |
+    | -------------- | ----------------------------------------------- |
+    | macOS, Linux   | `~/.codeium/windsurf/mcp_config.json`           |
+    | Windows        | `%USERPROFILE%\.codeium\windsurf\mcp_config.json` |
 
   </Tab>
 
