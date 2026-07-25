@@ -18,6 +18,7 @@
 		"scan-pii",
 		"budgets",
 		"kill-switch",
+		"honeytokens",
 		"local-testing",
 		"---Write safety---",
 		"approvals",

@@ -1,0 +1,63 @@
+---
+title: createHoneytoken
+description: Register a honeytoken
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Registers a decoy (canary) relation for the project. Any agent statement
+that references it is blocked and recorded as a canary_tripped audit event.
+
+## Usage
+
+```typescript
+const result = await api.honeytokens.createHoneytoken({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    relation_name: "customer_ssns",
+    action: "audit_only",
+  },
+});
+```
+
+## Parameters
+
+| Parameter             | Type                     | Required | Description                                                         |
+| --------------------- | ------------------------ | -------- | ------------------------------------------------------------------- |
+| pathParams.project_id | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
+| body.schema_name      | `string`                 | No       | Optional schema. Null or empty matches the unqualified/public form. |
+| body.relation_name    | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
+| body.action           | `"audit_only" \| "kill"` | Yes      | Response when the honeytoken is tripped.                            |
+
+## Response
+
+`Promise<Honeytoken>`: honeytoken registered.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.honeytokens.createHoneytoken({
+  pathParams: { project_id: "prj_xxx" },
+  body: {
+    relation_name: "customer_ssns",
+    action: "audit_only",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

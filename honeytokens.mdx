@@ -1,0 +1,78 @@
+---
+title: Honeytokens
+icon: Fingerprint
+description:
+  Register decoy relations that no legitimate agent should ever touch. An agent
+  query that references one is blocked and recorded as a canary_tripped event,
+  with an optional automatic kill.
+---
+
+A honeytoken is a decoy (canary) relation. No legitimate agent has any reason to
+read it, so a query that references one is a strong signal of a misused
+credential, a prompt-injected agent, or an over-broad policy. PgBeam matches
+every agent statement against the project's honeytokens before it reaches the
+database. A match blocks the statement (fail closed), records a dedicated
+`canary_tripped` audit event, fires the `canary_tripped` webhook, and raises an
+anomaly alert. If the honeytoken's action is `kill`, the tripping credential is
+also disabled through the kill-switch.
+
+Detection rides the same static parse-tree analysis as the table allowlist, so a
+decoy reached through a JOIN, subquery, CTE, or alias trips exactly like a direct
+read. There is no second enforcement path to bypass.
+
+## Register a honeytoken
+
+Create a honeytoken from the dashboard under Configure, Security, or through the
+API. Each entry is a relation (an optional schema plus a required name) and an
+action.
+
+```bash
+curl -X POST https://api.pgbeam.com/v1/projects/prj_123/honeytokens \
+  -H "Authorization: Bearer $PGBEAM_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"schema_name": "public", "relation_name": "customer_ssns", "action": "kill"}'
+```
+
+The relation does not have to exist. A decoy table that is never used by your
+application is the cleanest signal: any access to it is unauthorized by
+definition. The relation is matched with the same normalization the allowlist
+uses, so `customer_ssns` (bare) and `public.customer_ssns` match the same table.
+
+## Actions
+
+| Action       | Effect on a trip                                                                                |
+| ------------ | ----------------------------------------------------------------------------------------------- |
+| `audit_only` | Block the statement, record the `canary_tripped` audit event, fire the webhook, raise an alert. |
+| `kill`       | Everything `audit_only` does, and disable the tripping credential through the kill-switch.      |
+
+Either way the statement is blocked with SQLSTATE `42501` and never runs against
+your database.
+
+## What happens on a trip
+
+1. The statement is blocked before it reaches the database, with an LLM-readable
+   reason.
+2. A `canary_tripped` audit event is written to the tamper-evident audit log,
+   carrying the credential, session, and normalized SQL.
+3. The `canary_tripped` webhook event is delivered to any subscribed endpoint.
+4. A critical anomaly alert is raised (deduped per credential per hour), visible
+   in the Anomalies view.
+5. For a `kill` honeytoken, the credential is disabled and every live session on
+   it is terminated within seconds.
+
+## Invisible by design
+
+Honeytokens are excluded from discovery so an agent cannot learn which relations
+to avoid:
+
+- They are hidden from the MCP `schema_catalog` and `list_tables` output,
+  including foreign keys that reference them.
+- The auto-policy recommender never adds a honeytoken to a derived allowlist,
+  even if a credential's real traffic touched one.
+
+## Notes
+
+- Honeytokens apply to agent credentials and to policy-enforced passthrough
+  connections. Direct, unenforced connections are not in the agent gateway path.
+- A honeytoken always blocks, even if the same relation was mistakenly added to
+  the allowlist. Detection wins.

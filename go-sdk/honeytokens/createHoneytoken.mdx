@@ -1,0 +1,63 @@
+---
+title: CreateHoneytoken
+description: Register a honeytoken
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Registers a decoy (canary) relation for the project. Any agent statement
+that references it is blocked and recorded as a canary_tripped audit event.
+
+## Usage
+
+```go
+result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.HoneytokenInput{
+    RelationName: "customer_ssns",
+    Action: "...",
+  })
+```
+
+## Parameters
+
+| Parameter        | Type                     | Required | Description                                                         |
+| ---------------- | ------------------------ | -------- | ------------------------------------------------------------------- |
+| ctx              | `context.Context`        | Yes      | Request context                                                     |
+| projectID        | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
+| req              | `pgbeam.HoneytokenInput` | Yes      | Request body                                                        |
+| req.SchemaName   | `*string`                | No       | Optional schema. Null or empty matches the unqualified/public form. |
+| req.RelationName | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
+| req.Action       | `string`                 | Yes      | Response when the honeytoken is tripped.                            |
+
+## Response
+
+`(*pgbeam.Honeytoken, error)`: honeytoken registered.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.HoneytokenInput{
+    SchemaName: "public",
+    RelationName: "customer_ssns",
+    Action: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

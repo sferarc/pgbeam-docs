@@ -1,0 +1,51 @@
+---
+title: getHoneytoken
+description: Get a honeytoken
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns a single honeytoken by ID.
+
+## Usage
+
+```typescript
+const result = await api.honeytokens.getHoneytoken({
+  pathParams: { project_id: "prj_xxx", honeytoken_id: "hnt_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter                | Type     | Required | Description                                            |
+| ------------------------ | -------- | -------- | ------------------------------------------------------ |
+| pathParams.project_id    | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
+| pathParams.honeytoken_id | `string` | Yes      | Unique honeytoken identifier (prefixed, e.g. hnt_xxx). |
+
+## Response
+
+`Promise<Honeytoken>`: the honeytoken.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.honeytokens.getHoneytoken({
+  pathParams: { project_id: "prj_xxx", honeytoken_id: "hnt_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

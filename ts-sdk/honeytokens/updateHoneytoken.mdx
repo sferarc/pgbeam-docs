@@ -1,0 +1,62 @@
+---
+title: updateHoneytoken
+description: Update a honeytoken
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Updates a honeytoken's relation or action.
+
+## Usage
+
+```typescript
+const result = await api.honeytokens.updateHoneytoken({
+  pathParams: { project_id: "prj_xxx", honeytoken_id: "hnt_xxx" },
+  body: {
+    relation_name: "customer_ssns",
+    action: "audit_only",
+  },
+});
+```
+
+## Parameters
+
+| Parameter                | Type                     | Required | Description                                                         |
+| ------------------------ | ------------------------ | -------- | ------------------------------------------------------------------- |
+| pathParams.project_id    | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
+| pathParams.honeytoken_id | `string`                 | Yes      | Unique honeytoken identifier (prefixed, e.g. hnt_xxx).              |
+| body.schema_name         | `string`                 | No       | Optional schema. Null or empty matches the unqualified/public form. |
+| body.relation_name       | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
+| body.action              | `"audit_only" \| "kill"` | Yes      | Response when the honeytoken is tripped.                            |
+
+## Response
+
+`Promise<Honeytoken>`: updated honeytoken.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.honeytokens.updateHoneytoken({
+  pathParams: { project_id: "prj_xxx", honeytoken_id: "hnt_xxx" },
+  body: {
+    relation_name: "customer_ssns",
+    action: "audit_only",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
