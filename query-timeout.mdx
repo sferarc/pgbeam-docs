@@ -19,7 +19,7 @@ database registered in a project can have its own timeout value.
 | Setting             | Behavior                                                    |
 | ------------------- | ----------------------------------------------------------- |
 | `0` (default)       | Disabled: no timeout override, upstream default applies     |
-| `1` – `300000` (ms) | PgBeam sets `statement_timeout` on each upstream connection |
+| `1` to `300000` (ms) | PgBeam sets `statement_timeout` on each upstream connection |
 
 When a query exceeds the timeout, PostgreSQL cancels it and returns:
 
@@ -60,8 +60,8 @@ regardless of whether PgBeam or a direct connection set the timeout.
 
 | Workload                         | Suggested timeout | Why                                                |
 | -------------------------------- | ----------------- | -------------------------------------------------- |
-| Web app (API responses)          | 5,000–15,000 ms   | Users won't wait longer than a few seconds         |
-| Background jobs                  | 60,000–300,000 ms | Longer queries are expected but should still bound |
+| Web app (API responses)          | 5,000-15,000 ms   | Users won't wait longer than a few seconds         |
+| Background jobs                  | 60,000-300,000 ms | Longer queries are expected but should still bound |
 | Analytics / reporting            | 300,000 ms (max)  | Complex aggregations need more time                |
 | Mixed (OLTP + occasional report) | 30,000 ms         | Balanced default for most applications             |
 

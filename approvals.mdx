@@ -45,17 +45,16 @@ Add an approval rule to a policy. It names which statement kinds are held.
     ```json title="Policy with an approval rule"
     {
       "name": "writer-supervised",
-      "mode": "read-write",
-      "allow": ["public.orders"],
-      "approvals": {
-        "hold": ["writes", "ddl"],
-        "expiry_seconds": 3600,
-        "auto_approve": [
-          { "table": "public.orders", "max_rows": 10 }
-        ]
-      }
+      "access_mode": "read_write",
+      "table_allowlist": ["public.orders"],
+      "approval_mode": "all",
+      "approval_timeout_seconds": 3600,
+      "approval_auto_max_rows": 10
     }
     ```
+
+    `approval_mode` is one of `off`, `writes`, `ddl`, or `all`, and sets which
+    statement classes are held for a reviewer.
   </Tab>
 </Tabs>
 
@@ -112,21 +111,22 @@ curl -X POST \
 
 ## Auto-approve rules
 
-Holding every write on a busy credential is noise. Auto-approve rules let the safe
-changes through and reserve human attention for the rest. A rule matches on the
-table and a row ceiling: a write that touches fewer rows than the ceiling is
-approved automatically; anything larger is held.
+Holding every write on a busy credential is noise. The `approval_auto_max_rows`
+setting lets the safe changes through and reserves human attention for the rest.
+It is a single row ceiling for the whole policy: a held write that touches at most
+that many rows is approved automatically, and anything larger stays held.
 
-```json title="Auto-approve small writes, hold the rest"
-"auto_approve": [
-  { "table": "public.orders", "max_rows": 10 },
-  { "table": "public.tags", "max_rows": 100 }
-]
+```json title="Auto-approve writes touching at most 10 rows"
+{
+  "approval_mode": "writes",
+  "approval_auto_max_rows": 10
+}
 ```
 
-PgBeam counts the rows a write would affect before it commits. A write under the
-ceiling is approved and recorded; a write over it is parked for a person. DDL is
-never auto-approved.
+PgBeam counts the rows a write would affect before it commits. A write at or under
+the ceiling is approved and recorded; a write over it is parked for a person. Set
+`approval_auto_max_rows` to `0` to auto-approve nothing. DDL and other statements
+with no countable row effect are never auto-approved.
 
 ## Auto-expire
 

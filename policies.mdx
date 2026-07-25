@@ -60,10 +60,11 @@ applying policies beyond per-agent credentials.
       -H "Authorization: Bearer pbo_..." \
       -d '{
         "name": "analytics-readonly",
-        "mode": "read-only",
-        "allow": ["public.orders", "public.users"],
-        "mask": [{"column": "users.email", "kind": "hash"}],
-        "budget": {"queries_per_day": 5000, "max_rows": 1000}
+        "access_mode": "read_only",
+        "table_allowlist": ["public.orders", "public.users"],
+        "masking_rules": [{"table": "public.users", "column": "email", "kind": "hash"}],
+        "budget_queries_per_day": 5000,
+        "max_rows": 1000
       }'
     ```
   </Tab>

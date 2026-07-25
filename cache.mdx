@@ -173,7 +173,7 @@ PgBeam checks cache controls in priority order. The first match wins:
 | 3        | Cache rule           | Dashboard rule for query shape | Per query shape |
 | 4        | Session override on  | `SET pgbeam.cache = on`        | Per session     |
 | 5        | Database default     | Database-level cache setting   | All queries     |
-| 6        | Fallback             | Off                            | —               |
+| 6        | Fallback             | Off                            | n/a             |
 
 This precedence lets you set broad defaults and override them precisely where
 needed.

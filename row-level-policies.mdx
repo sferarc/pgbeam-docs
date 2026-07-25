@@ -51,8 +51,8 @@ expression evaluated against that table's columns.
     ```json title="Policy with row filters"
     {
       "name": "tenant-42",
-      "mode": "read-only",
-      "allow": ["public.orders", "public.invoices"],
+      "access_mode": "read_only",
+      "table_allowlist": ["public.orders", "public.invoices"],
       "row_filters": [
         { "table": "public.orders", "predicate": "tenant_id = 42" },
         { "table": "public.invoices", "predicate": "tenant_id = 42" }
