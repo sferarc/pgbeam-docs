@@ -80,13 +80,66 @@ detail under `data`. The [webhook events](/docs/webhook-events) page documents t
 }
 ```
 
-PgBeam signs every native (`json`) and `elastic` delivery. The signature is sent
-in the `X-PgBeam-Signature` header as `sha256=<hex>`, where the value is the
-HMAC-SHA-256 of the raw request body keyed with your signing secret. Each delivery
-also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`, `X-PgBeam-Timestamp` (unix
-seconds), and `X-PgBeam-Delivery` (a per-attempt id for de-duplication).
+PgBeam signs every native (`json`) and `elastic` delivery. Two signature headers
+are sent, both as `sha256=<hex>` keyed with your signing secret:
 
-```ts title="Verify a delivery (Node.js)"
+- `X-PgBeam-Signature` (v1) is the HMAC-SHA-256 of the raw request body only.
+- `X-PgBeam-Signature-V2` (v2) is the HMAC-SHA-256 of the exact byte string
+  `timestamp + "." + body`, where `timestamp` is the same value sent in the
+  `X-PgBeam-Timestamp` header (unix seconds, as a decimal string) and `.` is a
+  single literal period. Because the timestamp is part of the signed bytes, a
+  captured delivery cannot be replayed with a rewritten timestamp: rewriting it
+  invalidates the signature. This is the same construction Stripe uses.
+
+Each delivery also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`,
+`X-PgBeam-Timestamp` (unix seconds), and `X-PgBeam-Delivery` (a per-attempt id
+for de-duplication).
+
+We recommend verifying `X-PgBeam-Signature-V2` and rejecting stale timestamps.
+v1 stays in place unchanged for existing receivers, so you can migrate at your
+own pace. The SIEM/token destinations (Splunk HEC, Datadog) carry neither
+signature; they authenticate with the destination's own token.
+
+```ts title="Verify a delivery with the v2 signature (Node.js)"
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+// Signed bytes are exactly: timestamp + "." + rawBody
+export function verifyV2(
+  rawBody: string,
+  timestamp: string, // the X-PgBeam-Timestamp header, verbatim
+  signatureHeader: string, // the X-PgBeam-Signature-V2 header
+  secret: string,
+  toleranceSeconds = 300,
+): boolean {
+  // Reject stale timestamps first to enforce a replay window.
+  const ts = Number(timestamp);
+  if (!Number.isFinite(ts)) return false;
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - ts) > toleranceSeconds) return false;
+
+  const expected =
+    "sha256=" +
+    createHmac("sha256", secret)
+      .update(timestamp + "." + rawBody)
+      .digest("hex");
+
+  const a = Buffer.from(signatureHeader);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+```
+
+Verify against the raw request body, before any JSON parsing reserializes it,
+and use the `X-PgBeam-Timestamp` value verbatim so your recomputed signature
+matches the bytes we signed. Compare with a constant-time function. Rejecting
+deliveries whose `X-PgBeam-Timestamp` is far from the current time (5 minutes is
+a reasonable window) is what closes the replay gap, so enforce it when you verify
+v2.
+
+The v1 header is still valid if you have not migrated. It signs the body only, so
+it cannot bind the timestamp:
+
+```ts title="Verify the legacy v1 signature (Node.js)"
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 export function verify(
@@ -102,10 +155,6 @@ export function verify(
   return a.length === b.length && timingSafeEqual(a, b);
 }
 ```
-
-Verify against the raw request body, before any JSON parsing reserializes it.
-Compare with a constant-time function. To defend against replays, reject
-deliveries whose `X-PgBeam-Timestamp` is far from the current time.
 
 <Callout type="info" title="SIEM authentication">
   Splunk HEC and Datadog deliveries are not HMAC-signed. They authenticate with
