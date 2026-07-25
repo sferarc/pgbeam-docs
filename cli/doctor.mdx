@@ -1,0 +1,46 @@
+---
+title: doctor
+description: Diagnose your PgBeam setup end to end
+icon: Stethoscope
+---
+
+Run an end-to-end diagnostic of your PgBeam setup and print actionable pass, warning, and fail results. Doctor checks that credentials are present and valid, the control-plane API is reachable, the selected organization, project, and databases resolve, the proxy Postgres port is reachable (best-effort TCP), the hosted MCP endpoint answers (and, with `--mcp-token`, exposes the expected agent-database tools), and summarizes the project's default policy. It degrades gracefully offline: network problems are warnings with guidance, not crashes, and it never prints secrets. It exits non-zero only when a check fails.
+
+## Usage
+
+```bash
+pgbeam doctor [flags]
+```
+
+## Options
+
+| Option                  | Description                                                                                                | Required | Default |
+| ----------------------- | --------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| `--mcp-url <value>`     | MCP endpoint URL to check directly (defaults to the project's proxy host).                                | No       | -       |
+| `--mcp-token <value>`   | Agent MCP bearer token (`pba_...`) used to verify the endpoint's tool set. Also read from `PGBEAM_MCP_TOKEN`. | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Diagnose the linked project
+pgbeam doctor
+
+# Diagnose a specific project
+pgbeam doctor --project prj_xxx
+
+# Fully verify the MCP tool set with an agent token
+pgbeam doctor --mcp-token pba_xxx
+
+# Machine-readable output for CI
+pgbeam doctor --json
+```
+
+## Output
+
+Prints one line per check with a `PASS`, `WARN`, `FAIL`, or `SKIP` tag, a one-line finding, and a remedy for anything that is not passing, followed by a summary. With `--json`, returns `{ ok, summary, checks }`. Exits non-zero when any check fails.
