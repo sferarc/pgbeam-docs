@@ -8,6 +8,7 @@
 		"create",
 		"update",
 		"dry-eval",
+		"lint",
 		"delete"
 	]
 }

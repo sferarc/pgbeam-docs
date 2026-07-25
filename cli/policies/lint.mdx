@@ -1,0 +1,48 @@
+---
+title: policies lint
+description: Check a policy profile for risky configuration
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Statically check a policy profile for risky combinations before you attach it to a credential, without running any SQL. Supply exactly one of `--policy` (an existing saved policy ID) or `--draft` (a JSON file describing an unsaved draft policy). The linter reasons about the policy's own shape: it flags read-write access with no table allowlist, writes that commit with no affected-row cap or approval, missing query budgets, PII masking with no read ceiling, masking or row-filter rules on tables the policy makes unreachable, write settings that are inert on a read-only policy, and redundant allow/deny overlaps. It complements `policies dry-eval` (a single statement) and `policies replay` (recorded traffic). Pass `--strict` to exit non-zero when any warning-or-worse finding is present, for use as a CI gate.
+
+## Usage
+
+```bash
+pgbeam policies lint [flags]
+```
+
+## Options
+
+| Option             | Description                                                | Required | Default |
+| ------------------ | ---------------------------------------------------------- | -------- | ------- |
+| `--policy <value>` | ID of an existing saved policy to lint                     | No       | -       |
+| `--draft <value>`  | Path to a JSON file with a draft policy body to lint       | No       | -       |
+| `--strict`         | Exit non-zero when any warning-or-worse finding is present | No       | `false` |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Lint a saved policy
+pgbeam policies lint --policy pol_xxx
+
+# Lint a draft policy file before creating it
+pgbeam policies lint --draft ./policy.json
+
+# Fail CI on any warning-or-worse finding
+pgbeam policies lint --policy pol_xxx --strict
+
+# Get findings as JSON
+pgbeam policies lint --policy pol_xxx --json
+```
+
+## Output
+
+Prints each finding with its severity, code, message, and a suggested fix, then a summary count. With --json, returns \{ findings, summary \}. With --strict, exits 1 when any warning or error finding is present.
