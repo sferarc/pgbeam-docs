@@ -95,5 +95,7 @@ never surfaced.
 - Writing an annotation needs the `schema_annotation:write` permission (held by
   owners, admins, security admins, and policy authors). Reading needs
   `schema_annotation:read`.
-- The dashboard editor for annotations is a planned follow-up. For now they are
-  managed through the API.
+- Annotations are editable in the dashboard, on a project's **Schema** page under
+  Policy and Safety. It lists the tables and columns the project can see, shows
+  which columns a masking rule covers and with which mask kind, and lets you write
+  or remove a description inline. The API stays available for scripted use.
