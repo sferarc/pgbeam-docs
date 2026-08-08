@@ -1,0 +1,51 @@
+---
+title: deleteCrmDeal
+description: Delete a deal
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Delete a deal.
+
+## Usage
+
+```typescript
+const result = await api.crm.deleteCrmDeal({
+  pathParams: { org_id: "org_abc123", deal_id: "dl_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter          | Type     | Required | Description                                         |
+| ------------------ | -------- | -------- | --------------------------------------------------- |
+| pathParams.org_id  | `string` | Yes      | Unique organization identifier.                     |
+| pathParams.deal_id | `string` | Yes      | Unique CRM deal identifier (prefixed, e.g. dl_xxx). |
+
+## Response
+
+`Promise<void>`: no content.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.crm.deleteCrmDeal({
+  pathParams: { org_id: "org_abc123", deal_id: "dl_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

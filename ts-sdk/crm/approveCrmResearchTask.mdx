@@ -1,0 +1,51 @@
+---
+title: approveCrmResearchTask
+description: Approve a research task
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Approves a task that is awaiting approval (an irreversible action). The task flips to pending and is then run by the worker.
+
+## Usage
+
+```typescript
+const result = await api.crm.approveCrmResearchTask({
+  pathParams: { org_id: "org_abc123", task_id: "ctk_xxx" },
+});
+```
+
+## Parameters
+
+| Parameter          | Type     | Required | Description                                                   |
+| ------------------ | -------- | -------- | ------------------------------------------------------------- |
+| pathParams.org_id  | `string` | Yes      | Unique organization identifier.                               |
+| pathParams.task_id | `string` | Yes      | Unique CRM research task identifier (prefixed, e.g. ctk_xxx). |
+
+## Response
+
+`Promise<ResearchTask>`: the approved task.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.crm.approveCrmResearchTask({
+  pathParams: { org_id: "org_abc123", task_id: "ctk_xxx" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

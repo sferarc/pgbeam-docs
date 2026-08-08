@@ -1,0 +1,60 @@
+---
+title: updateCrmContext
+description: Update the org CRM context
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates or updates the shared CRM context document.
+
+## Usage
+
+```typescript
+const result = await api.crm.updateCrmContext({
+    pathParams: { org_id: "org_abc123" },
+    body: {
+      ,
+    },
+  });
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                     |
+| ----------------- | -------- | -------- | ------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier. |
+| body.positioning  | `string` | No       | How the org positions itself.   |
+| body.icp          | `string` | No       | Ideal customer profile.         |
+| body.tone         | `string` | No       | Preferred voice and tone.       |
+| body.notes        | `string` | No       | Any other durable facts.        |
+
+## Response
+
+`Promise<CrmContext>`: the updated crm context.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.crm.updateCrmContext({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+      ,
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

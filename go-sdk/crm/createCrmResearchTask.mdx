@@ -1,0 +1,67 @@
+---
+title: CreateCrmResearchTask
+description: Enqueue a research task
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Adds a task to the CRM research queue. The autonomous research worker leases pending tasks, enriches the subject entity, and writes results back.
+
+## Usage
+
+```go
+result, err := client.Crm.CreateCrmResearchTask(ctx, "org_abc123", pgbeam.ResearchTaskInput{
+    Kind: pgbeam.ResearchTaskKind{ /* ... */ },
+    SubjectType: pgbeam.ResearchTaskSubjectType{ /* ... */ },
+    SubjectID: "...",
+  })
+```
+
+## Parameters
+
+| Parameter       | Type                             | Required | Description                                       |
+| --------------- | -------------------------------- | -------- | ------------------------------------------------- |
+| ctx             | `context.Context`                | Yes      | Request context                                   |
+| orgID           | `string`                         | Yes      | Unique organization identifier.                   |
+| req             | `pgbeam.ResearchTaskInput`       | Yes      | Request body                                      |
+| req.Kind        | `pgbeam.ResearchTaskKind`        | Yes      |                                                   |
+| req.SubjectType | `pgbeam.ResearchTaskSubjectType` | Yes      |                                                   |
+| req.SubjectID   | `string`                         | Yes      | ID of the company/contact/deal this task targets. |
+| req.Role        | `*pgbeam.AgentRole`              | No       |                                                   |
+| req.Priority    | `*int`                           | No       | Higher runs first.                                |
+
+## Response
+
+`(*pgbeam.ResearchTask, error)`: task enqueued.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Crm.CreateCrmResearchTask(ctx, "org_abc123", pgbeam.ResearchTaskInput{
+    Kind: pgbeam.ResearchTaskKind{ /* ... */ },
+    SubjectType: pgbeam.ResearchTaskSubjectType{ /* ... */ },
+    SubjectID: "...",
+    Role: pgbeam.AgentRole{ /* ... */ },
+    Priority: 0,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

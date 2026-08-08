@@ -1,0 +1,50 @@
+---
+title: DeleteCrmContact
+description: Delete a contact
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Delete a contact.
+
+## Usage
+
+```go
+err := client.Crm.DeleteCrmContact(ctx, "org_abc123", "cnt_xxx")
+```
+
+## Parameters
+
+| Parameter | Type              | Required | Description                                             |
+| --------- | ----------------- | -------- | ------------------------------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                                         |
+| orgID     | `string`          | Yes      | Unique organization identifier.                         |
+| contactID | `string`          | Yes      | Unique CRM contact identifier (prefixed, e.g. cnt_xxx). |
+
+## Response
+
+`error`: returns nil on success.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+err := client.Crm.DeleteCrmContact(ctx, "org_abc123", "cnt_xxx")
+if err != nil {
+  log.Fatal(err)
+}
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

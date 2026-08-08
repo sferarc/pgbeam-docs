@@ -1,0 +1,62 @@
+---
+title: UpdateCrmContext
+description: Update the org CRM context
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates or updates the shared CRM context document.
+
+## Usage
+
+```go
+result, err := client.Crm.UpdateCrmContext(ctx, "org_abc123", pgbeam.CrmContextInput{
+
+  })
+```
+
+## Parameters
+
+| Parameter       | Type                     | Required | Description                     |
+| --------------- | ------------------------ | -------- | ------------------------------- |
+| ctx             | `context.Context`        | Yes      | Request context                 |
+| orgID           | `string`                 | Yes      | Unique organization identifier. |
+| req             | `pgbeam.CrmContextInput` | Yes      | Request body                    |
+| req.Positioning | `*string`                | No       | How the org positions itself.   |
+| req.Icp         | `*string`                | No       | Ideal customer profile.         |
+| req.Tone        | `*string`                | No       | Preferred voice and tone.       |
+| req.Notes       | `*string`                | No       | Any other durable facts.        |
+
+## Response
+
+`(*pgbeam.CrmContext, error)`: the updated crm context.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Crm.UpdateCrmContext(ctx, "org_abc123", pgbeam.CrmContextInput{
+    Positioning: "...",
+    Icp: "...",
+    Tone: "...",
+    Notes: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

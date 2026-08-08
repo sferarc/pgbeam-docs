@@ -1,0 +1,50 @@
+---
+title: getCrmContext
+description: Get the org CRM context
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns the shared CRM context document for the organization.
+
+## Usage
+
+```typescript
+const result = await api.crm.getCrmContext({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                     |
+| ----------------- | -------- | -------- | ------------------------------- |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier. |
+
+## Response
+
+`Promise<CrmContext>`: the crm context.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.crm.getCrmContext({
+  pathParams: { org_id: "org_abc123" },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

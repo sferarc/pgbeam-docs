@@ -1,0 +1,51 @@
+---
+title: GetCrmCompany
+description: Get a company
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Get a company.
+
+## Usage
+
+```go
+result, err := client.Crm.GetCrmCompany(ctx, "org_abc123", "cmp_xxx")
+```
+
+## Parameters
+
+| Parameter | Type              | Required | Description                                             |
+| --------- | ----------------- | -------- | ------------------------------------------------------- |
+| ctx       | `context.Context` | Yes      | Request context                                         |
+| orgID     | `string`          | Yes      | Unique organization identifier.                         |
+| companyID | `string`          | Yes      | Unique CRM company identifier (prefixed, e.g. cmp_xxx). |
+
+## Response
+
+`(*pgbeam.Company, error)`: the company.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Crm.GetCrmCompany(ctx, "org_abc123", "cmp_xxx")
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |

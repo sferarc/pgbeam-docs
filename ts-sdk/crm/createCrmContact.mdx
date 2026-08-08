@@ -1,0 +1,64 @@
+---
+title: createCrmContact
+description: Create a contact
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Create a contact.
+
+## Usage
+
+```typescript
+const result = await api.crm.createCrmContact({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+    name: "...",
+  },
+});
+```
+
+## Parameters
+
+| Parameter         | Type     | Required | Description                                |
+| ----------------- | -------- | -------- | ------------------------------------------ |
+| pathParams.org_id | `string` | Yes      | Unique organization identifier.            |
+| body.company_id   | `string` | No       | Company to attach this contact to, if any. |
+| body.name         | `string` | Yes      | Contact full name.                         |
+| body.email        | `string` | No       | Contact email address.                     |
+| body.title        | `string` | No       | Job title or role.                         |
+| body.phone        | `string` | No       | Phone number.                              |
+| body.linkedin_url | `string` | No       | LinkedIn profile URL.                      |
+| body.notes        | `string` | No       | Free-form notes about the contact.         |
+
+## Response
+
+`Promise<Contact>`: contact created.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.crm.createCrmContact({
+  pathParams: { org_id: "org_abc123" },
+  body: {
+    name: "...",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
