@@ -16,9 +16,9 @@ runs longer than the configured limit.
 The timeout is applied at the database level, not the project level. Each
 database registered in a project can have its own timeout value.
 
-| Setting             | Behavior                                                    |
-| ------------------- | ----------------------------------------------------------- |
-| `0` (default)       | Disabled: no timeout override, upstream default applies     |
+| Setting              | Behavior                                                    |
+| -------------------- | ----------------------------------------------------------- |
+| `0` (default)        | Disabled: no timeout override, upstream default applies     |
 | `1` to `300000` (ms) | PgBeam sets `statement_timeout` on each upstream connection |
 
 When a query exceeds the timeout, PostgreSQL cancels it and returns:
