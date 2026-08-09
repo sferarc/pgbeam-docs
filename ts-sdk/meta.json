@@ -16,7 +16,6 @@
 		"webhooks",
 		"honeytokens",
 		"schemaannotations",
-		"crm",
 		"anomalies",
 		"branches",
 		"migrations",
