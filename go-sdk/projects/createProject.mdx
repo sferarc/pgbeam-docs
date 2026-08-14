@@ -29,7 +29,7 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
 | req.Tags        | `*[]string`                    | No       | User-defined labels to attach to the project.                                                                                             |
 | req.Cloud       | `*string`                      | No       | Cloud provider for the project.                                                                                                           |
 | req.SelfHosted  | `*bool`                        | No       | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
-| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      | Primary database. Created atomically with the project.                                                                                    |
+| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      |                                                                                                                                           |
 
 ## Response
 
