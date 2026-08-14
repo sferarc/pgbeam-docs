@@ -26,7 +26,7 @@ const result = await api.projects.createReplica({
 | pathParams.database_id | `string`  | Yes      | Unique database identifier (prefixed, e.g. db_xxx). |
 | body.host              | `string`  | Yes      | PostgreSQL replica host.                            |
 | body.port              | `number`  | Yes      | PostgreSQL replica port.                            |
-| body.ssl_mode          | `SSLMode` | No       |                                                     |
+| body.ssl_mode          | `SSLMode` | No       | PostgreSQL SSL connection mode.                     |
 
 ## Response
 

@@ -23,7 +23,7 @@ result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayI
 | projectID        | `string`                     | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                             |
 | req              | `pgbeam.PolicyReplayInput`   | Yes      | Request body                                                                                                                    |
 | req.PolicyID     | `*string`                    | No       | ID of an existing saved policy profile to replay against.                                                                       |
-| req.Policy       | `*pgbeam.PolicyProfileInput` | No       |                                                                                                                                 |
+| req.Policy       | `*pgbeam.PolicyProfileInput` | No       | Mutable fields of a policy profile (used for create and update).                                                                |
 | req.CredentialID | `*string`                    | No       | Restrict the replay to traffic recorded for one agent credential.                                                               |
 | req.StartTs      | `*string`                    | No       | Start of the traffic window (inclusive). Defaults to 7 days before end_ts.                                                      |
 | req.EndTs        | `*string`                    | No       | End of the traffic window (exclusive). Defaults to now.                                                                         |

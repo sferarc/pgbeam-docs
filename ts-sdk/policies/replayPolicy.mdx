@@ -24,7 +24,7 @@ const result = await api.policies.replayPolicy({
 | --------------------- | -------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | pathParams.project_id | `string`             | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                             |
 | body.policy_id        | `string`             | No       | ID of an existing saved policy profile to replay against.                                                                       |
-| body.policy           | `PolicyProfileInput` | No       |                                                                                                                                 |
+| body.policy           | `PolicyProfileInput` | No       | Mutable fields of a policy profile (used for create and update).                                                                |
 | body.credential_id    | `string`             | No       | Restrict the replay to traffic recorded for one agent credential.                                                               |
 | body.start_ts         | `string`             | No       | Start of the traffic window (inclusive). Defaults to 7 days before end_ts.                                                      |
 | body.end_ts           | `string`             | No       | End of the traffic window (exclusive). Defaults to now.                                                                         |

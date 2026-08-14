@@ -29,7 +29,7 @@ const result = await api.projects.createProject({
 | body.tags        | `string[]`                  | No       | User-defined labels to attach to the project.                                                                                             |
 | body.cloud       | `"aws" \| "azure" \| "gcp"` | No       | Cloud provider for the project.                                                                                                           |
 | body.self_hosted | `boolean`                   | No       | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
-| body.database    | `CreateDatabaseRequest`     | Yes      |                                                                                                                                           |
+| body.database    | `CreateDatabaseRequest`     | Yes      | Request body for registering an upstream database.                                                                                        |
 
 ## Response
 

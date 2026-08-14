@@ -25,7 +25,7 @@ result, err := client.Projects.CreateReplica(ctx, "db_xxx", pgbeam.CreateReplica
 | req         | `pgbeam.CreateReplicaRequest` | Yes      | Request body                                        |
 | req.Host    | `string`                      | Yes      | PostgreSQL replica host.                            |
 | req.Port    | `int`                         | Yes      | PostgreSQL replica port.                            |
-| req.SSLMode | `*pgbeam.SSLMode`             | No       |                                                     |
+| req.SSLMode | `*pgbeam.SSLMode`             | No       | PostgreSQL SSL connection mode.                     |
 
 ## Response
 

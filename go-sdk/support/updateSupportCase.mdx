@@ -23,7 +23,7 @@ result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgb
 | orgID      | `string`                          | Yes      | Unique organization identifier.                         |
 | caseID     | `string`                          | Yes      | Unique support case identifier (prefixed, e.g. sc_xxx). |
 | req        | `pgbeam.UpdateSupportCaseRequest` | Yes      | Request body                                            |
-| req.Status | `*pgbeam.SupportCaseStatus`       | No       |                                                         |
+| req.Status | `*pgbeam.SupportCaseStatus`       | No       | Current status of the support case.                     |
 
 ## Response
 
