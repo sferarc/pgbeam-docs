@@ -70,12 +70,20 @@ combines your predicate with the statement's own `WHERE` clause using `AND`. The
 credential cannot widen its own scope: a query that asks for `tenant_id = 99`
 returns nothing, because the appended `tenant_id = 42` rules it out.
 
-| Statement                                      | Effective query                                                 |
-| ---------------------------------------------- | --------------------------------------------------------------- |
-| `SELECT * FROM orders`                         | `SELECT * FROM orders WHERE (tenant_id = 42)`                   |
-| `SELECT * FROM orders WHERE total > 100`       | `SELECT * FROM orders WHERE (total > 100) AND (tenant_id = 42)` |
-| `UPDATE orders SET status = 'x'` (read-write)  | `UPDATE orders SET status = 'x' WHERE (tenant_id = 42)`         |
-| `DELETE FROM orders WHERE id = 7` (read-write) | `DELETE FROM orders WHERE (id = 7) AND (tenant_id = 42)`        |
+Your predicate's column references are bound to the filtered table before the
+predicate is appended: PgBeam qualifies them with the query's alias for that
+table, or with the table name when the query gave it no alias. That is what keeps
+the filter attached to the right relation in a join, where another table may
+carry a column of the same name.
+
+| Statement                                                  | Effective query                                                                   |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `SELECT * FROM orders`                                     | `SELECT * FROM orders WHERE orders.tenant_id = 42`                                |
+| `SELECT * FROM orders WHERE total > 100`                   | `SELECT * FROM orders WHERE total > 100 AND orders.tenant_id = 42`                |
+| `SELECT * FROM orders o JOIN customers c ON c.id = o.cust` | `SELECT * FROM orders o JOIN customers c ON c.id = o.cust WHERE o.tenant_id = 42` |
+| `SELECT * FROM orders a JOIN orders b ON a.parent = b.id`  | `... WHERE a.tenant_id = 42 AND b.tenant_id = 42`                                 |
+| `UPDATE orders SET status = 'x'` (read-write)              | `UPDATE orders SET status = 'x' WHERE orders.tenant_id = 42`                      |
+| `DELETE FROM orders WHERE id = 7` (read-write)             | `DELETE FROM orders WHERE id = 7 AND orders.tenant_id = 42`                       |
 
 In read-write mode the filter scopes writes too: an `UPDATE` or `DELETE` can only
 touch rows the credential can already see. A row outside the filter is invisible,
@@ -92,8 +100,10 @@ forwarded unfiltered.
 <Callout type="warn" title="Predicates run on the database">
   A row filter is a SQL expression that executes upstream. Keep predicates
   simple and indexed (`tenant_id = 42`, `region = 'eu'`). Reference only columns
-  on the filtered table. PgBeam validates the predicate against the schema, but
-  it does not rewrite a slow predicate into a fast one.
+  on the filtered table. A sub-select inside a predicate keeps its own scope, so
+  its column references are left as you wrote them. PgBeam validates the
+  predicate against the schema, but it does not rewrite a slow predicate into a
+  fast one.
 </Callout>
 
 ## Combine with the rest of the policy
