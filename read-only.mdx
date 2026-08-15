@@ -35,6 +35,14 @@ In the dashboard, set **Access mode** to **Read-only** on the policy profile.
 | `CREATE` / `ALTER` / `DROP` / `TRUNCATE` | Blocked   |
 | `COPY`                                   | Blocked   |
 | Data-modifying CTE (`WITH … UPDATE`)     | Blocked   |
+| `SELECT … INTO t` (creates a table)      | Blocked   |
+| `EXPLAIN ANALYZE` (runs the statement)   | Blocked   |
+
+`SELECT … INTO t` and `CREATE TABLE t AS SELECT …` are the same statement in
+Postgres, so both are blocked. `EXPLAIN ANALYZE` runs the statement it is given
+rather than only planning it, so it is blocked whenever the statement underneath
+it writes or creates a table. A plain `EXPLAIN` of a read executes nothing and
+stays allowed.
 
 ## What the agent sees
 
