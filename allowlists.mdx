@@ -35,6 +35,12 @@ pgbeam policies create --name analytics --mode read_only --file analytics.json
 
 - **Tables**: a statement is allowed only if every relation it reads (or writes,
   in read-write mode) is on the table allowlist and none is on the denylist.
+- **Schemas**: an entry is schema-qualified (`billing.orders`) or bare
+  (`orders`). A bare allowlist entry grants the `public` schema only, because
+  `SET search_path` is blocked and `public` is the only schema a bare name can
+  resolve to. `billing.orders` is a different table, and allowlisting `orders`
+  does not reach it. A bare **denylist** entry works the other way and blocks
+  that relation in every schema, so a denylist is never narrower than you meant.
 - **Catalog**: reads of `pg_catalog` and `information_schema` are always
   permitted, so the agent can introspect the schema it is allowed to query.
 - **Columns**: there is no column allowlist. To restrict what individual columns
