@@ -43,9 +43,12 @@ application's passthrough connection is never masked.
 <Callout type="warn" title="Masking semantics">
   Binary-format result columns are masked to `NULL` to stay type-safe;
   text-format columns get a redaction token or hash. When a query computes an
-  expression over a masked column (for example `lower(email)`), PgBeam masks by
-  the output column name as a conservative extra net. Allowlist the columns you
-  expose and mask the ones you must protect.
+  expression over a masked column (for example `lower(email)`), the result cannot
+  be proven to preserve the original value, so PgBeam masks that output column to
+  `NULL` rather than returning the computed value. This follows the value through
+  a subquery or CTE, so an aggregate over a derived column (for example
+  `SELECT sum(n) FROM (SELECT length(email) AS n FROM users) t`) is masked too.
+  Allowlist the columns you expose and mask the ones you must protect.
 </Callout>
 
 ## Combine with allowlists
