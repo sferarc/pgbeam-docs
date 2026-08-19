@@ -41,8 +41,15 @@ pgbeam policies create --name analytics --mode read_only --file analytics.json
   resolve to. `billing.orders` is a different table, and allowlisting `orders`
   does not reach it. A bare **denylist** entry works the other way and blocks
   that relation in every schema, so a denylist is never narrower than you meant.
-- **Catalog**: reads of `pg_catalog` and `information_schema` are always
-  permitted, so the agent can introspect the schema it is allowed to query.
+- **Catalog**: reads of `pg_catalog` and `information_schema` are permitted
+  without an allowlist entry, so the agent can introspect the schema it is
+  allowed to query. Two groups are carved out of that, because neither is
+  introspection: the views carrying other sessions' SQL text
+  (`pg_stat_activity`, `pg_stat_statements`, `pg_prepared_statements`,
+  `pg_cursors`) and the catalogs carrying credentials or raw bytes (`pg_authid`,
+  `pg_shadow`, `pg_subscription`, `pg_user_mapping`, `pg_user_mappings`,
+  `pg_largeobject`). Those need an explicit allowlist entry, written with the
+  schema (`pg_catalog.pg_stat_activity`), the same as any other table.
 - **Columns**: there is no column allowlist. To restrict what individual columns
   return, use [masking](/docs/masking) (redact, null, or hash a column's values
   in flight).
