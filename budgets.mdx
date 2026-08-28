@@ -43,6 +43,40 @@ The message names the window and the exact reset time, so an agent can back off
 rather than retry blindly. A per-day egress (bytes) budget produces a similar
 message when exceeded.
 
+### Headroom on the MCP endpoint
+
+Over the [hosted MCP endpoint](/docs/mcp), an agent does not have to wait for
+that error to learn where it stands. Every row-returning tool result (`query`,
+`explain`, `list_tables`, `describe_table`) carries a `budget` block for the
+credential that ran it:
+
+```json title="Tail of a query tool result"
+{
+  "row_count": 42,
+  "budget": {
+    "queries_per_hour": {
+      "limit": 200,
+      "used": 37,
+      "remaining": 163,
+      "resets_at": "2026-06-15T14:00:00Z"
+    },
+    "egress_bytes_per_day": {
+      "limit": 104857600,
+      "used": 5242880,
+      "remaining": 99614720,
+      "resets_at": "2026-06-16T00:00:00Z"
+    }
+  }
+}
+```
+
+A window your policy leaves uncapped is omitted, so a present key means the cap
+is enforced. A credential with no budget at all gets no `budget` block. The
+figures are the same per-region counters the wire path enforces, so they are
+approximate in the same way, and the egress figure can trail the agent's last
+statement by a moment because bytes are charged after the response is sent. It
+is a signal for pacing a long job, not a billing record.
+
 ## Write row cap
 
 `--max-affected-rows` bounds how many rows a single write may affect, separate
