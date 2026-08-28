@@ -22,9 +22,22 @@ read. There is no second enforcement path to bypass.
 
 ## Register a honeytoken
 
-Create a honeytoken from the dashboard under Configure, Security, or through the
-API. Each entry is a relation (an optional schema plus a required name) and an
-action.
+Create a honeytoken from the dashboard under Configure, Security, from the CLI,
+or through the API. Each entry is a relation (an optional schema plus a required
+name) and an action.
+
+```bash
+pgbeam honeytokens create \
+  --schema-name public --relation-name customer_ssns --action kill
+
+pgbeam honeytokens list
+pgbeam honeytokens update hnt_123 --relation-name customer_ssns --action audit_only
+pgbeam honeytokens delete hnt_123
+```
+
+`update` replaces the whole record, so pass the relation as well as the action.
+The commands act on the linked project; pass `--project` to target another one.
+The equivalent REST call is:
 
 ```bash
 curl -X POST https://api.pgbeam.com/v1/projects/prj_123/honeytokens \

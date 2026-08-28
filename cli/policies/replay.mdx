@@ -5,7 +5,7 @@ description: Replay recorded agent traffic against a policy
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Replay the project's recorded agent audit traffic against a candidate policy and print what would change: which queries that ran would now be blocked, which blocked queries would now be permitted, and which results would be masked or row-filtered. Supply exactly one of `--policy` (an existing saved policy ID) or `--draft` (a JSON file describing an unsaved draft policy). Traffic is deduplicated by normalized query shape, newest first, and every statement is evaluated through the data plane's own policy engine, so verdicts match real enforcement. The replay reads only the audit log; it never connects to the upstream database.
+Replay the project's recorded agent audit traffic against a candidate policy and print what would change: which queries that ran would now be blocked, which blocked queries would now be permitted, and which results would be masked or row-filtered. Supply exactly one of `--policy` (an existing saved policy ID) or `--draft` (a JSON file describing an unsaved draft policy). Traffic is deduplicated by normalized query shape, newest first, and every statement is evaluated through the data plane's own policy engine, so verdicts match real enforcement. The replay reads only the audit log; it never connects to the upstream database. By default it covers every credential in the project, including credentials bound to other policies, whose behaviour saving this candidate cannot change; pass `--bound-policy` to narrow it to the credentials a policy actually governs, which is usually the question you want answered before editing a live policy.
 
 ## Usage
 
@@ -15,14 +15,15 @@ pgbeam policies replay [flags]
 
 ## Options
 
-| Option                 | Description                                                           | Required | Default |
-| ---------------------- | --------------------------------------------------------------------- | -------- | ------- |
-| `--policy <value>`     | ID of an existing saved policy to replay against                      | No       | -       |
-| `--draft <value>`      | Path to a JSON file with a draft policy body to replay against        | No       | -       |
-| `--credential <value>` | Restrict the replay to traffic recorded for one agent credential      | No       | -       |
-| `--start <value>`      | Start of the traffic window (RFC3339; default 7 days before the end)  | No       | -       |
-| `--end <value>`        | End of the traffic window (RFC3339; default now)                      | No       | -       |
-| `--limit <value>`      | Maximum distinct queries to replay, newest first (1-500; default 200) | No       | -       |
+| Option                   | Description                                                                                                        | Required | Default |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
+| `--policy <value>`       | ID of an existing saved policy to replay against                                                                   | No       | -       |
+| `--draft <value>`        | Path to a JSON file with a draft policy body to replay against                                                     | No       | -       |
+| `--credential <value>`   | Restrict the replay to traffic recorded for one agent credential                                                   | No       | -       |
+| `--bound-policy <value>` | Restrict the replay to traffic from the credentials bound to this policy ID (mutually exclusive with --credential) | No       | -       |
+| `--start <value>`        | Start of the traffic window (RFC3339; default 7 days before the end)                                               | No       | -       |
+| `--end <value>`          | End of the traffic window (RFC3339; default now)                                                                   | No       | -       |
+| `--limit <value>`        | Maximum distinct queries to replay, newest first (1-500; default 200)                                              | No       | -       |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -35,6 +36,9 @@ pgbeam policies replay [flags]
 ```bash
 # Replay the last 7 days of traffic against a saved policy
 pgbeam policies replay --policy pol_xxx
+
+# Replay only the traffic the policy governs, before editing it
+pgbeam policies replay --draft ./policy.json --bound-policy pol_xxx
 
 # Replay one credential's traffic against a draft policy
 pgbeam policies replay --draft ./policy.json --credential cred_xxx

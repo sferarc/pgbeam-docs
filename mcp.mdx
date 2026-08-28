@@ -9,8 +9,9 @@ description:
 The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes policy-enforced database tools to an AI agent. You paste one
 URL into your MCP client, and the agent gets `query`, `validate_sql`,
-`list_tables`, `describe_table`, `explain`, and `schema_catalog`, plus
-`search_docs` and `read_doc` for looking up how PgBeam works. Every database call runs through the
+`list_tables`, `describe_table`, `explain`, `schema_catalog`, and
+`my_permissions`, plus `search_docs` and `read_doc` for looking up how PgBeam
+works. Every database call runs through the
 same policy engine as a scoped connection string, so the agent is held to the
 same guardrails. There is nothing to install and no server to run.
 
@@ -217,12 +218,24 @@ response; copy them from there.
 | `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                                                      |
 | `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                                                       |
 | `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see.                              |
+| `my_permissions` | What this credential may do: access mode, permitted statement kinds, allowlist and denylist, row-filtered tables, masked columns, budgets, and how writes are routed. No arguments.            |
 | `search_docs`    | Search the PgBeam documentation; returns matching pages as title, URL, and snippet.                                                                                                            |
 | `read_doc`       | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result.                                                                                              |
 
 Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of
 `pg_catalog` and `information_schema` are permitted regardless of the allowlist,
 so an agent can discover the schema it is allowed to query.
+
+`my_permissions` is how an agent learns its limits without discovering them by
+being blocked. It reads the credential's compiled policy out of the proxy's own
+streamed state, so it costs no database round-trip, and it reports the effective
+policy rather than the raw record: a statement kind listed as allowed is one the
+policy engine itself was asked about, and the `always_blocked` list carries the
+safety floor no policy can switch off (DO blocks, `search_path` changes,
+whereless writes, `DROP`/`TRUNCATE`, the dangerous-function families). Two
+things it never returns: your [honeytokens](/docs/honeytokens), because a decoy
+an agent can enumerate has stopped being a decoy, and the text of a row-filter
+predicate, though the filtered table is named.
 
 The docs tools (`search_docs`, `read_doc`) are read-only and not scoped to your
 database. They let the agent answer its own questions about PgBeam, for example

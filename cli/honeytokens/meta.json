@@ -1,0 +1,12 @@
+{
+	"defaultOpen": false,
+	"title": "honeytokens",
+	"icon": "Fingerprint",
+	"pages": [
+		"list",
+		"create",
+		"show",
+		"update",
+		"delete"
+	]
+}

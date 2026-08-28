@@ -1,0 +1,40 @@
+---
+title: honeytokens show
+description: Get a honeytoken
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Returns a single honeytoken by ID.
+
+## Usage
+
+```bash
+pgbeam honeytokens show <id>
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Get a honeytoken
+pgbeam honeytokens show
+
+# Output as JSON
+pgbeam honeytokens show --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

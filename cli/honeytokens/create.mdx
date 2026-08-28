@@ -1,0 +1,43 @@
+---
+title: honeytokens create
+description: Register a honeytoken
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Registers a decoy (canary) relation for the project. Any agent statement
+that references it is blocked and recorded as a canary_tripped audit event.
+
+## Usage
+
+```bash
+pgbeam honeytokens create [flags]
+```
+
+## Options
+
+| Option                    | Description                                                         | Required | Default |
+| ------------------------- | ------------------------------------------------------------------- | -------- | ------- |
+| `--schema-name <value>`   | Optional schema. Null or empty matches the unqualified/public form. | No       | -       |
+| `--relation-name <value>` | Relation (table or view) name of the decoy.                         | Yes      | -       |
+| `--action <value>`        | Response when the honeytoken is tripped. One of: audit_only, kill.  | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Register a honeytoken
+pgbeam honeytokens create
+
+# Output as JSON
+pgbeam honeytokens create --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

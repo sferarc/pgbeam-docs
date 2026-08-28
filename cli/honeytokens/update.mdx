@@ -1,0 +1,43 @@
+---
+title: honeytokens update
+description: Update a honeytoken
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Updates a honeytoken's relation or action.
+
+## Usage
+
+```bash
+pgbeam honeytokens update <id> [flags]
+```
+
+## Options
+
+| Option                    | Description                                                         | Required | Default |
+| ------------------------- | ------------------------------------------------------------------- | -------- | ------- |
+| `<id>`                    |                                                                     | Yes      | -       |
+| `--schema-name <value>`   | Optional schema. Null or empty matches the unqualified/public form. | No       | -       |
+| `--relation-name <value>` | Relation (table or view) name of the decoy.                         | Yes      | -       |
+| `--action <value>`        | Response when the honeytoken is tripped. One of: audit_only, kill.  | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Update a honeytoken
+pgbeam honeytokens update
+
+# Output as JSON
+pgbeam honeytokens update --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

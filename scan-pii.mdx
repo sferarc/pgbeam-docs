@@ -25,6 +25,11 @@ schema by hand.
     PII**. Pick the database to scan and click **Run scan**. PgBeam lists the
     columns it flagged; review them and add the ones you want (see
     [Review and apply](#review-and-apply) below).
+
+    A project's **Schema** page runs the same scan from the other direction: click
+    **Scan for PII** there and every flagged column that no masking rule covers is
+    marked as you browse (see [While browsing the schema](#while-browsing-the-schema)).
+
   </Tab>
 
   <Tab value="SDK">
@@ -114,13 +119,23 @@ Detection combines two signals per column:
   `email` or `phone_number`).
 - **Value signal**: for columns that show a name signal, the scanner samples up
   to 20 non-null values and matches them against value-shape patterns (for
-  example an email or SSN shape). A high match ratio strengthens the score; a low
-  one tempers it.
+  example an email or SSN shape). A high match ratio strengthens the score.
 
 The two signals fuse into a single confidence score in `[0, 1]`, and a column is
 only suggested when it clears the detection floor. The scan runs read-only and
 samples a small number of values per column, so it does not read your whole
 table.
+
+A match ratio of zero lowers the score only where the value shape covers
+essentially every form its type takes, so a column named `ip` holding
+`intellectual property` tags is dropped. Some shapes recognize only part of
+their type: `api_secret` is a list of known token prefixes, `bank_account` is
+IBAN, and `passport` is a short uppercase code. A bcrypt digest, a US routing
+number and a SWIFT code are all exactly what their column names say and match
+none of those, so for these types the name signal stands on its own and the
+column is still suggested. Where the column's own name points at a type, that
+type wins over one only its values suggest: `routing_number` comes back as
+`bank_account`, not as a `phone` its nine digits also fit.
 
 ## PII types and recommended masks
 
@@ -157,6 +172,26 @@ Suggestions are advisory: nothing changes on the profile until you add them.
 
 Once added, the rules behave like any masking rule you wrote by hand. See
 [PII masking](/docs/masking) for how each mask kind renders on the wire.
+
+## While browsing the schema
+
+The project's **Schema** page normally reports a column as PII when a masking
+rule covers it, because a rule is the only thing that changes what an agent
+receives. That leaves one gap: a column that looks like personal data and that
+nobody has written a rule for reads as plain `Visible`.
+
+Click **Scan for PII** on that page to close it. The scan runs against the
+database you are browsing and the page then marks every flagged column no rule
+covers with a **Likely PII** badge, hover it for the detected type, the
+confidence, and the suggested mask kind. A **Likely PII** lens appears next to
+the column filters and narrows the table to those columns, and each table in the
+list carries its own count. A flagged column that a rule already masks gets no
+badge, because there is nothing to act on.
+
+The scan is opt-in per database and per visit: it connects to your database and
+samples values, so the page never runs it on load. Nothing on the Schema page
+writes a masking rule; the link in the scan summary takes you to the policy
+profile where you add them.
 
 ## Related
 

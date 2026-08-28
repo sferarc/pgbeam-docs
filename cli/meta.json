@@ -21,6 +21,7 @@
 		"policies",
 		"approvals",
 		"anomalies",
+		"honeytokens",
 		"audit",
 		"webhooks",
 		"branches",
