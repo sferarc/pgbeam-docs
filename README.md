@@ -5,7 +5,7 @@ unlisted: true
 
 # PgBeam Documentation
 
-Source files for [docs.pgbeam.com](https://docs.pgbeam.com) — the documentation
+Source files for [pgbeam.com/docs](https://pgbeam.com/docs) — the documentation
 for PgBeam, a globally distributed PostgreSQL proxy platform with connection
 pooling and query caching.
 

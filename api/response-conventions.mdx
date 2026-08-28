@@ -102,7 +102,11 @@ double-create resources.
   if the initial request succeeds but the client loses the response
 - GET and DELETE are naturally idempotent — no key needed
 - The server caches idempotent responses for **24 hours**
-- Transient errors (408, 429, 502, 503, 504) are **not** cached — the next retry
+- Success responses and 4xx responses are cached. A 4xx is the server's settled
+  answer about that exact request, so a retry carrying the same key is answered
+  from the cache rather than running the handler again
+- Every 5xx, plus 408 and 429, is **not** cached. A server error means the
+  request produced no settled answer, so the next retry with the same key
   executes the handler again
 
 See the [TypeScript SDK](/docs/ts-sdk/error-handling#retry-configuration) and

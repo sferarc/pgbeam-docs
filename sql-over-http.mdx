@@ -50,6 +50,12 @@ Parameters are bound over the PostgreSQL extended query protocol. Values are
 never interpolated into the SQL text, so there is no injection surface in the
 binding step.
 
+A parameter that is itself a JSON array binds as a PostgreSQL array, so
+`"params": [[1, 2, 3]]` works against `WHERE id = ANY($1)`. A JSON object binds
+as JSON. Both keep their exact values: a whole number never picks up exponent
+notation, and a string is never read back as SQL `NULL` or trimmed of
+surrounding whitespace.
+
 One statement per request. Batch bodies (a `queries` array) are rejected with
 a clear error; if you need multi-statement transactions in one request, use
 the [Neon-compatible `/sql` endpoint](/docs/serverless) and
@@ -83,7 +89,11 @@ Values are typed JSON: numbers for `int2`/`int4`/floats, booleans for `bool`,
 parsed objects for `json`/`jsonb`, arrays for array columns. `bigint` (`int8`),
 `numeric`, and `money` are returned as strings, matching the serverless driver
 contract: a JavaScript `Number` silently corrupts integers above 2^53 and
-arbitrary-precision decimals.
+arbitrary-precision decimals. The same holds element-wise for `int8[]`,
+`numeric[]` and `money[]`.
+
+`uuid` is returned as its canonical dashed text (`"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"`),
+and `uuid[]` as an array of those strings.
 
 ## Errors
 
