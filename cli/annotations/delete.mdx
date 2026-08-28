@@ -1,0 +1,43 @@
+---
+title: annotations delete
+description: Delete a schema annotation
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Removes a single annotation identified by its natural key. Omit column_name to delete a table-level annotation, and omit schema_name to match the unqualified form.
+
+## Usage
+
+```bash
+pgbeam annotations delete [flags]
+```
+
+## Options
+
+| Option                  | Description                                                 | Required | Default |
+| ----------------------- | ----------------------------------------------------------- | -------- | ------- |
+| `--table-name <value>`  | Relation (table or view) the annotation describes.          | Yes      | -       |
+| `--schema-name <value>` | Optional schema. Omit to match the unqualified form.        | No       | -       |
+| `--column-name <value>` | Optional column. Omit to delete a table-level annotation.   | No       | -       |
+| `--yes`, `-y`           | Skip the confirmation prompt (useful for scripts and CI/CD) | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Delete a schema annotation
+pgbeam annotations delete
+
+# Output as JSON
+pgbeam annotations delete --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

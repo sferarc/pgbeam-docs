@@ -1,0 +1,41 @@
+---
+title: annotations list
+description: List schema annotations
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Lists the project's human-written table and column descriptions. These are surfaced to connected agents through the MCP schema catalog.
+
+## Usage
+
+```bash
+pgbeam annotations list [flags]
+```
+
+## Options
+
+| Option            | Description                     | Required | Default |
+| ----------------- | ------------------------------- | -------- | ------- |
+| `--limit <value>` | Maximum number of items (1-100) | No       | -       |
+| `--all`           | Fetch every page                | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# List schema annotations
+pgbeam annotations list
+
+# Output as JSON
+pgbeam annotations list --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

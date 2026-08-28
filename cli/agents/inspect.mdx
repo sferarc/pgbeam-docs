@@ -1,0 +1,40 @@
+---
+title: agents inspect
+description: Show what an agent credential can actually do
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Fetch an agent credential together with the policy profile attached to it and print one capability card: whether the credential can connect at all, which statement kinds it can run, which relations it can reach, which columns come back masked, its budgets and caps, and how its writes are handled. The card resolves the two records against each other the way the proxy does, so it reports the effective answer rather than the raw fields: a read-only credential that lists `update` in its statement allowlist is still shown as blocked, because access_mode is a ceiling the allowlist cannot lift. The same static checks `pgbeam policies lint` runs are appended, so a credential attached to a risky policy says so here. Read-only: it fetches two records and computes the rest offline. Use `pgbeam agents show` for the raw credential record.
+
+## Usage
+
+```bash
+pgbeam agents inspect <id>
+```
+
+## Options
+
+| Option | Description         | Required | Default |
+| ------ | ------------------- | -------- | ------- |
+| `<id>` | Agent credential ID | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Show a credential's capability card
+pgbeam agents inspect agt_xxx
+
+# Capture the card as JSON
+pgbeam agents inspect agt_xxx --json
+```
+
+## Output
+
+Prints the capability card: credential state, effective statement kinds, reachable relations, masked columns, row filters, budgets, write handling, the non-configurable safety floor, and any policy lint findings. With --json, returns the full card object including a per-kind statement verdict list and the lint findings with their summary.

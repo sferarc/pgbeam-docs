@@ -19,6 +19,7 @@
 		"---Agent gateway---",
 		"agents",
 		"policies",
+		"annotations",
 		"approvals",
 		"anomalies",
 		"honeytokens",

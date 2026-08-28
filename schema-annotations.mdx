@@ -36,7 +36,24 @@ Annotations are keyed by `(schema_name, table_name, column_name)`. Omit
 `column_name` to describe the table itself. Omit `schema_name` to match the
 unqualified form. A `PUT` with an existing key replaces that annotation.
 
-Describe a table:
+From the CLI, against the linked project:
+
+```bash
+# Describe a table
+pgbeam annotations set \
+  --schema-name public \
+  --table-name users \
+  --description "Primary customer account. One row per signed-up user."
+
+# Describe a column
+pgbeam annotations set \
+  --schema-name public \
+  --table-name users \
+  --column-name lifecycle_stage \
+  --description "Funnel stage: one of lead, trial, active, churned."
+```
+
+Or over HTTP. Describe a table:
 
 ```bash
 curl -X PUT https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
@@ -65,7 +82,24 @@ curl -X PUT https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
 
 ## List and delete
 
-List every annotation for a project (cursor-paginated):
+From the CLI:
+
+```bash
+# Every annotation on the linked project (add --all to follow every page)
+pgbeam annotations list
+
+# Remove one by its key
+pgbeam annotations delete \
+  --schema-name public \
+  --table-name users \
+  --column-name lifecycle_stage
+```
+
+`annotations list` prints the key and the description; pass `--json` for the
+full records, including ids and timestamps. `annotations delete` prompts before
+removing, and `--yes` skips the prompt for scripts and CI.
+
+Over HTTP, list every annotation for a project (cursor-paginated):
 
 ```bash
 curl https://api.pgbeam.com/v1/projects/prj_123/schema-annotations \
@@ -95,6 +129,8 @@ never surfaced.
 - Writing an annotation needs the `schema_annotation:write` permission (held by
   owners, admins, security admins, and policy authors). Reading needs
   `schema_annotation:read`.
+- The CLI commands act on the linked project. Use `--project` to target another
+  one without switching links.
 - Annotations are editable in the dashboard, on a project's **Schema** page under
   Policy and Safety. It lists the tables and columns the project can see, shows
   which columns a masking rule covers and with which mask kind, and lets you write

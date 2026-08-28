@@ -1,0 +1,43 @@
+---
+title: annotations set
+description: Create or replace a schema annotation
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Attaches an operator-written description to a table (omit column_name) or a column. Keyed by (schema_name, table_name, column_name); an existing annotation with the same key is replaced.
+
+## Usage
+
+```bash
+pgbeam annotations set [flags]
+```
+
+## Options
+
+| Option                  | Description                                                  | Required | Default |
+| ----------------------- | ------------------------------------------------------------ | -------- | ------- |
+| `--schema-name <value>` | Optional schema. Null or empty matches the unqualified form. | No       | -       |
+| `--table-name <value>`  | Relation (table or view) the annotation describes.           | Yes      | -       |
+| `--column-name <value>` | Optional column. Null describes the table itself.            | No       | -       |
+| `--description <value>` | The operator-written description text.                       | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Create or replace a schema annotation
+pgbeam annotations set
+
+# Output as JSON
+pgbeam annotations set --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

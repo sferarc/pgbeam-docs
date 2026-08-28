@@ -5,6 +5,7 @@
 	"pages": [
 		"list",
 		"show",
+		"inspect",
 		"create",
 		"mcp-config",
 		"rotate",

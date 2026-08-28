@@ -1,0 +1,10 @@
+{
+	"defaultOpen": false,
+	"title": "annotations",
+	"icon": "BookText",
+	"pages": [
+		"list",
+		"set",
+		"delete"
+	]
+}
