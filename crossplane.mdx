@@ -3,13 +3,13 @@ title: Crossplane
 icon: Blocks
 tag: Kubernetes
 description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments as
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens as
   Kubernetes custom resources using the Crossplane provider.
 ---
 
 Manage your PgBeam infrastructure as Kubernetes custom resources with
 Crossplane. The `provider-pgbeam` package provides managed resources for
-projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, and self host enrollments.
+projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens.
 
 ## Setup
 
@@ -119,15 +119,13 @@ kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
 
 ## Resources
 
-<Callout type="warn">
-  **Policy profiles are not yet managed as code.** Resources that reference a
-  policy (`policy_profile_id` on an agent credential,
-  `default_policy_profile_id` on a project) expect the ID of a profile created
-  out of band with `pgbeam policies create` or the dashboard. There is no
-  policy-profile resource in the providers yet, so the policy itself, the most
-  security-sensitive primitive, lives outside your reviewed IaC flow and is
-  invisible to drift detection. Track this before gating full adoption on
-  policy-as-code.
+<Callout type="info">
+  **Approval and anomaly rules are not yet managed as code.** Policy profiles
+  and honeytokens are managed resources, so the enforcement rules and the decoys
+  live in your reviewed IaC flow and are covered by drift detection. Approval
+  rules and anomaly rules are not: the API exposes them only as events to review
+  after the fact (approve/reject, ack/resolve), so there is nothing to declare
+  yet. Those two still live outside IaC.
 </Callout>
 
 ### Project
@@ -398,6 +396,27 @@ spec:
 
 **Status:** `createdBy`, `createdAt`, `lastSeenAt`, `revokedAt`, `token`
 
+### Honeytoken
+
+Manages a honeytoken: a decoy (canary) relation that no legitimate query should ever touch. Any agent statement referencing it is blocked and recorded as a canary_tripped audit event; the kill action additionally disables the tripping credential via the kill-switch. The relation does not have to exist in the upstream database: enforcement is by name, in the wire protocol, before the statement reaches Postgres.
+
+```yaml
+apiVersion: pgbeam.io/v1alpha1
+kind: Honeytoken
+metadata:
+  name: example
+spec:
+  forProvider:
+    projectID: prj_01j9x8y7z6w5v4u3t2s1r0q9p8
+    schemaName: public
+    relationName: customer_ssns
+    action: audit_only
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `createdAt`, `updatedAt`
+
 ## Configuration
 
 | Setting           | Source         | Description                                      |
@@ -421,6 +440,7 @@ Some spec changes trigger resource recreation rather than in-place updates:
 | PolicyProfile      | `projectId`                                                          |
 | WebhookEndpoint    | `projectId`                                                          |
 | SelfHostEnrollment | Any spec change (immutable)                                          |
+| Honeytoken         | `projectId`                                                          |
 
 ## Further reading
 
