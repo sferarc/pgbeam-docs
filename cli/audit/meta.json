@@ -4,6 +4,7 @@
 	"icon": "ScrollText",
 	"pages": [
 		"list",
-		"export"
+		"export",
+		"session"
 	]
 }

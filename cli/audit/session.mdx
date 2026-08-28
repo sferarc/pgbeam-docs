@@ -1,0 +1,45 @@
+---
+title: audit session
+description: Summarize one agent session's audit entries
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Group one session's audit entries into a single summary: the credentials and origins involved, the window it spans, how many statements were allowed, blocked, masked and truncated, the rows and bytes it moved, and the tables it read, wrote and was refused. Session IDs come from the session_id field of `pgbeam audit list --json`. The summary is computed from the audit log with no model involved, so the same entries always summarize the same way, and it carries table names and counts only, never row values. A session ID is unique per connection within a proxy instance and not over time, so narrow a reused one with --start and --end.
+
+## Usage
+
+```bash
+pgbeam audit session <session-id> [flags]
+```
+
+## Options
+
+| Option            | Description                                                              | Required | Default |
+| ----------------- | ------------------------------------------------------------------------ | -------- | ------- |
+| `<session-id>`    | Session ID from an audit entry                                           | Yes      | -       |
+| `--start <value>` | Only entries at or after this ISO 8601 timestamp (inclusive lower bound) | No       | -       |
+| `--end <value>`   | Only entries strictly older than this ISO 8601 timestamp (upper bound)   | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Summarize a session
+pgbeam audit session 0000a41f
+
+# Narrow a reused session ID to one window
+pgbeam audit session 0000a41f --start 2026-01-01T00:00:00Z --end 2026-01-02T00:00:00Z
+
+# Machine-readable output
+pgbeam audit session 0000a41f --json
+```
+
+## Output
+
+Prints the session window, credentials and sources, the allowed/blocked/masked/truncated statement counts, rows and bytes returned, and the tables read, written, and blocked.

@@ -1,0 +1,58 @@
+---
+title: GetAuditSessionSummary
+description: Summarize one agent session
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Groups a session's audit entries into one deterministic summary: the credentials and origins involved, the window it spans, how many statements were allowed, blocked, masked and truncated, the rows and bytes it moved, and the tables it read, wrote and was refused. No model is involved, so the same entries always summarize the same way. Returns metadata only (table names and counts), never row values, and requires the same audit:read permission the list and export endpoints do.
+
+## Usage
+
+```go
+result, err := client.Agents.GetAuditSessionSummary(ctx, "prj_xxx", "...", nil)
+```
+
+## Parameters
+
+| Parameter    | Type                                   | Required | Description                                                                                                              |
+| ------------ | -------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| ctx          | `context.Context`                      | Yes      | Request context                                                                                                          |
+| projectID    | `string`                               | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                      |
+| sessionID    | `string`                               | Yes      | Session identifier from an audit entry's session_id field. Unique per connection within a proxy instance, not over time. |
+| params       | `*pgbeam.GetAuditSessionSummaryParams` | No       | Query parameters                                                                                                         |
+| params.Start | `string`                               | No       | Return entries at or after this timestamp (inclusive lower bound).                                                       |
+| params.End   | `string`                               | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                |
+
+## Response
+
+`(*pgbeam.AuditSessionSummary, error)`: session summary.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Agents.GetAuditSessionSummary(ctx, "prj_xxx", "...", &pgbeam.GetAuditSessionSummaryParams{
+    Start: "...",
+    End: "...",
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

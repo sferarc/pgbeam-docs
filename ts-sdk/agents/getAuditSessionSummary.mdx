@@ -1,0 +1,55 @@
+---
+title: getAuditSessionSummary
+description: Summarize one agent session
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Groups a session's audit entries into one deterministic summary: the credentials and origins involved, the window it spans, how many statements were allowed, blocked, masked and truncated, the rows and bytes it moved, and the tables it read, wrote and was refused. No model is involved, so the same entries always summarize the same way. Returns metadata only (table names and counts), never row values, and requires the same audit:read permission the list and export endpoints do.
+
+## Usage
+
+```typescript
+const result = await api.agents.getAuditSessionSummary({
+  pathParams: { project_id: "prj_xxx", session_id: "..." },
+});
+```
+
+## Parameters
+
+| Parameter             | Type     | Required | Description                                                                                                              |
+| --------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                      |
+| pathParams.session_id | `string` | Yes      | Session identifier from an audit entry's session_id field. Unique per connection within a proxy instance, not over time. |
+| queryParams.start     | `string` | No       | Return entries at or after this timestamp (inclusive lower bound).                                                       |
+| queryParams.end       | `string` | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                |
+
+## Response
+
+`Promise<AuditSessionSummary>`: session summary.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.agents.getAuditSessionSummary({
+  pathParams: { project_id: "prj_xxx", session_id: "..." },
+  queryParams: { start: "...", end: "..." },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |
