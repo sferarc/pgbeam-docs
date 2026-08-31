@@ -8,10 +8,10 @@ description:
 
 The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
 server that exposes policy-enforced database tools to an AI agent. You paste one
-URL into your MCP client, and the agent gets `query`, `validate_sql`,
-`list_tables`, `describe_table`, `explain`, `schema_catalog`, and
-`my_permissions`, plus `search_docs` and `read_doc` for looking up how PgBeam
-works. Every database call runs through the
+URL into your MCP client, and the agent gets `briefing`, `query`,
+`validate_sql`, `list_tables`, `describe_table`, `explain`, `schema_catalog`,
+and `my_permissions`, plus `search_docs` and `read_doc` for looking up how
+PgBeam works. Every database call runs through the
 same policy engine as a scoped connection string, so the agent is held to the
 same guardrails. There is nothing to install and no server to run.
 
@@ -212,6 +212,7 @@ response; copy them from there.
 
 | Tool             | Purpose                                                                                                                                                                                        |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `briefing`       | Start here. One call returns a compact summary of the schema you can see, everything `my_permissions` reports, and short guidance on querying within those limits. No arguments.               |
 | `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.                                                                                                                           |
 | `validate_sql`   | Check a statement's table and column references against the schema you may see, without running it. Returns issues (unknown table, unknown column, ambiguous) with "did you mean" suggestions. |
 | `list_tables`    | List tables in a schema, shaped for an LLM.                                                                                                                                                    |
@@ -225,6 +226,19 @@ response; copy them from there.
 Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of
 `pg_catalog` and `information_schema` are permitted regardless of the allowlist,
 so an agent can discover the schema it is allowed to query.
+
+`briefing` is the one call to make at the start of a session. It composes the
+other two orientation tools: a compact digest of `schema_catalog` (tables with
+their columns, types, primary keys, foreign keys, approximate row counts, and
+masked-column flags, with the nullability, defaults, comments and indexes left
+to `schema_catalog` itself), the whole `my_permissions` report, and a short
+`how_to_query` list saying how to work within both. It costs the same database
+round-trips as one `schema_catalog` call and charges the query budget the same
+way. Two things to know about it: when `schema.truncated` is set the table list
+is a prefix and `schema_catalog` is the tool that pages through the rest, and
+when the schema cannot be read at all (an engaged kill-switch, an unreachable
+upstream) the briefing still answers, with `schema.unavailable` carrying the
+reason and the policy half intact.
 
 `my_permissions` is how an agent learns its limits without discovering them by
 being blocked. It reads the credential's compiled policy out of the proxy's own
