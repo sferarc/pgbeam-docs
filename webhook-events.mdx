@@ -22,6 +22,7 @@ fires, and the fields in its payload. Subscribe to a subset with `event_types`
 | `migration_flagged`  | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
 | `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
 | `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
+| `audit_checkpoint`   | A signed checkpoint is issued over the project's audit chain.                     |
 
 A separate `webhook.test` event is sent only when you use **Send test event** on
 an endpoint. You do not subscribe to it, and it never fires from live traffic.
@@ -152,6 +153,46 @@ from its baseline.
 | `window_start`  | Start of the window the alert was computed over (RFC 3339).                                                |
 | `window_end`    | End of that window (RFC 3339).                                                                             |
 
+## `audit_checkpoint`
+
+A periodic signed statement of how long the project's audit chain is and what it
+contains. Unlike every other event here, it is not about one query: it is about
+the whole chain.
+
+Keep these. A hash chain cannot detect deletion at its own tip, because nothing
+inside it records how long it was supposed to be. A checkpoint you have retained
+is an outside record, so it lets you detect a truncation from a copy PgBeam no
+longer holds, and lets you verify the claim without trusting us to verify it for
+you.
+
+```json title="audit_checkpoint data"
+{
+  "checkpoint_id": "ackp_...",
+  "origin": "pgbeam/audit/prj_...",
+  "size": 10423,
+  "root": "9f2c...",
+  "key_name": "pgbeam-audit-anchor",
+  "note": "pgbeam/audit/prj_...\n10423\nnyw...=\n\n\u2014 pgbeam-audit-anchor Ab3d...\n"
+}
+```
+
+| Field           | Description                                                                       |
+| --------------- | --------------------------------------------------------------------------------- |
+| `checkpoint_id` | Id of the checkpoint.                                                             |
+| `origin`        | Log identity, `pgbeam/audit/<project_id>`. Bound into the signature.              |
+| `size`          | Number of audit entries the checkpoint commits to.                                |
+| `root`          | Merkle root over those entries, hex.                                              |
+| `key_name`      | Name of the Ed25519 key that signed the note.                                     |
+| `note`          | The signed artifact, in the transparency-log note format. This is what to retain. |
+
+The `size` and `root` fields are there so you can read the event without parsing
+anything. `note` is the one that carries the claim: it is signed, so `size` and
+`root` cannot be altered inside it, and it is what a verifier checks. If you keep
+only one field, keep that one.
+
+The tree is an RFC 6962 Merkle tree, so any library implementing that
+specification can verify a note against a set of entries.
+
 ## `webhook.test`
 
 Sent by **Send test event** so you can verify a receiver before relying on it.
@@ -172,3 +213,5 @@ Sent by **Send test event** so you can verify a receiver before relying on it.
   from.
 - [Anomaly detection](/docs/anomaly-detection): source of `anomaly_alert` events.
 - [Kill-switch](/docs/kill-switch): source of `kill_switch` events.
+- [Audit log](/docs/audit-log): the chain `audit_checkpoint` commits to, and the
+  verification endpoint that compares the two.
