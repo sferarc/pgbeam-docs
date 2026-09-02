@@ -1,0 +1,44 @@
+---
+title: agents usage
+description: Break down project usage by agent credential
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Aggregate the audit trail into per-agent usage for a window: statements by decision, rows and bytes returned, the cache outcome breakdown, and latency percentiles. Without --start and --end the window is the last 30 days, and it cannot exceed 92 days because the report reads every entry in it. Grouped by credential, not by session, because a session ID identifies one connection rather than an agent or a run. Usage recorded against no credential is reported as its own line rather than dropped, so the agent lines plus unattributed always equal the totals. The command reports usage and prices nothing: overage is computed on the organization's total against a plan limit, so no single agent causes it independently of the others. The plan's limits and marginal rates are included in --json output for a caller that wants to apply its own pricing policy.
+
+## Usage
+
+```bash
+pgbeam agents usage [flags]
+```
+
+## Options
+
+| Option            | Description                                                              | Required | Default |
+| ----------------- | ------------------------------------------------------------------------ | -------- | ------- |
+| `--start <value>` | Only entries at or after this ISO 8601 timestamp (inclusive lower bound) | No       | -       |
+| `--end <value>`   | Only entries strictly older than this ISO 8601 timestamp (upper bound)   | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Usage for the linked project
+pgbeam agents usage
+
+# One window
+pgbeam agents usage --start 2026-09-01T00:00:00Z --end 2026-09-08T00:00:00Z
+
+# Machine-readable output
+pgbeam agents usage --json
+```
+
+## Output
+
+Prints one line per agent credential with statement counts by decision, rows and bytes returned, and latency percentiles, followed by the unattributed line and the totals. Warns when the trail lost entries in the window, because the totals are then a floor rather than a measurement.
