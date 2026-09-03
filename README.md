@@ -5,8 +5,9 @@ unlisted: true
 
 # PgBeam Documentation
 
-Source files for [pgbeam.com/docs](https://pgbeam.com/docs) — the documentation
-for PgBeam, a globally distributed PostgreSQL proxy platform with connection
+Source files for [pgbeam.com/docs](https://pgbeam.com/docs), the documentation
+for PgBeam, a Postgres proxy for safe AI agent access with policy enforcement
+in the wire protocol. It is also globally distributed and provides connection
 pooling and query caching.
 
 ## Structure
