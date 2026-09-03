@@ -52,6 +52,37 @@ application's passthrough connection is never masked.
   protect.
 </Callout>
 
+## Views are not seen through
+
+A masking rule names a relation, and a view is a relation of its own. PgBeam
+reads the SQL an agent sends and does not consult the database catalog, so it
+never learns that a view is a stored query over a masked table. A rule on
+`patients.full_name` does nothing for `SELECT full_name FROM patient_summary`,
+whether the view exposes the column under its own name or renames it.
+
+Two consequences follow. The value comes back in the clear, and the guard that
+normally refuses a masked column in a `WHERE`, `ORDER BY` or `GROUP BY` clause is
+blind in the same place, so an agent can also filter and sort on it through the
+view.
+
+The remedy is to name the view in its own rule, using whatever the view calls the
+column:
+
+```bash title="Mask the view as well as the table"
+pgbeam policies create --name analytics \
+  --mask patients.full_name=redact \
+  --mask patient_summary.full_name=redact
+```
+
+Masking then works on the view exactly as it does on a table, guard included. The
+policy editor flags this for you: when a relation you name resolves to a view, it
+says so above the field. Allowlists and [row filters](/docs/policies) carry the
+same limit, so a view over a row-filtered table serves every row.
+
+An agent credential cannot create the view to get around its own policy. Every
+`CREATE VIEW` and `CREATE MATERIALIZED VIEW` over a masked column is refused. The
+case to watch for is a view you built yourself and then exposed to the agent.
+
 ## Combine with allowlists
 
 Masking and [allowlists](/docs/allowlists) work together. Allow a column so the
