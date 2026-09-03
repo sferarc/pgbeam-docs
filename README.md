@@ -31,14 +31,19 @@ pooling and query caching.
 
 ## Contributing
 
-Documentation is written in MDX (Markdown + JSX). Pages use
-[Fumadocs](https://fumadocs.vercel.app/) conventions.
+Issues and pull requests are welcome here. An issue is the right place to start
+for a page that is wrong, missing, or out of date; link the page and say what it
+should have told you.
 
-To preview locally, run from the monorepo root:
+Pages are MDX (Markdown plus JSX) and follow
+[Fumadocs](https://fumadocs.vercel.app/) conventions. The `api/`, `cli/`,
+`ts-sdk/`, and `go-sdk/` sections are reference material built from the API
+contract and the CLI command definitions, so corrections to those are best filed
+as an issue naming the operation or command.
 
-```bash
-pnpm dev
-```
+Do not open a public issue for a suspected security vulnerability. Email
+security@pgbeam.com, or report it privately from this repository's Security
+tab.
 
 ## License
 
