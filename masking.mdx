@@ -9,7 +9,7 @@ description:
 Masking rewrites sensitive column values in an agent's results before they leave
 the wire. You name the columns to protect and choose how to mask each one. Your
 application keeps reading the real values on its own connection. The agent
-receives masked data it can still join and group on, but never the raw value.
+receives the masked value and never the raw one.
 
 ## Define masking rules
 
@@ -24,14 +24,16 @@ In the dashboard, add masking rules on the policy profile under **Masking**.
 
 ## Mask kinds
 
-| Kind     | Text-format result               | Binary-format result | Use it for                                |
-| -------- | -------------------------------- | -------------------- | ----------------------------------------- |
-| `redact` | A fixed token, e.g. `[redacted]` | `NULL`               | Free-text fields the agent must not read. |
-| `hash`   | SHA-256 hex of the value         | `NULL`               | Joinable identifiers (email, user key).   |
-| `null`   | Empty / `NULL`                   | `NULL`               | Columns the agent should ignore entirely. |
+| Kind     | Text-format result               | Binary-format result | Use it for                                                                                           |
+| -------- | -------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------- |
+| `redact` | A fixed token, e.g. `[redacted]` | `NULL`               | Free-text fields the agent must not read.                                                            |
+| `hash`   | SHA-256 hex of the value         | `NULL`               | Identifiers whose equality the agent may correlate across rows in its own results (email, user key). |
+| `null`   | Empty / `NULL`                   | `NULL`               | Columns the agent should ignore entirely.                                                            |
 
-`hash` keeps the same input mapping to the same output, so an agent can still
-join and group on the column without ever seeing the cleartext.
+`hash` maps the same input to the same output, so equal values are visibly
+equal in the rows the agent gets back and it can correlate them itself. It
+cannot ask the database to do that correlation: a masked column may be selected
+and nothing else. See the guard below.
 
 ## When masking applies
 
@@ -83,11 +85,26 @@ An agent credential cannot create the view to get around its own policy. Every
 `CREATE VIEW` and `CREATE MATERIALIZED VIEW` over a masked column is refused. The
 case to watch for is a view you built yourself and then exposed to the agent.
 
+## A masked column may be selected, and nothing else
+
+Masking redacts a column's output, but the raw value can still steer a query:
+`WHERE dob >= '1980-01-01'` probes a range, `WHERE name LIKE 'A%'` enumerates
+characters, and `ORDER BY dob` leaks the ordering, all without the value ever
+appearing in a result cell. So the policy fails closed. A masked column
+referenced in `WHERE`, `HAVING`, a join condition, `GROUP BY`, `ORDER BY`,
+`DISTINCT`, a window clause, `LIMIT`/`OFFSET`, or the arguments of a
+set-returning function is refused, in the top-level statement and in every
+subquery and CTE.
+
+The practical consequence: an existing query that groups by a column you are
+about to mask starts failing rather than returning masked groups, and has to be
+rewritten.
+
 ## Combine with allowlists
 
-Masking and [allowlists](/docs/allowlists) work together. Allow a column so the
-agent can join and group on it, and mask it so the agent never reads the raw
-value.
+Masking and [allowlists](/docs/allowlists) work together. Allowlisting decides
+which relations and columns an agent may reach at all; masking decides what the
+allowed column's value looks like when it comes back.
 
 ## Related
 

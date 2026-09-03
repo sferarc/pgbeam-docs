@@ -129,6 +129,8 @@ the ceiling is approved and recorded; a write over it is parked for a person. Se
 `approval_auto_max_rows` to `0` to auto-approve nothing. DDL and other statements
 with no countable row effect are never auto-approved.
 
+An auto-approved write is recorded in the [audit log](/docs/audit-log) as an `auto_approved` event, and it is the only entry that write produces. That is a different event from `approved`, which records a person releasing a held statement that then runs and files its own outcome. Both `auto_approved` and `query` answer the `decision=allow` filter, so a report of everything the gateway let through includes the writes a policy waved past a human.
+
 ## Auto-expire
 
 A held request that no one acts on expires after the policy's expiry window. The
