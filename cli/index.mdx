@@ -1,24 +1,65 @@
 ---
-title: CLI installation
-description: Install the PgBeam CLI on macOS or Linux.
+title: Installation
+description: Install the PgBeam CLI with npm, Homebrew, or the install script, on macOS, Linux, or Windows.
 ---
 
-<Tabs items={["macOS", "Linux"]}>
-  <Tab value="macOS">
+The PgBeam CLI is open source at [sferarc/pgbeam-cli](https://github.com/sferarc/pgbeam-cli).
+
+<Callout type="warn" title="npm and Homebrew are not live yet">
+  The install script below works today. The npm package `@pgbeam/cli` and the
+  Homebrew tap `sferarc/pgbeam` are documented here as what they will be, and
+  neither installs anything until the first release publishes them. Use the
+  install script, or the Windows script, until then.
+</Callout>
+
+Pick whichever fits how you already install tools. They all give you the same `pgbeam` command.
+
+<Tabs items={["npm", "Homebrew", "Install script", "Windows"]}>
+  <Tab value="npm">
+    Not published yet, so this command does not work today. It is what the npm
+    install will be.
+
     ```bash
-    curl -fsSL https://pgbeam.com/install | sh
+    npm install -g @pgbeam/cli
     ```
 
-    The installer downloads a precompiled binary and adds it to your PATH.
+    Runs on Node 20.19 or newer. To use it once without installing:
+
+    ```bash
+    npx @pgbeam/cli --help
+    ```
 
   </Tab>
 
-  <Tab value="Linux">
+  <Tab value="Homebrew">
+    The tap is not populated yet, so this command does not work today. It is
+    what the Homebrew install will be.
+
+    ```bash
+    brew install sferarc/pgbeam/pgbeam
+    ```
+
+    Installs a self-contained native binary, so no Node runtime is needed. macOS and Linux, on both Apple silicon or ARM64 and x86\_64.
+
+    Upgrade with `brew upgrade pgbeam`.
+
+  </Tab>
+
+  <Tab value="Install script">
     ```bash
     curl -fsSL https://pgbeam.com/install | sh
     ```
 
-    Supports x86\_64 and ARM64 architectures.
+    Downloads the same native binary as Homebrew and puts it on your PATH. macOS and Linux, x86\_64 and ARM64.
+
+  </Tab>
+
+  <Tab value="Windows">
+    ```powershell
+    irm https://pgbeam.com/install/windows | iex
+    ```
+
+    Once `@pgbeam/cli` is published, npm will work the same on Windows: `npm install -g @pgbeam/cli`.
 
   </Tab>
 </Tabs>
@@ -36,3 +77,15 @@ pgbeam auth login
 ```
 
 See [auth login](/docs/cli/auth/login) for details.
+
+## Keeping it up to date
+
+How you upgrade depends on how you installed:
+
+| Installed with | Upgrade with                        |
+| -------------- | ----------------------------------- |
+| npm            | `npm install -g @pgbeam/cli@latest` |
+| Homebrew       | `brew upgrade pgbeam`               |
+| Install script | `pgbeam update`                     |
+
+[`pgbeam update`](/docs/cli/update) replaces the native binary in place, so use it for an install-script install. On a Homebrew or npm install, let the package manager do it instead, or its bookkeeping and the binary on disk will disagree.
