@@ -64,6 +64,7 @@
 		"---Reference---",
 		"organizations",
 		"api-keys",
+		"api-lifecycle",
 		"sso",
 		"plans",
 		"error-codes",

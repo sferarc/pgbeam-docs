@@ -1,0 +1,104 @@
+---
+title: API Lifecycle
+icon: CalendarClock
+description: What a PgBeam API version guarantees, how long a deprecated endpoint keeps answering, and how deprecations are announced.
+---
+
+This is the policy for the PgBeam control plane REST API (`https://api.pgbeam.com`), the SDKs and the CLI generated from it, and the IaC providers generated from it. If you build against `/v1`, this is what you can rely on.
+
+## Versioning
+
+The API is versioned in the URL path: `https://api.pgbeam.com/v1/projects`. A major version number changes only for a break that no amount of care can avoid. Everything else ships inside `v1`.
+
+The [OpenAPI document](https://pgbeam.com/openapi.json) is the contract. The SDKs, the CLI, the Terraform, Pulumi and Crossplane providers, and this documentation are all generated from it, so anything true of the spec is true of every client we publish.
+
+## What a version guarantees
+
+Inside a major version, we will not:
+
+- remove an endpoint, or change its method or path
+- remove a response field, or change its type
+- add a required request parameter, or make an optional one required
+- narrow an accepted value (for example, dropping an enum member the API used to accept)
+- change the meaning of an existing field
+- change an error's HTTP status code for the same condition
+
+Inside a major version, we will:
+
+- add endpoints
+- add optional request parameters
+- add response fields
+- add new values to a response enum
+- add new error codes for new conditions
+
+Write your client so those additions are non-events: ignore response fields you do not recognise, and do not assume a closed set of enum values or error codes.
+
+Two things sit outside the guarantee. Endpoints marked `x-internal` in the spec (they are stripped from the published spec and the SDKs) exist for our own services and can change at any time. So can anything documented as a preview.
+
+## Deprecation
+
+A deprecated endpoint keeps working. It is marked, it is announced, and it is given a retirement date, in that order.
+
+An endpoint is deprecated when it is marked `deprecated: true` in the OpenAPI document. From that moment every response from it carries:
+
+| Header        | Meaning                                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `Deprecation` | When the endpoint was deprecated, as an [RFC 9745](https://www.rfc-editor.org/rfc/rfc9745.html) structured date |
+| `Sunset`      | When it stops answering, as an [RFC 8594](https://www.rfc-editor.org/rfc/rfc8594.html) HTTP date                |
+| `Link`        | `rel="deprecation"` points at this page; `rel="successor-version"` points at the replacement when there is one  |
+
+For example:
+
+```http
+HTTP/1.1 200 OK
+Deprecation: @1767225600
+Sunset: Wed, 01 Jul 2026 00:00:00 GMT
+Link: <https://pgbeam.com/docs/api-lifecycle>; rel="deprecation"; type="text/html"
+```
+
+`Deprecation` is seconds since the Unix epoch, prefixed with `@`. `Sunset` is never earlier than `Deprecation`.
+
+### Timelines
+
+- **Minimum notice: 6 months.** A deprecated endpoint answers for at least six months after its `Deprecation` date before its `Sunset`.
+- **A sunset date is set when the deprecation is announced,** not later. If you see `Deprecation` you will see `Sunset`.
+- **A sunset date can move later, never earlier.**
+- **After the sunset date** the endpoint returns `410 Gone`, still carrying the `Link` to its replacement.
+
+### How a deprecation is announced
+
+1. The OpenAPI document marks the operation `deprecated: true`, so it shows up in the spec, this documentation, and the generated SDKs and providers on their next release.
+2. The response headers above start on the next deploy.
+3. It is written up in the [changelog](https://pgbeam.com/changelog).
+4. Organizations whose traffic hit the endpoint in the previous 30 days get an email.
+
+### Reacting to it in code
+
+Both the header and the spec are machine-readable, which is the point. Log a warning when you see `Deprecation` on a response, and follow `rel="successor-version"` to whatever replaced the endpoint. An agent reading the OpenAPI document can find the same thing under the operation's `deprecated` flag, without waiting to be told at request time.
+
+## Currently deprecated
+
+Nothing. No endpoint in `/v1` is deprecated, so no response carries a `Deprecation` or `Sunset` header today. The mechanism is in place so that the first deprecation is announced properly rather than being the thing that makes us build it.
+
+## Breaking changes and a v2
+
+There is no `v2` and none is planned. If one ever ships:
+
+- `v1` keeps answering for at least 12 months after `v2` is generally available.
+- Every `v1` endpoint gets a `Deprecation` and `Sunset` header and a `rel="successor-version"` link to its `v2` equivalent.
+- A migration guide ships with `v2`, not after it.
+
+## Rate limits
+
+Rate limit state comes back on every response, so a client never has to guess where it stands:
+
+```http
+RateLimit-Policy: "default";q=200;w=2;qu="requests"
+RateLimit: "default";r=173;t=2
+X-RateLimit-Limit: 200
+X-RateLimit-Remaining: 173
+```
+
+`RateLimit-Policy` and `RateLimit` are the IETF structured fields from [draft-ietf-httpapi-ratelimit-headers](https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/): `q` is the quota, `w` the window in seconds, `r` what is left, and `t` how long the current window still has to run. The `X-RateLimit-*` pair is the older, non-standard form, kept alongside them for existing clients. It is the pair that will eventually be deprecated, under this policy.
+
+A request over the limit gets `429 Too Many Requests` with a `Retry-After` in whole seconds. Wait that long, then retry.
