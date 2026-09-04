@@ -1,23 +1,16 @@
 ---
 title: Table Allowlists
 icon: ListChecks
-description:
-  Allow the exact schemas and tables an agent may touch. Anything off the list
-  is blocked in the wire protocol.
+description: Allow the exact schemas and tables an agent may touch. Anything off the list is blocked in the wire protocol.
 ---
 
-A table allowlist names the schemas and tables an agent is allowed to touch.
-PgBeam parses each statement, resolves the relations it references, and blocks
-the statement if any of them is not on the list. When an allowlist is set the
-default is deny: an agent reaches only what you explicitly allow.
+A table allowlist names the schemas and tables an agent is allowed to touch. PgBeam parses each statement, resolves the relations it references, and blocks the statement if any of them is not on the list. When an allowlist is set the default is deny: an agent reaches only what you explicitly allow.
 
-A table **denylist** does the opposite: it names relations that are always
-blocked, and it takes precedence over the allowlist.
+A table **denylist** does the opposite: it names relations that are always blocked, and it takes precedence over the allowlist.
 
 ## Define an allowlist
 
-Set the allowlist and denylist on a policy profile. In the dashboard, edit the
-profile under **Allowlist**. From the CLI, pass a JSON profile file:
+Set the allowlist and denylist on a policy profile. In the dashboard, edit the profile under **Allowlist**. From the CLI, pass a JSON profile file:
 
 ```json title="analytics.json"
 {
@@ -33,33 +26,10 @@ pgbeam policies create --name analytics --mode read_only --file analytics.json
 
 ## How matching works
 
-- **Tables**: a statement is allowed only if every relation it reads (or writes,
-  in read-write mode) is on the table allowlist and none is on the denylist.
-- **Schemas**: an entry is schema-qualified (`billing.orders`) or bare
-  (`orders`). A bare allowlist entry grants the `public` schema only, because
-  `SET search_path` is blocked and `public` is the only schema a bare name can
-  resolve to. `billing.orders` is a different table, and allowlisting `orders`
-  does not reach it. A bare **denylist** entry works the other way and blocks
-  that relation in every schema, so a denylist is never narrower than you meant.
-- **Catalog**: reads of `pg_catalog` and `information_schema` are permitted
-  without an allowlist entry, so the agent can introspect the schema it is
-  allowed to query. Three groups are carved out of that, because none of them is
-  introspection: the views carrying other sessions' SQL text
-  (`pg_stat_activity`, `pg_stat_statements`, `pg_prepared_statements`,
-  `pg_cursors`), the catalogs carrying credentials or raw bytes (`pg_authid`,
-  `pg_shadow`, `pg_subscription`, `pg_user_mapping`, `pg_user_mappings`,
-  `information_schema.user_mapping_options`, `pg_largeobject`), and the planner
-  statistics that carry sampled values out of your tables (`pg_stats`,
-  `pg_statistic`, `pg_stats_ext`, `pg_stats_ext_exprs`,
-  `pg_statistic_ext_data`). That last group is the one worth knowing about if you
-  rely on masking: `pg_stats.most_common_vals` holds real values from a column,
-  and it is read off the statistics relation rather than off your table, so no
-  mask applies to it. Anything in these three groups needs an explicit allowlist
-  entry, written with the schema (`pg_catalog.pg_stat_activity`), the same as any
-  other table.
-- **Columns**: there is no column allowlist. To restrict what individual columns
-  return, use [masking](/docs/masking) (redact, null, or hash a column's values
-  in flight).
+- **Tables**: a statement is allowed only if every relation it reads (or writes, in read-write mode) is on the table allowlist and none is on the denylist.
+- **Schemas**: an entry is schema-qualified (`billing.orders`) or bare (`orders`). A bare allowlist entry grants the `public` schema only, because `SET search_path` is blocked and `public` is the only schema a bare name can resolve to. `billing.orders` is a different table, and allowlisting `orders` does not reach it. A bare **denylist** entry works the other way and blocks that relation in every schema, so a denylist is never narrower than you meant.
+- **Catalog**: reads of `pg_catalog` and `information_schema` are permitted without an allowlist entry, so the agent can introspect the schema it is allowed to query. Three groups are carved out of that, because none of them is introspection: the views carrying other sessions' SQL text (`pg_stat_activity`, `pg_stat_statements`, `pg_prepared_statements`, `pg_cursors`), the catalogs carrying credentials or raw bytes (`pg_authid`, `pg_shadow`, `pg_subscription`, `pg_user_mapping`, `pg_user_mappings`, `information_schema.user_mapping_options`, `pg_largeobject`), and the planner statistics that carry sampled values out of your tables (`pg_stats`, `pg_statistic`, `pg_stats_ext`, `pg_stats_ext_exprs`, `pg_statistic_ext_data`). That last group is the one worth knowing about if you rely on masking: `pg_stats.most_common_vals` holds real values from a column, and it is read off the statistics relation rather than off your table, so no mask applies to it. Anything in these three groups needs an explicit allowlist entry, written with the schema (`pg_catalog.pg_stat_activity`), the same as any other table.
+- **Columns**: there is no column allowlist. To restrict what individual columns return, use [masking](/docs/masking) (redact, null, or hash a column's values in flight).
 
 A blocked statement comes back as a Postgres error (SQLSTATE `42501`):
 
@@ -67,8 +37,7 @@ A blocked statement comes back as a Postgres error (SQLSTATE `42501`):
 ERROR:  blocked by PgBeam agent policy: table "public.internal_api_keys" is not in this credential's allowlist; allowed tables: public.orders, public.users
 ```
 
-The message is written to be read by an LLM, so an agent can correct its plan
-and retry within the rules.
+The message is written to be read by an LLM, so an agent can correct its plan and retry within the rules.
 
 ## Honest limits
 
@@ -78,9 +47,7 @@ and retry within the rules.
   credentials to prevent allowlist evasion through unqualified names.
 </Callout>
 
-For columns that exist but should never leave the database in cleartext, reach
-for [masking](/docs/masking): the column stays usable for joins and grouping,
-but its values are hashed or redacted in flight.
+For columns that exist but should never leave the database in cleartext, reach for [masking](/docs/masking): the column stays usable for joins and grouping, but its values are hashed or redacted in flight.
 
 ## Related
 

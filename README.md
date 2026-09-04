@@ -5,10 +5,7 @@ unlisted: true
 
 # PgBeam Documentation
 
-Source files for [pgbeam.com/docs](https://pgbeam.com/docs), the documentation
-for PgBeam, a Postgres proxy for safe AI agent access with policy enforcement
-in the wire protocol. It is also globally distributed and provides connection
-pooling and query caching.
+Source files for [pgbeam.com/docs](https://pgbeam.com/docs), the documentation for PgBeam, a Postgres proxy for safe AI agent access with policy enforcement in the wire protocol. It is also globally distributed and provides connection pooling and query caching.
 
 ## Structure
 
@@ -31,19 +28,11 @@ pooling and query caching.
 
 ## Contributing
 
-Issues and pull requests are welcome here. An issue is the right place to start
-for a page that is wrong, missing, or out of date; link the page and say what it
-should have told you.
+Issues and pull requests are welcome here. An issue is the right place to start for a page that is wrong, missing, or out of date; link the page and say what it should have told you.
 
-Pages are MDX (Markdown plus JSX) and follow
-[Fumadocs](https://fumadocs.vercel.app/) conventions. The `api/`, `cli/`,
-`ts-sdk/`, and `go-sdk/` sections are reference material built from the API
-contract and the CLI command definitions, so corrections to those are best filed
-as an issue naming the operation or command.
+Pages are MDX (Markdown plus JSX) and follow [Fumadocs](https://fumadocs.vercel.app/) conventions. The `api/`, `cli/`, `ts-sdk/`, and `go-sdk/` sections are reference material built from the API contract and the CLI command definitions, so corrections to those are best filed as an issue naming the operation or command.
 
-Do not open a public issue for a suspected security vulnerability. Email
-security@pgbeam.com, or report it privately from this repository's Security
-tab.
+Do not open a public issue for a suspected security vulnerability. Email security@pgbeam.com, or report it privately from this repository's Security tab.
 
 ## License
 

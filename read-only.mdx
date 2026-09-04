@@ -1,15 +1,10 @@
 ---
 title: Read-only Enforcement
 icon: Eye
-description:
-  Block every write and DDL statement for an agent credential. Reads pass,
-  writes are rejected in the wire protocol before they reach your database.
+description: Block every write and DDL statement for an agent credential. Reads pass, writes are rejected in the wire protocol before they reach your database.
 ---
 
-Read-only is the safest access mode for an agent. With it, PgBeam allows reads
-and rejects every `INSERT`, `UPDATE`, `DELETE`, and DDL statement before it
-reaches your database. The agent receives an LLM-readable reason, so it can
-adjust instead of failing blind.
+Read-only is the safest access mode for an agent. With it, PgBeam allows reads and rejects every `INSERT`, `UPDATE`, `DELETE`, and DDL statement before it reaches your database. The agent receives an LLM-readable reason, so it can adjust instead of failing blind.
 
 ## Turn it on
 
@@ -19,8 +14,7 @@ pgbeam policies create --name read-only --mode read_only
 pgbeam agents create --name analytics-bot --policy pol_1a2b3c…
 ```
 
-A credential's policy is fixed at creation. To move an existing credential to a
-different policy, rotate or re-issue it against the new profile.
+A credential's policy is fixed at creation. To move an existing credential to a different policy, rotate or re-issue it against the new profile.
 
 In the dashboard, set **Access mode** to **Read-only** on the policy profile.
 
@@ -38,11 +32,7 @@ In the dashboard, set **Access mode** to **Read-only** on the policy profile.
 | `SELECT … INTO t` (creates a table)      | Blocked   |
 | `EXPLAIN ANALYZE` (runs the statement)   | Blocked   |
 
-`SELECT … INTO t` and `CREATE TABLE t AS SELECT …` are the same statement in
-Postgres, so both are blocked. `EXPLAIN ANALYZE` runs the statement it is given
-rather than only planning it, so it is blocked whenever the statement underneath
-it writes or creates a table. A plain `EXPLAIN` of a read executes nothing and
-stays allowed.
+`SELECT … INTO t` and `CREATE TABLE t AS SELECT …` are the same statement in Postgres, so both are blocked. `EXPLAIN ANALYZE` runs the statement it is given rather than only planning it, so it is blocked whenever the statement underneath it writes or creates a table. A plain `EXPLAIN` of a read executes nothing and stays allowed.
 
 ## What the agent sees
 
@@ -52,14 +42,11 @@ A blocked write comes back as a Postgres error (SQLSTATE `42501`):
 ERROR:  blocked by PgBeam agent policy: this credential is read-only; update is not permitted; only SELECT, SHOW, and EXPLAIN are allowed
 ```
 
-The error is written to be read by an LLM, so an agent can correct its plan and
-retry within the rules.
+The error is written to be read by an LLM, so an agent can correct its plan and retry within the rules.
 
 ## Fails closed
 
-A multi-statement batch is rejected if any statement in it would be blocked.
-Unparseable SQL and unknown statement types are rejected too. This prevents an
-agent from slipping a write past the parser.
+A multi-statement batch is rejected if any statement in it would be blocked. Unparseable SQL and unknown statement types are rejected too. This prevents an agent from slipping a write past the parser.
 
 <Callout type="info" title="Need writes sometimes?">
   Read-only is the right default. When an agent genuinely needs to write,

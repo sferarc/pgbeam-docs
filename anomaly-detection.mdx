@@ -1,39 +1,28 @@
 ---
 title: Anomaly Detection
 icon: Activity
-description:
-  PgBeam learns each credential's normal behavior and alerts when it drifts.
-  Volume spikes, off-hours access, new query shapes, and error or egress spikes.
+description: PgBeam learns each credential's normal behavior and alerts when it drifts. Volume spikes, off-hours access, new query shapes, and error or egress spikes.
 ---
 
-Anomaly detection watches each credential's traffic and raises an alert when it
-drifts from its own baseline. A bot that quietly read four tables for a month and
-suddenly scans a fifth, runs at 3am, or pulls ten times its usual rows is doing
-something worth a look. PgBeam flags it without you writing a single threshold.
+Anomaly detection watches each credential's traffic and raises an alert when it drifts from its own baseline. A bot that quietly read four tables for a month and suddenly scans a fifth, runs at 3am, or pulls ten times its usual rows is doing something worth a look. PgBeam flags it without you writing a single threshold.
 
-It runs on agent credentials and human credentials alike. The baseline is
-per-credential, so a noisy analytics agent and a quiet support bot each get
-judged against their own history, not a shared average.
+It runs on agent credentials and human credentials alike. The baseline is per-credential, so a noisy analytics agent and a quiet support bot each get judged against their own history, not a shared average.
 
 ## What it watches
 
-| Signal           | What trips it                                                        |
-| ---------------- | -------------------------------------------------------------------- |
-| Volume spike     | Query count or rate well above the credential's recent baseline.     |
-| Off-hours access | Activity outside the hours this credential normally runs.            |
-| New query shape  | A normalized statement shape never seen from this credential before. |
-| Error spike      | A burst of blocked or failing statements (often probing or a loop).  |
-| Egress spike     | Bytes returned well above baseline (a possible bulk exfiltration).   |
+| Signal | What trips it |
+| --- | --- |
+| Volume spike | Query count or rate well above the credential's recent baseline. |
+| Off-hours access | Activity outside the hours this credential normally runs. |
+| New query shape | A normalized statement shape never seen from this credential before. |
+| Error spike | A burst of blocked or failing statements (often probing or a loop). |
+| Egress spike | Bytes returned well above baseline (a possible bulk exfiltration). |
 
-A "query shape" is the statement with its literals stripped, so `SELECT * FROM
-orders WHERE id = 1` and `... WHERE id = 2` are the same shape. A genuinely new
-shape means the credential is doing something it has not done before.
+A "query shape" is the statement with its literals stripped, so `SELECT * FROM orders WHERE id = 1` and `... WHERE id = 2` are the same shape. A genuinely new shape means the credential is doing something it has not done before.
 
 ## Alerts
 
-Each detection becomes an anomaly alert with the signal, the credential, the
-window, and the statements that triggered it. Review them on the **Anomalies**
-tab, or pull them from the API:
+Each detection becomes an anomaly alert with the signal, the credential, the window, and the statements that triggered it. Review them on the **Anomalies** tab, or pull them from the API:
 
 ```bash title="List open anomaly alerts"
 curl "https://api.pgbeam.com/v1/projects/{projectId}/anomalies?status=open" \
@@ -50,25 +39,17 @@ curl -X PATCH \
   --data '{"status": "acknowledged"}'
 ```
 
-The CLI does the same with [`pgbeam anomalies ack`](/docs/cli/anomalies/ack):
-pass one or more alert ids, or `--all` to acknowledge every open alert in the
-project. [`pgbeam anomalies resolve`](/docs/cli/anomalies/resolve) closes them
-out, and [`pgbeam anomalies list`](/docs/cli/anomalies/list) shows what is open.
+The CLI does the same with [`pgbeam anomalies ack`](/docs/cli/anomalies/ack): pass one or more alert ids, or `--all` to acknowledge every open alert in the project. [`pgbeam anomalies resolve`](/docs/cli/anomalies/resolve) closes them out, and [`pgbeam anomalies list`](/docs/cli/anomalies/list) shows what is open.
 
-Every alert can also fire an [`anomaly_alert`](/docs/audit-export) webhook, so it
-lands in Slack, PagerDuty, or your SIEM the moment it is raised.
+Every alert can also fire an [`anomaly_alert`](/docs/audit-export) webhook, so it lands in Slack, PagerDuty, or your SIEM the moment it is raised.
 
 ## From alert to action
 
-Anomaly detection tells you something changed; the rest of the policy engine lets
-you respond.
+Anomaly detection tells you something changed; the rest of the policy engine lets you respond.
 
-- A volume or egress spike on a credential that should be quiet: trip the
-  [kill-switch](/docs/kill-switch) and investigate.
-- A new query shape that should never happen: tighten the
-  [allowlist](/docs/allowlists) or add a [row filter](/docs/row-level-policies).
-- A run of blocked statements: read the [audit log](/docs/audit-log) to see what
-  the agent kept trying, then adjust its policy.
+- A volume or egress spike on a credential that should be quiet: trip the [kill-switch](/docs/kill-switch) and investigate.
+- A new query shape that should never happen: tighten the [allowlist](/docs/allowlists) or add a [row filter](/docs/row-level-policies).
+- A run of blocked statements: read the [audit log](/docs/audit-log) to see what the agent kept trying, then adjust its policy.
 
 <Callout type="info" title="Baselines need history">
   A new credential has no baseline yet, so its first hours of traffic establish
@@ -80,6 +61,5 @@ you respond.
 
 - [Audit log](/docs/audit-log): the per-statement record alerts are built from.
 - [Audit export](/docs/audit-export): forward `anomaly_alert` events to a SIEM.
-- [Kill-switch](/docs/kill-switch): stop a credential the moment something looks
-  wrong.
+- [Kill-switch](/docs/kill-switch): stop a credential the moment something looks wrong.
 - [Budgets](/docs/budgets): hard ceilings that complement baseline detection.

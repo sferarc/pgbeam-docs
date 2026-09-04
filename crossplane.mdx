@@ -2,14 +2,10 @@
 title: Crossplane
 icon: Blocks
 tag: Kubernetes
-description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens as
-  Kubernetes custom resources using the Crossplane provider.
+description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens as Kubernetes custom resources using the Crossplane provider.
 ---
 
-Manage your PgBeam infrastructure as Kubernetes custom resources with
-Crossplane. The `provider-pgbeam` package provides managed resources for
-projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens.
+Manage your PgBeam infrastructure as Kubernetes custom resources with Crossplane. The `provider-pgbeam` package provides managed resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens.
 
 ## Setup
 
@@ -106,9 +102,7 @@ spec:
 kubectl apply -f project.yaml
 ```
 
-Crossplane creates the PgBeam project and its primary database atomically.
-The proxy hostname is available in `status.atProvider.proxyHost` and
-published to the connection secret.
+Crossplane creates the PgBeam project and its primary database atomically. The proxy hostname is available in `status.atProvider.proxyHost` and published to the connection secret.
 
 ```bash
 kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
@@ -419,28 +413,28 @@ spec:
 
 ## Configuration
 
-| Setting           | Source         | Description                                      |
-| ----------------- | -------------- | ------------------------------------------------ |
-| `apiKeySecretRef` | ProviderConfig | Secret reference for the API key                 |
-| `baseURL`         | ProviderConfig | API base URL (default: `https://api.pgbeam.com`) |
+| Setting | Source | Description |
+| --- | --- | --- |
+| `apiKeySecretRef` | ProviderConfig | Secret reference for the API key |
+| `baseURL` | ProviderConfig | API base URL (default: `https://api.pgbeam.com`) |
 
 ## Replacement vs update
 
 Some spec changes trigger resource recreation rather than in-place updates:
 
-| Resource           | Recreation triggers                                                  |
-| ------------------ | -------------------------------------------------------------------- |
-| Project            | `orgId`, `cloud`, `selfHosted`                                       |
-| Database           | `projectId`                                                          |
-| Replica            | Any spec change (immutable)                                          |
-| CustomDomain       | Any spec change (immutable)                                          |
-| CacheRule          | `projectId`, `databaseId`, `queryHash`                               |
-| SpendLimit         | `orgId`                                                              |
-| AgentCredential    | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
-| PolicyProfile      | `projectId`                                                          |
-| WebhookEndpoint    | `projectId`                                                          |
-| SelfHostEnrollment | Any spec change (immutable)                                          |
-| Honeytoken         | `projectId`                                                          |
+| Resource | Recreation triggers |
+| --- | --- |
+| Project | `orgId`, `cloud`, `selfHosted` |
+| Database | `projectId` |
+| Replica | Any spec change (immutable) |
+| CustomDomain | Any spec change (immutable) |
+| CacheRule | `projectId`, `databaseId`, `queryHash` |
+| SpendLimit | `orgId` |
+| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
+| PolicyProfile | `projectId` |
+| WebhookEndpoint | `projectId` |
+| SelfHostEnrollment | Any spec change (immutable) |
+| Honeytoken | `projectId` |
 
 ## Further reading
 

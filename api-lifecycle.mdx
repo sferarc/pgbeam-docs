@@ -41,11 +41,11 @@ A deprecated endpoint keeps working. It is marked, it is announced, and it is gi
 
 An endpoint is deprecated when it is marked `deprecated: true` in the OpenAPI document. From that moment every response from it carries:
 
-| Header        | Meaning                                                                                                         |
-| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| Header | Meaning |
+| --- | --- |
 | `Deprecation` | When the endpoint was deprecated, as an [RFC 9745](https://www.rfc-editor.org/rfc/rfc9745.html) structured date |
-| `Sunset`      | When it stops answering, as an [RFC 8594](https://www.rfc-editor.org/rfc/rfc8594.html) HTTP date                |
-| `Link`        | `rel="deprecation"` points at this page; `rel="successor-version"` points at the replacement when there is one  |
+| `Sunset` | When it stops answering, as an [RFC 8594](https://www.rfc-editor.org/rfc/rfc8594.html) HTTP date |
+| `Link` | `rel="deprecation"` points at this page; `rel="successor-version"` points at the replacement when there is one |
 
 For example:
 

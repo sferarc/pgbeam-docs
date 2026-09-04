@@ -1,34 +1,22 @@
 ---
 title: SCRAM-SHA-256 Auth
 icon: Lock
-description:
-  Authenticate credentials with SCRAM-SHA-256 so the password never crosses the
-  wire. Cleartext-over-TLS stays available as a fallback for clients that need
-  it.
+description: Authenticate credentials with SCRAM-SHA-256 so the password never crosses the wire. Cleartext-over-TLS stays available as a fallback for clients that need it.
 ---
 
-PgBeam authenticates agent and human credentials with SCRAM-SHA-256. The password
-is never sent over the connection: the client and PgBeam each prove knowledge of
-it through a challenge-response exchange, and PgBeam stores only a verifier, not
-the password itself. This is the same mechanism modern Postgres uses by default,
-so every current driver already speaks it.
+PgBeam authenticates agent and human credentials with SCRAM-SHA-256. The password is never sent over the connection: the client and PgBeam each prove knowledge of it through a challenge-response exchange, and PgBeam stores only a verifier, not the password itself. This is the same mechanism modern Postgres uses by default, so every current driver already speaks it.
 
-Cleartext-over-TLS remains available as a fallback for older clients that cannot
-do SCRAM. TLS is mandatory on every credential either way.
+Cleartext-over-TLS remains available as a fallback for older clients that cannot do SCRAM. TLS is mandatory on every credential either way.
 
 ## Connect with SCRAM
 
-Nothing special is required on the client. Any PostgreSQL client that supports
-SCRAM-SHA-256 (libpq 10+, and every driver built on it) negotiates it
-automatically. Connect with the scoped credential as usual:
+Nothing special is required on the client. Any PostgreSQL client that supports SCRAM-SHA-256 (libpq 10+, and every driver built on it) negotiates it automatically. Connect with the scoped credential as usual:
 
 ```bash title="psql over SCRAM"
 psql "postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app?sslmode=require"
 ```
 
-PgBeam advertises SCRAM-SHA-256 in the authentication handshake. The client and
-PgBeam exchange the SCRAM messages, and the connection is authenticated without
-the password ever appearing on the wire. You can confirm the negotiated method:
+PgBeam advertises SCRAM-SHA-256 in the authentication handshake. The client and PgBeam exchange the SCRAM messages, and the connection is authenticated without the password ever appearing on the wire. You can confirm the negotiated method:
 
 ```text
 $ PGSSLMODE=require psql "host=a1b2c3.proxy.pgbeam.app dbname=app user=agent_4f2c"
@@ -40,26 +28,15 @@ app=>
 
 ## How it works
 
-PgBeam terminates authentication itself. It verifies the credential against a
-stored SCRAM verifier, then opens the upstream connection with your project's
-real database credentials. The agent or analyst never sees the upstream
-credentials, and with SCRAM their own password never travels in cleartext either.
+PgBeam terminates authentication itself. It verifies the credential against a stored SCRAM verifier, then opens the upstream connection with your project's real database credentials. The agent or analyst never sees the upstream credentials, and with SCRAM their own password never travels in cleartext either.
 
-1. The client opens a TLS connection. PgBeam routes it by SNI and offers
-   SCRAM-SHA-256.
-2. The client and PgBeam run the SCRAM challenge-response. Each proves it knows
-   the password without sending it.
-3. On success, PgBeam acquires an upstream connection using the project's stored
-   credentials and relays the session under the credential's
-   [policy](/docs/policies).
+1. The client opens a TLS connection. PgBeam routes it by SNI and offers SCRAM-SHA-256.
+2. The client and PgBeam run the SCRAM challenge-response. Each proves it knows the password without sending it.
+3. On success, PgBeam acquires an upstream connection using the project's stored credentials and relays the session under the credential's [policy](/docs/policies).
 
 ## Cleartext fallback
 
-Some clients and embedded drivers do not implement SCRAM. For those, PgBeam
-accepts a cleartext password, which is safe only because the connection is
-already inside mandatory TLS, the same posture connection poolers have shipped for
-years. SCRAM is the default and the better choice: prefer it whenever your client
-supports it.
+Some clients and embedded drivers do not implement SCRAM. For those, PgBeam accepts a cleartext password, which is safe only because the connection is already inside mandatory TLS, the same posture connection poolers have shipped for years. SCRAM is the default and the better choice: prefer it whenever your client supports it.
 
 <Callout type="info" title="Per-credential, agents and humans">
   SCRAM applies to every PgBeam-issued credential, agent or human. The hosted

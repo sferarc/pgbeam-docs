@@ -4,14 +4,9 @@ description: Remote MCP endpoint for AI agent integration.
 icon: Bot
 ---
 
-`POST /v1/mcp` is a remote
-[Model Context Protocol](https://modelcontextprotocol.io) server using the
-Streamable HTTP transport. It lets AI assistants manage PgBeam resources
-(projects, databases, policies, agent credentials) through three meta-tools
-rather than one tool per endpoint.
+`POST /v1/mcp` is a remote [Model Context Protocol](https://modelcontextprotocol.io) server using the Streamable HTTP transport. It lets AI assistants manage PgBeam resources (projects, databases, policies, agent credentials) through three meta-tools rather than one tool per endpoint.
 
-See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering
-both the CLI (stdio) and remote (HTTP) transports.
+See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering both the CLI (stdio) and remote (HTTP) transports.
 
 <Callout type="info" title="Two different MCP servers">
   This is the **management** MCP — it administers your account. To give an agent
@@ -43,30 +38,25 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
 
 ## Protocol
 
-| Property    | Value                                                                         |
-| ----------- | ----------------------------------------------------------------------------- |
-| Transport   | Streamable HTTP (MCP spec 2025-03-26)                                         |
-| Wire format | JSON-RPC 2.0                                                                  |
-| Auth        | `Authorization: Bearer <token>`                                               |
-| Methods     | `initialize`, `notifications/initialized`, `tools/list`, `tools/call`, `ping` |
+| Property | Value |
+| --- | --- |
+| Transport | Streamable HTTP (MCP spec 2025-03-26) |
+| Wire format | JSON-RPC 2.0 |
+| Auth | `Authorization: Bearer <token>` |
+| Methods | `initialize`, `notifications/initialized`, `tools/list`, `tools/call`, `ping` |
 
 ## Authentication
 
-The MCP endpoint uses the same authentication as the REST API. Pass a bearer
-token or API key in the `Authorization` header. See
-[Authentication](/docs/api#authentication).
+The MCP endpoint uses the same authentication as the REST API. Pass a bearer token or API key in the `Authorization` header. See [Authentication](/docs/api#authentication).
 
 ## Tools
 
-`tools/list` returns three meta-tools that wrap the whole API. This keeps the
-agent's context small — it discovers operations on demand instead of loading a
-schema for every endpoint up front.
+`tools/list` returns three meta-tools that wrap the whole API. This keeps the agent's context small — it discovers operations on demand instead of loading a schema for every endpoint up front.
 
-| Tool                | Purpose                                                                                        |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| `search_endpoints`  | Find operations by intent (`query`, `limit`). Returns `operation_id`, `method`, `path`, `tag`. |
-| `describe_endpoint` | Full schema for one operation (`operation_id`): parameters and request body.                   |
-| `call_endpoint`     | Invoke an operation: `operation_id`, plus `path_params`, `query_params`, and `body` as needed. |
+| Tool | Purpose |
+| --- | --- |
+| `search_endpoints` | Find operations by intent (`query`, `limit`). Returns `operation_id`, `method`, `path`, `tag`. |
+| `describe_endpoint` | Full schema for one operation (`operation_id`): parameters and request body. |
+| `call_endpoint` | Invoke an operation: `operation_id`, plus `path_params`, `query_params`, and `body` as needed. |
 
-The operation ids and shapes mirror the [OpenAPI spec](/docs/api). A typical
-flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.
+The operation ids and shapes mirror the [OpenAPI spec](/docs/api). A typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.

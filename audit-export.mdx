@@ -1,28 +1,22 @@
 ---
 title: Audit Export
 icon: Send
-description:
-  Stream audit events to your own systems. HMAC-signed webhooks for any endpoint,
-  plus native formats for Splunk HEC, Datadog, and Elastic.
+description: Stream audit events to your own systems. HMAC-signed webhooks for any endpoint, plus native formats for Splunk HEC, Datadog, and Elastic.
 ---
 
-Audit export pushes PgBeam events to your systems as they happen. Point it at a
-webhook endpoint and PgBeam delivers a signed JSON payload for each event. Point
-it at a SIEM and PgBeam formats the events the way that SIEM expects. The
-[audit log](/docs/audit-log) keeps the full history for querying; export is for
-getting events out in real time.
+Audit export pushes PgBeam events to your systems as they happen. Point it at a webhook endpoint and PgBeam delivers a signed JSON payload for each event. Point it at a SIEM and PgBeam formats the events the way that SIEM expects. The [audit log](/docs/audit-log) keeps the full history for querying; export is for getting events out in real time.
 
 ## Event types
 
-| Event                | Fires when                                                                        |
-| -------------------- | --------------------------------------------------------------------------------- |
-| `query_blocked`      | A statement is rejected by policy (allowlist, read-only, etc.).                   |
-| `budget_exhausted`   | A credential hits its query or row budget.                                        |
-| `kill_switch`        | A credential or project kill-switch is tripped.                                   |
-| `masked`             | A result is returned with one or more masked columns.                             |
-| `migration_flagged`  | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
-| `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
-| `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
+| Event | Fires when |
+| --- | --- |
+| `query_blocked` | A statement is rejected by policy (allowlist, read-only, etc.). |
+| `budget_exhausted` | A credential hits its query or row budget. |
+| `kill_switch` | A credential or project kill-switch is tripped. |
+| `masked` | A result is returned with one or more masked columns. |
+| `migration_flagged` | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
+| `approval_requested` | A write or DDL is held for [approval](/docs/approvals). |
+| `anomaly_alert` | [Anomaly detection](/docs/anomaly-detection) raises an alert. |
 
 For each event's full payload shape, see [webhook events](/docs/webhook-events).
 
@@ -53,15 +47,11 @@ For each event's full payload shape, see [webhook events](/docs/webhook-events).
   </Tab>
 </Tabs>
 
-You set the signing secret when you create the endpoint. It is write-only:
-PgBeam stores it to sign deliveries and never returns it, so keep your own copy.
-The same secret verifies every delivery.
+You set the signing secret when you create the endpoint. It is write-only: PgBeam stores it to sign deliveries and never returns it, so keep your own copy. The same secret verifies every delivery.
 
 ## Webhook payload
 
-Each delivery is a JSON body with the event, the project, and the event-specific
-detail under `data`. The [webhook events](/docs/webhook-events) page documents the
-`data` fields for every event type.
+Each delivery is a JSON body with the event, the project, and the event-specific detail under `data`. The [webhook events](/docs/webhook-events) page documents the `data` fields for every event type.
 
 ```json title="query_blocked delivery"
 {
@@ -80,25 +70,14 @@ detail under `data`. The [webhook events](/docs/webhook-events) page documents t
 }
 ```
 
-PgBeam signs every native (`json`) and `elastic` delivery. Two signature headers
-are sent, both as `sha256=<hex>` keyed with your signing secret:
+PgBeam signs every native (`json`) and `elastic` delivery. Two signature headers are sent, both as `sha256=<hex>` keyed with your signing secret:
 
 - `X-PgBeam-Signature` (v1) is the HMAC-SHA-256 of the raw request body only.
-- `X-PgBeam-Signature-V2` (v2) is the HMAC-SHA-256 of the exact byte string
-  `timestamp + "." + body`, where `timestamp` is the same value sent in the
-  `X-PgBeam-Timestamp` header (unix seconds, as a decimal string) and `.` is a
-  single literal period. Because the timestamp is part of the signed bytes, a
-  captured delivery cannot be replayed with a rewritten timestamp: rewriting it
-  invalidates the signature. This is the same construction Stripe uses.
+- `X-PgBeam-Signature-V2` (v2) is the HMAC-SHA-256 of the exact byte string `timestamp + "." + body`, where `timestamp` is the same value sent in the `X-PgBeam-Timestamp` header (unix seconds, as a decimal string) and `.` is a single literal period. Because the timestamp is part of the signed bytes, a captured delivery cannot be replayed with a rewritten timestamp: rewriting it invalidates the signature. This is the same construction Stripe uses.
 
-Each delivery also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`,
-`X-PgBeam-Timestamp` (unix seconds), and `X-PgBeam-Delivery` (a per-attempt id
-for de-duplication).
+Each delivery also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`, `X-PgBeam-Timestamp` (unix seconds), and `X-PgBeam-Delivery` (a per-attempt id for de-duplication).
 
-We recommend verifying `X-PgBeam-Signature-V2` and rejecting stale timestamps.
-v1 stays in place unchanged for existing receivers, so you can migrate at your
-own pace. The SIEM/token destinations (Splunk HEC, Datadog) carry neither
-signature; they authenticate with the destination's own token.
+We recommend verifying `X-PgBeam-Signature-V2` and rejecting stale timestamps. v1 stays in place unchanged for existing receivers, so you can migrate at your own pace. The SIEM/token destinations (Splunk HEC, Datadog) carry neither signature; they authenticate with the destination's own token.
 
 ```ts title="Verify a delivery with the v2 signature (Node.js)"
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -129,15 +108,9 @@ export function verifyV2(
 }
 ```
 
-Verify against the raw request body, before any JSON parsing reserializes it,
-and use the `X-PgBeam-Timestamp` value verbatim so your recomputed signature
-matches the bytes we signed. Compare with a constant-time function. Rejecting
-deliveries whose `X-PgBeam-Timestamp` is far from the current time (5 minutes is
-a reasonable window) is what closes the replay gap, so enforce it when you verify
-v2.
+Verify against the raw request body, before any JSON parsing reserializes it, and use the `X-PgBeam-Timestamp` value verbatim so your recomputed signature matches the bytes we signed. Compare with a constant-time function. Rejecting deliveries whose `X-PgBeam-Timestamp` is far from the current time (5 minutes is a reasonable window) is what closes the replay gap, so enforce it when you verify v2.
 
-The v1 header is still valid if you have not migrated. It signs the body only, so
-it cannot bind the timestamp:
+The v1 header is still valid if you have not migrated. It signs the body only, so it cannot bind the timestamp:
 
 ```ts title="Verify the legacy v1 signature (Node.js)"
 import { createHmac, timingSafeEqual } from "node:crypto";
@@ -171,18 +144,15 @@ export function verify(
 
 ## SIEM formats
 
-For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that
-product ingests it. The signing and retry behavior is the same.
+For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that product ingests it. The signing and retry behavior is the same.
 
-| Format       | Sends                                                                         |
-| ------------ | ----------------------------------------------------------------------------- |
+| Format | Sends |
+| --- | --- |
 | `splunk_hec` | Splunk HTTP Event Collector (HEC) envelope. Set your HEC token as the secret. |
-| `datadog`    | Datadog Logs intake payload with `ddsource: pgbeam` and event tags.           |
-| `elastic`    | Elastic / OpenSearch JSON documents with an ECS-style shape.                  |
+| `datadog` | Datadog Logs intake payload with `ddsource: pgbeam` and event tags. |
+| `elastic` | Elastic / OpenSearch JSON documents with an ECS-style shape. |
 
-For `splunk_hec` and `datadog`, the endpoint secret is the destination's own
-token (Splunk sends it as `Authorization: Splunk <token>`, Datadog as
-`DD-API-KEY`) rather than an HMAC signature.
+For `splunk_hec` and `datadog`, the endpoint secret is the destination's own token (Splunk sends it as `Authorization: Splunk <token>`, Datadog as `DD-API-KEY`) rather than an HMAC signature.
 
 ```bash title="Export to Splunk HEC"
 pgbeam webhooks create https://splunk.example.com:8088/services/collector \

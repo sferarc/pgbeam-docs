@@ -15,19 +15,19 @@ result, err := client.Agents.ListAuditLogs(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter           | Type                          | Required | Description                                                                                                                                                                                                                          |
-| ------------------- | ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ctx                 | `context.Context`             | Yes      | Request context                                                                                                                                                                                                                      |
-| projectID           | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                                                                                                                  |
-| params              | `*pgbeam.ListAuditLogsParams` | No       | Query parameters                                                                                                                                                                                                                     |
-| params.CredentialID | `string`                      | No       | Filter to a single agent credential.                                                                                                                                                                                                 |
-| params.Event        | `string`                      | No       | Filter to a single event type (e.g. blocked, masked, query).                                                                                                                                                                         |
-| params.Decision     | `pgbeam.AuditDecision`        | No       | Coarse outcome filter that groups events. `allow` = query, auto_approved; `block` = blocked, budget_exhausted, auth_failed, credential_expired, canary_tripped, rejected, approval_expired; `mask` = masked; `truncate` = truncated. |
-| params.Source       | `pgbeam.AuditSource`          | No       | Filter by statement origin (wire, mcp, rest, or control).                                                                                                                                                                            |
-| params.Start        | `string`                      | No       | Return entries at or after this timestamp (inclusive lower bound).                                                                                                                                                                   |
-| params.End          | `string`                      | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                                                                                                                            |
-| params.Before       | `string`                      | No       | Return entries strictly older than this timestamp (keyset pagination cursor).                                                                                                                                                        |
-| params.PageSize     | `int`                         | No       | Maximum number of items to return (1-100, default 20).                                                                                                                                                                               |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params | `*pgbeam.ListAuditLogsParams` | No | Query parameters |
+| params.CredentialID | `string` | No | Filter to a single agent credential. |
+| params.Event | `string` | No | Filter to a single event type (e.g. blocked, masked, query). |
+| params.Decision | `pgbeam.AuditDecision` | No | Coarse outcome filter that groups events. `allow` = query, auto_approved; `block` = blocked, budget_exhausted, auth_failed, credential_expired, canary_tripped, rejected, approval_expired; `mask` = masked; `truncate` = truncated. |
+| params.Source | `pgbeam.AuditSource` | No | Filter by statement origin (wire, mcp, rest, or control). |
+| params.Start | `string` | No | Return entries at or after this timestamp (inclusive lower bound). |
+| params.End | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
+| params.Before | `string` | No | Return entries strictly older than this timestamp (keyset pagination cursor). |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
 
 ## Response
 

@@ -21,13 +21,13 @@ const result = await api.schemaannotations.putSchemaAnnotation({
 
 ## Parameters
 
-| Parameter             | Type     | Required | Description                                                  |
-| --------------------- | -------- | -------- | ------------------------------------------------------------ |
-| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| body.schema_name      | `string` | No       | Optional schema. Null or empty matches the unqualified form. |
-| body.table_name       | `string` | Yes      | Relation (table or view) the annotation describes.           |
-| body.column_name      | `string` | No       | Optional column. Null describes the table itself.            |
-| body.description      | `string` | Yes      | The operator-written description text.                       |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| body.schema_name | `string` | No | Optional schema. Null or empty matches the unqualified form. |
+| body.table_name | `string` | Yes | Relation (table or view) the annotation describes. |
+| body.column_name | `string` | No | Optional column. Null describes the table itself. |
+| body.description | `string` | Yes | The operator-written description text. |
 
 ## Response
 

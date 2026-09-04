@@ -1,26 +1,16 @@
 ---
 title: Row-level Policies
 icon: Rows3
-description:
-  Scope a credential to a slice of a table with a WHERE predicate. PgBeam appends
-  the filter to every statement so an agent or analyst only ever sees its own
-  rows.
+description: Scope a credential to a slice of a table with a WHERE predicate. PgBeam appends the filter to every statement so an agent or analyst only ever sees its own rows.
 ---
 
-A row-level policy attaches a `WHERE` predicate to a credential. PgBeam appends
-the predicate to every statement that touches the named table, so the credential
-reads and writes only the rows that match. Use it to scope one agent to a single
-tenant, an analyst to their region, or a support bot to a single customer's
-records, without changing your schema or your application.
+A row-level policy attaches a `WHERE` predicate to a credential. PgBeam appends the predicate to every statement that touches the named table, so the credential reads and writes only the rows that match. Use it to scope one agent to a single tenant, an analyst to their region, or a support bot to a single customer's records, without changing your schema or your application.
 
-Row filters apply to agent credentials and to human credentials. The predicate
-follows the credential, not the user, so the same query returns a different slice
-of the table depending on who runs it.
+Row filters apply to agent credentials and to human credentials. The predicate follows the credential, not the user, so the same query returns a different slice of the table depending on who runs it.
 
 ## Define a row filter
 
-A policy carries a list of row filters, one per table. Each filter is a `WHERE`
-expression evaluated against that table's columns.
+A policy carries a list of row filters, one per table. Each filter is a `WHERE` expression evaluated against that table's columns.
 
 <Tabs items={["CLI", "Dashboard", "API"]}>
   <Tab value="CLI">
@@ -65,37 +55,24 @@ expression evaluated against that table's columns.
 
 ## How the filter is applied
 
-PgBeam parses each statement, finds the references to a filtered table, and
-combines your predicate with the statement's own `WHERE` clause using `AND`. The
-credential cannot widen its own scope: a query that asks for `tenant_id = 99`
-returns nothing, because the appended `tenant_id = 42` rules it out.
+PgBeam parses each statement, finds the references to a filtered table, and combines your predicate with the statement's own `WHERE` clause using `AND`. The credential cannot widen its own scope: a query that asks for `tenant_id = 99` returns nothing, because the appended `tenant_id = 42` rules it out.
 
-Your predicate's column references are bound to the filtered table before the
-predicate is appended: PgBeam qualifies them with the query's alias for that
-table, or with the table name when the query gave it no alias. That is what keeps
-the filter attached to the right relation in a join, where another table may
-carry a column of the same name.
+Your predicate's column references are bound to the filtered table before the predicate is appended: PgBeam qualifies them with the query's alias for that table, or with the table name when the query gave it no alias. That is what keeps the filter attached to the right relation in a join, where another table may carry a column of the same name.
 
-| Statement                                                  | Effective query                                                                   |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `SELECT * FROM orders`                                     | `SELECT * FROM orders WHERE orders.tenant_id = 42`                                |
-| `SELECT * FROM orders WHERE total > 100`                   | `SELECT * FROM orders WHERE total > 100 AND orders.tenant_id = 42`                |
+| Statement | Effective query |
+| --- | --- |
+| `SELECT * FROM orders` | `SELECT * FROM orders WHERE orders.tenant_id = 42` |
+| `SELECT * FROM orders WHERE total > 100` | `SELECT * FROM orders WHERE total > 100 AND orders.tenant_id = 42` |
 | `SELECT * FROM orders o JOIN customers c ON c.id = o.cust` | `SELECT * FROM orders o JOIN customers c ON c.id = o.cust WHERE o.tenant_id = 42` |
-| `SELECT * FROM orders a JOIN orders b ON a.parent = b.id`  | `... WHERE a.tenant_id = 42 AND b.tenant_id = 42`                                 |
-| `UPDATE orders SET status = 'x'` (read-write)              | `UPDATE orders SET status = 'x' WHERE orders.tenant_id = 42`                      |
-| `DELETE FROM orders WHERE id = 7` (read-write)             | `DELETE FROM orders WHERE id = 7 AND orders.tenant_id = 42`                       |
+| `SELECT * FROM orders a JOIN orders b ON a.parent = b.id` | `... WHERE a.tenant_id = 42 AND b.tenant_id = 42` |
+| `UPDATE orders SET status = 'x'` (read-write) | `UPDATE orders SET status = 'x' WHERE orders.tenant_id = 42` |
+| `DELETE FROM orders WHERE id = 7` (read-write) | `DELETE FROM orders WHERE id = 7 AND orders.tenant_id = 42` |
 
-In read-write mode the filter scopes writes too: an `UPDATE` or `DELETE` can only
-touch rows the credential can already see. A row outside the filter is invisible,
-so it cannot be modified.
+In read-write mode the filter scopes writes too: an `UPDATE` or `DELETE` can only touch rows the credential can already see. A row outside the filter is invisible, so it cannot be modified.
 
 ## Fails closed
 
-The predicate is parsed and bound against the table's real columns when you save
-the policy, not at query time. A predicate that references an unknown column is
-rejected at save. A statement that PgBeam cannot rewrite safely (an unparseable
-query, a construct where the filter cannot be placed) is blocked rather than
-forwarded unfiltered.
+The predicate is parsed and bound against the table's real columns when you save the policy, not at query time. A predicate that references an unknown column is rejected at save. A statement that PgBeam cannot rewrite safely (an unparseable query, a construct where the filter cannot be placed) is blocked rather than forwarded unfiltered.
 
 <Callout type="warn" title="Predicates run on the database">
   A row filter is a SQL expression that executes upstream. Keep predicates
@@ -108,16 +85,11 @@ forwarded unfiltered.
 
 ## Combine with the rest of the policy
 
-Row filters stack with the other policy rules. A credential can be read-only,
-allowlisted to two tables, masked on a column, budgeted, and row-filtered, all at
-once. PgBeam applies the allowlist first (can the credential touch this table at
-all), then the row filter (which rows), then masking (which column values leave
-the wire).
+Row filters stack with the other policy rules. A credential can be read-only, allowlisted to two tables, masked on a column, budgeted, and row-filtered, all at once. PgBeam applies the allowlist first (can the credential touch this table at all), then the row filter (which rows), then masking (which column values leave the wire).
 
 ## Related
 
 - [Policies](/docs/policies): the bundle a row filter lives in.
 - [Allowlists](/docs/allowlists): which tables a credential may touch.
 - [PII masking](/docs/masking): redact column values the credential may read.
-- [Passthrough policies](/docs/policies#human-and-passthrough-connections): apply
-  row filters to human and application connections.
+- [Passthrough policies](/docs/policies#human-and-passthrough-connections): apply row filters to human and application connections.

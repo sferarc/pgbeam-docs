@@ -19,17 +19,17 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
 
 ## Parameters
 
-| Parameter       | Type                           | Required | Description                                                                                                                               |
-| --------------- | ------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| ctx             | `context.Context`              | Yes      | Request context                                                                                                                           |
-| req             | `pgbeam.CreateProjectRequest`  | Yes      | Request body                                                                                                                              |
-| req.Name        | `string`                       | Yes      | Human-readable project name.                                                                                                              |
-| req.OrgID       | `string`                       | Yes      | Better Auth organization ID.                                                                                                              |
-| req.Description | `*string`                      | No       | Optional project description.                                                                                                             |
-| req.Tags        | `*[]string`                    | No       | User-defined labels to attach to the project.                                                                                             |
-| req.Cloud       | `*string`                      | No       | Cloud provider for the project.                                                                                                           |
-| req.SelfHosted  | `*bool`                        | No       | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
-| req.Database    | `pgbeam.CreateDatabaseRequest` | Yes      | Request body for registering an upstream database.                                                                                        |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `pgbeam.CreateProjectRequest` | Yes | Request body |
+| req.Name | `string` | Yes | Human-readable project name. |
+| req.OrgID | `string` | Yes | Better Auth organization ID. |
+| req.Description | `*string` | No | Optional project description. |
+| req.Tags | `*[]string` | No | User-defined labels to attach to the project. |
+| req.Cloud | `*string` | No | Cloud provider for the project. |
+| req.SelfHosted | `*bool` | No | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
+| req.Database | `pgbeam.CreateDatabaseRequest` | Yes | Request body for registering an upstream database. |
 
 ## Response
 

@@ -1,17 +1,10 @@
 ---
 title: Insights
 icon: ChartNoAxesColumn
-description:
-  Query-level analytics for a project. Top query shapes by call count, with cache
-  hit rate and latency for each, plus aggregate cache and latency summaries.
+description: Query-level analytics for a project. Top query shapes by call count, with cache hit rate and latency for each, plus aggregate cache and latency summaries.
 ---
 
-Insights shows what your project's traffic actually looks like. It groups
-statements by normalized shape, ranks them by call count, and reports the cache
-hit rate and latency for each shape. Alongside the per-query breakdown it gives
-you two aggregate summaries: overall cache performance and overall latency for
-the window you pick. Use it to find the queries worth caching, spot a shape whose
-latency has crept up, and see how much the [cache](/docs/cache) is saving you.
+Insights shows what your project's traffic actually looks like. It groups statements by normalized shape, ranks them by call count, and reports the cache hit rate and latency for each shape. Alongside the per-query breakdown it gives you two aggregate summaries: overall cache performance and overall latency for the window you pick. Use it to find the queries worth caching, spot a shape whose latency has crept up, and see how much the [cache](/docs/cache) is saving you.
 
 ## Read insights
 
@@ -49,17 +42,16 @@ latency has crept up, and see how much the [cache](/docs/cache) is saving you.
 
 Two query parameters shape the response:
 
-| Parameter | Values                  | Default | Description                                   |
-| --------- | ----------------------- | ------- | --------------------------------------------- |
-| `range`   | `1h`, `6h`, `24h`, `7d` | `24h`   | Time window the metrics are computed over.    |
-| `limit`   | `1` to `100`            | `20`    | Maximum number of top query shapes to return. |
+| Parameter | Values | Default | Description |
+| --- | --- | --- | --- |
+| `range` | `1h`, `6h`, `24h`, `7d` | `24h` | Time window the metrics are computed over. |
+| `limit` | `1` to `100` | `20` | Maximum number of top query shapes to return. |
 
 The CLI exposes `--range`; the dashboard exposes the same windows as buttons.
 
 ## What you get back
 
-The response has three parts: a list of top query shapes, a cache summary, and a
-latency summary.
+The response has three parts: a list of top query shapes, a cache summary, and a latency summary.
 
 ```json title="ProjectInsights"
 {
@@ -88,8 +80,7 @@ latency summary.
 
 ### Top queries
 
-Each entry in `queries` is one normalized query shape, so `WHERE id = 1` and
-`WHERE id = 2` count as the same shape. Entries are ranked by call count.
+Each entry in `queries` is one normalized query shape, so `WHERE id = 1` and `WHERE id = 2` count as the same shape. Entries are ranked by call count.
 
 | Field                | Description                                      |
 | -------------------- | ------------------------------------------------ |
@@ -122,17 +113,12 @@ Aggregate latency across all queries in the window.
 
 ## How to read it
 
-- A shape with a high `total_count` and a low `total_cache_hits` is a caching
-  opportunity. Add a [cache annotation](/docs/cache) and watch the hit rate climb
-  on the next scan.
-- A shape whose `p99_latency_ms` is far above its `avg_latency_ms` has a tail
-  worth investigating: a missing index, a lock, or an occasional large result.
-- A `hit_rate` that drops after a deploy usually means a query shape changed and
-  the old cache entries no longer match.
+- A shape with a high `total_count` and a low `total_cache_hits` is a caching opportunity. Add a [cache annotation](/docs/cache) and watch the hit rate climb on the next scan.
+- A shape whose `p99_latency_ms` is far above its `avg_latency_ms` has a tail worth investigating: a missing index, a lock, or an occasional large result.
+- A `hit_rate` that drops after a deploy usually means a query shape changed and the old cache entries no longer match.
 
 ## Related
 
 - [Caching](/docs/cache): the feature these hit-rate numbers measure.
 - [Audit log](/docs/audit-log): per-statement detail behind the aggregates.
-- [Anomaly detection](/docs/anomaly-detection): alerts when a credential's traffic
-  drifts from its baseline.
+- [Anomaly detection](/docs/anomaly-detection): alerts when a credential's traffic drifts from its baseline.

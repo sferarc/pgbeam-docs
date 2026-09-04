@@ -1,76 +1,44 @@
 ---
 title: AI assist
 icon: Sparkles
-description:
-  Optional, metadata-only AI features that help you author policies, explain
-  incidents, search the audit trail, classify PII, and draft schema
-  descriptions. They never see a row of your data, and they are off until you
-  turn them on.
+description: Optional, metadata-only AI features that help you author policies, explain incidents, search the audit trail, classify PII, and draft schema descriptions. They never see a row of your data, and they are off until you turn them on.
 ---
 
-PgBeam ships a set of optional AI assist features in the dashboard. They help an
-operator do the security work: draft a policy from plain English, explain an
-anomaly, ask the audit trail a question, raise confidence on ambiguous PII, and
-draft schema descriptions. Every one of them runs on metadata only, and every one
-is off by default.
+PgBeam ships a set of optional AI assist features in the dashboard. They help an operator do the security work: draft a policy from plain English, explain an anomaly, ask the audit trail a question, raise confidence on ambiguous PII, and draft schema descriptions. Every one of them runs on metadata only, and every one is off by default.
 
 ## Metadata only
 
-The whole product is safe data access, so the AI features hold the same line:
-they never send customer row data or masked column values to a model. What they
-send is metadata: schema shape (table and column names and Postgres types),
-policy configuration, normalized and hashed query shapes, aggregate counts, and
-audit-event fields. This is enforced in code, not just by policy: every model call
-passes through a redaction assertion that whitelists metadata fields and rejects
-SQL text, client IPs, row values, and audit hash-chain fields.
+The whole product is safe data access, so the AI features hold the same line: they never send customer row data or masked column values to a model. What they send is metadata: schema shape (table and column names and Postgres types), policy configuration, normalized and hashed query shapes, aggregate counts, and audit-event fields. This is enforced in code, not just by policy: every model call passes through a redaction assertion that whitelists metadata fields and rejects SQL text, client IPs, row values, and audit hash-chain fields.
 
-Model calls route through the Vercel AI Gateway, which applies per-organization
-spend caps, provider fallback, and no-training headers.
+Model calls route through the Vercel AI Gateway, which applies per-organization spend caps, provider fallback, and no-training headers.
 
 ## Off until you enable them
 
-Each feature is gated by its own flag and defaults to off. A feature that is off,
-or that has no gateway key configured, is inert: it never runs, never throws, and
-never blocks a page. Nothing about AI is on until an operator turns it on.
+Each feature is gated by its own flag and defaults to off. A feature that is off, or that has no gateway key configured, is inert: it never runs, never throws, and never blocks a page. Nothing about AI is on until an operator turns it on.
 
 To enable AI assist:
 
-1. Set the `AI_GATEWAY_API_KEY` environment variable on the dashboard deployment
-   (a Vercel AI Gateway key). Without it, every AI feature stays inert even if a
-   flag is on.
-2. Turn on the features you want from **Settings, AI assist**. The panel lists
-   each feature, whether its flag is on, and whether the gateway key is
-   configured.
+1. Set the `AI_GATEWAY_API_KEY` environment variable on the dashboard deployment (a Vercel AI Gateway key). Without it, every AI feature stays inert even if a flag is on.
+2. Turn on the features you want from **Settings, AI assist**. The panel lists each feature, whether its flag is on, and whether the gateway key is configured.
 
 ## The features
 
-| Feature                     | What it does                                                                                                                                                                                                                            |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Incident explainer          | Summarizes one audit event or anomaly (what happened, blast radius, recommended action) from its metadata, on the anomaly and audit detail views.                                                                                       |
-| Policy authoring assist     | Drafts a policy profile from a plain-English description and your schema shape. The draft is clamped to your real catalog and loaded into the editor for review. Nothing is saved automatically.                                        |
-| Ask your audit              | Answers a plain-English question over normalized audit metadata and cites the audit event ids it used.                                                                                                                                  |
-| PII classification assist   | Raises confidence on the columns the heuristic PII scan is unsure about, using column name and type only (never sample values). Each suggestion is reviewed in the scan dialog.                                                         |
-| Weekly security digest      | A metadata-only weekly summary of agent activity: query volume, top query shapes, policy near-misses, top credentials, and anomaly trips, with recommendations. Preview it in the dashboard or receive it by scheduled email and Slack. |
-| Schema description drafting | Drafts plain-English table and column descriptions from the schema shape for the schema-annotations feature. Accepting a draft saves it through the schema-annotations API.                                                             |
+| Feature | What it does |
+| --- | --- |
+| Incident explainer | Summarizes one audit event or anomaly (what happened, blast radius, recommended action) from its metadata, on the anomaly and audit detail views. |
+| Policy authoring assist | Drafts a policy profile from a plain-English description and your schema shape. The draft is clamped to your real catalog and loaded into the editor for review. Nothing is saved automatically. |
+| Ask your audit | Answers a plain-English question over normalized audit metadata and cites the audit event ids it used. |
+| PII classification assist | Raises confidence on the columns the heuristic PII scan is unsure about, using column name and type only (never sample values). Each suggestion is reviewed in the scan dialog. |
+| Weekly security digest | A metadata-only weekly summary of agent activity: query volume, top query shapes, policy near-misses, top credentials, and anomaly trips, with recommendations. Preview it in the dashboard or receive it by scheduled email and Slack. |
+| Schema description drafting | Drafts plain-English table and column descriptions from the schema shape for the schema-annotations feature. Accepting a draft saves it through the schema-annotations API. |
 
-Each feature reviews its output before anything is applied. Policy drafts load
-into the editor for you to edit and save, PII suggestions appear for review in the
-scan dialog, and schema descriptions are saved only when you accept them.
+Each feature reviews its output before anything is applied. Policy drafts load into the editor for you to edit and save, PII suggestions appear for review in the scan dialog, and schema descriptions are saved only when you accept them.
 
 ## Eve, the Slack agent
 
-Eve is a customer-facing Slack agent built on the same metadata-only foundation.
-It turns PgBeam's security primitives into a Slack surface: approve or deny a held
-agent write with a button, ask the audit trail a question, summarize what a
-policy allows, toggle the kill-switch, and list honeytokens. Every Eve tool
-returns metadata only and checks the Slack user's mapped PgBeam role before it
-runs. Eve is a foundation today and not yet generally available; contact us if you
-want early access.
+Eve is a customer-facing Slack agent built on the same metadata-only foundation. It turns PgBeam's security primitives into a Slack surface: approve or deny a held agent write with a button, ask the audit trail a question, summarize what a policy allows, toggle the kill-switch, and list honeytokens. Every Eve tool returns metadata only and checks the Slack user's mapped PgBeam role before it runs. Eve is a foundation today and not yet generally available; contact us if you want early access.
 
 ## Notes
 
-- AI assist is an operator convenience. It does not change enforcement: policies
-  are still enforced on the wire, and a drafted policy only takes effect once you
-  save it.
-- The features are organization-scoped and cost is capped at the gateway. Leave a
-  feature off if you do not want any metadata leaving for a model.
+- AI assist is an operator convenience. It does not change enforcement: policies are still enforced on the wire, and a drafted policy only takes effect once you save it.
+- The features are organization-scoped and cost is capped at the gateway. Leave a feature off if you do not want any metadata leaving for a model.

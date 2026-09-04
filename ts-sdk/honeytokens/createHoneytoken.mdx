@@ -5,8 +5,7 @@ description: Register a honeytoken
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Registers a decoy (canary) relation for the project. Any agent statement
-that references it is blocked and recorded as a canary_tripped audit event.
+Registers a decoy (canary) relation for the project. Any agent statement that references it is blocked and recorded as a canary_tripped audit event.
 
 ## Usage
 
@@ -22,12 +21,12 @@ const result = await api.honeytokens.createHoneytoken({
 
 ## Parameters
 
-| Parameter             | Type                     | Required | Description                                                         |
-| --------------------- | ------------------------ | -------- | ------------------------------------------------------------------- |
-| pathParams.project_id | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
-| body.schema_name      | `string`                 | No       | Optional schema. Null or empty matches the unqualified/public form. |
-| body.relation_name    | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
-| body.action           | `"audit_only" \| "kill"` | Yes      | Response when the honeytoken is tripped.                            |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| body.schema_name | `string` | No | Optional schema. Null or empty matches the unqualified/public form. |
+| body.relation_name | `string` | Yes | Relation (table or view) name of the decoy. |
+| body.action | `"audit_only" \| "kill"` | Yes | Response when the honeytoken is tripped. |
 
 ## Response
 

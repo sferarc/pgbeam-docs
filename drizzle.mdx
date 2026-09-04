@@ -2,14 +2,10 @@
 title: Drizzle
 icon: Droplets
 tag: TypeScript
-description:
-  Connect Drizzle ORM to your PostgreSQL database through PgBeam for connection
-  pooling, caching, and global routing.
+description: Connect Drizzle ORM to your PostgreSQL database through PgBeam for connection pooling, caching, and global routing.
 ---
 
-Connect your Drizzle ORM application to PgBeam by updating the connection
-string. No changes to your schema definitions, table declarations, or queries
-are required.
+Connect your Drizzle ORM application to PgBeam by updating the connection string. No changes to your schema definitions, table declarations, or queries are required.
 
 ## Setup
 
@@ -66,9 +62,7 @@ are required.
 
 ## Connection pool sizing
 
-PgBeam handles upstream connection pooling, so the `pg` pool on your application
-side should be small. A pool size of 3-5 per application instance is typically
-sufficient.
+PgBeam handles upstream connection pooling, so the `pg` pool on your application side should be small. A pool size of 3-5 per application instance is typically sufficient.
 
 | Deployment type        | Recommended `max` pool size |
 | ---------------------- | --------------------------- |
@@ -104,9 +98,7 @@ DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" npx drizzle-kit p
 
 ### Query builder queries (recommended)
 
-For standard Drizzle query builder queries (`db.select()`, `db.query`, etc.),
-PgBeam automatically tracks the generated SQL shapes. Enable caching for these
-through [Cache Rules](/docs/cache) in the dashboard, with no code changes needed.
+For standard Drizzle query builder queries (`db.select()`, `db.query`, etc.), PgBeam automatically tracks the generated SQL shapes. Enable caching for these through [Cache Rules](/docs/cache) in the dashboard, with no code changes needed.
 
 ### Raw queries with annotations
 
@@ -144,8 +136,7 @@ const stats = await db.execute(
 );
 ```
 
-Standard query builder calls always go to the primary database. To use replica
-routing, use raw SQL with the annotation.
+Standard query builder calls always go to the primary database. To use replica routing, use raw SQL with the annotation.
 
 See [Read Replicas](/docs/replicas) for details on replica setup.
 
@@ -164,11 +155,11 @@ const result = await db.execute(sql`SELECT * FROM users WHERE id = ${userId}`);
 
 ## Common issues
 
-| Issue                          | Cause                          | Fix                                    |
-| ------------------------------ | ------------------------------ | -------------------------------------- |
-| "Too many connections" errors  | `pg` pool too large            | Set `max: 5` in Pool config            |
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| "Too many connections" errors | `pg` pool too large | Set `max: 5` in Pool config |
 | Migrations fail through PgBeam | Session features not available | Run migrations against origin directly |
-| Stale data after writes        | Cache returning old results    | Use `noCache` annotation or adjust TTL |
+| Stale data after writes | Cache returning old results | Use `noCache` annotation or adjust TTL |
 
 ## Further reading
 

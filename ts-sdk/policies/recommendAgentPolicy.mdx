@@ -20,12 +20,12 @@ const result = await api.policies.recommendAgentPolicy({
 
 ## Parameters
 
-| Parameter             | Type     | Required | Description                                                                                                                    |
-| --------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                            |
-| pathParams.agent_id   | `string` | Yes      | Unique agent credential identifier (prefixed, e.g. agt_xxx).                                                                   |
-| body.lookback_days    | `number` | No       | How many days of recorded audit history to analyze.                                                                            |
-| body.limit            | `number` | No       | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.agent_id | `string` | Yes | Unique agent credential identifier (prefixed, e.g. agt_xxx). |
+| body.lookback_days | `number` | No | How many days of recorded audit history to analyze. |
+| body.limit | `number` | No | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
 
 ## Response
 

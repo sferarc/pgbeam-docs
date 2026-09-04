@@ -1,15 +1,10 @@
 ---
 title: Query Budgets
 icon: Gauge
-description:
-  Cap queries per window and rows per result for an agent credential. Runaway
-  loops and full-table scans hit a ceiling instead of your database.
+description: Cap queries per window and rows per result for an agent credential. Runaway loops and full-table scans hit a ceiling instead of your database.
 ---
 
-A budget caps how much an agent can run. You set queries per window, a maximum
-number of rows per result, and a statement timeout. When an agent loops or asks
-for too much, the budget stops it at the wire instead of letting it hammer your
-database.
+A budget caps how much an agent can run. You set queries per window, a maximum number of rows per result, and a statement timeout. When an agent loops or asks for too much, the budget stops it at the wire instead of letting it hammer your database.
 
 ## Set a budget
 
@@ -24,12 +19,12 @@ In the dashboard, set the budget on the policy profile under **Budgets**.
 
 ## What you can cap
 
-| Limit              | Effect                                                                                                            |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Limit | Effect |
+| --- | --- |
 | Queries per window | Cap statements per hour or per day. The next query past the cap is blocked with an error until the window resets. |
-| Max rows           | Truncate any result to at most this many rows.                                                                    |
-| Write row cap      | Hard cap on rows a single write (INSERT/UPDATE/DELETE) may affect. Set with `--max-affected-rows`.                |
-| Statement timeout  | Cancel a statement that runs longer than this.                                                                    |
+| Max rows | Truncate any result to at most this many rows. |
+| Write row cap | Hard cap on rows a single write (INSERT/UPDATE/DELETE) may affect. Set with `--max-affected-rows`. |
+| Statement timeout | Cancel a statement that runs longer than this. |
 
 ## What the agent sees
 
@@ -39,16 +34,11 @@ A query past the cap comes back as a Postgres error (SQLSTATE `53400`):
 ERROR:  PgBeam agent day query budget exhausted; resets at 2026-06-15T00:00:00Z; ask your operator to raise the limit
 ```
 
-The message names the window and the exact reset time, so an agent can back off
-rather than retry blindly. A per-day egress (bytes) budget produces a similar
-message when exceeded.
+The message names the window and the exact reset time, so an agent can back off rather than retry blindly. A per-day egress (bytes) budget produces a similar message when exceeded.
 
 ### Headroom on the MCP endpoint
 
-Over the [hosted MCP endpoint](/docs/mcp), an agent does not have to wait for
-that error to learn where it stands. Every row-returning tool result (`query`,
-`explain`, `list_tables`, `describe_table`) carries a `budget` block for the
-credential that ran it:
+Over the [hosted MCP endpoint](/docs/mcp), an agent does not have to wait for that error to learn where it stands. Every row-returning tool result (`query`, `explain`, `list_tables`, `describe_table`) carries a `budget` block for the credential that ran it:
 
 ```json title="Tail of a query tool result"
 {
@@ -70,20 +60,11 @@ credential that ran it:
 }
 ```
 
-A window your policy leaves uncapped is omitted, so a present key means the cap
-is enforced. A credential with no budget at all gets no `budget` block. The
-figures are the same per-region counters the wire path enforces, so they are
-approximate in the same way, and the egress figure can trail the agent's last
-statement by a moment because bytes are charged after the response is sent. It
-is a signal for pacing a long job, not a billing record.
+A window your policy leaves uncapped is omitted, so a present key means the cap is enforced. A credential with no budget at all gets no `budget` block. The figures are the same per-region counters the wire path enforces, so they are approximate in the same way, and the egress figure can trail the agent's last statement by a moment because bytes are charged after the response is sent. It is a signal for pacing a long job, not a billing record.
 
 ## Write row cap
 
-`--max-affected-rows` bounds how many rows a single write may affect, separate
-from `--max-rows` (which truncates read results). A write whose affected-row
-count would exceed the cap runs inside a transaction, is checked, and is rolled
-back so nothing persists, then blocked. It applies to INSERT, UPDATE, and DELETE
-and is enforced independently of human approval. 0 means unlimited.
+`--max-affected-rows` bounds how many rows a single write may affect, separate from `--max-rows` (which truncates read results). A write whose affected-row count would exceed the cap runs inside a transaction, is checked, and is rolled back so nothing persists, then blocked. It applies to INSERT, UPDATE, and DELETE and is enforced independently of human approval. 0 means unlimited.
 
 <Callout type="info" title="Per-region windows">
   Budget counters are kept per data plane and per region, like the rate limiter.

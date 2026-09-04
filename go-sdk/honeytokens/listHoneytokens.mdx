@@ -15,13 +15,13 @@ result, err := client.Honeytokens.ListHoneytokens(ctx, "prj_xxx", nil)
 
 ## Parameters
 
-| Parameter        | Type                            | Required | Description                                            |
-| ---------------- | ------------------------------- | -------- | ------------------------------------------------------ |
-| ctx              | `context.Context`               | Yes      | Request context                                        |
-| projectID        | `string`                        | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).    |
-| params           | `*pgbeam.ListHoneytokensParams` | No       | Query parameters                                       |
-| params.PageSize  | `int`                           | No       | Maximum number of items to return (1-100, default 20). |
-| params.PageToken | `string`                        | No       | Opaque token for cursor-based pagination.              |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params | `*pgbeam.ListHoneytokensParams` | No | Query parameters |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 

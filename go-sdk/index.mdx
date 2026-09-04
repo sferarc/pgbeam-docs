@@ -1,17 +1,11 @@
 ---
 title: Go SDK installation
-description:
-  Install the pgbeam-go SDK, configure the client, authenticate, and learn the
-  service-based access pattern with a full agent-gateway quickstart.
+description: Install the pgbeam-go SDK, configure the client, authenticate, and learn the service-based access pattern with a full agent-gateway quickstart.
 ---
 
-The PgBeam Go SDK is the official client for the PgBeam control-plane API. It
-covers every API resource — projects and databases, plus the agent gateway:
-agent credentials, policy profiles, approvals, webhooks, anomalies, and audit
-logs — so you can provision safe, scoped Postgres access for AI agents from Go.
+The PgBeam Go SDK is the official client for the PgBeam control-plane API. It covers every API resource — projects and databases, plus the agent gateway: agent credentials, policy profiles, approvals, webhooks, anomalies, and audit logs — so you can provision safe, scoped Postgres access for AI agents from Go.
 
-The module path is `go.pgbeam.com/sdk` (a vanity import that resolves to the
-public mirror). The package name is `pgbeam`.
+The module path is `go.pgbeam.com/sdk` (a vanity import that resolves to the public mirror). The package name is `pgbeam`.
 
 ## Installation
 
@@ -38,11 +32,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 ## Constructor options
 
-| Option       | Type           | Description                                      |
-| ------------ | -------------- | ------------------------------------------------ |
-| `APIKey`     | `string`       | PgBeam API key (required, prefix `pgb_`)         |
-| `BaseURL`    | `string`       | API base URL (default: `https://api.pgbeam.com`) |
-| `HTTPClient` | `*http.Client` | Custom HTTP client for proxies, timeouts, etc.   |
+| Option | Type | Description |
+| --- | --- | --- |
+| `APIKey` | `string` | PgBeam API key (required, prefix `pgb_`) |
+| `BaseURL` | `string` | API base URL (default: `https://api.pgbeam.com`) |
+| `HTTPClient` | `*http.Client` | Custom HTTP client for proxies, timeouts, etc. |
 
 ## Authentication
 
@@ -70,8 +64,7 @@ See [API Keys](/docs/api-keys) for key creation and rotation.
 
 ## Usage pattern
 
-The Go SDK uses service-based access, matching the TypeScript SDK's tag-based
-`api.projects.*`, `api.databases.*` pattern:
+The Go SDK uses service-based access, matching the TypeScript SDK's tag-based `api.projects.*`, `api.databases.*` pattern:
 
 ```go
 // Projects — note request bodies are passed by value
@@ -97,26 +90,24 @@ health, err := client.Platform.GetHealth(ctx)
 
 Each service field on the client maps to an API tag:
 
-| Service      | Go                  | Covers                                           |
-| ------------ | ------------------- | ------------------------------------------------ |
-| `Projects`   | `client.Projects`   | Projects, replicas, custom domains, cache rules  |
-| `Databases`  | `client.Databases`  | Upstream database connections                    |
-| `Policies`   | `client.Policies`   | Policy profiles (read-only, allowlists, masking) |
-| `Agents`     | `client.Agents`     | Agent credentials, rotation, audit logs          |
-| `Approvals`  | `client.Approvals`  | Held-statement approval requests                 |
-| `Webhooks`   | `client.Webhooks`   | Webhook endpoints for gateway events             |
-| `Anomalies`  | `client.Anomalies`  | Anomaly alerts                                   |
-| `Branches`   | `client.Branches`   | Database branches                                |
-| `Migrations` | `client.Migrations` | Migration safety linting                         |
-| `Analytics`  | `client.Analytics`  | Plans, usage, spend limits, insights             |
-| `Platform`   | `client.Platform`   | Health, regions                                  |
-| `Account`    | `client.Account`    | Account export, onboarding                       |
+| Service | Go | Covers |
+| --- | --- | --- |
+| `Projects` | `client.Projects` | Projects, replicas, custom domains, cache rules |
+| `Databases` | `client.Databases` | Upstream database connections |
+| `Policies` | `client.Policies` | Policy profiles (read-only, allowlists, masking) |
+| `Agents` | `client.Agents` | Agent credentials, rotation, audit logs |
+| `Approvals` | `client.Approvals` | Held-statement approval requests |
+| `Webhooks` | `client.Webhooks` | Webhook endpoints for gateway events |
+| `Anomalies` | `client.Anomalies` | Anomaly alerts |
+| `Branches` | `client.Branches` | Database branches |
+| `Migrations` | `client.Migrations` | Migration safety linting |
+| `Analytics` | `client.Analytics` | Plans, usage, spend limits, insights |
+| `Platform` | `client.Platform` | Health, regions |
+| `Account` | `client.Account` | Account export, onboarding |
 
 ## Quickstart: provision an agent credential
 
-This end-to-end example creates a read-only policy profile and issues a scoped
-agent credential against it. The connection string and MCP token are returned
-**once** — capture them immediately.
+This end-to-end example creates a read-only policy profile and issues a scoped agent credential against it. The connection string and MCP token are returned **once** — capture them immediately.
 
 ```go
 package main
@@ -194,8 +185,7 @@ err = client.Agents.RevokeAgentCredential(ctx, projectID, "agt_xxx")
 
 ### Approve a held statement
 
-When a policy holds a write for approval, decide on it from the approvals
-service:
+When a policy holds a write for approval, decide on it from the approvals service:
 
 ```go
 reason := "verified against ticket OPS-1234"
@@ -232,6 +222,4 @@ for _, e := range logs.Entries {
 }
 ```
 
-For per-method reference — every parameter, response type, and error code — see
-the service pages in the sidebar. For error handling, retries, and idempotency,
-see [Error Handling](/docs/go-sdk/error-handling).
+For per-method reference — every parameter, response type, and error code — see the service pages in the sidebar. For error handling, retries, and idempotency, see [Error Handling](/docs/go-sdk/error-handling).

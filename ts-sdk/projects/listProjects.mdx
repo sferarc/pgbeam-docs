@@ -17,12 +17,12 @@ const result = await api.projects.listProjects({
 
 ## Parameters
 
-| Parameter              | Type                                             | Required | Description                                            |
-| ---------------------- | ------------------------------------------------ | -------- | ------------------------------------------------------ |
-| queryParams.org_id     | `string`                                         | Yes      | Organization ID to filter projects.                    |
-| queryParams.page_size  | `number`                                         | No       | Maximum number of items to return (1-100, default 20). |
-| queryParams.page_token | `string`                                         | No       | Opaque token for cursor-based pagination.              |
-| queryParams.sort_by    | `"name" \| "created_at" \| "active_connections"` | No       | Sort field for projects list.                          |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| queryParams.org_id | `string` | Yes | Organization ID to filter projects. |
+| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
+| queryParams.sort_by | `"name" \| "created_at" \| "active_connections"` | No | Sort field for projects list. |
 
 ## Response
 

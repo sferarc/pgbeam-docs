@@ -2,14 +2,10 @@
 title: pgx
 icon: Blocks
 tag: Go
-description:
-  Connect Go applications using pgx to PgBeam for connection pooling, caching,
-  and global routing.
+description: Connect Go applications using pgx to PgBeam for connection pooling, caching, and global routing.
 ---
 
-Connect your Go application to PgBeam by updating the connection string. pgx is
-the most widely used PostgreSQL driver for Go and works with PgBeam without any
-code changes.
+Connect your Go application to PgBeam by updating the connection string. pgx is the most widely used PostgreSQL driver for Go and works with PgBeam without any code changes.
 
 ## Setup
 
@@ -91,9 +87,7 @@ Since PgBeam manages upstream connections, keep your client-side pool small:
 
 ## TLS
 
-pgx uses TLS by default when connecting to PgBeam. No additional configuration
-is needed. PgBeam's `*.proxy.pgbeam.app` certificate is publicly trusted and
-works with all standard Go TLS configurations.
+pgx uses TLS by default when connecting to PgBeam. No additional configuration is needed. PgBeam's `*.proxy.pgbeam.app` certificate is publicly trusted and works with all standard Go TLS configurations.
 
 If you need to verify the TLS connection explicitly:
 
@@ -106,9 +100,7 @@ config, _ := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
 
 ### Automatic caching via cache rules
 
-For standard queries, PgBeam tracks the SQL shapes flowing through your project.
-Enable caching for specific shapes through [Cache Rules](/docs/cache) in the
-dashboard. No code changes needed.
+For standard queries, PgBeam tracks the SQL shapes flowing through your project. Enable caching for specific shapes through [Cache Rules](/docs/cache) in the dashboard. No code changes needed.
 
 ### SQL annotations for fine-grained control
 
@@ -144,8 +136,7 @@ See [Read Replicas](/docs/replicas) for replica setup and health check details.
 
 ## Error handling
 
-PgBeam returns standard PostgreSQL SQLSTATE codes. Use `pgconn.PgError` to
-handle PgBeam-specific errors:
+PgBeam returns standard PostgreSQL SQLSTATE codes. Use `pgconn.PgError` to handle PgBeam-specific errors:
 
 ```go title="Handling PgBeam errors"
 _, err := pool.Exec(ctx, "SELECT 1")
@@ -174,10 +165,7 @@ Run migrations directly against the origin database:
 DATABASE_URL="postgresql://user:pass@db.example.com:5432/mydb" go run ./cmd/migrate
 ```
 
-This applies to all migration tools:
-[golang-migrate](https://github.com/golang-migrate/migrate),
-[goose](https://github.com/pressly/goose), [atlas](https://atlasgo.io/), or
-custom migration scripts.
+This applies to all migration tools: [golang-migrate](https://github.com/golang-migrate/migrate), [goose](https://github.com/pressly/goose), [atlas](https://atlasgo.io/), or custom migration scripts.
 
 ## Debugging
 
@@ -192,11 +180,11 @@ rows, err := pool.Query(ctx, "/* @pgbeam:replica */ SELECT 1")
 
 ## Common issues
 
-| Issue                         | Cause                       | Fix                                         |
-| ----------------------------- | --------------------------- | ------------------------------------------- |
-| "too many connections"        | `MaxConns` too high         | Reduce to 3-5 per pod                       |
-| Prepared statement errors     | Using transaction pool mode | Use session pool mode, or avoid `Prepare()` |
-| Connection refused on startup | Cold start after inactivity | Normal: first connection is slower          |
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| "too many connections" | `MaxConns` too high | Reduce to 3-5 per pod |
+| Prepared statement errors | Using transaction pool mode | Use session pool mode, or avoid `Prepare()` |
+| Connection refused on startup | Cold start after inactivity | Normal: first connection is slower |
 
 ## Further reading
 

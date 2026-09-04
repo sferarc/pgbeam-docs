@@ -1,16 +1,10 @@
 ---
 title: Connection String
 icon: Link
-description:
-  Give an AI agent a scoped Postgres connection string. Every driver, ORM, and
-  agent framework works unchanged, with policy enforced in the wire protocol.
+description: Give an AI agent a scoped Postgres connection string. Every driver, ORM, and agent framework works unchanged, with policy enforced in the wire protocol.
 ---
 
-A scoped connection string is the second front door for an agent. It looks like
-an ordinary PostgreSQL URL, so every driver, ORM, and agent framework works
-unchanged. The difference is that the username and password belong to a PgBeam
-agent credential, and every statement is enforced against that credential's
-policy before it reaches your database.
+A scoped connection string is the second front door for an agent. It looks like an ordinary PostgreSQL URL, so every driver, ORM, and agent framework works unchanged. The difference is that the username and password belong to a PgBeam agent credential, and every statement is enforced against that credential's policy before it reaches your database.
 
 ```bash title="Scoped connection string"
 postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app
@@ -48,21 +42,18 @@ postgresql://agent_4f2c:****@a1b2c3.proxy.pgbeam.app:5432/app
   </Tab>
 </Tabs>
 
-The agent framework does not need a PgBeam SDK. Set the agent's `DATABASE_URL` to
-the scoped connection string and it is enforced from the first query.
+The agent framework does not need a PgBeam SDK. Set the agent's `DATABASE_URL` to the scoped connection string and it is enforced from the first query.
 
 ## What enforcement looks like to the agent
 
-A blocked statement returns a PostgreSQL `ErrorResponse` with an LLM-readable
-reason, so an agent reading the error can correct itself:
+A blocked statement returns a PostgreSQL `ErrorResponse` with an LLM-readable reason, so an agent reading the error can correct itself:
 
 ```text
 ERROR: policy is read-only: UPDATE is not allowed
 ERROR: table internal_api_keys is not in the allowlist
 ```
 
-Masked columns come back redacted, hashed, or nulled in the result, depending on
-the rule. See [Masking](/docs/masking).
+Masked columns come back redacted, hashed, or nulled in the result, depending on the rule. See [Masking](/docs/masking).
 
 <Callout type="warn" title="TLS is required">
   Agent connections must use TLS. The hostname (`<id>.proxy.pgbeam.app`) carries the
@@ -72,11 +63,11 @@ the rule. See [Masking](/docs/masking).
 
 ## Connection string vs hosted MCP
 
-| Use the connection string when…           | Use the hosted MCP endpoint when…             |
-| ----------------------------------------- | --------------------------------------------- |
-| The agent already uses a Postgres driver. | The client speaks MCP (Claude Code, Cursor).  |
+| Use the connection string when… | Use the hosted MCP endpoint when… |
+| --- | --- |
+| The agent already uses a Postgres driver. | The client speaks MCP (Claude Code, Cursor). |
 | You want ORM and framework compatibility. | You want ready-made `query`/`describe` tools. |
-| You run your own query loop.              | You want a paste-one-URL setup.               |
+| You run your own query loop. | You want a paste-one-URL setup. |
 
 Both are backed by the same policy engine. See [Hosted MCP](/docs/mcp).
 

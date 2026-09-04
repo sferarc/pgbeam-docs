@@ -15,15 +15,15 @@ result, err := client.Support.ListSupportCases(ctx, "org_abc123", nil)
 
 ## Parameters
 
-| Parameter       | Type                             | Required | Description                                     |
-| --------------- | -------------------------------- | -------- | ----------------------------------------------- |
-| ctx             | `context.Context`                | Yes      | Request context                                 |
-| orgID           | `string`                         | Yes      | Unique organization identifier.                 |
-| params          | `*pgbeam.ListSupportCasesParams` | No       | Query parameters                                |
-| params.Status   | `pgbeam.SupportCaseStatus`       | No       | Filter by case status.                          |
-| params.Search   | `string`                         | No       | Search cases by title.                          |
-| params.PageSize | `int`                            | No       | Number of results per page (1-100, default 20). |
-| params.Page     | `int`                            | No       | Page number (1-based, default 1).               |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| params | `*pgbeam.ListSupportCasesParams` | No | Query parameters |
+| params.Status | `pgbeam.SupportCaseStatus` | No | Filter by case status. |
+| params.Search | `string` | No | Search cases by title. |
+| params.PageSize | `int` | No | Number of results per page (1-100, default 20). |
+| params.Page | `int` | No | Page number (1-based, default 1). |
 
 ## Response
 

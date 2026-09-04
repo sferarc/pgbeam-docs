@@ -2,14 +2,10 @@
 title: psycopg
 icon: Bug
 tag: Python
-description:
-  Connect Python applications using psycopg to PgBeam for connection pooling,
-  caching, and global routing. Includes SQLAlchemy integration.
+description: Connect Python applications using psycopg to PgBeam for connection pooling, caching, and global routing. Includes SQLAlchemy integration.
 ---
 
-Connect your Python application to PgBeam by updating the connection string.
-This guide covers psycopg 3, psycopg connection pools, and SQLAlchemy
-integration.
+Connect your Python application to PgBeam by updating the connection string. This guide covers psycopg 3, psycopg connection pools, and SQLAlchemy integration.
 
 ## Setup
 
@@ -67,8 +63,7 @@ integration.
 
 ## Pool sizing
 
-PgBeam handles upstream connection pooling, so keep your application-side pool
-small:
+PgBeam handles upstream connection pooling, so keep your application-side pool small:
 
 | Deployment type           | Recommended `max_size` |
 | ------------------------- | ---------------------- |
@@ -84,8 +79,7 @@ small:
 
 ## SQLAlchemy integration
 
-psycopg works as the default PostgreSQL driver for SQLAlchemy. Update your
-engine configuration to point at PgBeam:
+psycopg works as the default PostgreSQL driver for SQLAlchemy. Update your engine configuration to point at PgBeam:
 
 <Tabs items={["SQLAlchemy 2.x", "SQLAlchemy 1.x"]}>
   <Tab value="SQLAlchemy 2.x">
@@ -121,9 +115,7 @@ engine configuration to point at PgBeam:
 
 ### Automatic caching via cache rules
 
-For ORM queries (SQLAlchemy, Django ORM), PgBeam tracks the SQL shapes
-automatically. Enable caching for specific shapes through
-[Cache Rules](/docs/cache) in the dashboard.
+For ORM queries (SQLAlchemy, Django ORM), PgBeam tracks the SQL shapes automatically. Enable caching for specific shapes through [Cache Rules](/docs/cache) in the dashboard.
 
 ### SQL annotations for fine-grained control
 
@@ -149,8 +141,7 @@ cur.execute(
 )
 ```
 
-Standard ORM queries always go to the primary. For replica routing with
-SQLAlchemy, use `text()` or raw SQL execution.
+Standard ORM queries always go to the primary. For replica routing with SQLAlchemy, use `text()` or raw SQL execution.
 
 See [Read Replicas](/docs/replicas) for replica setup and routing details.
 
@@ -182,8 +173,7 @@ See [Error Codes](/docs/error-codes) for the full reference.
 
 ## Django integration
 
-Django uses psycopg as its default PostgreSQL backend. Update `DATABASES` in
-`settings.py`:
+Django uses psycopg as its default PostgreSQL backend. Update `DATABASES` in `settings.py`:
 
 ```python title="settings.py"
 import dj_database_url
@@ -230,11 +220,11 @@ cur.execute("SELECT * FROM users WHERE id = %s", [user_id])
 
 ## Common issues
 
-| Issue                         | Cause                       | Fix                                    |
-| ----------------------------- | --------------------------- | -------------------------------------- |
-| "too many connections"        | Pool too large              | Set `max_size=5` in ConnectionPool     |
-| `OperationalError` on connect | Cold start after inactivity | Normal: first connection is slower     |
-| Stale data after writes       | Cache returning old results | Adjust TTL or use `noCache` annotation |
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| "too many connections" | Pool too large | Set `max_size=5` in ConnectionPool |
+| `OperationalError` on connect | Cold start after inactivity | Normal: first connection is slower |
+| Stale data after writes | Cache returning old results | Adjust TTL or use `noCache` annotation |
 
 ## Further reading
 

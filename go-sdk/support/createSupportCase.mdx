@@ -19,15 +19,15 @@ result, err := client.Support.CreateSupportCase(ctx, "org_abc123", pgbeam.Create
 
 ## Parameters
 
-| Parameter    | Type                              | Required | Description                                          |
-| ------------ | --------------------------------- | -------- | ---------------------------------------------------- |
-| ctx          | `context.Context`                 | Yes      | Request context                                      |
-| orgID        | `string`                          | Yes      | Unique organization identifier.                      |
-| req          | `pgbeam.CreateSupportCaseRequest` | Yes      | Request body                                         |
-| req.OrgID    | `string`                          | Yes      | Organization ID.                                     |
-| req.Title    | `string`                          | Yes      | Brief summary of the issue.                          |
-| req.Severity | `*int`                            | No       | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
-| req.Body     | `string`                          | Yes      | Initial message body.                                |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| req | `pgbeam.CreateSupportCaseRequest` | Yes | Request body |
+| req.OrgID | `string` | Yes | Organization ID. |
+| req.Title | `string` | Yes | Brief summary of the issue. |
+| req.Severity | `*int` | No | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
+| req.Body | `string` | Yes | Initial message body. |
 
 ## Response
 

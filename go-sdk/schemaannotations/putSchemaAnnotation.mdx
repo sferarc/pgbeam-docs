@@ -18,15 +18,15 @@ result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbe
 
 ## Parameters
 
-| Parameter       | Type                           | Required | Description                                                  |
-| --------------- | ------------------------------ | -------- | ------------------------------------------------------------ |
-| ctx             | `context.Context`              | Yes      | Request context                                              |
-| projectID       | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| req             | `pgbeam.SchemaAnnotationInput` | Yes      | Request body                                                 |
-| req.SchemaName  | `*string`                      | No       | Optional schema. Null or empty matches the unqualified form. |
-| req.TableName   | `string`                       | Yes      | Relation (table or view) the annotation describes.           |
-| req.ColumnName  | `*string`                      | No       | Optional column. Null describes the table itself.            |
-| req.Description | `string`                       | Yes      | The operator-written description text.                       |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.SchemaAnnotationInput` | Yes | Request body |
+| req.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified form. |
+| req.TableName | `string` | Yes | Relation (table or view) the annotation describes. |
+| req.ColumnName | `*string` | No | Optional column. Null describes the table itself. |
+| req.Description | `string` | Yes | The operator-written description text. |
 
 ## Response
 

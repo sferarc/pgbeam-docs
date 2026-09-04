@@ -22,13 +22,13 @@ const result = await api.support.createSupportCase({
 
 ## Parameters
 
-| Parameter         | Type     | Required | Description                                          |
-| ----------------- | -------- | -------- | ---------------------------------------------------- |
-| pathParams.org_id | `string` | Yes      | Unique organization identifier.                      |
-| body.org_id       | `string` | Yes      | Organization ID.                                     |
-| body.title        | `string` | Yes      | Brief summary of the issue.                          |
-| body.severity     | `number` | No       | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
-| body.body         | `string` | Yes      | Initial message body.                                |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| body.org_id | `string` | Yes | Organization ID. |
+| body.title | `string` | Yes | Brief summary of the issue. |
+| body.severity | `number` | No | Severity level: 1=Critical, 2=High, 3=Normal, 4=Low. |
+| body.body | `string` | Yes | Initial message body. |
 
 ## Response
 

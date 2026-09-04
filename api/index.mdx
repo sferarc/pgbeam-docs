@@ -1,14 +1,9 @@
 ---
 title: REST API
-description:
-  The PgBeam REST API. Control-plane endpoints for projects, databases,
-  policies, agents, analytics, and platform state, described by an OpenAPI 3.1
-  spec at https://pgbeam.com/openapi.json.
+description: The PgBeam REST API. Control-plane endpoints for projects, databases, policies, agents, analytics, and platform state, described by an OpenAPI 3.1 spec at https://pgbeam.com/openapi.json.
 ---
 
-The PgBeam API is the control plane behind the dashboard and CLI. Use it when
-you want to automate project creation, database setup, usage reporting, cache
-configuration, or onboarding from your own tooling.
+The PgBeam API is the control plane behind the dashboard and CLI. Use it when you want to automate project creation, database setup, usage reporting, cache configuration, or onboarding from your own tooling.
 
 **Base URL:** `https://api.pgbeam.com`
 
@@ -20,30 +15,29 @@ configuration, or onboarding from your own tooling.
 
 ## What this API is good at
 
-| Area       | Use it for                                                                      |
-| ---------- | ------------------------------------------------------------------------------- |
-| Projects   | Create, inspect, update, and delete PgBeam projects                             |
-| Databases  | Register origin databases, test connectivity, and adjust pool or cache settings |
-| Agents     | Issue, inspect, and revoke scoped agent and human credentials                   |
-| Policies   | Manage policy profiles: access mode, allowlists, row filters, masking, budgets  |
-| Approvals  | List, approve, and reject held writes and DDL                                   |
-| Webhooks   | Configure HMAC-signed webhook and SIEM audit export endpoints                   |
-| Anomalies  | List and triage anomaly alerts                                                  |
-| Branches   | List and discard sandbox branches                                               |
-| Migrations | Lint DDL for locks, rewrites, and unsafe changes                                |
-| Analytics  | Read usage, activity, metrics, and query insights                               |
-| Platform   | Discover regions, plans, and health                                             |
-| Account    | Export account data and track onboarding progress                               |
+| Area | Use it for |
+| --- | --- |
+| Projects | Create, inspect, update, and delete PgBeam projects |
+| Databases | Register origin databases, test connectivity, and adjust pool or cache settings |
+| Agents | Issue, inspect, and revoke scoped agent and human credentials |
+| Policies | Manage policy profiles: access mode, allowlists, row filters, masking, budgets |
+| Approvals | List, approve, and reject held writes and DDL |
+| Webhooks | Configure HMAC-signed webhook and SIEM audit export endpoints |
+| Anomalies | List and triage anomaly alerts |
+| Branches | List and discard sandbox branches |
+| Migrations | Lint DDL for locks, rewrites, and unsafe changes |
+| Analytics | Read usage, activity, metrics, and query insights |
+| Platform | Discover regions, plans, and health |
+| Account | Export account data and track onboarding progress |
 
 ## Authentication
 
-Most endpoints require `Authorization: Bearer ...`. The credential can be
-either:
+Most endpoints require `Authorization: Bearer ...`. The credential can be either:
 
-| Credential      | How to get it                                                            | Header                            |
-| --------------- | ------------------------------------------------------------------------ | --------------------------------- |
-| Dashboard token | Sign in to the dashboard and reuse the session token in trusted tooling  | `Authorization: Bearer <token>`   |
-| API key         | Create one from the dashboard for scripts, CI, and long-lived automation | `Authorization: Bearer <api-key>` |
+| Credential | How to get it | Header |
+| --- | --- | --- |
+| Dashboard token | Sign in to the dashboard and reuse the session token in trusted tooling | `Authorization: Bearer <token>` |
+| API key | Create one from the dashboard for scripts, CI, and long-lived automation | `Authorization: Bearer <api-key>` |
 
 <Tabs items={["Bearer token", "API key"]}>
   <Tab value="Bearer token">
@@ -67,9 +61,7 @@ See [API Keys](/docs/api-keys) for key creation and rotation.
 
 ## OpenAPI & Codegen
 
-The public spec is available at
-[api.pgbeam.com/openapi.json](https://api.pgbeam.com/openapi.json). It is the
-source for our SDK and the generated endpoint pages in this section.
+The public spec is available at [api.pgbeam.com/openapi.json](https://api.pgbeam.com/openapi.json). It is the source for our SDK and the generated endpoint pages in this section.
 
 ### Download the spec
 
@@ -79,8 +71,7 @@ curl -o openapi.json https://api.pgbeam.com/openapi.json
 
 ### Generate a client
 
-Feed the spec to your OpenAPI tooling of choice. For example, with
-[openapi-generator](https://openapi-generator.tech/):
+Feed the spec to your OpenAPI tooling of choice. For example, with [openapi-generator](https://openapi-generator.tech/):
 
 ```bash
 openapi-generator generate \
@@ -98,5 +89,4 @@ openapi-generator generate \
 
 ## Next steps
 
-- [Response Conventions](/docs/api/response-conventions) — status codes,
-  pagination, and error envelopes
+- [Response Conventions](/docs/api/response-conventions) — status codes, pagination, and error envelopes

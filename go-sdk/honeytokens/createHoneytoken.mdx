@@ -5,8 +5,7 @@ description: Register a honeytoken
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Registers a decoy (canary) relation for the project. Any agent statement
-that references it is blocked and recorded as a canary_tripped audit event.
+Registers a decoy (canary) relation for the project. Any agent statement that references it is blocked and recorded as a canary_tripped audit event.
 
 ## Usage
 
@@ -19,14 +18,14 @@ result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.Honeyt
 
 ## Parameters
 
-| Parameter        | Type                     | Required | Description                                                         |
-| ---------------- | ------------------------ | -------- | ------------------------------------------------------------------- |
-| ctx              | `context.Context`        | Yes      | Request context                                                     |
-| projectID        | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
-| req              | `pgbeam.HoneytokenInput` | Yes      | Request body                                                        |
-| req.SchemaName   | `*string`                | No       | Optional schema. Null or empty matches the unqualified/public form. |
-| req.RelationName | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
-| req.Action       | `string`                 | Yes      | Response when the honeytoken is tripped.                            |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.HoneytokenInput` | Yes | Request body |
+| req.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified/public form. |
+| req.RelationName | `string` | Yes | Relation (table or view) name of the decoy. |
+| req.Action | `string` | Yes | Response when the honeytoken is tripped. |
 
 ## Response
 

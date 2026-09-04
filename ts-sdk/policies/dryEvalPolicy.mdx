@@ -20,12 +20,12 @@ const result = await api.policies.dryEvalPolicy({
 
 ## Parameters
 
-| Parameter             | Type                 | Required | Description                                                      |
-| --------------------- | -------------------- | -------- | ---------------------------------------------------------------- |
-| pathParams.project_id | `string`             | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).              |
-| body.sql              | `string`             | Yes      | The single SQL statement to evaluate.                            |
-| body.policy_id        | `string`             | No       | ID of an existing saved policy profile to evaluate against.      |
-| body.policy           | `PolicyProfileInput` | No       | Mutable fields of a policy profile (used for create and update). |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| body.sql | `string` | Yes | The single SQL statement to evaluate. |
+| body.policy_id | `string` | No | ID of an existing saved policy profile to evaluate against. |
+| body.policy | `PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
 
 ## Response
 

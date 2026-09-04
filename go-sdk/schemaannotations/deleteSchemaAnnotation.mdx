@@ -17,14 +17,14 @@ err := client.Schemaannotations.DeleteSchemaAnnotation(ctx, "prj_xxx", &pgbeam.D
 
 ## Parameters
 
-| Parameter         | Type                                   | Required | Description                                               |
-| ----------------- | -------------------------------------- | -------- | --------------------------------------------------------- |
-| ctx               | `context.Context`                      | Yes      | Request context                                           |
-| projectID         | `string`                               | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
-| params            | `*pgbeam.DeleteSchemaAnnotationParams` | Yes      | Query parameters                                          |
-| params.TableName  | `string`                               | Yes      | Relation (table or view) the annotation describes.        |
-| params.SchemaName | `string`                               | No       | Optional schema. Omit to match the unqualified form.      |
-| params.ColumnName | `string`                               | No       | Optional column. Omit to delete a table-level annotation. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| params | `*pgbeam.DeleteSchemaAnnotationParams` | Yes | Query parameters |
+| params.TableName | `string` | Yes | Relation (table or view) the annotation describes. |
+| params.SchemaName | `string` | No | Optional schema. Omit to match the unqualified form. |
+| params.ColumnName | `string` | No | Optional column. Omit to delete a table-level annotation. |
 
 ## Response
 

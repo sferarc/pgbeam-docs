@@ -17,13 +17,13 @@ result, err := client.Migrations.LintMigration(ctx, "prj_xxx", pgbeam.MigrationL
 
 ## Parameters
 
-| Parameter      | Type                          | Required | Description                                                    |
-| -------------- | ----------------------------- | -------- | -------------------------------------------------------------- |
-| ctx            | `context.Context`             | Yes      | Request context                                                |
-| projectID      | `string`                      | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).            |
-| req            | `pgbeam.MigrationLintRequest` | Yes      | Request body                                                   |
-| req.SQL        | `string`                      | Yes      | The migration SQL to analyze. May contain multiple statements. |
-| req.DatabaseID | `*string`                     | No       | Optional database to scope the lint to.                        |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.MigrationLintRequest` | Yes | Request body |
+| req.SQL | `string` | Yes | The migration SQL to analyze. May contain multiple statements. |
+| req.DatabaseID | `*string` | No | Optional database to scope the lint to. |
 
 ## Response
 

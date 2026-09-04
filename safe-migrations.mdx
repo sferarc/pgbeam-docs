@@ -1,38 +1,27 @@
 ---
 title: Safe Migrations
 icon: FileCog
-description:
-  PgBeam lints DDL for the changes that lock tables or lose data. Table rewrites,
-  ACCESS EXCLUSIVE locks, missing CONCURRENTLY, unsafe drops and type changes,
-  NOT NULL without a default. Warn or block.
+description: PgBeam lints DDL for the changes that lock tables or lose data. Table rewrites, ACCESS EXCLUSIVE locks, missing CONCURRENTLY, unsafe drops and type changes, NOT NULL without a default. Warn or block.
 ---
 
-A generated migration is one of the most dangerous things an agent can run. The
-syntax is valid, the statement succeeds, and it takes an `ACCESS EXCLUSIVE` lock
-on a hot table for the duration of a full rewrite. Safe migrations catch that
-before it reaches your database. PgBeam parses every DDL statement, checks it
-against a set of known-dangerous patterns, and either warns or blocks based on
-your policy.
+A generated migration is one of the most dangerous things an agent can run. The syntax is valid, the statement succeeds, and it takes an `ACCESS EXCLUSIVE` lock on a hot table for the duration of a full rewrite. Safe migrations catch that before it reaches your database. PgBeam parses every DDL statement, checks it against a set of known-dangerous patterns, and either warns or blocks based on your policy.
 
-This runs for agent credentials and human credentials. A platform engineer's
-hand-written `ALTER TABLE` gets the same lint as an agent's generated one.
+This runs for agent credentials and human credentials. A platform engineer's hand-written `ALTER TABLE` gets the same lint as an agent's generated one.
 
 ## What the linter flags
 
-| Pattern                                | Why it is risky                                                           |
-| -------------------------------------- | ------------------------------------------------------------------------- |
-| Table rewrite                          | Rewrites every row and holds a lock for the whole operation.              |
-| `ACCESS EXCLUSIVE` lock on a hot table | Blocks all reads and writes to the table while it runs.                   |
-| Missing `CONCURRENTLY`                 | `CREATE INDEX` without `CONCURRENTLY` locks the table for writes.         |
-| Unsafe drop                            | `DROP COLUMN` / `DROP TABLE` destroys data with no undo.                  |
-| Unsafe type change                     | `ALTER COLUMN ... TYPE` that forces a rewrite or can lose data.           |
-| `NOT NULL` without a default           | Adding `NOT NULL` to an existing column rewrites and can fail mid-flight. |
+| Pattern | Why it is risky |
+| --- | --- |
+| Table rewrite | Rewrites every row and holds a lock for the whole operation. |
+| `ACCESS EXCLUSIVE` lock on a hot table | Blocks all reads and writes to the table while it runs. |
+| Missing `CONCURRENTLY` | `CREATE INDEX` without `CONCURRENTLY` locks the table for writes. |
+| Unsafe drop | `DROP COLUMN` / `DROP TABLE` destroys data with no undo. |
+| Unsafe type change | `ALTER COLUMN ... TYPE` that forces a rewrite or can lose data. |
+| `NOT NULL` without a default | Adding `NOT NULL` to an existing column rewrites and can fail mid-flight. |
 
 ## Lint a migration before you run it
 
-`migrations:lint` checks a DDL script and returns findings without touching your
-database. Use it in CI, in a pre-commit hook, or as a tool the agent calls before
-it proposes a change.
+`migrations:lint` checks a DDL script and returns findings without touching your database. Use it in CI, in a pre-commit hook, or as a tool the agent calls before it proposes a change.
 
 ```bash title="Lint a migration"
 curl -X POST \
@@ -67,14 +56,10 @@ pgbeam migrations lint --file migration.sql
 
 ## Warn or block at the wire
 
-The lint also runs inline when an agent or analyst issues DDL through PgBeam. Set
-the policy's enforcement level for migrations:
+The lint also runs inline when an agent or analyst issues DDL through PgBeam. Set the policy's enforcement level for migrations:
 
-- **Warn**: the statement runs, the finding is recorded, and a
-  [`migration_flagged`](/docs/audit-export) event fires. Use this once you trust
-  the workflow and want a record.
-- **Block**: a statement with a finding at or above the threshold is refused on
-  the wire, with the rule and suggestion in the error so the agent can fix it.
+- **Warn**: the statement runs, the finding is recorded, and a [`migration_flagged`](/docs/audit-export) event fires. Use this once you trust the workflow and want a record.
+- **Block**: a statement with a finding at or above the threshold is refused on the wire, with the rule and suggestion in the error so the agent can fix it.
 
 ```bash title="Block dangerous DDL on a policy"
 pgbeam policies create --name migrator \

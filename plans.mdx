@@ -1,16 +1,12 @@
 ---
 title: Plans and Limits
 icon: CreditCard
-description:
-  Plan tiers, feature comparison, per-plan quotas, overage billing, rate limits,
-  and default settings.
+description: Plan tiers, feature comparison, per-plan quotas, overage billing, rate limits, and default settings.
 ---
 
-PgBeam offers three self-serve plans. New signups start on **Starter** with a
-14-day trial. No credit card required.
+PgBeam offers three self-serve plans. New signups start on **Starter** with a 14-day trial. No credit card required.
 
-All limits apply per **organization**. Projects within an organization share the
-same quotas.
+All limits apply per **organization**. Projects within an organization share the same quotas.
 
 ## Plan comparison
 
@@ -31,51 +27,35 @@ same quotas.
 
 ### Which plan to choose
 
-**Starter** is for individual developers and small projects. It gives you enough
-headroom to run a production workload with moderate traffic. The 14-day trial
-lets you evaluate PgBeam without entering payment details.
+**Starter** is for individual developers and small projects. It gives you enough headroom to run a production workload with moderate traffic. The 14-day trial lets you evaluate PgBeam without entering payment details.
 
-**Pro** is for growing teams and production workloads. The higher QPS and
-connection limits handle multi-service architectures and busier applications.
-Three included team seats cover a small engineering team.
+**Pro** is for growing teams and production workloads. The higher QPS and connection limits handle multi-service architectures and busier applications. Three included team seats cover a small engineering team.
 
-**Scale** is for teams that need enterprise features: custom domains, SSO, and
-significantly higher quotas. If you have multiple services, high traffic, or
-compliance requirements, Scale is the right fit.
+**Scale** is for teams that need enterprise features: custom domains, SSO, and significantly higher quotas. If you have multiple services, high traffic, or compliance requirements, Scale is the right fit.
 
 ## Quota details
 
 ### Queries/day
 
-Total queries executed across all projects in the organization, counting every
-SQL statement that passes through PgBeam. Cache hits count as queries (they
-still flow through PgBeam), but they do not generate upstream database load.
+Total queries executed across all projects in the organization, counting every SQL statement that passes through PgBeam. Cache hits count as queries (they still flow through PgBeam), but they do not generate upstream database load.
 
 The daily counter resets at **midnight UTC**.
 
 ### Data transfer
 
-Total bytes transferred between PgBeam and your application (egress) per billing
-month. This does not include traffic between PgBeam and your upstream database.
+Total bytes transferred between PgBeam and your application (egress) per billing month. This does not include traffic between PgBeam and your upstream database.
 
 ### Connections
 
-Maximum number of **concurrent** connections across all projects. Each open
-connection from your application to PgBeam counts as one connection, regardless
-of pool mode. Using transaction pool mode helps reduce upstream connections but
-does not change the client-side connection count.
+Maximum number of **concurrent** connections across all projects. Each open connection from your application to PgBeam counts as one connection, regardless of pool mode. Using transaction pool mode helps reduce upstream connections but does not change the client-side connection count.
 
 ### QPS (queries per second)
 
-Maximum queries per second per project. When exceeded, PgBeam returns SQLSTATE
-`53400` (`query rate limit exceeded`). The rate limit is enforced per project,
-not per organization.
+Maximum queries per second per project. When exceeded, PgBeam returns SQLSTATE `53400` (`query rate limit exceeded`). The rate limit is enforced per project, not per organization.
 
 ### Query shapes
 
-Maximum number of distinct query fingerprints that PgBeam tracks for cache rules
-and query insights. A query shape is the normalized SQL template with parameter
-values removed (e.g., `SELECT * FROM users WHERE id = $1`).
+Maximum number of distinct query fingerprints that PgBeam tracks for cache rules and query insights. A query shape is the normalized SQL template with parameter values removed (e.g., `SELECT * FROM users WHERE id = $1`).
 
 ## 14-day trial
 
@@ -83,19 +63,14 @@ New accounts on the Starter plan get a 14-day trial with full Starter features:
 
 - No credit card required to start
 - All Starter quotas and limits apply
-- **Overage billing is not active** during the trial: queries exceeding the
-  daily limit are blocked until the next UTC day
-- Add a payment method at any time to convert to a paid subscription and enable
-  overage billing
+- **Overage billing is not active** during the trial: queries exceeding the daily limit are blocked until the next UTC day
+- Add a payment method at any time to convert to a paid subscription and enable overage billing
 
-After 14 days without a payment method, the organization is suspended. Projects
-and configuration are preserved. Add a payment method to reactivate.
+After 14 days without a payment method, the organization is suspended. Projects and configuration are preserved. Add a payment method to reactivate.
 
 ## Overage billing
 
-Paid subscribers (with an active payment method) use **overage billing** instead
-of hard caps. This keeps your traffic flowing when usage spikes, rather than
-blocking queries at the plan limit.
+Paid subscribers (with an active payment method) use **overage billing** instead of hard caps. This keeps your traffic flowing when usage spikes, rather than blocking queries at the plan limit.
 
 | Overage type     | Rate                    |
 | ---------------- | ----------------------- |
@@ -158,8 +133,7 @@ Switch to annual billing from **Settings > Billing** in the dashboard.
 
 ## Cancellation
 
-Cancelling the subscription suspends the organization but does not delete
-anything:
+Cancelling the subscription suspends the organization but does not delete anything:
 
 - Active connections are terminated
 - New connections are blocked
@@ -203,14 +177,11 @@ New databases and projects start with these defaults:
 
 ## Enterprise
 
-For organizations with requirements beyond the Scale plan (custom quotas, SLAs,
-dedicated support, or volume pricing), contact
-[sales@pgbeam.com](mailto:sales@pgbeam.com).
+For organizations with requirements beyond the Scale plan (custom quotas, SLAs, dedicated support, or volume pricing), contact [sales@pgbeam.com](mailto:sales@pgbeam.com).
 
 ## Further reading
 
-- [Organizations](/docs/organizations): How quotas, seats, and billing work at
-  the org level
+- [Organizations](/docs/organizations): How quotas, seats, and billing work at the org level
 - [Connection Pooling](/docs/pooling): Pool mode selection and sizing guidance
 - [Caching](/docs/cache): Cache defaults and how to tune TTL/SWR
 - [Error Codes](/docs/error-codes): Rate limit error codes and handling

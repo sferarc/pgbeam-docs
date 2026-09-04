@@ -17,14 +17,14 @@ result, err := client.Projects.ListProjects(ctx, &pgbeam.ListProjectsParams{
 
 ## Parameters
 
-| Parameter        | Type                         | Required | Description                                            |
-| ---------------- | ---------------------------- | -------- | ------------------------------------------------------ |
-| ctx              | `context.Context`            | Yes      | Request context                                        |
-| params           | `*pgbeam.ListProjectsParams` | Yes      | Query parameters                                       |
-| params.OrgID     | `string`                     | Yes      | Organization ID to filter projects.                    |
-| params.PageSize  | `int`                        | No       | Maximum number of items to return (1-100, default 20). |
-| params.PageToken | `string`                     | No       | Opaque token for cursor-based pagination.              |
-| params.SortBy    | `string`                     | No       | Sort field for projects list.                          |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| params | `*pgbeam.ListProjectsParams` | Yes | Query parameters |
+| params.OrgID | `string` | Yes | Organization ID to filter projects. |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
+| params.SortBy | `string` | No | Sort field for projects list. |
 
 ## Response
 

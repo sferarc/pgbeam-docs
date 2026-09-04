@@ -1,14 +1,10 @@
 ---
 title: Custom Domains
 icon: Globe
-description:
-  Use your own domain for PgBeam connection strings with automatic TLS
-  certificate provisioning and renewal. Scale plan only.
+description: Use your own domain for PgBeam connection strings with automatic TLS certificate provisioning and renewal. Scale plan only.
 ---
 
-Replace the default `*.proxy.pgbeam.app` hostname in your connection string with
-your own domain. Your applications connect to `db.yourcompany.com` instead of
-`abc.proxy.pgbeam.app`, while PgBeam handles TLS certificates automatically.
+Replace the default `*.proxy.pgbeam.app` hostname in your connection string with your own domain. Your applications connect to `db.yourcompany.com` instead of `abc.proxy.pgbeam.app`, while PgBeam handles TLS certificates automatically.
 
 <Callout type="warn" title="Scale plan required">
   Custom domains are available on the **Scale plan** only. See [Plans &
@@ -17,18 +13,14 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 
 ## Why use a custom domain
 
-- **Portability.** If you move between proxy providers, your connection strings
-  stay the same. No application changes needed.
-- **Branding.** Internal tools and dashboards show your domain instead of a
-  third-party hostname.
-- **Security policy compliance.** Some organizations require all external
-  connections to use company-owned domains.
+- **Portability.** If you move between proxy providers, your connection strings stay the same. No application changes needed.
+- **Branding.** Internal tools and dashboards show your domain instead of a third-party hostname.
+- **Security policy compliance.** Some organizations require all external connections to use company-owned domains.
 
 ## Prerequisites
 
 - A **Scale plan** subscription
-- Access to your domain's **DNS settings** (through your registrar or DNS
-  provider like Cloudflare, Route 53, etc.)
+- Access to your domain's **DNS settings** (through your registrar or DNS provider like Cloudflare, Route 53, etc.)
 - A project with at least one configured database
 
 ## Setup
@@ -134,10 +126,7 @@ your own domain. Your applications connect to `db.yourcompany.com` instead of
 
 ## TLS certificate management
 
-PgBeam provisions and renews TLS certificates for your custom domain
-automatically. The ACME challenge CNAME you added in the DNS step delegates the
-certificate challenge, so PgBeam can issue and renew certificates without any
-further action from you.
+PgBeam provisions and renews TLS certificates for your custom domain automatically. The ACME challenge CNAME you added in the DNS step delegates the certificate challenge, so PgBeam can issue and renew certificates without any further action from you.
 
 - **Provisioning** happens within minutes of successful domain verification.
 - **Renewal** happens automatically before the certificate expires.
@@ -147,10 +136,7 @@ You do not need to upload or manage certificates manually.
 
 ## Multiple custom domains
 
-You can add multiple custom domains to a single project. Each domain gets its
-own TLS certificate and DNS verification. This is useful when you want different
-domains for different environments or services while routing to the same PgBeam
-project:
+You can add multiple custom domains to a single project. Each domain gets its own TLS certificate and DNS verification. This is useful when you want different domains for different environments or services while routing to the same PgBeam project:
 
 ```bash
 # Production
@@ -194,25 +180,23 @@ After removal:
 
 ### Verification failures
 
-| Issue                | Likely cause                              | Fix                                                                |
-| -------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
-| TXT record not found | DNS propagation delay                     | Wait and retry. Check with `dig TXT _pgbeam-verify.db.example.com` |
-| CNAME mismatch       | Target is not the exact project subdomain | Verify the CNAME points to `abc.proxy.pgbeam.app` exactly          |
-| CNAME lookup failed  | Missing trailing dot at some providers    | Try `abc.proxy.pgbeam.app.` (with trailing dot)                    |
+| Issue | Likely cause | Fix |
+| --- | --- | --- |
+| TXT record not found | DNS propagation delay | Wait and retry. Check with `dig TXT _pgbeam-verify.db.example.com` |
+| CNAME mismatch | Target is not the exact project subdomain | Verify the CNAME points to `abc.proxy.pgbeam.app` exactly |
+| CNAME lookup failed | Missing trailing dot at some providers | Try `abc.proxy.pgbeam.app.` (with trailing dot) |
 
 ### Certificate issues
 
-| Issue                 | Likely cause                          | Fix                                                                     |
-| --------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
-| Certificate not ready | ACME challenge CNAME missing or wrong | Verify `_acme-challenge` CNAME record is correct                        |
-| Certificate expired   | ACME challenge CNAME was removed      | Re-add the ACME challenge CNAME to enable auto-renewal                  |
-| TLS error on connect  | Client does not trust the certificate | Update system CA bundle; PgBeam certs are trusted by all modern systems |
+| Issue | Likely cause | Fix |
+| --- | --- | --- |
+| Certificate not ready | ACME challenge CNAME missing or wrong | Verify `_acme-challenge` CNAME record is correct |
+| Certificate expired | ACME challenge CNAME was removed | Re-add the ACME challenge CNAME to enable auto-renewal |
+| TLS error on connect | Client does not trust the certificate | Update system CA bundle; PgBeam certs are trusted by all modern systems |
 
 ### Cloudflare-specific notes
 
-If your DNS is managed by Cloudflare, make sure the CNAME record has the **proxy
-toggle disabled** (DNS-only / grey cloud). Cloudflare's proxy intercepts TCP
-traffic and will break PostgreSQL wire protocol connections.
+If your DNS is managed by Cloudflare, make sure the CNAME record has the **proxy toggle disabled** (DNS-only / grey cloud). Cloudflare's proxy intercepts TCP traffic and will break PostgreSQL wire protocol connections.
 
 ## Further reading
 

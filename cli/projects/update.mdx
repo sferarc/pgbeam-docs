@@ -15,16 +15,16 @@ pgbeam projects update [id] [flags]
 
 ## Options
 
-| Option                                | Description                                                                                                     | Required | Default |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| `<id>`                                | Project ID to update. Uses the linked project if omitted.                                                       | No       | -       |
-| `--name <value>`                      | New display name for the project                                                                                | No       | -       |
-| `--description <value>`               | New project description                                                                                         | No       | -       |
-| `--tags <value>`                      | Comma-separated labels (replaces the current set)                                                               | No       | -       |
-| `--status <value>`                    | Project lifecycle status: active, suspended, or deleted                                                         | No       | -       |
-| `--allowed-cidrs <value>`             | Comma-separated CIDR ranges for the IP allowlist (replaces the current set). Pass an empty string to allow all. | No       | -       |
-| `--default-policy-profile-id <value>` | Policy profile enforced on passthrough/human connections. Pass an empty string to clear.                        | No       | -       |
-| `--agents-disabled <value>`           | Project kill-switch. true blocks all agent-credential connections; false re-enables.                            | No       | -       |
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<id>` | Project ID to update. Uses the linked project if omitted. | No | - |
+| `--name <value>` | New display name for the project | No | - |
+| `--description <value>` | New project description | No | - |
+| `--tags <value>` | Comma-separated labels (replaces the current set) | No | - |
+| `--status <value>` | Project lifecycle status: active, suspended, or deleted | No | - |
+| `--allowed-cidrs <value>` | Comma-separated CIDR ranges for the IP allowlist (replaces the current set). Pass an empty string to allow all. | No | - |
+| `--default-policy-profile-id <value>` | Policy profile enforced on passthrough/human connections. Pass an empty string to clear. | No | - |
+| `--agents-disabled <value>` | Project kill-switch. true blocks all agent-credential connections; false re-enables. | No | - |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,

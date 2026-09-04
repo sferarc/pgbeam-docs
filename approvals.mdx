@@ -1,24 +1,14 @@
 ---
 title: Human-in-the-Loop Approvals
 icon: UserCheck
-description:
-  Hold an agent's writes and DDL until a human approves them. Approve or reject
-  in the dashboard, set auto-approve rules for safe changes, and auto-expire
-  stale requests.
+description: Hold an agent's writes and DDL until a human approves them. Approve or reject in the dashboard, set auto-approve rules for safe changes, and auto-expire stale requests.
 ---
 
-Approvals hold a statement before it reaches your database and wait for a human
-to say yes. Turn it on for a credential, and every write or DDL statement it runs
-is parked as an approval request instead of executing. A reviewer approves or
-rejects it in the dashboard, the agent's session blocks until then, and the
-statement runs only on approval.
+Approvals hold a statement before it reaches your database and wait for a human to say yes. Turn it on for a credential, and every write or DDL statement it runs is parked as an approval request instead of executing. A reviewer approves or rejects it in the dashboard, the agent's session blocks until then, and the statement runs only on approval.
 
-This is the middle ground between read-only (no writes ever) and read-write (any
-write, immediately). The agent stays productive: it can draft a change and hand
-it to a person, rather than being told no.
+This is the middle ground between read-only (no writes ever) and read-write (any write, immediately). The agent stays productive: it can draft a change and hand it to a person, rather than being told no.
 
-Approvals apply to agent credentials and to human credentials. A junior analyst's
-write can be held for a senior reviewer the same way an agent's is.
+Approvals apply to agent credentials and to human credentials. A junior analyst's write can be held for a senior reviewer the same way an agent's is.
 
 ## Turn it on
 
@@ -61,16 +51,13 @@ Add an approval rule to a policy. It names which statement kinds are held.
 
 ## What the agent sees
 
-When a held statement is parked, the agent gets an LLM-readable notice on the
-wire and the session waits:
+When a held statement is parked, the agent gets an LLM-readable notice on the wire and the session waits:
 
 ```text
 NOTICE: statement held for approval (request apr_7f3a). Waiting for a reviewer.
 ```
 
-If the request is approved, the statement runs and the agent gets its result. If
-it is rejected or expires, the agent gets an error explaining why, so it can move
-on instead of hanging.
+If the request is approved, the statement runs and the agent gets its result. If it is rejected or expires, the agent gets an error explaining why, so it can move on instead of hanging.
 
 ```text
 ERROR: statement rejected by reviewer (request apr_7f3a)
@@ -79,18 +66,13 @@ ERROR: approval request apr_7f3a expired after 1h
 
 ## What reviewers see
 
-Each pending request on the **Approvals** tab carries the context needed to
-decide without opening a SQL console:
+Each pending request on the **Approvals** tab carries the context needed to decide without opening a SQL console:
 
-- The full SQL of the held statement and the credential that ran it, shown by
-  its friendly name rather than an opaque `agt_…` id.
+- The full SQL of the held statement and the credential that ran it, shown by its friendly name rather than an opaque `agt_…` id.
 - The statement kind (for example `update`, `delete`, or a DDL kind) as a badge.
 - The target tables the statement touches.
-- An affected-row estimate, always labeled estimated because the data can change
-  between the estimate and execution.
-- A warning when the estimate exceeds the policy's `max_affected_rows` cap: even
-  if the request is approved, the gateway still blocks a write that actually
-  affects more rows than the cap.
+- An affected-row estimate, always labeled estimated because the data can change between the estimate and execution.
+- A warning when the estimate exceeds the policy's `max_affected_rows` cap: even if the request is approved, the gateway still blocks a write that actually affects more rows than the cap.
 
 ## Approve or reject a request
 
@@ -112,10 +94,7 @@ curl -X POST \
 
 ## Auto-approve rules
 
-Holding every write on a busy credential is noise. The `approval_auto_max_rows`
-setting lets the safe changes through and reserves human attention for the rest.
-It is a single row ceiling for the whole policy: a held write that touches at most
-that many rows is approved automatically, and anything larger stays held.
+Holding every write on a busy credential is noise. The `approval_auto_max_rows` setting lets the safe changes through and reserves human attention for the rest. It is a single row ceiling for the whole policy: a held write that touches at most that many rows is approved automatically, and anything larger stays held.
 
 ```json title="Auto-approve writes touching at most 10 rows"
 {
@@ -124,26 +103,17 @@ that many rows is approved automatically, and anything larger stays held.
 }
 ```
 
-PgBeam counts the rows a write would affect before it commits. A write at or under
-the ceiling is approved and recorded; a write over it is parked for a person. Set
-`approval_auto_max_rows` to `0` to auto-approve nothing. DDL and other statements
-with no countable row effect are never auto-approved.
+PgBeam counts the rows a write would affect before it commits. A write at or under the ceiling is approved and recorded; a write over it is parked for a person. Set `approval_auto_max_rows` to `0` to auto-approve nothing. DDL and other statements with no countable row effect are never auto-approved.
 
 An auto-approved write is recorded in the [audit log](/docs/audit-log) as an `auto_approved` event, and it is the only entry that write produces. That is a different event from `approved`, which records a person releasing a held statement that then runs and files its own outcome. Both `auto_approved` and `query` answer the `decision=allow` filter, so a report of everything the gateway let through includes the writes a policy waved past a human.
 
 ## Auto-expire
 
-A held request that no one acts on expires after the policy's expiry window. The
-statement is rejected, the agent is told, and the request closes. This keeps a
-forgotten request from holding an agent session open forever. Every approval,
-rejection, and expiry is written to the [audit log](/docs/audit-log) and can fire
-an [`approval_requested`](/docs/audit-export) webhook.
+A held request that no one acts on expires after the policy's expiry window. The statement is rejected, the agent is told, and the request closes. This keeps a forgotten request from holding an agent session open forever. Every approval, rejection, and expiry is written to the [audit log](/docs/audit-log) and can fire an [`approval_requested`](/docs/audit-export) webhook.
 
 ## Related
 
-- [Read-only enforcement](/docs/read-only): block writes entirely instead of
-  holding them.
-- [Sandbox writes](/docs/sandbox-writes): let an agent write freely against a
-  throwaway branch.
+- [Read-only enforcement](/docs/read-only): block writes entirely instead of holding them.
+- [Sandbox writes](/docs/sandbox-writes): let an agent write freely against a throwaway branch.
 - [Audit log](/docs/audit-log): every approval decision is recorded.
 - [Audit export](/docs/audit-export): fire a webhook when a request is created.

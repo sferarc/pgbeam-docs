@@ -17,15 +17,15 @@ const result = await api.agents.exportAuditLogs({
 
 ## Parameters
 
-| Parameter                 | Type            | Required | Description                                                                                                                                                                                                                          |
-| ------------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| pathParams.project_id     | `string`        | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                                                                                                                                  |
-| queryParams.credential_id | `string`        | No       | Filter to a single agent credential.                                                                                                                                                                                                 |
-| queryParams.event         | `string`        | No       | Filter to a single event type (e.g. blocked, masked, query).                                                                                                                                                                         |
-| queryParams.decision      | `AuditDecision` | No       | Coarse outcome filter that groups events. `allow` = query, auto_approved; `block` = blocked, budget_exhausted, auth_failed, credential_expired, canary_tripped, rejected, approval_expired; `mask` = masked; `truncate` = truncated. |
-| queryParams.source        | `AuditSource`   | No       | Filter by statement origin (wire, mcp, rest, or control).                                                                                                                                                                            |
-| queryParams.start         | `string`        | No       | Return entries at or after this timestamp (inclusive lower bound).                                                                                                                                                                   |
-| queryParams.end           | `string`        | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                                                                                                                            |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.credential_id | `string` | No | Filter to a single agent credential. |
+| queryParams.event | `string` | No | Filter to a single event type (e.g. blocked, masked, query). |
+| queryParams.decision | `AuditDecision` | No | Coarse outcome filter that groups events. `allow` = query, auto_approved; `block` = blocked, budget_exhausted, auth_failed, credential_expired, canary_tripped, rejected, approval_expired; `mask` = masked; `truncate` = truncated. |
+| queryParams.source | `AuditSource` | No | Filter by statement origin (wire, mcp, rest, or control). |
+| queryParams.start | `string` | No | Return entries at or after this timestamp (inclusive lower bound). |
+| queryParams.end | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
 
 ## Response
 

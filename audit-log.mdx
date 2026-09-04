@@ -1,21 +1,12 @@
 ---
 title: Audit Log
 icon: ScrollText
-description:
-  Every statement an agent runs, allowed or blocked, recorded with its decision,
-  reason, rows, bytes, latency, and credential.
+description: Every statement an agent runs, allowed or blocked, recorded with its decision, reason, rows, bytes, latency, and credential.
 ---
 
-The audit log records every statement a credential runs through PgBeam, whether
-it was allowed, masked, blocked, or throttled. Each entry captures the SQL, the
-decision and the reason for it, the rows and bytes returned, the latency, and the
-credential that ran it. Recent entries are queryable in the control plane;
-older entries are archived for retention.
+The audit log records every statement a credential runs through PgBeam, whether it was allowed, masked, blocked, or throttled. Each entry captures the SQL, the decision and the reason for it, the rows and bytes returned, the latency, and the credential that ran it. Recent entries are queryable in the control plane; older entries are archived for retention.
 
-It covers agent and human credentials, and records each credential's
-`principal_type` so you can tell agent traffic from people. To stream events to
-your own systems in real time, see [audit export](/docs/audit-export); to flag
-unusual behavior automatically, see [anomaly detection](/docs/anomaly-detection).
+It covers agent and human credentials, and records each credential's `principal_type` so you can tell agent traffic from people. To stream events to your own systems in real time, see [audit export](/docs/audit-export); to flag unusual behavior automatically, see [anomaly detection](/docs/anomaly-detection).
 
 ## What is recorded
 
@@ -33,8 +24,7 @@ unusual behavior automatically, see [anomaly detection](/docs/anomaly-detection)
 
 ## Read the log
 
-Open the **Audit** tab in the dashboard to filter by agent, decision, or time
-range and export the result. From the terminal or API:
+Open the **Audit** tab in the dashboard to filter by agent, decision, or time range and export the result. From the terminal or API:
 
 ```bash title="Read the audit log"
 # CLI
@@ -47,10 +37,7 @@ curl "https://api.pgbeam.com/v1/projects/{projectId}/audit?decision=blocked" \
 
 ## How the pipeline works
 
-Each data plane captures the decision for every agent statement and ships it to
-the control plane. Recent entries are stored in control-plane Postgres for fast
-querying, and batched archives are written to object storage for long-term
-retention.
+Each data plane captures the decision for every agent statement and ships it to the control plane. Recent entries are stored in control-plane Postgres for fast querying, and batched archives are written to object storage for long-term retention.
 
 <Callout type="info" title="Retention by plan">
   Audit retention depends on your plan: 7 days on Starter, 30 days on Pro, and

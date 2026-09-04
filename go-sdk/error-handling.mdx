@@ -1,13 +1,9 @@
 ---
 title: Error Handling
-description:
-  Catch and inspect API errors, configure retries, and use idempotency keys in
-  the PgBeam Go SDK.
+description: Catch and inspect API errors, configure retries, and use idempotency keys in the PgBeam Go SDK.
 ---
 
-All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for
-404 responses, and `errors.As` to extract detailed status information from
-`*pgbeam.APIError`.
+All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for 404 responses, and `errors.As` to extract detailed status information from `*pgbeam.APIError`.
 
 ```go
 import pgbeam "go.pgbeam.com/sdk"
@@ -39,9 +35,7 @@ if err != nil {
 
 ## IsNotFound helper
 
-`pgbeam.IsNotFound(err)` returns `true` if the underlying error is a 404
-response. It uses `errors.As` internally, so it works even when the error is
-wrapped with `fmt.Errorf("...: %w", err)`.
+`pgbeam.IsNotFound(err)` returns `true` if the underlying error is a 404 response. It uses `errors.As` internally, so it works even when the error is wrapped with `fmt.Errorf("...: %w", err)`.
 
 ```go
 _, err := client.Projects.GetProject(ctx, "prj_missing")
@@ -50,22 +44,17 @@ if pgbeam.IsNotFound(err) {
 }
 ```
 
-See [Response Conventions](/docs/api/response-conventions) for the full list of
-error codes and the error envelope format.
+See [Response Conventions](/docs/api/response-conventions) for the full list of error codes and the error envelope format.
 
 ## Retries
 
-The SDK automatically retries transient errors with exponential backoff.
-Non-retryable errors are returned immediately.
+The SDK automatically retries transient errors with exponential backoff. Non-retryable errors are returned immediately.
 
-**Retried:** 408, 429, 502, 503, 504, and network errors (connection refused,
-DNS failure, timeout). All other status codes are **not** retried.
+**Retried:** 408, 429, 502, 503, 504, and network errors (connection refused, DNS failure, timeout). All other status codes are **not** retried.
 
-When the server returns a `Retry-After` header (on 429 or 503), the SDK uses
-that value instead of its own computed backoff.
+When the server returns a `Retry-After` header (on 429 or 503), the SDK uses that value instead of its own computed backoff.
 
-See [Response Conventions](/docs/api/response-conventions#retries) for the
-backoff formula and retry behavior details.
+See [Response Conventions](/docs/api/response-conventions#retries) for the backoff formula and retry behavior details.
 
 ### Retry configuration
 
@@ -82,11 +71,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 })
 ```
 
-| Field          | Type            | Default | Description                                                         |
-| -------------- | --------------- | ------- | ------------------------------------------------------------------- |
-| `MaxRetries`   | `int`           | `5`     | Max retry attempts after the initial request. `0` disables retries. |
-| `InitialDelay` | `time.Duration` | `500ms` | Initial backoff delay.                                              |
-| `MaxDelay`     | `time.Duration` | `30s`   | Maximum backoff delay.                                              |
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `MaxRetries` | `int` | `5` | Max retry attempts after the initial request. `0` disables retries. |
+| `InitialDelay` | `time.Duration` | `500ms` | Initial backoff delay. |
+| `MaxDelay` | `time.Duration` | `30s` | Maximum backoff delay. |
 
 ### Disabling retries
 
@@ -99,8 +88,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 ### Context cancellation
 
-Retry loops respect `context.Context`. If the context is cancelled or its
-deadline expires, the SDK stops retrying and returns the context error.
+Retry loops respect `context.Context`. If the context is cancelled or its deadline expires, the SDK stops retrying and returns the context error.
 
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -111,9 +99,6 @@ project, err := client.Projects.GetProject(ctx, "prj_abc123")
 
 ## Idempotency
 
-POST and PATCH requests automatically include an `Idempotency-Key` header when
-retries are enabled, so retries never double-create resources. The server caches
-responses for 24 hours.
+POST and PATCH requests automatically include an `Idempotency-Key` header when retries are enabled, so retries never double-create resources. The server caches responses for 24 hours.
 
-See [Response Conventions](/docs/api/response-conventions#idempotency) for how
-idempotency keys work.
+See [Response Conventions](/docs/api/response-conventions#idempotency) for how idempotency keys work.

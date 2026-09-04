@@ -20,11 +20,11 @@ const result = await api.migrations.lintMigration({
 
 ## Parameters
 
-| Parameter             | Type     | Required | Description                                                    |
-| --------------------- | -------- | -------- | -------------------------------------------------------------- |
-| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).            |
-| body.sql              | `string` | Yes      | The migration SQL to analyze. May contain multiple statements. |
-| body.database_id      | `string` | No       | Optional database to scope the lint to.                        |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| body.sql | `string` | Yes | The migration SQL to analyze. May contain multiple statements. |
+| body.database_id | `string` | No | Optional database to scope the lint to. |
 
 ## Response
 

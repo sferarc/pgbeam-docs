@@ -1,15 +1,10 @@
 ---
 title: SSO (SAML / OIDC)
 icon: Shield
-description:
-  Configure Single Sign-On for your organization using SAML 2.0 or OpenID
-  Connect. Scale plan only.
+description: Configure Single Sign-On for your organization using SAML 2.0 or OpenID Connect. Scale plan only.
 ---
 
-Single Sign-On (SSO) lets your team authenticate to PgBeam using your existing
-identity provider: Okta, Azure AD, Google Workspace, or any SAML 2.0 / OIDC
-provider. Team members sign in with their corporate credentials instead of
-managing separate PgBeam passwords.
+Single Sign-On (SSO) lets your team authenticate to PgBeam using your existing identity provider: Okta, Azure AD, Google Workspace, or any SAML 2.0 / OIDC provider. Team members sign in with their corporate credentials instead of managing separate PgBeam passwords.
 
 <Callout type="warn" title="Scale plan required">
   SSO requires the **Scale plan**. See [Plans & Pricing](/docs/plans) for
@@ -23,8 +18,7 @@ managing separate PgBeam passwords.
 | **SAML 2.0**       | Enterprise IdPs (Okta, Azure AD, OneLogin) |
 | **OpenID Connect** | Modern IdPs and custom OAuth2 providers    |
 
-Choose whichever protocol your identity provider supports. If your IdP supports
-both, OIDC is generally simpler to configure.
+Choose whichever protocol your identity provider supports. If your IdP supports both, OIDC is generally simpler to configure.
 
 ## SAML 2.0 setup
 
@@ -133,8 +127,7 @@ both, OIDC is generally simpler to configure.
 
 ## Supported identity providers
 
-SSO works with any SAML 2.0 or OIDC-compliant identity provider. Commonly used
-providers include:
+SSO works with any SAML 2.0 or OIDC-compliant identity provider. Commonly used providers include:
 
 | Provider            | SAML | OIDC | Notes                                 |
 | ------------------- | ---- | ---- | ------------------------------------- |
@@ -147,17 +140,13 @@ providers include:
 
 ## Just-in-time provisioning
 
-When a user authenticates via SSO for the first time, PgBeam automatically
-creates an account for them in your organization with the **Member** role. This
-means you do not need to invite users individually. Anyone who can authenticate
-through your IdP is automatically provisioned.
+When a user authenticates via SSO for the first time, PgBeam automatically creates an account for them in your organization with the **Member** role. This means you do not need to invite users individually. Anyone who can authenticate through your IdP is automatically provisioned.
 
 Admins and Owners can change a user's role after they have been provisioned.
 
 ## SSO enforcement
 
-Once SSO is configured and tested, you can **enforce** it for your organization.
-Enforcement means:
+Once SSO is configured and tested, you can **enforce** it for your organization. Enforcement means:
 
 - All organization members **must** authenticate via SSO
 - Password-based login is **disabled** for the organization
@@ -172,40 +161,37 @@ Enforcement means:
 
 ### Enable enforcement
 
-Go to **Settings > Security** in the dashboard. After configuring SSO, toggle
-**Require SSO for all members**. Confirm the action. All non-owner members will
-be signed out immediately.
+Go to **Settings > Security** in the dashboard. After configuring SSO, toggle **Require SSO for all members**. Confirm the action. All non-owner members will be signed out immediately.
 
 ## Troubleshooting
 
 ### SAML issues
 
-| Problem                       | Likely cause                            | Fix                                         |
-| ----------------------------- | --------------------------------------- | ------------------------------------------- |
-| "Invalid ACS URL" error       | ACS URL mismatch between IdP and PgBeam | Copy the exact ACS URL from PgBeam          |
-| "Audience mismatch" error     | Entity ID mismatch                      | Verify SP Entity ID matches in both systems |
-| User lands on error page      | Attribute mapping missing `email`       | Ensure `email` or `NameID` is mapped        |
-| Certificate validation failed | IdP certificate rotated                 | Re-import the metadata URL in PgBeam        |
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| "Invalid ACS URL" error | ACS URL mismatch between IdP and PgBeam | Copy the exact ACS URL from PgBeam |
+| "Audience mismatch" error | Entity ID mismatch | Verify SP Entity ID matches in both systems |
+| User lands on error page | Attribute mapping missing `email` | Ensure `email` or `NameID` is mapped |
+| Certificate validation failed | IdP certificate rotated | Re-import the metadata URL in PgBeam |
 
 ### OIDC issues
 
-| Problem                | Likely cause                               | Fix                                      |
-| ---------------------- | ------------------------------------------ | ---------------------------------------- |
-| "Invalid redirect URI" | Redirect URI mismatch                      | Copy the exact redirect URI from PgBeam  |
-| "Invalid client" error | Wrong client ID or secret                  | Re-copy credentials from your IdP        |
-| Discovery URL fails    | URL is incorrect or not publicly reachable | Verify the URL returns JSON in a browser |
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| "Invalid redirect URI" | Redirect URI mismatch | Copy the exact redirect URI from PgBeam |
+| "Invalid client" error | Wrong client ID or secret | Re-copy credentials from your IdP |
+| Discovery URL fails | URL is incorrect or not publicly reachable | Verify the URL returns JSON in a browser |
 
 ### General issues
 
-| Problem                           | Likely cause                | Fix                                                          |
-| --------------------------------- | --------------------------- | ------------------------------------------------------------ |
-| Users can still use passwords     | SSO enforcement not enabled | Toggle "Require SSO" in Security settings                    |
-| New user gets wrong role          | Default JIT role is Member  | Change role after provisioning                               |
-| IdP is down and nobody can log in | SSO enforcement is enabled  | Owner can log in with email/password and disable enforcement |
+| Problem | Likely cause | Fix |
+| --- | --- | --- |
+| Users can still use passwords | SSO enforcement not enabled | Toggle "Require SSO" in Security settings |
+| New user gets wrong role | Default JIT role is Member | Change role after provisioning |
+| IdP is down and nobody can log in | SSO enforcement is enabled | Owner can log in with email/password and disable enforcement |
 
 ## Further reading
 
-- [Organizations](/docs/organizations): Roles, team seats, and member
-  management
+- [Organizations](/docs/organizations): Roles, team seats, and member management
 - [Plans & Limits](/docs/plans): SSO is available on the Scale plan
 - [API Keys](/docs/api-keys): Programmatic access that does not require SSO

@@ -25,11 +25,11 @@ const result = await api.agents.getAgentUsageBreakdown({
 
 ## Parameters
 
-| Parameter             | Type     | Required | Description                                                               |
-| --------------------- | -------- | -------- | ------------------------------------------------------------------------- |
-| pathParams.project_id | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                       |
-| queryParams.start     | `string` | No       | Return entries at or after this timestamp (inclusive lower bound).        |
-| queryParams.end       | `string` | No       | Return entries strictly older than this timestamp (cursor / upper bound). |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.start | `string` | No | Return entries at or after this timestamp (inclusive lower bound). |
+| queryParams.end | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
 
 ## Response
 

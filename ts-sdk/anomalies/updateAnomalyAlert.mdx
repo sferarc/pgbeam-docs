@@ -20,11 +20,11 @@ const result = await api.anomalies.updateAnomalyAlert({
 
 ## Parameters
 
-| Parameter             | Type                           | Required | Description                                               |
-| --------------------- | ------------------------------ | -------- | --------------------------------------------------------- |
-| pathParams.project_id | `string`                       | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
-| pathParams.anomaly_id | `string`                       | Yes      | Unique anomaly alert identifier (prefixed, e.g. ano_xxx). |
-| body.status           | `"acknowledged" \| "resolved"` | Yes      | New triage state for the alert.                           |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.anomaly_id | `string` | Yes | Unique anomaly alert identifier (prefixed, e.g. ano_xxx). |
+| body.status | `"acknowledged" \| "resolved"` | Yes | New triage state for the alert. |
 
 ## Response
 

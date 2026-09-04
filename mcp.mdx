@@ -1,19 +1,10 @@
 ---
 title: Hosted MCP server
 icon: Plug
-description:
-  A hosted MCP endpoint that gives AI agents policy-enforced database tools.
-  Paste one URL into Claude Code, Cursor, or any MCP client. No server to run.
+description: A hosted MCP endpoint that gives AI agents policy-enforced database tools. Paste one URL into Claude Code, Cursor, or any MCP client. No server to run.
 ---
 
-The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io)
-server that exposes policy-enforced database tools to an AI agent. You paste one
-URL into your MCP client, and the agent gets `briefing`, `query`,
-`validate_sql`, `list_tables`, `describe_table`, `explain`, `schema_catalog`,
-and `my_permissions`, plus `search_docs` and `read_doc` for looking up how
-PgBeam works. Every database call runs through the
-same policy engine as a scoped connection string, so the agent is held to the
-same guardrails. There is nothing to install and no server to run.
+The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontextprotocol.io) server that exposes policy-enforced database tools to an AI agent. You paste one URL into your MCP client, and the agent gets `briefing`, `query`, `validate_sql`, `list_tables`, `describe_table`, `explain`, `schema_catalog`, and `my_permissions`, plus `search_docs` and `read_doc` for looking up how PgBeam works. Every database call runs through the same policy engine as a scoped connection string, so the agent is held to the same guardrails. There is nothing to install and no server to run.
 
 <Callout type="info" title="Not the same as the management MCP">
   This endpoint gives an agent **query access to your database**. The separate
@@ -23,11 +14,7 @@ same guardrails. There is nothing to install and no server to run.
 
 ## Connect a client
 
-The endpoint is served on your project's own host,
-`https://<project>.proxy.pgbeam.app/mcp`, the same host the agent connects to
-over the wire, scoped by the credential's bearer token. The exact URL and the
-`pba_…` token are shown in the **Credentials** tab and in the credential create
-response; copy them from there.
+The endpoint is served on your project's own host, `https://<project>.proxy.pgbeam.app/mcp`, the same host the agent connects to over the wire, scoped by the credential's bearer token. The exact URL and the `pba_…` token are shown in the **Credentials** tab and in the credential create response; copy them from there.
 
 <Tabs items={["Claude Code", "Claude Desktop", "Cursor", "VS Code", "Cline", "Windsurf", "MCP Inspector"]}>
   <Tab value="Claude Code">
@@ -210,78 +197,40 @@ response; copy them from there.
 
 ## Tools
 
-| Tool             | Purpose                                                                                                                                                                                        |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `briefing`       | Start here. One call returns a compact summary of the schema you can see, everything `my_permissions` reports, and short guidance on querying within those limits. No arguments.               |
-| `query`          | Run SQL. Policy errors surface verbatim, written to be LLM-readable.                                                                                                                           |
-| `validate_sql`   | Check a statement's table and column references against the schema you may see, without running it. Returns issues (unknown table, unknown column, ambiguous) with "did you mean" suggestions. |
-| `list_tables`    | List tables in a schema, shaped for an LLM.                                                                                                                                                    |
-| `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count.                                                                                                                      |
-| `explain`        | `EXPLAIN (FORMAT JSON)` for a statement.                                                                                                                                                       |
-| `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see.                              |
-| `my_permissions` | What this credential may do: access mode, permitted statement kinds, allowlist and denylist, row-filtered tables, masked columns, budgets, and how writes are routed. No arguments.            |
-| `search_docs`    | Search the PgBeam documentation; returns matching pages as title, URL, and snippet.                                                                                                            |
-| `read_doc`       | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result.                                                                                              |
+| Tool | Purpose |
+| --- | --- |
+| `briefing` | Start here. One call returns a compact summary of the schema you can see, everything `my_permissions` reports, and short guidance on querying within those limits. No arguments. |
+| `query` | Run SQL. Policy errors surface verbatim, written to be LLM-readable. |
+| `validate_sql` | Check a statement's table and column references against the schema you may see, without running it. Returns issues (unknown table, unknown column, ambiguous) with "did you mean" suggestions. |
+| `list_tables` | List tables in a schema, shaped for an LLM. |
+| `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count. |
+| `explain` | `EXPLAIN (FORMAT JSON)` for a statement. |
+| `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see. |
+| `my_permissions` | What this credential may do: access mode, permitted statement kinds, allowlist and denylist, row-filtered tables, masked columns, budgets, and how writes are routed. No arguments. |
+| `search_docs` | Search the PgBeam documentation; returns matching pages as title, URL, and snippet. |
+| `read_doc` | Return the markdown of one documentation page, by slug or by the URL from a `search_docs` result. |
 
-Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of
-`pg_catalog` and `information_schema` are permitted regardless of the allowlist,
-so an agent can discover the schema it is allowed to query.
+Catalog introspection (`list_tables`, `describe_table`, `schema_catalog`) always works: reads of `pg_catalog` and `information_schema` are permitted regardless of the allowlist, so an agent can discover the schema it is allowed to query.
 
-`briefing` is the one call to make at the start of a session. It composes the
-other two orientation tools: a compact digest of `schema_catalog` (tables with
-their columns, types, primary keys, foreign keys, approximate row counts, and
-masked-column flags, with the nullability, defaults, comments and indexes left
-to `schema_catalog` itself), the whole `my_permissions` report, and a short
-`how_to_query` list saying how to work within both. It costs the same database
-round-trips as one `schema_catalog` call and charges the query budget the same
-way. Two things to know about it: when `schema.truncated` is set the table list
-is a prefix and `schema_catalog` is the tool that pages through the rest, and
-when the schema cannot be read at all (an engaged kill-switch, an unreachable
-upstream) the briefing still answers, with `schema.unavailable` carrying the
-reason and the policy half intact.
+`briefing` is the one call to make at the start of a session. It composes the other two orientation tools: a compact digest of `schema_catalog` (tables with their columns, types, primary keys, foreign keys, approximate row counts, and masked-column flags, with the nullability, defaults, comments and indexes left to `schema_catalog` itself), the whole `my_permissions` report, and a short `how_to_query` list saying how to work within both. It costs the same database round-trips as one `schema_catalog` call and charges the query budget the same way. Two things to know about it: when `schema.truncated` is set the table list is a prefix and `schema_catalog` is the tool that pages through the rest, and when the schema cannot be read at all (an engaged kill-switch, an unreachable upstream) the briefing still answers, with `schema.unavailable` carrying the reason and the policy half intact.
 
-`my_permissions` is how an agent learns its limits without discovering them by
-being blocked. It reads the credential's compiled policy out of the proxy's own
-streamed state, so it costs no database round-trip, and it reports the effective
-policy rather than the raw record: a statement kind listed as allowed is one the
-policy engine itself was asked about, and the `always_blocked` list carries the
-safety floor no policy can switch off (DO blocks, `search_path` changes,
-whereless writes, `DROP`/`TRUNCATE`, the dangerous-function families). Two
-things it never returns: your [honeytokens](/docs/honeytokens), because a decoy
-an agent can enumerate has stopped being a decoy, and the text of a row-filter
-predicate, though the filtered table is named.
+`my_permissions` is how an agent learns its limits without discovering them by being blocked. It reads the credential's compiled policy out of the proxy's own streamed state, so it costs no database round-trip, and it reports the effective policy rather than the raw record: a statement kind listed as allowed is one the policy engine itself was asked about, and the `always_blocked` list carries the safety floor no policy can switch off (DO blocks, `search_path` changes, whereless writes, `DROP`/`TRUNCATE`, the dangerous-function families). Two things it never returns: your [honeytokens](/docs/honeytokens), because a decoy an agent can enumerate has stopped being a decoy, and the text of a row-filter predicate, though the filtered table is named.
 
-The docs tools (`search_docs`, `read_doc`) are read-only and not scoped to your
-database. They let the agent answer its own questions about PgBeam, for example
-why a query was blocked or how masking and budgets behave, without leaving the
-session.
+The docs tools (`search_docs`, `read_doc`) are read-only and not scoped to your database. They let the agent answer its own questions about PgBeam, for example why a query was blocked or how masking and budgets behave, without leaving the session.
 
 ## Enforcement is identical to the connection string
 
-The MCP endpoint executes SQL as a PostgreSQL wire client through the nearest
-data plane, using the agent credential. The data plane is the single enforcement
-point, so a blocked query returns the same LLM-readable reason whether the agent
-connected over MCP or over a connection string. Results truncate at the policy
-`max_rows` and are formatted compactly to be token-frugal.
+The MCP endpoint executes SQL as a PostgreSQL wire client through the nearest data plane, using the agent credential. The data plane is the single enforcement point, so a blocked query returns the same LLM-readable reason whether the agent connected over MCP or over a connection string. Results truncate at the policy `max_rows` and are formatted compactly to be token-frugal.
 
-A truncated result says so. When the policy `max_rows` cap or the endpoint's own
-1000-row ceiling withholds rows, the `query` result carries `"truncated": true`
-and a `notices` list naming the cap that fired, so an agent can tell a short
-answer from a complete one instead of reporting the prefix as the total. The
-same signal reaches a connection-string client as a PostgreSQL `NOTICE`.
+A truncated result says so. When the policy `max_rows` cap or the endpoint's own 1000-row ceiling withholds rows, the `query` result carries `"truncated": true` and a `notices` list naming the cap that fired, so an agent can tell a short answer from a complete one instead of reporting the prefix as the total. The same signal reaches a connection-string client as a PostgreSQL `NOTICE`.
 
 ## Errors an agent will see
 
-All of these come back as **tool-result errors** (the MCP endpoint authenticates
-each tool call, so failures are reported in the result rather than as an HTTP
-status):
+All of these come back as **tool-result errors** (the MCP endpoint authenticates each tool call, so failures are reported in the result rather than as an HTTP status):
 
-- A blocked statement returns the policy reason in the tool result, so the agent
-  can correct itself and retry within the rules.
-- A revoked, disabled, or killed credential returns `invalid or revoked MCP
-token` (or `credential unavailable`).
-- An exhausted [budget](/docs/budgets) returns a clear message naming the window
-  and reset time.
+- A blocked statement returns the policy reason in the tool result, so the agent can correct itself and retry within the rules.
+- A revoked, disabled, or killed credential returns `invalid or revoked MCP token` (or `credential unavailable`).
+- An exhausted [budget](/docs/budgets) returns a clear message naming the window and reset time.
 
 ## Related
 

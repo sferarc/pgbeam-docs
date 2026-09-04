@@ -17,13 +17,13 @@ result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx"
 
 ## Parameters
 
-| Parameter  | Type                             | Required | Description                                                  |
-| ---------- | -------------------------------- | -------- | ------------------------------------------------------------ |
-| ctx        | `context.Context`                | Yes      | Request context                                              |
-| projectID  | `string`                         | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| approvalID | `string`                         | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
-| req        | `pgbeam.ApprovalDecisionRequest` | Yes      | Request body                                                 |
-| req.Reason | `*string`                        | No       | Human-readable note explaining the decision.                 |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| approvalID | `string` | Yes | Unique approval request identifier (prefixed, e.g. apr_xxx). |
+| req | `pgbeam.ApprovalDecisionRequest` | Yes | Request body |
+| req.Reason | `*string` | No | Human-readable note explaining the decision. |
 
 ## Response
 

@@ -20,14 +20,14 @@ result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPay
 
 ## Parameters
 
-| Parameter     | Type                       | Required | Description                                                 |
-| ------------- | -------------------------- | -------- | ----------------------------------------------------------- |
-| ctx           | `context.Context`          | Yes      | Request context                                             |
-| req           | `pgbeam.SlackEventPayload` | Yes      | Request body                                                |
-| req.ChannelID | `string`                   | Yes      | Slack channel ID where the message was posted.              |
-| req.ThreadTs  | `string`                   | Yes      | Slack thread timestamp identifying the support case thread. |
-| req.UserID    | `string`                   | Yes      | Slack user ID of the message author.                        |
-| req.Text      | `string`                   | Yes      | Message text from Slack.                                    |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| req | `pgbeam.SlackEventPayload` | Yes | Request body |
+| req.ChannelID | `string` | Yes | Slack channel ID where the message was posted. |
+| req.ThreadTs | `string` | Yes | Slack thread timestamp identifying the support case thread. |
+| req.UserID | `string` | Yes | Slack user ID of the message author. |
+| req.Text | `string` | Yes | Message text from Slack. |
 
 ## Response
 

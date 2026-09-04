@@ -1,15 +1,10 @@
 ---
 title: Kill-switch
 icon: Ban
-description:
-  Stop one agent or every agent on a project instantly. The next statement is
-  refused, with no credential rotation.
+description: Stop one agent or every agent on a project instantly. The next statement is refused, with no credential rotation.
 ---
 
-The kill-switch stops an agent now. Trip it on a single credential to cut off one
-agent, or at the project level to stop every agent at once. The next statement on
-a killed credential is refused. There is no credential rotation and no change to
-your database.
+The kill-switch stops an agent now. Trip it on a single credential to cut off one agent, or at the project level to stop every agent at once. The next statement on a killed credential is refused. There is no credential rotation and no change to your database.
 
 ## Trip the kill-switch
 
@@ -53,19 +48,16 @@ your database.
 
 ## How it takes effect
 
-The kill state streams to the data planes and applies on the next statement. A
-killed agent gets a clear error over a connection string, and a `401` over the
-[hosted MCP endpoint](/docs/mcp).
+The kill state streams to the data planes and applies on the next statement. A killed agent gets a clear error over a connection string, and a `401` over the [hosted MCP endpoint](/docs/mcp).
 
 ## Kill-switch vs revoke
 
-| Action      | Effect                                                          | Reversible |
-| ----------- | --------------------------------------------------------------- | ---------- |
-| Kill-switch | Pauses access immediately. Credential and policy are preserved. | Yes        |
-| Revoke      | Removes the credential entirely.                                | No         |
+| Action | Effect | Reversible |
+| --- | --- | --- |
+| Kill-switch | Pauses access immediately. Credential and policy are preserved. | Yes |
+| Revoke | Removes the credential entirely. | No |
 
-Use the kill-switch when you want to stop an agent now and decide later. Use
-[revoke](/docs/agent-credentials) when the credential should be gone for good.
+Use the kill-switch when you want to stop an agent now and decide later. Use [revoke](/docs/agent-credentials) when the credential should be gone for good.
 
 <Callout type="info" title="Org-level safety net">
   When an organization-level budget ceiling is breached, the control plane can

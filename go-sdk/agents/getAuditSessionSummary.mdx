@@ -15,14 +15,14 @@ result, err := client.Agents.GetAuditSessionSummary(ctx, "prj_xxx", "...", nil)
 
 ## Parameters
 
-| Parameter    | Type                                   | Required | Description                                                                                                              |
-| ------------ | -------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
-| ctx          | `context.Context`                      | Yes      | Request context                                                                                                          |
-| projectID    | `string`                               | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                      |
-| sessionID    | `string`                               | Yes      | Session identifier from an audit entry's session_id field. Unique per connection within a proxy instance, not over time. |
-| params       | `*pgbeam.GetAuditSessionSummaryParams` | No       | Query parameters                                                                                                         |
-| params.Start | `string`                               | No       | Return entries at or after this timestamp (inclusive lower bound).                                                       |
-| params.End   | `string`                               | No       | Return entries strictly older than this timestamp (cursor / upper bound).                                                |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| sessionID | `string` | Yes | Session identifier from an audit entry's session_id field. Unique per connection within a proxy instance, not over time. |
+| params | `*pgbeam.GetAuditSessionSummaryParams` | No | Query parameters |
+| params.Start | `string` | No | Return entries at or after this timestamp (inclusive lower bound). |
+| params.End | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
 
 ## Response
 

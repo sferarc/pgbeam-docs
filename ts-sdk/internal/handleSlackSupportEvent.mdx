@@ -22,12 +22,12 @@ const result = await api.internal.handleSlackSupportEvent({
 
 ## Parameters
 
-| Parameter       | Type     | Required | Description                                                 |
-| --------------- | -------- | -------- | ----------------------------------------------------------- |
-| body.channel_id | `string` | Yes      | Slack channel ID where the message was posted.              |
-| body.thread_ts  | `string` | Yes      | Slack thread timestamp identifying the support case thread. |
-| body.user_id    | `string` | Yes      | Slack user ID of the message author.                        |
-| body.text       | `string` | Yes      | Message text from Slack.                                    |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| body.channel_id | `string` | Yes | Slack channel ID where the message was posted. |
+| body.thread_ts | `string` | Yes | Slack thread timestamp identifying the support case thread. |
+| body.user_id | `string` | Yes | Slack user ID of the message author. |
+| body.text | `string` | Yes | Message text from Slack. |
 
 ## Response
 

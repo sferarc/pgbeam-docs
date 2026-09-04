@@ -15,14 +15,14 @@ pgbeam agents mcp-config [flags]
 
 ## Options
 
-| Option                | Description                                                                           | Required | Default  |
-| --------------------- | ------------------------------------------------------------------------------------- | -------- | -------- |
-| `--url <value>`       | Hosted MCP URL (the mcp_url from create/rotate)                                       | No       | -        |
-| `--mcp-token <value>` | Bearer token for the MCP endpoint (the mcp_token from create/rotate)                  | No       | -        |
-| `--from-json`         | Read mcp_url + mcp_token from an `agents create --json` blob piped on stdin.          | No       | `false`  |
-| `--from-file <value>` | Read mcp_url + mcp_token from an `agents create --json` blob saved to this file.      | No       | -        |
-| `--client <value>`    | MCP client: claude (default), claude-desktop, cursor, vscode, cline, windsurf, or all | No       | `claude` |
-| `--write`             | Write each client's config to its conventional file path instead of stdout            | No       | `false`  |
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `--url <value>` | Hosted MCP URL (the mcp_url from create/rotate) | No | - |
+| `--mcp-token <value>` | Bearer token for the MCP endpoint (the mcp_token from create/rotate) | No | - |
+| `--from-json` | Read mcp_url + mcp_token from an `agents create --json` blob piped on stdin. | No | `false` |
+| `--from-file <value>` | Read mcp_url + mcp_token from an `agents create --json` blob saved to this file. | No | - |
+| `--client <value>` | MCP client: claude (default), claude-desktop, cursor, vscode, cline, windsurf, or all | No | `claude` |
+| `--write` | Write each client's config to its conventional file path instead of stdout | No | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,

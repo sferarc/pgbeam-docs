@@ -2,15 +2,10 @@
 title: Serverless Driver
 icon: Zap
 tag: TypeScript
-description:
-  Use @neondatabase/serverless to connect from edge runtimes and serverless
-  functions through PgBeam with HTTP or WebSocket transports.
+description: Use @neondatabase/serverless to connect from edge runtimes and serverless functions through PgBeam with HTTP or WebSocket transports.
 ---
 
-Connect from edge runtimes and serverless functions using the
-`@neondatabase/serverless` driver. PgBeam supports both the HTTP query endpoint
-and the WebSocket wire protocol. Your `neon()` / `Pool` call sites and every
-query stay exactly as they are.
+Connect from edge runtimes and serverless functions using the `@neondatabase/serverless` driver. PgBeam supports both the HTTP query endpoint and the WebSocket wire protocol. Your `neon()` / `Pool` call sites and every query stay exactly as they are.
 
 <Callout type="warn" title="One required step: point the driver at PgBeam">
   Changing the connection-string host is **not** enough on its own. By default
@@ -29,9 +24,7 @@ neonConfig.fetchEndpoint = (host) => `https://${host}/sql`;
 neonConfig.wsProxy = (host) => `${host}/v2`;
 ```
 
-These two lines are the only addition. Your query call sites do not change.
-(On Neon's own `*.neon.tech` hosts the defaults work; PgBeam needs the override
-because its hostnames are not `*.neon.tech`.)
+These two lines are the only addition. Your query call sites do not change. (On Neon's own `*.neon.tech` hosts the defaults work; PgBeam needs the override because its hostnames are not `*.neon.tech`.)
 
 </Callout>
 
@@ -181,19 +174,18 @@ because its hostnames are not `*.neon.tech`.)
 
 ## HTTP vs WebSocket
 
-|                  | HTTP (`neon()`)                    | WebSocket (`Pool` / `Client`)  |
-| ---------------- | ---------------------------------- | ------------------------------ |
-| **Best for**     | One-shot queries, edge functions   | Transactions, session features |
-| **Connection**   | Stateless HTTP request             | Persistent WebSocket           |
-| **Cold start**   | None                               | WebSocket handshake + TLS      |
-| **Transactions** | `sql.transaction([...])`           | `BEGIN` / `COMMIT` via client  |
-| **Pipelining**   | Automatic (batched in one request) | PostgreSQL wire protocol       |
-| **Max payload**  | \~10 MB response                   | Unlimited streaming            |
+|  | HTTP (`neon()`) | WebSocket (`Pool` / `Client`) |
+| --- | --- | --- |
+| **Best for** | One-shot queries, edge functions | Transactions, session features |
+| **Connection** | Stateless HTTP request | Persistent WebSocket |
+| **Cold start** | None | WebSocket handshake + TLS |
+| **Transactions** | `sql.transaction([...])` | `BEGIN` / `COMMIT` via client |
+| **Pipelining** | Automatic (batched in one request) | PostgreSQL wire protocol |
+| **Max payload** | \~10 MB response | Unlimited streaming |
 
 ## Edge runtime compatibility
 
-The serverless driver works in any runtime with `fetch` (for HTTP) or
-`WebSocket` (for WS):
+The serverless driver works in any runtime with `fetch` (for HTTP) or `WebSocket` (for WS):
 
 | Runtime               | HTTP | WebSocket | Notes                      |
 | --------------------- | ---- | --------- | -------------------------- |
@@ -207,8 +199,7 @@ The serverless driver works in any runtime with `fetch` (for HTTP) or
 
 Use the serverless driver adapters with Drizzle for type-safe queries:
 
-The same `neonConfig` setup applies. Drizzle wraps the Neon driver, so once the
-endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
+The same `neonConfig` setup applies. Drizzle wraps the Neon driver, so once the endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
 
 <Tabs items={["HTTP (drizzle-orm/neon-http)", "WebSocket (drizzle-orm/neon-serverless)"]}>
   <Tab value="HTTP (drizzle-orm/neon-http)">
@@ -290,11 +281,7 @@ endpoint is pointed at PgBeam, your Drizzle schema and queries are unchanged.
 
 ## Data type notes
 
-PgBeam matches the `@neondatabase/serverless` type contract over the HTTP
-endpoint. In particular, `bigint` (`int8`), `numeric`, and `money` are returned
-as **strings**, not numbers: a JavaScript `Number` cannot represent integers
-above 2^53 or arbitrary-precision decimals without silent loss. Wrap them with
-`BigInt(...)` or a decimal library as needed.
+PgBeam matches the `@neondatabase/serverless` type contract over the HTTP endpoint. In particular, `bigint` (`int8`), `numeric`, and `money` are returned as **strings**, not numbers: a JavaScript `Number` cannot represent integers above 2^53 or arbitrary-precision decimals without silent loss. Wrap them with `BigInt(...)` or a decimal library as needed.
 
 ```ts
 const [row] = await sql`SELECT 9223372036854775807::bigint AS big`;
@@ -302,8 +289,7 @@ row.big; // "9223372036854775807" (string)
 BigInt(row.big); // 9223372036854775807n
 ```
 
-`json` / `jsonb` are parsed into objects, and arrays into JS arrays, exactly as
-the Neon driver does.
+`json` / `jsonb` are parsed into objects, and arrays into JS arrays, exactly as the Neon driver does.
 
 ## Caching and replicas
 
@@ -330,19 +316,18 @@ See [Caching](/docs/cache) and [Read Replicas](/docs/replicas) for details.
 
 ## Common issues
 
-| Issue                                                     | Cause                                                                                       | Fix                                                                                                             |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set; driver rewrote the host to `api.`                       | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2)                            |
-| `WebSocket is not defined`                                | Node.js missing WS constructor                                                              | Install `ws` and set `neonConfig.webSocketConstructor = ws`                                                     |
+| Issue | Cause | Fix |
+| --- | --- | --- |
+| Requests hit `api.proxy.pgbeam.app` / 404 / wrong project | `neonConfig.fetchEndpoint` not set; driver rewrote the host to `api.` | Set `neonConfig.fetchEndpoint` so requests target the `/sql` path (see Setup step 2) |
+| `WebSocket is not defined` | Node.js missing WS constructor | Install `ws` and set `neonConfig.webSocketConstructor = ws` |
 | WebSocket `Pool` / `Client` connects then hangs, no error | Default `pipelineConnect: "password"` pipelines a cleartext password, but PgBeam uses SCRAM | Set `neonConfig.pipelineConnect = false`. If you only need one-shot queries, use the HTTP `neon()` path instead |
-| `fetch failed` on HTTP endpoint                           | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql`                   | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set                                |
-| Slow cold starts with WebSocket                           | TLS + WS handshake on each invocation                                                       | Use HTTP transport for stateless queries                                                                        |
-| `connection terminated`                                   | Idle timeout exceeded                                                                       | Use connection pooling or reconnect on error                                                                    |
+| `fetch failed` on HTTP endpoint | Network/firewall blocking HTTPS, or `fetchEndpoint` not pointed at `/sql` | Verify the proxy hostname resolves, port 443 is open, and `fetchEndpoint` is set |
+| Slow cold starts with WebSocket | TLS + WS handshake on each invocation | Use HTTP transport for stateless queries |
+| `connection terminated` | Idle timeout exceeded | Use connection pooling or reconnect on error |
 
 ## Further reading
 
 - [Connection Pooling](/docs/pooling): Pool modes and sizing guidance
 - [Caching](/docs/cache): TTL, SWR, cache rules, and SQL annotations
 - [Read Replicas](/docs/replicas): Replica setup and routing
-- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless):
-  Driver documentation
+- [@neondatabase/serverless on npm](https://www.npmjs.com/package/@neondatabase/serverless): Driver documentation

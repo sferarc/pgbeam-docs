@@ -1,24 +1,16 @@
 ---
 title: Routing & Regions
 icon: Route
-description:
-  How PgBeam routes connections across global regions and caches reads close to
-  the client, and what happens when things fail.
+description: How PgBeam routes connections across global regions and caches reads close to the client, and what happens when things fail.
 ---
 
-PgBeam is a globally distributed proxy. When a client connects, it is routed to
-the nearest PgBeam region automatically. From there, PgBeam handles everything:
-TLS termination, project lookup, connection pooling, caching, and the upstream
-query.
+PgBeam is a globally distributed proxy. When a client connects, it is routed to the nearest PgBeam region automatically. From there, PgBeam handles everything: TLS termination, project lookup, connection pooling, caching, and the upstream query.
 
-You do not choose a region when creating a project. Every project is accessible
-from every region. PgBeam picks the best path to the upstream database for you.
+You do not choose a region when creating a project. Every project is accessible from every region. PgBeam picks the best path to the upstream database for you.
 
 ## Regions
 
-PgBeam runs the proxy on a global anycast network with a presence in metros
-worldwide. A single anycast address (`proxy.pgbeam.app`) routes each connection
-to the nearest metro automatically:
+PgBeam runs the proxy on a global anycast network with a presence in metros worldwide. A single anycast address (`proxy.pgbeam.app`) routes each connection to the nearest metro automatically:
 
 | Location      | Metro |
 | ------------- | ----- |
@@ -35,8 +27,7 @@ to the nearest metro automatically:
 | Singapore     | `sin` |
 | Sydney, AU    | `syd` |
 
-Anycast steers each client to the closest metro, so you do not pick one. The
-metro set can change as we add capacity.
+Anycast steers each client to the closest metro, so you do not pick one. The metro set can change as we add capacity.
 
 ## How a connection is routed
 
@@ -108,39 +99,25 @@ Every client connection follows the same lifecycle:
 
 ## Routing across regions
 
-When your database is in a different region from the connecting client, PgBeam
-keeps connection pools close to the database while still serving clients from the
-nearest region. Clients connect to the region nearest them; PgBeam routes the
-query to the region nearest your database, where the pool lives.
+When your database is in a different region from the connecting client, PgBeam keeps connection pools close to the database while still serving clients from the nearest region. Clients connect to the region nearest them; PgBeam routes the query to the region nearest your database, where the pool lives.
 
 Keeping pools close to the database has two advantages:
 
-1. **Connection stability.** Long-lived upstream connections stay on the
-   shortest, most stable network path to the database.
-2. **Pool efficiency.** Connections from every region share the same pool,
-   maximizing connection reuse.
+1. **Connection stability.** Long-lived upstream connections stay on the shortest, most stable network path to the database.
+2. **Pool efficiency.** Connections from every region share the same pool, maximizing connection reuse.
 
 ### Cache and routing interaction
 
-The cache check always happens in the region nearest the client, before any
-cross-region hop. This is the key performance benefit:
+The cache check always happens in the region nearest the client, before any cross-region hop. This is the key performance benefit:
 
-- **Cache hit:** Served from the nearest region. No cross-region hop. No upstream
-  query. The client gets the result with local latency only.
-- **Cache miss:** The query is routed to the region nearest the database,
-  executed against the upstream, and the result is cached near the client for
-  future requests.
+- **Cache hit:** Served from the nearest region. No cross-region hop. No upstream query. The client gets the result with local latency only.
+- **Cache miss:** The query is routed to the region nearest the database, executed against the upstream, and the result is cached near the client for future requests.
 
-This means a client in Singapore querying a database in Virginia can get
-sub-millisecond response times for cached queries, despite the database being
-halfway around the world.
+This means a client in Singapore querying a database in Virginia can get sub-millisecond response times for cached queries, despite the database being halfway around the world.
 
 ### Failover
 
-If the path to the database's region is unavailable (network partition, region
-outage), PgBeam falls back to connecting to the upstream database directly from
-the client's region. This is less efficient (no pool sharing across regions) but
-maintains connectivity.
+If the path to the database's region is unavailable (network partition, region outage), PgBeam falls back to connecting to the upstream database directly from the client's region. This is less efficient (no pool sharing across regions) but maintains connectivity.
 
 <Callout type="info">
   Failover is automatic. Your application does not need to handle it: the
@@ -149,10 +126,7 @@ maintains connectivity.
 
 ### Verify the serving region
 
-On connect, PgBeam sends the serving region as a `pgbeam.region` startup
-parameter (a Postgres `ParameterStatus` message). Read it from whatever your
-client exposes for connection parameters. With `node-postgres` / the Neon
-driver:
+On connect, PgBeam sends the serving region as a `pgbeam.region` startup parameter (a Postgres `ParameterStatus` message). Read it from whatever your client exposes for connection parameters. With `node-postgres` / the Neon driver:
 
 ```ts
 await client.connect();
@@ -160,8 +134,7 @@ const region = (client as unknown as { parameters: Record<string, string> })
   .parameters["pgbeam.region"]; // e.g. "iad"
 ```
 
-libpq-based clients expose the same value through `PQparameterStatus(conn,
-"pgbeam.region")`.
+libpq-based clients expose the same value through `PQparameterStatus(conn, "pgbeam.region")`.
 
 <Callout type="info">
   A `SHOW pgbeam.region` command that returns the region in any SQL client is
@@ -184,51 +157,45 @@ Annotate queries with `/* @pgbeam:replica */` to send them to a replica:
 
 ### Auto read routing
 
-When enabled on a database with replicas configured, PgBeam automatically routes
-all SELECT queries to replicas without requiring annotations. Enable it per
-database in the dashboard, API, or CLI.
+When enabled on a database with replicas configured, PgBeam automatically routes all SELECT queries to replicas without requiring annotations. Enable it per database in the dashboard, API, or CLI.
 
-| Query type                         | Annotation mode             | Auto read routing mode      |
-| ---------------------------------- | --------------------------- | --------------------------- |
-| Read with `@pgbeam:replica`        | Round-robin across replicas | Round-robin across replicas |
-| Read without annotation            | Primary database            | Round-robin across replicas |
-| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database            | Primary database            |
-| Inside transaction                 | Primary database            | Primary database            |
+| Query type | Annotation mode | Auto read routing mode |
+| --- | --- | --- |
+| Read with `@pgbeam:replica` | Round-robin across replicas | Round-robin across replicas |
+| Read without annotation | Primary database | Round-robin across replicas |
+| Write (`INSERT`/`UPDATE`/`DELETE`) | Primary database | Primary database |
+| Inside transaction | Primary database | Primary database |
 
-PgBeam strips annotations before forwarding. See [Read Replicas](/docs/replicas)
-for setup instructions, ORM examples, and health check details.
+PgBeam strips annotations before forwarding. See [Read Replicas](/docs/replicas) for setup instructions, ORM examples, and health check details.
 
 ## Latency characteristics
 
 Understanding where latency comes from helps you optimize your setup:
 
-| Scenario                               | Typical latency | What determines it        |
-| -------------------------------------- | --------------- | ------------------------- |
-| Cache hit near client                  | \< 1ms          | L1/L2 cache lookup        |
-| Cache miss, database in same region    | 1-5ms           | Upstream query time       |
-| Cache miss, database in another region | 30-150ms        | Inter-region RTT + query  |
-| Cold start (project was parked)        | Varies          | Pool re-init + first dial |
+| Scenario | Typical latency | What determines it |
+| --- | --- | --- |
+| Cache hit near client | \< 1ms | L1/L2 cache lookup |
+| Cache miss, database in same region | 1-5ms | Upstream query time |
+| Cache miss, database in another region | 30-150ms | Inter-region RTT + query |
+| Cold start (project was parked) | Varies | Pool re-init + first dial |
 
-The biggest latency win comes from caching. A cache hit eliminates both the
-upstream query and any cross-region hop.
+The biggest latency win comes from caching. A cache hit eliminates both the upstream query and any cross-region hop.
 
 ## Failure scenarios
 
-| Failure                             | PgBeam behavior                                             |
-| ----------------------------------- | ----------------------------------------------------------- |
-| A PgBeam region goes down           | Clients are automatically routed to the next nearest region |
-| Path to the database's region fails | Fallback to a direct connection from the client's region    |
-| Upstream database unreachable       | Circuit breaker opens after 3 failures                      |
-| Shared cache goes down              | Queries fall through to upstream (fail-open)                |
-| All replicas unhealthy              | Replica-annotated queries fall back to primary              |
+| Failure | PgBeam behavior |
+| --- | --- |
+| A PgBeam region goes down | Clients are automatically routed to the next nearest region |
+| Path to the database's region fails | Fallback to a direct connection from the client's region |
+| Upstream database unreachable | Circuit breaker opens after 3 failures |
+| Shared cache goes down | Queries fall through to upstream (fail-open) |
+| All replicas unhealthy | Replica-annotated queries fall back to primary |
 
-See [Resilience](/docs/resilience) for detailed circuit breaker behavior and
-recovery.
+See [Resilience](/docs/resilience) for detailed circuit breaker behavior and recovery.
 
 ## Further reading
 
-- [Connection Pooling](/docs/pooling): Pool modes, sizing, and connection
-  lifecycle
+- [Connection Pooling](/docs/pooling): Pool modes, sizing, and connection lifecycle
 - [Caching](/docs/cache): How cache lookup interacts with routing
 - [Read Replicas](/docs/replicas): Opt-in replica routing with SQL annotations
 - [Resilience](/docs/resilience): Circuit breakers, health checks, and failover

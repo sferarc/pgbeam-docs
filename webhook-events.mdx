@@ -1,36 +1,29 @@
 ---
 title: Webhook Events
 icon: Webhook
-description:
-  The full set of webhook event types PgBeam delivers, when each one fires, and
-  the payload shape you receive.
+description: The full set of webhook event types PgBeam delivers, when each one fires, and the payload shape you receive.
 ---
 
-[Audit export](/docs/audit-export) delivers events to a webhook endpoint as they
-happen. This page enumerates every event type you can subscribe to, when each one
-fires, and the fields in its payload. Subscribe to a subset with `event_types`
-(the CLI `--event` flag), or omit it to receive all of them.
+[Audit export](/docs/audit-export) delivers events to a webhook endpoint as they happen. This page enumerates every event type you can subscribe to, when each one fires, and the fields in its payload. Subscribe to a subset with `event_types` (the CLI `--event` flag), or omit it to receive all of them.
 
 ## Event types
 
-| `event_type`         | Fires when                                                                        |
-| -------------------- | --------------------------------------------------------------------------------- |
-| `query_blocked`      | A statement is rejected by policy (allowlist, read-only, and so on).              |
-| `budget_exhausted`   | A credential hits its query or row [budget](/docs/budgets).                       |
-| `kill_switch`        | A credential or project [kill-switch](/docs/kill-switch) is tripped.              |
-| `masked`             | A result is returned with one or more [masked](/docs/masking) columns.            |
-| `migration_flagged`  | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
-| `approval_requested` | A write or DDL is held for [approval](/docs/approvals).                           |
-| `anomaly_alert`      | [Anomaly detection](/docs/anomaly-detection) raises an alert.                     |
-| `audit_checkpoint`   | A signed checkpoint is issued over the project's audit chain.                     |
+| `event_type` | Fires when |
+| --- | --- |
+| `query_blocked` | A statement is rejected by policy (allowlist, read-only, and so on). |
+| `budget_exhausted` | A credential hits its query or row [budget](/docs/budgets). |
+| `kill_switch` | A credential or project [kill-switch](/docs/kill-switch) is tripped. |
+| `masked` | A result is returned with one or more [masked](/docs/masking) columns. |
+| `migration_flagged` | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
+| `approval_requested` | A write or DDL is held for [approval](/docs/approvals). |
+| `anomaly_alert` | [Anomaly detection](/docs/anomaly-detection) raises an alert. |
+| `audit_checkpoint` | A signed checkpoint is issued over the project's audit chain. |
 
-A separate `webhook.test` event is sent only when you use **Send test event** on
-an endpoint. You do not subscribe to it, and it never fires from live traffic.
+A separate `webhook.test` event is sent only when you use **Send test event** on an endpoint. You do not subscribe to it, and it never fires from live traffic.
 
 ## Envelope
 
-Every delivery in the native `json` format shares the same envelope. The
-event-specific fields live under `data`.
+Every delivery in the native `json` format shares the same envelope. The event-specific fields live under `data`.
 
 ```json title="Envelope"
 {
@@ -50,15 +43,11 @@ event-specific fields live under `data`.
 | `occurred_at` | When the underlying event happened (RFC 3339).              |
 | `data`        | Event-specific fields, documented per event type below.     |
 
-The [SIEM formats](/docs/audit-export#siem-formats) (`splunk_hec`, `datadog`,
-`elastic`) wrap these same fields in the shape that product expects.
+The [SIEM formats](/docs/audit-export#siem-formats) (`splunk_hec`, `datadog`, `elastic`) wrap these same fields in the shape that product expects.
 
 ## Audit-derived events
 
-`query_blocked`, `budget_exhausted`, `masked`, `migration_flagged`, and
-`approval_requested` all come from the [audit log](/docs/audit-log). They share
-the same `data` shape; the `event` field inside `data` tells you which underlying
-audit event it was.
+`query_blocked`, `budget_exhausted`, `masked`, `migration_flagged`, and `approval_requested` all come from the [audit log](/docs/audit-log). They share the same `data` shape; the `event` field inside `data` tells you which underlying audit event it was.
 
 ```json title="query_blocked data"
 {
@@ -81,32 +70,30 @@ audit event it was.
 }
 ```
 
-| Field            | Description                                                   |
-| ---------------- | ------------------------------------------------------------- |
-| `audit_id`       | Id of the audit-log entry this event came from.               |
-| `credential_id`  | The credential that ran the statement.                        |
-| `region`         | Region that served the statement.                             |
-| `event`          | The underlying audit event (for example `blocked`, `masked`). |
-| `sql`            | The statement, as parsed.                                     |
-| `normalized_sql` | The statement with literals stripped.                         |
-| `query_hash`     | Hash of the normalized statement.                             |
-| `statement_kind` | The statement kind (for example `select`, `delete`).          |
-| `decision_rule`  | The rule that produced the decision.                          |
-| `reason`         | Why it was blocked, masked, or held.                          |
-| `rows_returned`  | Rows returned to the agent, after masking and row caps.       |
-| `bytes_out`      | Bytes returned.                                               |
-| `latency_ms`     | Time to serve the statement.                                  |
-| `client_ip`      | The agent's source IP.                                        |
-| `session_id`     | The wire session the statement ran in.                        |
-| `source`         | Where the statement came from: a connection string or MCP.    |
+| Field | Description |
+| --- | --- |
+| `audit_id` | Id of the audit-log entry this event came from. |
+| `credential_id` | The credential that ran the statement. |
+| `region` | Region that served the statement. |
+| `event` | The underlying audit event (for example `blocked`, `masked`). |
+| `sql` | The statement, as parsed. |
+| `normalized_sql` | The statement with literals stripped. |
+| `query_hash` | Hash of the normalized statement. |
+| `statement_kind` | The statement kind (for example `select`, `delete`). |
+| `decision_rule` | The rule that produced the decision. |
+| `reason` | Why it was blocked, masked, or held. |
+| `rows_returned` | Rows returned to the agent, after masking and row caps. |
+| `bytes_out` | Bytes returned. |
+| `latency_ms` | Time to serve the statement. |
+| `client_ip` | The agent's source IP. |
+| `session_id` | The wire session the statement ran in. |
+| `source` | Where the statement came from: a connection string or MCP. |
 
-The `kill_switch` type also fires from the audit stream when a statement is
-killed mid-flight, with the same `data` shape as above.
+The `kill_switch` type also fires from the audit stream when a statement is killed mid-flight, with the same `data` shape as above.
 
 ## `kill_switch` (project)
 
-When a project kill-switch is engaged from the control plane, the event carries a
-compact payload rather than a per-statement one:
+When a project kill-switch is engaged from the control plane, the event carries a compact payload rather than a per-statement one:
 
 ```json title="kill_switch data (project engage)"
 {
@@ -124,8 +111,7 @@ compact payload rather than a per-statement one:
 
 ## `anomaly_alert`
 
-Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts
-from its baseline.
+Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts from its baseline.
 
 ```json title="anomaly_alert data"
 {
@@ -141,29 +127,23 @@ from its baseline.
 }
 ```
 
-| Field           | Description                                                                                                |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| `id`            | The anomaly alert id.                                                                                      |
-| `project_id`    | The project the alert belongs to.                                                                          |
-| `credential_id` | The credential the alert is about.                                                                         |
-| `kind`          | The signal that tripped: `volume_spike`, `egress_spike`, `new_query_shape`, `off_hours`, or `error_spike`. |
-| `severity`      | The alert severity.                                                                                        |
-| `title`         | A short human-readable summary.                                                                            |
-| `details`       | Signal-specific detail (varies by `kind`).                                                                 |
-| `window_start`  | Start of the window the alert was computed over (RFC 3339).                                                |
-| `window_end`    | End of that window (RFC 3339).                                                                             |
+| Field | Description |
+| --- | --- |
+| `id` | The anomaly alert id. |
+| `project_id` | The project the alert belongs to. |
+| `credential_id` | The credential the alert is about. |
+| `kind` | The signal that tripped: `volume_spike`, `egress_spike`, `new_query_shape`, `off_hours`, or `error_spike`. |
+| `severity` | The alert severity. |
+| `title` | A short human-readable summary. |
+| `details` | Signal-specific detail (varies by `kind`). |
+| `window_start` | Start of the window the alert was computed over (RFC 3339). |
+| `window_end` | End of that window (RFC 3339). |
 
 ## `audit_checkpoint`
 
-A periodic signed statement of how long the project's audit chain is and what it
-contains. Unlike every other event here, it is not about one query: it is about
-the whole chain.
+A periodic signed statement of how long the project's audit chain is and what it contains. Unlike every other event here, it is not about one query: it is about the whole chain.
 
-Keep these. A hash chain cannot detect deletion at its own tip, because nothing
-inside it records how long it was supposed to be. A checkpoint you have retained
-is an outside record, so it lets you detect a truncation from a copy PgBeam no
-longer holds, and lets you verify the claim without trusting us to verify it for
-you.
+Keep these. A hash chain cannot detect deletion at its own tip, because nothing inside it records how long it was supposed to be. A checkpoint you have retained is an outside record, so it lets you detect a truncation from a copy PgBeam no longer holds, and lets you verify the claim without trusting us to verify it for you.
 
 ```json title="audit_checkpoint data"
 {
@@ -176,22 +156,18 @@ you.
 }
 ```
 
-| Field           | Description                                                                       |
-| --------------- | --------------------------------------------------------------------------------- |
-| `checkpoint_id` | Id of the checkpoint.                                                             |
-| `origin`        | Log identity, `pgbeam/audit/<project_id>`. Bound into the signature.              |
-| `size`          | Number of audit entries the checkpoint commits to.                                |
-| `root`          | Merkle root over those entries, hex.                                              |
-| `key_name`      | Name of the Ed25519 key that signed the note.                                     |
-| `note`          | The signed artifact, in the transparency-log note format. This is what to retain. |
+| Field | Description |
+| --- | --- |
+| `checkpoint_id` | Id of the checkpoint. |
+| `origin` | Log identity, `pgbeam/audit/<project_id>`. Bound into the signature. |
+| `size` | Number of audit entries the checkpoint commits to. |
+| `root` | Merkle root over those entries, hex. |
+| `key_name` | Name of the Ed25519 key that signed the note. |
+| `note` | The signed artifact, in the transparency-log note format. This is what to retain. |
 
-The `size` and `root` fields are there so you can read the event without parsing
-anything. `note` is the one that carries the claim: it is signed, so `size` and
-`root` cannot be altered inside it, and it is what a verifier checks. If you keep
-only one field, keep that one.
+The `size` and `root` fields are there so you can read the event without parsing anything. `note` is the one that carries the claim: it is signed, so `size` and `root` cannot be altered inside it, and it is what a verifier checks. If you keep only one field, keep that one.
 
-The tree is an RFC 6962 Merkle tree, so any library implementing that
-specification can verify a note against a set of entries.
+The tree is an RFC 6962 Merkle tree, so any library implementing that specification can verify a note against a set of entries.
 
 ## `webhook.test`
 
@@ -207,11 +183,8 @@ Sent by **Send test event** so you can verify a receiver before relying on it.
 
 ## Related
 
-- [Audit export](/docs/audit-export): configure endpoints, signing, and SIEM
-  formats.
-- [Audit log](/docs/audit-log): the queryable history audit-derived events come
-  from.
+- [Audit export](/docs/audit-export): configure endpoints, signing, and SIEM formats.
+- [Audit log](/docs/audit-log): the queryable history audit-derived events come from.
 - [Anomaly detection](/docs/anomaly-detection): source of `anomaly_alert` events.
 - [Kill-switch](/docs/kill-switch): source of `kill_switch` events.
-- [Audit log](/docs/audit-log): the chain `audit_checkpoint` commits to, and the
-  verification endpoint that compares the two.
+- [Audit log](/docs/audit-log): the chain `audit_checkpoint` commits to, and the verification endpoint that compares the two.

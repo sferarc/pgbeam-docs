@@ -1,17 +1,9 @@
 ---
 title: Getting Started
-description:
-  Give an AI agent safe, scoped, audited access to your Postgres. Enforcement is
-  in the wire protocol, so it works with any Postgres and no code changes.
+description: Give an AI agent safe, scoped, audited access to your Postgres. Enforcement is in the wire protocol, so it works with any Postgres and no code changes.
 ---
 
-PgBeam is the safe Postgres gateway for AI agents. You hand an agent a scoped
-connection string or a hosted MCP endpoint instead of a superuser one, and PgBeam
-enforces what it can do: read-only access, table allowlists, PII
-masking, query budgets, and a kill-switch. Every query is audited. Enforcement
-happens at the PostgreSQL wire protocol, so it works with RDS, Aurora,
-self-hosted, or any managed Postgres, with no extension to install and no change
-to your schema.
+PgBeam is the safe Postgres gateway for AI agents. You hand an agent a scoped connection string or a hosted MCP endpoint instead of a superuser one, and PgBeam enforces what it can do: read-only access, table allowlists, PII masking, query budgets, and a kill-switch. Every query is audited. Enforcement happens at the PostgreSQL wire protocol, so it works with RDS, Aurora, self-hosted, or any managed Postgres, with no extension to install and no change to your schema.
 
 <Callout title="Two minutes to safe agent access" type="info">
   Issue a scoped credential, attach a read-only policy, and point your agent at
@@ -73,9 +65,7 @@ to your schema.
 
 ### A real proxy underneath
 
-The gateway runs on a globally distributed wire-protocol proxy. Agent traffic
-gets connection pooling, query caching, replica routing, and edge latency for
-free. These are supporting features now, not the headline.
+The gateway runs on a globally distributed wire-protocol proxy. Agent traffic gets connection pooling, query caching, replica routing, and edge latency for free. These are supporting features now, not the headline.
 
 <Cards>
   <Card title="Connection Pooling" href="/docs/pooling" icon="🔗">
@@ -95,19 +85,14 @@ free. These are supporting features now, not the headline.
 
 ## How do you connect your own application?
 
-The pages above cover giving an **agent** safe access. PgBeam also sits in front
-of your **own application** for pooling, caching, replicas, and routing. The
-setup below is that path: point your app at a PgBeam hostname and keep speaking
-normal PostgreSQL. Your application's passthrough connection is never subject to
-agent policies.
+The pages above cover giving an **agent** safe access. PgBeam also sits in front of your **own application** for pooling, caching, replicas, and routing. The setup below is that path: point your app at a PgBeam hostname and keep speaking normal PostgreSQL. Your application's passthrough connection is never subject to agent policies.
 
 ### Prerequisites
 
 Before you begin, you need:
 
 - A PostgreSQL database reachable from the internet
-- The connection details for that database: host, port, username, password, and
-  database name
+- The connection details for that database: host, port, username, password, and database name
 
 ### Setup
 
@@ -208,8 +193,7 @@ Before you begin, you need:
 
 ## When should you turn on caching?
 
-Caching starts off disabled for new databases. That is the safer default. Once
-traffic is flowing, you can enable it for stable reads that benefit from reuse.
+Caching starts off disabled for new databases. That is the safer default. Once traffic is flowing, you can enable it for stable reads that benefit from reuse.
 
 <Tabs items={["Dashboard", "SQL", "Session override"]}>
   <Tab value="Dashboard">
@@ -232,20 +216,18 @@ traffic is flowing, you can enable it for stable reads that benefit from reuse.
   </Tab>
 </Tabs>
 
-See the [Caching guide](/docs/cache) for TTL, SWR, bypass rules, and cache
-annotations.
+See the [Caching guide](/docs/cache) for TTL, SWR, bypass rules, and cache annotations.
 
 ## Which clients are supported?
 
-PgBeam works with any PostgreSQL-compatible client. The docs include concrete
-setup guides for the tools people ask about most often:
+PgBeam works with any PostgreSQL-compatible client. The docs include concrete setup guides for the tools people ask about most often:
 
-| Language   | Drivers and ORMs                                                     |
-| ---------- | -------------------------------------------------------------------- |
+| Language | Drivers and ORMs |
+| --- | --- |
 | TypeScript | [Prisma](/docs/prisma), [Drizzle](/docs/drizzle), Sequelize, TypeORM |
-| Python     | [psycopg](/docs/psycopg), SQLAlchemy                                 |
-| Go         | [pgx](/docs/pgx)                                                     |
-| Java       | [JDBC](/docs/jdbc), HikariCP, Spring Boot                            |
+| Python | [psycopg](/docs/psycopg), SQLAlchemy |
+| Go | [pgx](/docs/pgx) |
+| Java | [JDBC](/docs/jdbc), HikariCP, Spring Boot |
 
 ## Prefer the terminal?
 

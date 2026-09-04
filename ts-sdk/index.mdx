@@ -1,8 +1,6 @@
 ---
 title: TypeScript SDK installation
-description:
-  Install the PgBeam SDK, configure the client, authenticate, and learn the two
-  access patterns.
+description: Install the PgBeam SDK, configure the client, authenticate, and learn the two access patterns.
 ---
 
 ## Installation
@@ -24,17 +22,16 @@ const { api } = client;
 
 ## Constructor options
 
-| Option       | Type                                              | Description                                             |
-| ------------ | ------------------------------------------------- | ------------------------------------------------------- |
-| `token`      | `string \| null \| () => Promise<string \| null>` | JWT token, API key, or async function that resolves one |
-| `baseUrl`    | `string`                                          | Base URL of the PgBeam API                              |
-| `fetch`      | `typeof globalThis.fetch`                         | Optional custom fetch implementation                    |
-| `onResponse` | `OnResponseHook`                                  | Optional hook called after every response               |
+| Option | Type | Description |
+| --- | --- | --- |
+| `token` | `string \| null \| () => Promise<string \| null>` | JWT token, API key, or async function that resolves one |
+| `baseUrl` | `string` | Base URL of the PgBeam API |
+| `fetch` | `typeof globalThis.fetch` | Optional custom fetch implementation |
+| `onResponse` | `OnResponseHook` | Optional hook called after every response |
 
 ## Authentication
 
-The `token` constructor option accepts a static string, an async function, or an
-API key. Choose the approach that fits your environment.
+The `token` constructor option accepts a static string, an async function, or an API key. Choose the approach that fits your environment.
 
 <Tabs items={["Static token", "Async token", "API key"]}>
   <Tab value="Static token">
@@ -72,13 +69,11 @@ See [API Keys](/docs/api-keys) for key creation and rotation.
 
 ## Usage patterns
 
-The SDK supports two styles for making requests: tag-based access and
-route-based access. Both are fully type-safe.
+The SDK supports two styles for making requests: tag-based access and route-based access. Both are fully type-safe.
 
 ### Tag-based access
 
-Methods are grouped by tag: `projects`, `databases`, `analytics`, `platform`,
-and `account`.
+Methods are grouped by tag: `projects`, `databases`, `analytics`, `platform`, and `account`.
 
 ```typescript
 // List all projects

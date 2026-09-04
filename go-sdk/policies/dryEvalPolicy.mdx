@@ -17,14 +17,14 @@ result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput
 
 ## Parameters
 
-| Parameter    | Type                         | Required | Description                                                      |
-| ------------ | ---------------------------- | -------- | ---------------------------------------------------------------- |
-| ctx          | `context.Context`            | Yes      | Request context                                                  |
-| projectID    | `string`                     | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).              |
-| req          | `pgbeam.DryEvalInput`        | Yes      | Request body                                                     |
-| req.SQL      | `string`                     | Yes      | The single SQL statement to evaluate.                            |
-| req.PolicyID | `*string`                    | No       | ID of an existing saved policy profile to evaluate against.      |
-| req.Policy   | `*pgbeam.PolicyProfileInput` | No       | Mutable fields of a policy profile (used for create and update). |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.DryEvalInput` | Yes | Request body |
+| req.SQL | `string` | Yes | The single SQL statement to evaluate. |
+| req.PolicyID | `*string` | No | ID of an existing saved policy profile to evaluate against. |
+| req.Policy | `*pgbeam.PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
 
 ## Response
 

@@ -15,15 +15,15 @@ pgbeam policies replay [flags]
 
 ## Options
 
-| Option                   | Description                                                                                                        | Required | Default |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | -------- | ------- |
-| `--policy <value>`       | ID of an existing saved policy to replay against                                                                   | No       | -       |
-| `--draft <value>`        | Path to a JSON file with a draft policy body to replay against                                                     | No       | -       |
-| `--credential <value>`   | Restrict the replay to traffic recorded for one agent credential                                                   | No       | -       |
-| `--bound-policy <value>` | Restrict the replay to traffic from the credentials bound to this policy ID (mutually exclusive with --credential) | No       | -       |
-| `--start <value>`        | Start of the traffic window (RFC3339; default 7 days before the end)                                               | No       | -       |
-| `--end <value>`          | End of the traffic window (RFC3339; default now)                                                                   | No       | -       |
-| `--limit <value>`        | Maximum distinct queries to replay, newest first (1-500; default 200)                                              | No       | -       |
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `--policy <value>` | ID of an existing saved policy to replay against | No | - |
+| `--draft <value>` | Path to a JSON file with a draft policy body to replay against | No | - |
+| `--credential <value>` | Restrict the replay to traffic recorded for one agent credential | No | - |
+| `--bound-policy <value>` | Restrict the replay to traffic from the credentials bound to this policy ID (mutually exclusive with --credential) | No | - |
+| `--start <value>` | Start of the traffic window (RFC3339; default 7 days before the end) | No | - |
+| `--end <value>` | End of the traffic window (RFC3339; default now) | No | - |
+| `--limit <value>` | Maximum distinct queries to replay, newest first (1-500; default 200) | No | - |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,

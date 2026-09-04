@@ -20,11 +20,11 @@ const result = await api.approvals.rejectApprovalRequest({
 
 ## Parameters
 
-| Parameter              | Type     | Required | Description                                                  |
-| ---------------------- | -------- | -------- | ------------------------------------------------------------ |
-| pathParams.project_id  | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).          |
-| pathParams.approval_id | `string` | Yes      | Unique approval request identifier (prefixed, e.g. apr_xxx). |
-| body.reason            | `string` | No       | Human-readable note explaining the decision.                 |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.approval_id | `string` | Yes | Unique approval request identifier (prefixed, e.g. apr_xxx). |
+| body.reason | `string` | No | Human-readable note explaining the decision. |
 
 ## Response
 

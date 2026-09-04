@@ -1,15 +1,10 @@
 ---
 title: PII Masking
 icon: EyeOff
-description:
-  Redact, null, or hash sensitive columns in agent results. Applied in flight,
-  so your app sees real values and the agent never does.
+description: Redact, null, or hash sensitive columns in agent results. Applied in flight, so your app sees real values and the agent never does.
 ---
 
-Masking rewrites sensitive column values in an agent's results before they leave
-the wire. You name the columns to protect and choose how to mask each one. Your
-application keeps reading the real values on its own connection. The agent
-receives the masked value and never the raw one.
+Masking rewrites sensitive column values in an agent's results before they leave the wire. You name the columns to protect and choose how to mask each one. Your application keeps reading the real values on its own connection. The agent receives the masked value and never the raw one.
 
 ## Define masking rules
 
@@ -24,23 +19,17 @@ In the dashboard, add masking rules on the policy profile under **Masking**.
 
 ## Mask kinds
 
-| Kind     | Text-format result               | Binary-format result | Use it for                                                                                           |
-| -------- | -------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------- |
-| `redact` | A fixed token, e.g. `[redacted]` | `NULL`               | Free-text fields the agent must not read.                                                            |
-| `hash`   | SHA-256 hex of the value         | `NULL`               | Identifiers whose equality the agent may correlate across rows in its own results (email, user key). |
-| `null`   | Empty / `NULL`                   | `NULL`               | Columns the agent should ignore entirely.                                                            |
+| Kind | Text-format result | Binary-format result | Use it for |
+| --- | --- | --- | --- |
+| `redact` | A fixed token, e.g. `[redacted]` | `NULL` | Free-text fields the agent must not read. |
+| `hash` | SHA-256 hex of the value | `NULL` | Identifiers whose equality the agent may correlate across rows in its own results (email, user key). |
+| `null` | Empty / `NULL` | `NULL` | Columns the agent should ignore entirely. |
 
-`hash` maps the same input to the same output, so equal values are visibly
-equal in the rows the agent gets back and it can correlate them itself. It
-cannot ask the database to do that correlation: a masked column may be selected
-and nothing else. See the guard below.
+`hash` maps the same input to the same output, so equal values are visibly equal in the rows the agent gets back and it can correlate them itself. It cannot ask the database to do that correlation: a masked column may be selected and nothing else. See the guard below.
 
 ## When masking applies
 
-Masking is applied at serve time on the result path, for agent sessions only. It
-runs whether the result comes from your database or from PgBeam's cache: the
-cache keeps raw bytes, and each connection's policy decides what it sees. Your
-application's passthrough connection is never masked.
+Masking is applied at serve time on the result path, for agent sessions only. It runs whether the result comes from your database or from PgBeam's cache: the cache keeps raw bytes, and each connection's policy decides what it sees. Your application's passthrough connection is never masked.
 
 <Callout type="warn" title="Masking semantics">
   Binary-format result columns are masked to `NULL` to stay type-safe;
@@ -56,19 +45,11 @@ application's passthrough connection is never masked.
 
 ## Views are not seen through
 
-A masking rule names a relation, and a view is a relation of its own. PgBeam
-reads the SQL an agent sends and does not consult the database catalog, so it
-never learns that a view is a stored query over a masked table. A rule on
-`patients.full_name` does nothing for `SELECT full_name FROM patient_summary`,
-whether the view exposes the column under its own name or renames it.
+A masking rule names a relation, and a view is a relation of its own. PgBeam reads the SQL an agent sends and does not consult the database catalog, so it never learns that a view is a stored query over a masked table. A rule on `patients.full_name` does nothing for `SELECT full_name FROM patient_summary`, whether the view exposes the column under its own name or renames it.
 
-Two consequences follow. The value comes back in the clear, and the guard that
-normally refuses a masked column in a `WHERE`, `ORDER BY` or `GROUP BY` clause is
-blind in the same place, so an agent can also filter and sort on it through the
-view.
+Two consequences follow. The value comes back in the clear, and the guard that normally refuses a masked column in a `WHERE`, `ORDER BY` or `GROUP BY` clause is blind in the same place, so an agent can also filter and sort on it through the view.
 
-The remedy is to name the view in its own rule, using whatever the view calls the
-column:
+The remedy is to name the view in its own rule, using whatever the view calls the column:
 
 ```bash title="Mask the view as well as the table"
 pgbeam policies create --name analytics \
@@ -76,35 +57,19 @@ pgbeam policies create --name analytics \
   --mask patient_summary.full_name=redact
 ```
 
-Masking then works on the view exactly as it does on a table, guard included. The
-policy editor flags this for you: when a relation you name resolves to a view, it
-says so above the field. Allowlists and [row filters](/docs/policies) carry the
-same limit, so a view over a row-filtered table serves every row.
+Masking then works on the view exactly as it does on a table, guard included. The policy editor flags this for you: when a relation you name resolves to a view, it says so above the field. Allowlists and [row filters](/docs/policies) carry the same limit, so a view over a row-filtered table serves every row.
 
-An agent credential cannot create the view to get around its own policy. Every
-`CREATE VIEW` and `CREATE MATERIALIZED VIEW` over a masked column is refused. The
-case to watch for is a view you built yourself and then exposed to the agent.
+An agent credential cannot create the view to get around its own policy. Every `CREATE VIEW` and `CREATE MATERIALIZED VIEW` over a masked column is refused. The case to watch for is a view you built yourself and then exposed to the agent.
 
 ## A masked column may be selected, and nothing else
 
-Masking redacts a column's output, but the raw value can still steer a query:
-`WHERE dob >= '1980-01-01'` probes a range, `WHERE name LIKE 'A%'` enumerates
-characters, and `ORDER BY dob` leaks the ordering, all without the value ever
-appearing in a result cell. So the policy fails closed. A masked column
-referenced in `WHERE`, `HAVING`, a join condition, `GROUP BY`, `ORDER BY`,
-`DISTINCT`, a window clause, `LIMIT`/`OFFSET`, or the arguments of a
-set-returning function is refused, in the top-level statement and in every
-subquery and CTE.
+Masking redacts a column's output, but the raw value can still steer a query: `WHERE dob >= '1980-01-01'` probes a range, `WHERE name LIKE 'A%'` enumerates characters, and `ORDER BY dob` leaks the ordering, all without the value ever appearing in a result cell. So the policy fails closed. A masked column referenced in `WHERE`, `HAVING`, a join condition, `GROUP BY`, `ORDER BY`, `DISTINCT`, a window clause, `LIMIT`/`OFFSET`, or the arguments of a set-returning function is refused, in the top-level statement and in every subquery and CTE.
 
-The practical consequence: an existing query that groups by a column you are
-about to mask starts failing rather than returning masked groups, and has to be
-rewritten.
+The practical consequence: an existing query that groups by a column you are about to mask starts failing rather than returning masked groups, and has to be rewritten.
 
 ## Combine with allowlists
 
-Masking and [allowlists](/docs/allowlists) work together. Allowlisting decides
-which relations and columns an agent may reach at all; masking decides what the
-allowed column's value looks like when it comes back.
+Masking and [allowlists](/docs/allowlists) work together. Allowlisting decides which relations and columns an agent may reach at all; masking decides what the allowed column's value looks like when it comes back.
 
 ## Related
 

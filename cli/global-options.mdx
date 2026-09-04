@@ -21,10 +21,7 @@ description: Flags and environment variables available on every PgBeam CLI comma
   useful for scripting and CI/CD pipelines.
 </Callout>
 
-With `--json`, errors are machine-readable too: instead of human-formatted
-console output, a failed command prints a JSON error object to stdout and exits
-non-zero. The `status` field is present for API errors, and `hint` carries the
-same remediation hint the human output shows:
+With `--json`, errors are machine-readable too: instead of human-formatted console output, a failed command prints a JSON error object to stdout and exits non-zero. The `status` field is present for API errors, and `hint` carries the same remediation hint the human output shows:
 
 ```json
 {

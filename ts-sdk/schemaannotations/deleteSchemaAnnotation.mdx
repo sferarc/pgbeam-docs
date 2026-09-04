@@ -18,12 +18,12 @@ const result = await api.schemaannotations.deleteSchemaAnnotation({
 
 ## Parameters
 
-| Parameter               | Type     | Required | Description                                               |
-| ----------------------- | -------- | -------- | --------------------------------------------------------- |
-| pathParams.project_id   | `string` | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).       |
-| queryParams.table_name  | `string` | Yes      | Relation (table or view) the annotation describes.        |
-| queryParams.schema_name | `string` | No       | Optional schema. Omit to match the unqualified form.      |
-| queryParams.column_name | `string` | No       | Optional column. Omit to delete a table-level annotation. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| queryParams.table_name | `string` | Yes | Relation (table or view) the annotation describes. |
+| queryParams.schema_name | `string` | No | Optional schema. Omit to match the unqualified form. |
+| queryParams.column_name | `string` | No | Optional column. Omit to delete a table-level annotation. |
 
 ## Response
 

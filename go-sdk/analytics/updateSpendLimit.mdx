@@ -17,12 +17,12 @@ result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.Updat
 
 ## Parameters
 
-| Parameter      | Type                             | Required | Description                                               |
-| -------------- | -------------------------------- | -------- | --------------------------------------------------------- |
-| ctx            | `context.Context`                | Yes      | Request context                                           |
-| orgID          | `string`                         | Yes      | Unique organization identifier.                           |
-| req            | `pgbeam.UpdateSpendLimitRequest` | Yes      | Request body                                              |
-| req.SpendLimit | `*float64`                       | No       | Monthly spend limit in dollars. Null to remove the limit. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| req | `pgbeam.UpdateSpendLimitRequest` | Yes | Request body |
+| req.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. |
 
 ## Response
 

@@ -17,14 +17,14 @@ result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", p
 
 ## Parameters
 
-| Parameter        | Type                               | Required | Description                                                                                                                    |
-| ---------------- | ---------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| ctx              | `context.Context`                  | Yes      | Request context                                                                                                                |
-| projectID        | `string`                           | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                                                                            |
-| agentID          | `string`                           | Yes      | Unique agent credential identifier (prefixed, e.g. agt_xxx).                                                                   |
-| req              | `pgbeam.PolicyRecommendationInput` | Yes      | Request body                                                                                                                   |
-| req.LookbackDays | `*int`                             | No       | How many days of recorded audit history to analyze.                                                                            |
-| req.Limit        | `*int`                             | No       | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| agentID | `string` | Yes | Unique agent credential identifier (prefixed, e.g. agt_xxx). |
+| req | `pgbeam.PolicyRecommendationInput` | Yes | Request body |
+| req.LookbackDays | `*int` | No | How many days of recorded audit history to analyze. |
+| req.Limit | `*int` | No | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
 
 ## Response
 

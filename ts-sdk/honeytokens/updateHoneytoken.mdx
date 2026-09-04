@@ -21,13 +21,13 @@ const result = await api.honeytokens.updateHoneytoken({
 
 ## Parameters
 
-| Parameter                | Type                     | Required | Description                                                         |
-| ------------------------ | ------------------------ | -------- | ------------------------------------------------------------------- |
-| pathParams.project_id    | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
-| pathParams.honeytoken_id | `string`                 | Yes      | Unique honeytoken identifier (prefixed, e.g. hnt_xxx).              |
-| body.schema_name         | `string`                 | No       | Optional schema. Null or empty matches the unqualified/public form. |
-| body.relation_name       | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
-| body.action              | `"audit_only" \| "kill"` | Yes      | Response when the honeytoken is tripped.                            |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| pathParams.honeytoken_id | `string` | Yes | Unique honeytoken identifier (prefixed, e.g. hnt_xxx). |
+| body.schema_name | `string` | No | Optional schema. Null or empty matches the unqualified/public form. |
+| body.relation_name | `string` | Yes | Relation (table or view) name of the decoy. |
+| body.action | `"audit_only" \| "kill"` | Yes | Response when the honeytoken is tripped. |
 
 ## Response
 

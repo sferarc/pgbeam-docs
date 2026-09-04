@@ -2,13 +2,10 @@
 title: Terraform
 icon: Blocks
 tag: HCL
-description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens as
-  infrastructure using Terraform and the pgbeam provider.
+description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens as infrastructure using Terraform and the pgbeam provider.
 ---
 
-Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
-provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens.
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, and honeytokens.
 
 ## Setup
 
@@ -51,9 +48,7 @@ variable "pgbeam_api_key" {
   sensitive = true
 }
 
-provider "pgbeam" {
-api_key = var.pgbeam_api_key
-}
+provider "pgbeam" { api_key = var.pgbeam_api_key }
 
 ````
 </Tab>
@@ -98,9 +93,7 @@ output "proxy_host" {
 terraform apply
 ```
 
-Terraform creates the PgBeam project and its primary database atomically.
-The `proxy_host` output gives you the PgBeam proxy endpoint to use in your
-application connection string.
+Terraform creates the PgBeam project and its primary database atomically. The `proxy_host` output gives you the PgBeam proxy endpoint to use in your application connection string.
 
 </Step>
 </Steps>
@@ -356,33 +349,32 @@ resource "pgbeam_honeytoken" "example" {
 
 ## Configuration
 
-| Setting          | Source         | Description                                      |
-| ---------------- | -------------- | ------------------------------------------------ |
-| `api_key`        | Provider block | API key (sensitive, recommended: use a variable) |
-| `base_url`       | Provider block | API base URL (default: `https://api.pgbeam.com`) |
-| `PGBEAM_API_KEY` | Environment    | Fallback API key                                 |
-| `PGBEAM_API_URL` | Environment    | Fallback base URL                                |
+| Setting | Source | Description |
+| --- | --- | --- |
+| `api_key` | Provider block | API key (sensitive, recommended: use a variable) |
+| `base_url` | Provider block | API base URL (default: `https://api.pgbeam.com`) |
+| `PGBEAM_API_KEY` | Environment | Fallback API key |
+| `PGBEAM_API_URL` | Environment | Fallback base URL |
 
 Config resolution order: provider block > environment variables.
 
 ## Replacement vs update
 
-Some property changes trigger resource replacement (destroy + create) rather
-than in-place updates:
+Some property changes trigger resource replacement (destroy + create) rather than in-place updates:
 
-| Resource           | Replacement triggers                                                      |
-| ------------------ | ------------------------------------------------------------------------- |
-| Project            | `org_id`, `cloud`, `self_hosted`                                          |
-| Database           | `project_id`                                                              |
-| Replica            | Any property change (immutable)                                           |
-| CustomDomain       | Any property change (immutable)                                           |
-| CacheRule          | `project_id`, `database_id`, `query_hash`                                 |
-| SpendLimit         | `org_id`                                                                  |
-| AgentCredential    | `project_id`, `policy_profile_id`, `name`, `principal_type`, `expires_at` |
-| PolicyProfile      | `project_id`                                                              |
-| WebhookEndpoint    | `project_id`                                                              |
-| SelfHostEnrollment | Any property change (immutable)                                           |
-| Honeytoken         | `project_id`                                                              |
+| Resource | Replacement triggers |
+| --- | --- |
+| Project | `org_id`, `cloud`, `self_hosted` |
+| Database | `project_id` |
+| Replica | Any property change (immutable) |
+| CustomDomain | Any property change (immutable) |
+| CacheRule | `project_id`, `database_id`, `query_hash` |
+| SpendLimit | `org_id` |
+| AgentCredential | `project_id`, `policy_profile_id`, `name`, `principal_type`, `expires_at` |
+| PolicyProfile | `project_id` |
+| WebhookEndpoint | `project_id` |
+| SelfHostEnrollment | Any property change (immutable) |
+| Honeytoken | `project_id` |
 
 ## Further reading
 

@@ -18,15 +18,15 @@ result, err := client.Honeytokens.UpdateHoneytoken(ctx, "prj_xxx", "hnt_xxx", pg
 
 ## Parameters
 
-| Parameter        | Type                     | Required | Description                                                         |
-| ---------------- | ------------------------ | -------- | ------------------------------------------------------------------- |
-| ctx              | `context.Context`        | Yes      | Request context                                                     |
-| projectID        | `string`                 | Yes      | Unique project identifier (prefixed, e.g. prj_xxx).                 |
-| honeytokenID     | `string`                 | Yes      | Unique honeytoken identifier (prefixed, e.g. hnt_xxx).              |
-| req              | `pgbeam.HoneytokenInput` | Yes      | Request body                                                        |
-| req.SchemaName   | `*string`                | No       | Optional schema. Null or empty matches the unqualified/public form. |
-| req.RelationName | `string`                 | Yes      | Relation (table or view) name of the decoy.                         |
-| req.Action       | `string`                 | Yes      | Response when the honeytoken is tripped.                            |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| honeytokenID | `string` | Yes | Unique honeytoken identifier (prefixed, e.g. hnt_xxx). |
+| req | `pgbeam.HoneytokenInput` | Yes | Request body |
+| req.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified/public form. |
+| req.RelationName | `string` | Yes | Relation (table or view) name of the decoy. |
+| req.Action | `string` | Yes | Response when the honeytoken is tripped. |
 
 ## Response
 
