@@ -56,8 +56,9 @@ const result = await client.api.support.createSupportCase({
 
 ## Errors
 
-| Status | Description                                   |
-| ------ | --------------------------------------------- |
-| 400    | Invalid request parameters.                   |
-| 401    | Missing or invalid authentication.            |
-| 403    | Operation not allowed by current plan limits. |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 409    | Resource already exists or conflicts with current state. |

@@ -96,9 +96,30 @@ POST and PATCH requests include an `Idempotency-Key` header so retries never dou
 
 - Keys are UUID v4, generated once per SDK call and reused across all attempts
 - Sent on every attempt (including the first) so the server can deduplicate even if the initial request succeeds but the client loses the response
-- GET and DELETE are naturally idempotent — no key needed
+- GET and DELETE are naturally idempotent, so no key is needed
 - The server caches idempotent responses for **24 hours**
 - Success responses and 4xx responses are cached. A 4xx is the server's settled answer about that exact request, so a retry carrying the same key is answered from the cache rather than running the handler again
 - Every 5xx, plus 408 and 429, is **not** cached. A server error means the request produced no settled answer, so the next retry with the same key executes the handler again
+
+The operations that accept a key declare `Idempotency-Key` as a header parameter in the [OpenAPI spec](https://pgbeam.com/.well-known/api-catalog), so it appears in the generated SDKs and in any client generated from the contract. Those are the operations that create a resource or mint a secret, where a duplicate actually costs something. The server honours the header on any POST or PATCH.
+
+## Reusing a key with a different body
+
+A key is a promise about one specific request, so the server records a fingerprint of the request body alongside it. Sending the same key with a different body returns **409 Conflict** rather than replaying the first response:
+
+```json
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Idempotency-Key was already used for a request with a different body; use a new key for a new request"
+  }
+}
+```
+
+Without this the second request would be answered from the cache with the first request's result, so a client that reused a key by mistake would be handed a `201` describing a resource it never asked to create. Generate a fresh key per logical operation and the case never arises.
+
+## Scope
+
+Keys are scoped to the calling organization, or to the user when the token is account-scoped and carries no organization. One tenant can never read another's cached response, and a request that identifies neither is not cached at all. Keys are stored in the control-plane database rather than a cache, so a key lives for its full 24 hours and is not evicted early under memory pressure.
 
 See the [TypeScript SDK](/docs/ts-sdk/error-handling#retry-configuration) and [Go SDK](/docs/go-sdk/error-handling#retry-configuration) docs for language-specific configuration.

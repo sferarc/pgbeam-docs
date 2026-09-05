@@ -51,9 +51,10 @@ const result = await client.api.platform.createSelfHostEnrollment({
 
 ## Errors
 
-| Status | Description                                           |
-| ------ | ----------------------------------------------------- |
-| 400    | Invalid request parameters.                           |
-| 401    | Missing or invalid authentication.                    |
-| 403    | The organization's plan is not entitled to self-host. |
-| 429    | Rate limited. Try again later.                        |
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | The organization's plan is not entitled to self-host.    |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |
