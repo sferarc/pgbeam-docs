@@ -100,6 +100,7 @@ POST and PATCH requests include an `Idempotency-Key` header so retries never dou
 - The server caches idempotent responses for **24 hours**
 - Success responses and 4xx responses are cached. A 4xx is the server's settled answer about that exact request, so a retry carrying the same key is answered from the cache rather than running the handler again
 - Every 5xx, plus 408 and 429, is **not** cached. A server error means the request produced no settled answer, so the next retry with the same key executes the handler again
+- That holds for a retry that arrives while the first attempt is still running, not only for one that waits its turn. A second request carrying a key another request is already working on waits for that one to finish and is then answered from the cache. If the first attempt fails without settling, the waiting request claims the key and runs the handler itself, so it gets a real answer rather than being told the operation is still in progress
 
 The operations that accept a key declare `Idempotency-Key` as a header parameter in the [OpenAPI spec](https://pgbeam.com/.well-known/api-catalog), so it appears in the generated SDKs and in any client generated from the contract. Those are the operations that create a resource or mint a secret, where a duplicate actually costs something. The server honours the header on any POST or PATCH.
 
