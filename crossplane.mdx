@@ -24,7 +24,7 @@ kind: Provider
 metadata:
   name: provider-pgbeam
 spec:
-  package: ghcr.io/pgbeam/provider-pgbeam:latest
+  package: ghcr.io/sferarc/provider-pgbeam:latest
 ```
 
 ```bash
@@ -59,7 +59,7 @@ spec:
     name: pgbeam-credentials
     namespace: crossplane-system
     key: api-key
-  baseURL: https://api.pgbeam.com # optional
+  baseUrl: https://api.pgbeam.com # optional
 ```
 
 ```bash
@@ -78,7 +78,7 @@ metadata:
   name: my-app
 spec:
   forProvider:
-    orgId: org_abc123
+    orgID: org_abc123
     name: my-app
     database:
       host: my-rds.us-east-1.rds.amazonaws.com
@@ -416,7 +416,7 @@ spec:
 | Setting | Source | Description |
 | --- | --- | --- |
 | `apiKeySecretRef` | ProviderConfig | Secret reference for the API key |
-| `baseURL` | ProviderConfig | API base URL (default: `https://api.pgbeam.com`) |
+| `baseUrl` | ProviderConfig | API base URL (default: `https://api.pgbeam.com`) |
 
 ## Replacement vs update
 
@@ -424,17 +424,17 @@ Some spec changes trigger resource recreation rather than in-place updates:
 
 | Resource | Recreation triggers |
 | --- | --- |
-| Project | `orgId`, `cloud`, `selfHosted` |
-| Database | `projectId` |
+| Project | `orgID`, `cloud`, `selfHosted` |
+| Database | `projectID` |
 | Replica | Any spec change (immutable) |
 | CustomDomain | Any spec change (immutable) |
-| CacheRule | `projectId`, `databaseId`, `queryHash` |
-| SpendLimit | `orgId` |
-| AgentCredential | `projectId`, `policyProfileId`, `name`, `principalType`, `expiresAt` |
-| PolicyProfile | `projectId` |
-| WebhookEndpoint | `projectId` |
+| CacheRule | `projectID`, `databaseID`, `queryHash` |
+| SpendLimit | `orgID` |
+| AgentCredential | `projectID`, `policyProfileID`, `name`, `principalType`, `expiresAt` |
+| PolicyProfile | `projectID` |
+| WebhookEndpoint | `projectID` |
 | SelfHostEnrollment | Any spec change (immutable) |
-| Honeytoken | `projectId` |
+| Honeytoken | `projectID` |
 
 ## Further reading
 
