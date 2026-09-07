@@ -1,0 +1,46 @@
+---
+title: GetDemo
+description: Describe the demo sandbox
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns everything an unauthenticated caller needs before asking for a demo credential: whether the demo is up, how much of the global ceiling is left, what each tier costs, the dataset schema with the treatment the demo policy applies to every column, and the walkthrough of statements that demonstrate each guardrail. Requires no account and no key.
+
+## Usage
+
+```go
+result, err := client.Demo.GetDemo(ctx)
+```
+
+## Parameters
+
+| Parameter | Type              | Required | Description     |
+| --------- | ----------------- | -------- | --------------- |
+| ctx       | `context.Context` | Yes      | Request context |
+
+## Response
+
+`(*pgbeam.DemoInfo, error)`: the demo sandbox description.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Demo.GetDemo(ctx)
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                    |
+| ------ | ------------------------------ |
+| 429    | Rate limited. Try again later. |

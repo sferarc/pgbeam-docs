@@ -1,0 +1,41 @@
+---
+title: getDemo
+description: Describe the demo sandbox
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Returns everything an unauthenticated caller needs before asking for a demo credential: whether the demo is up, how much of the global ceiling is left, what each tier costs, the dataset schema with the treatment the demo policy applies to every column, and the walkthrough of statements that demonstrate each guardrail. Requires no account and no key.
+
+## Usage
+
+```typescript
+const result = await api.demo.getDemo();
+```
+
+## Parameters
+
+None.
+
+## Response
+
+`Promise<DemoInfo>`: the demo sandbox description.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: null,
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.demo.getDemo();
+```
+
+## Errors
+
+| Status | Description                    |
+| ------ | ------------------------------ |
+| 429    | Rate limited. Try again later. |
