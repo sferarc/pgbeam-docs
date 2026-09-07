@@ -21,6 +21,7 @@
 		"budgets",
 		"kill-switch",
 		"honeytokens",
+		"prompt-scan",
 		"local-testing",
 		"---Write safety---",
 		"approvals",
