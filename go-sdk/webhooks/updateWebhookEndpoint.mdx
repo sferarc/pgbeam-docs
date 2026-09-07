@@ -26,7 +26,7 @@ result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", 
 | req.URL | `string` | Yes | HTTPS endpoint that receives event deliveries. |
 | req.Secret | `*string` | No | Shared secret used to sign delivery payloads. Write-only. |
 | req.Format | `*string` | No | Payload format for delivered events. |
-| req.EventTypes | `*[]string` | No | Event types to deliver. Empty means all events. |
+| req.EventTypes | `*[]pgbeam.WebhookEventType` | No | Event types to deliver. Empty means all events. |
 | req.Enabled | `*bool` | No | Whether deliveries are active for this endpoint. |
 | req.Description | `*string` | No | Human-readable label for the endpoint. |
 
@@ -45,11 +45,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", pgbeam.WebhookEndpointInput{
     URL: "https://example.com/hooks/pgbeam",
-    Secret: "...",
+    Secret: "whsec_do-not-log-this",
     Format: "json",
-    EventTypes: nil,
+    EventTypes: []pgbeam.WebhookEventType{"query_blocked", "canary_tripped"},
     Enabled: true,
-    Description: "...",
+    Description: "Read-only access for the reporting agent",
   })
 if err != nil {
   log.Fatal(err)

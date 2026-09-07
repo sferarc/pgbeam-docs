@@ -40,7 +40,7 @@ pgbeam webhooks create
 pgbeam webhooks create https://example.com/hook
 
 # Create a Datadog webhook for specific events
-pgbeam webhooks create https://example.com/hook --format datadog --event query.blocked,policy.updated
+pgbeam webhooks create https://example.com/hook --format datadog --event query_blocked,canary_tripped
 
 # Create a disabled webhook with a secret
 pgbeam webhooks create https://example.com/hook --secret s3cr3t --disabled

@@ -26,7 +26,7 @@ const result = await api.webhooks.createWebhookEndpoint({
 | body.url | `string` | Yes | HTTPS endpoint that receives event deliveries. |
 | body.secret | `string` | No | Shared secret used to sign delivery payloads. Write-only. |
 | body.format | `"json" \| "splunk_hec" \| "datadog" \| "elastic"` | No | Payload format for delivered events. |
-| body.event_types | `string[]` | No | Event types to deliver. Empty means all events. |
+| body.event_types | `WebhookEventType[]` | No | Event types to deliver. Empty means all events. |
 | body.enabled | `boolean` | No | Whether deliveries are active for this endpoint. |
 | body.description | `string` | No | Human-readable label for the endpoint. |
 

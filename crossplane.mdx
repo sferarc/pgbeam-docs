@@ -351,12 +351,12 @@ metadata:
   name: example
 spec:
   forProvider:
-    projectID: ...
+    projectID: prj_01j9x8y7z6w5v4u3t2s1r0q9p8
     url: https://example.com/hooks/pgbeam
     format: json
-    eventTypes: ["..."]
+    eventTypes: ["query_blocked", "canary_tripped"]
     enabled: true
-    description: ...
+    description: Read-only access for the reporting agent
     secretSecretRef:
       name: credentials
       namespace: default

@@ -38,7 +38,7 @@ pgbeam webhooks update <id> [flags]
 pgbeam webhooks update wh_xxx --url https://new.example.com/hook
 
 # Subscribe a webhook to specific events
-pgbeam webhooks update wh_xxx --event query.blocked,policy.updated
+pgbeam webhooks update wh_xxx --event query_blocked,canary_tripped
 
 # Disable a webhook
 pgbeam webhooks update wh_xxx --enabled=false
