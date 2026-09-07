@@ -19,6 +19,7 @@
 		"masking",
 		"scan-pii",
 		"budgets",
+		"agent-payments",
 		"kill-switch",
 		"honeytokens",
 		"prompt-scan",

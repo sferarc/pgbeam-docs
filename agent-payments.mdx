@@ -1,0 +1,214 @@
+---
+title: Agent Payments (HTTP 402)
+icon: CreditCard
+description: An agent that exhausts its query budget can buy more over HTTP 402 with the Machine Payments Protocol, settle the charge, and carry on without waiting for a human.
+---
+
+A query budget stops an agent dead. That is the point of it: a runaway loop hits a ceiling instead of your database. But it also stops an agent that is doing exactly what you asked, at three in the morning, with nobody around to raise the limit.
+
+Agent payments give that agent a way out that does not involve waking you up. When the budget refuses a statement, PgBeam answers with an HTTP 402 carrying a payment challenge. The agent pays, the queries are granted, and it keeps going.
+
+<Callout type="warn">
+  This surface ships switched off. Turning it on takes deliberate configuration
+  on both the control plane and the data planes, plus a feature flag. See
+  [Turning it on](#turning-it-on).
+</Callout>
+
+## The protocol
+
+PgBeam implements the [Machine Payments Protocol](https://mpp.dev) (MPP): the `Payment` HTTP authentication scheme built on the 402 status code, co-authored by Tempo and Stripe. Payment method `stripe`, intent `charge`.
+
+The exchange is the standard three steps.
+
+**1. The unpaid request gets a challenge.**
+
+```http title="Request"
+POST /v1/payments/budget-topups HTTP/1.1
+Host: api.pgbeam.com
+Authorization: Bearer pba_...
+Content-Type: application/json
+
+{"packs": 2}
+```
+
+```http title="Response"
+HTTP/1.1 402 Payment Required
+Cache-Control: no-store
+Content-Type: application/problem+json
+WWW-Authenticate: Payment id="K2UGPGEe0REhOsEk8yjhuYQf3YTqJ4e8QgkhzHKRuM0",
+  realm="api.pgbeam.com", method="stripe", intent="charge",
+  header="Payment-Authorization", expires="2026-09-04T13:37:16Z",
+  description="Query budget top-up: 2000 queries",
+  opaque="eyJub25jZSI6Ii4uLiIsInBhY2tzIjoiMiIsInJlc291cmNlIjoicXVlcnlfYnVkZ2V0X3RvcHVwIiwic3ViamVjdCI6ImFndF8uLi4ifQ",
+  request="eyJhbW91bnQiOiI0MDAiLCJjdXJyZW5jeSI6InVzZCIsLi4ufQ"
+
+{
+  "type": "https://paymentauth.org/problems/payment-required",
+  "title": "Payment Required",
+  "status": 402,
+  "detail": "this operation is paid for per purchase",
+  "challengeId": "K2UGPGEe0REhOsEk8yjhuYQf3YTqJ4e8QgkhzHKRuM0"
+}
+```
+
+The `request` parameter is base64url of the JCS-canonical charge request. Decoded, it is what you are being asked to pay:
+
+```json
+{
+  "amount": "400",
+  "currency": "usd",
+  "description": "PgBeam Query budget top-up: 2000 queries",
+  "externalId": "query_budget_topup",
+  "methodDetails": {
+    "metadata": {
+      "pgbeam_resource": "query_budget_topup",
+      "pgbeam_units": "2000"
+    },
+    "paymentMethodTypes": ["card", "link"]
+  }
+}
+```
+
+Note `header="Payment-Authorization"`. The endpoint already authenticates you with a bearer token, so the challenge selects the alternate credential field and leaves `Authorization` alone.
+
+**2. Pay, and repeat the request with the credential.**
+
+Create a Stripe [Shared Payment Token](https://docs.stripe.com/agentic-commerce/concepts/shared-payment-tokens) against your own Stripe account, with usage limits matching the challenge amount, then send the credential:
+
+```http
+POST /v1/payments/budget-topups HTTP/1.1
+Host: api.pgbeam.com
+Authorization: Bearer pba_...
+Payment-Authorization: Payment eyJjaGFsbGVuZ2UiOnsiaWQiOiJLMlVHUEdFZTBSRWhPc0VrOHlqaHVZUWYzWVRxSjRlOFFna2h6SEtSdU0wIiwuLi59LCJwYXlsb2FkIjp7InNwdCI6InNwdF8xTjRadjMyZVp2S1lsbzJDUGhWUGtKbFcifX0
+```
+
+The credential is base64url of `{"challenge": {...echoed unchanged...}, "payload": {"spt": "spt_..."}}`.
+
+**3. The queries are granted and a receipt comes back.**
+
+```http
+HTTP/1.1 201 Created
+Cache-Control: private
+Payment-Receipt: eyJzdGF0dXMiOiJzdWNjZXNzIiwibWV0aG9kIjoic3RyaXBlIiwidGltZXN0YW1wIjoiMjAyNi0wOS0wNFQxMzoyNzoxNloiLCJyZWZlcmVuY2UiOiJwaV8xTjRadjMyZVp2S1lsbzIiLCJjaGFsbGVuZ2VJZCI6IksyVUdQR0VlMFJFaE9zRWs4eWpodVlRZjNZVHFKNGU4UWdraHpIS1J1TTAifQ
+
+{
+  "grant_id": "bgt_01m1p9m956evprnmjqa1bv9sa9",
+  "credential_id": "agt_01m1p9m8t1e8ds5veph247ssw2",
+  "queries": 2000,
+  "expires_at": "2026-09-05T15:27:16Z",
+  "amount": 400,
+  "currency": "usd",
+  "payment_reference": "pi_1N4Zv32eZvKYlo2"
+}
+```
+
+The receipt decodes to `{"status":"success","method":"stripe","timestamp":"...","reference":"pi_...","challengeId":"..."}`.
+
+## Discovery
+
+An agent finds the price two ways.
+
+`GET /v1/payments/resources` needs no authentication and lists everything for sale, with the unit, the pack size, and the price of one pack.
+
+The published OpenAPI document at `/openapi.json` carries the MPP discovery extension on the priced operation:
+
+```yaml
+x-payment-info:
+  offers:
+    - intent: charge
+      method: stripe
+      amount: "200"
+      currency: usd
+      description: 1000 queries per pack; buy 1 to 25 packs per payment.
+```
+
+Both are read from the same catalog the settlement path charges from, and a test fails the build if they disagree.
+
+## What you are buying
+
+| Resource             | Unit    | Pack  | Price | Per payment   |
+| -------------------- | ------- | ----- | ----- | ------------- |
+| `query_budget_topup` | queries | 1,000 | $2.00 | 1 to 25 packs |
+
+Purchased queries expire 24 hours after settlement.
+
+They do not raise the policy budget. They are a separate pool the proxy spends only once the hourly and daily windows have already refused a statement, so a top-up can never let an agent run further inside its free allowance than the policy grants, and it is never consumed while the policy would have allowed the statement anyway.
+
+The MCP `budget` block shows the reserve:
+
+```json
+{
+  "queries_per_hour": {
+    "limit": 100,
+    "used": 100,
+    "remaining": 0,
+    "resets_at": "2026-09-04T14:00:00Z"
+  },
+  "purchased_queries": 2000
+}
+```
+
+## Where the 402 shows up
+
+**The control plane API** is the payment surface. `POST /v1/payments/budget-topups` is a real HTTP 402 with a complete `WWW-Authenticate: Payment` challenge, and it is what an MPP client talks to.
+
+**The MCP endpoint** hands you the challenge when a tool call is refused. The tool result is the MPP JSON-RPC error object with code `-32042`, `httpStatus: 402`, a `challenges` array and a `settlementUrl` naming where to pay. The MCP server also advertises the capability at initialize, under `capabilities.experimental.payment`.
+
+**The PostgreSQL wire protocol cannot carry a 402.** A blocked statement leaves the proxy as an ErrorResponse and there is no field in it for a challenge, so the wire path does the only honest thing available and names the URL:
+
+```
+ERROR:  PgBeam agent hour query budget exhausted; resets at 2026-09-04T14:00:00Z;
+        ask your operator to raise the limit; or buy more queries with an HTTP 402
+        payment at https://api.pgbeam.com/v1/payments/budget-topups
+```
+
+## Authentication
+
+The endpoint authenticates with the agent credential's own hosted MCP token (`pba_...`), the same one it already uses against the MCP endpoint. The credential identifies itself, so no human, no dashboard session, and no API key is involved. An agent can only buy budget for itself: a challenge issued for one credential is refused if a different one presents it.
+
+Authentication is checked before payment. A caller with no valid token gets `401` and never sees a price.
+
+## Single use
+
+A payment proof is redeemable exactly once.
+
+- The challenge identifier is claimed in the database before the charge reaches Stripe, so two concurrent redemptions of one credential resolve to a single charge.
+- The proof's fingerprint is unique across all challenges, so presenting a spent token against a fresh challenge is refused too.
+- A challenge that already settled or already failed is consumed. Retrying needs a fresh challenge, which is what the `402` on a failure hands you.
+- The Stripe idempotency key is derived from the challenge and the proof, so a settlement resumed after an interruption returns the original PaymentIntent rather than charging twice.
+
+A replay is answered `402` with problem type `invalid-challenge` and a fresh challenge, never a receipt.
+
+## Reconciliation
+
+Stripe is the system of record. PgBeam stores the PaymentIntent id and what it granted; it keeps no balance that could disagree with Stripe about how much money moved. Each charge carries the challenge id, the resource, the unit count and the agent credential in its Stripe metadata, and each settlement row carries the organization and project that own the credential.
+
+A top-up is a one-off charge. It does not touch the organization's subscription, its plan limits, or its usage overage.
+
+### If a charge succeeds and the queries are not granted
+
+There is one failure that costs you money: the charge settles at Stripe and the grant cannot be written, for example because the project was retired between the `402` and the payment. That answers `500`, not `402`, and it carries no fresh challenge. The message says the payment has been taken. Do not present the credential again: the settlement row records the PaymentIntent id against the failure, and support can refund the charge or grant the queries by hand. Retrying with a new payment buys the same pack a second time.
+
+## Limits
+
+### The purchase ceiling
+
+One credential may buy at most 100,000 queries within the 24 hour grant lifetime. Buying past that is refused with `403` naming the time the oldest of those purchases expires, which is when the ceiling drops.
+
+This counts what was bought, not what is left. Spending purchased queries happens inside each proxy and is not reported back, so the control plane cannot know your remaining headroom, only what you paid for recently. An agent that buys the full allowance and spends all of it still waits for those purchases to age out. The ceiling is what bounds the damage if an agent credential is stolen, and it always clears on its own.
+
+### A pack is worth a pack per proxy
+
+Purchased queries are counted in the proxy process that spends them, exactly like the policy's own hourly and daily windows. A grant streamed to several regions is spendable in each of them, and a proxy restart hands back whatever that instance had not spent. This is inherited from how budgets already work rather than something top-ups introduce, and it errs in your favour, but it means a 1,000 query pack is a floor rather than a precise quantity.
+
+## Turning it on
+
+Nothing about payments answers until all of the following are true.
+
+**Control plane** (`PAYMENTS_ENABLED=true`, `PAYMENTS_CHALLENGE_KEY`, `PAYMENTS_API_BASE`, `STRIPE_SECRET_KEY`). The challenge key is at least 32 bytes, hex-encoded, and must be the same key the proxies hold. `PAYMENTS_API_BASE` is the public API origin; its host becomes the challenge realm.
+
+**Data planes** (`PAYMENTS_ENABLED=true`, `PAYMENTS_CHALLENGE_KEY`, `PAYMENTS_API_BASE`), with the same key and the same base URL. Without them the proxy says nothing about payments and a budget refusal reads exactly as it did before.
+
+**Feature flag.** The priced operation is gated on `mpp-payments`. In production and staging the flag provider is required, so an unregistered flag denies with `404`.
+
+**Stripe.** Settlement creates a PaymentIntent with `shared_payment_granted_token`, which needs agentic commerce enabled on the Stripe account. Until it is, settlement fails and the endpoint answers `402` with `verification-failed`.
