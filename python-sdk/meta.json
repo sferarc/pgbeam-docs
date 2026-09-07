@@ -1,0 +1,7 @@
+{
+	"title": "Python SDK",
+	"root": true,
+	"icon": "Package",
+	"defaultOpen": false,
+	"pages": ["index"]
+}

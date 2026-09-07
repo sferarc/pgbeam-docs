@@ -1,0 +1,182 @@
+---
+title: Python SDK
+description: The pgbeam Python SDK. Blocking and asyncio clients, authentication, and a full agent-gateway round trip. Not yet released to PyPI.
+---
+
+The PgBeam Python SDK is the official client for the PgBeam control-plane API. It covers every API resource: projects and databases, plus the agent gateway (agent credentials, policy profiles, approvals, webhooks, anomalies, and audit logs), so you can provision safe, scoped Postgres access for AI agents from Python.
+
+It ships two clients over one transport. `PgBeamClient` blocks, `AsyncPgBeamClient` awaits, and they expose the same method names, the same arguments, and the same return types.
+
+## Installation
+
+<Callout type="warn">
+  **Not released yet, so do not install it.** The first release has not run, and
+  no project called `pgbeam` on PyPI is ours. If you find one there today it is
+  somebody else's, and it is not this SDK. This page will carry the install
+  command once we have published, and until then the code below is here to be
+  read rather than run.
+</Callout>
+
+The package will require Python 3.10 or newer, and its only runtime dependency is [httpx](https://www.python-httpx.org/).
+
+## Client setup
+
+```python
+from pgbeam import PgBeamClient
+
+client = PgBeamClient(
+    token="pgb_your_api_key",
+    base_url="https://api.pgbeam.com",  # optional
+)
+```
+
+Omit `token` and the client reads the environment, first match wins: `PGBEAM_API_KEY`, then `PGBEAM_TOKEN`, then `PGBEAM_API_TOKEN`. That is the same order the CLI and the Terraform, Crossplane and Pulumi providers use, so one credential in the environment works everywhere. `PGBEAM_API_URL` overrides the base URL.
+
+Both clients hold a connection pool, so close them when you are done. A context manager is the least error-prone way:
+
+```python
+with PgBeamClient() as client:
+    ...
+```
+
+## Constructor options
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `token` | `str` or callable | API key, or a callable resolving one. A callable is resolved under `timeout_ms`, so a stalled credential service cannot hang a call. |
+| `base_url` | `str` | API base URL (default `https://api.pgbeam.com`) |
+| `timeout_ms` | `int` | Per-attempt timeout in milliseconds (default 30000). 0 disables it. |
+| `retry` | `RetryConfig` | Retry policy. `RetryConfig(max_retries=0)` disables retrying. |
+| `headers` | `Mapping[str, str]` | Extra headers sent on every request. |
+| `http_client` | `httpx.Client`, `httpx.AsyncClient` | Bring your own client to share a pool, route through a proxy, or install a custom transport. Yours to close. |
+
+## Tag-based access
+
+Operations are grouped the way the API groups them. One attribute per tag, one method per operation.
+
+```python
+with PgBeamClient() as client:
+    projects = client.projects.list_projects(org_id="org_123")
+    databases = client.databases.list_databases(project_id="prj_123")
+    credentials = client.agents.list_agent_credentials(project_id="prj_123")
+```
+
+## A full round trip
+
+```python
+from pgbeam import ApiError, PgBeamClient
+from pgbeam.models import CreateProjectRequest
+
+body: CreateProjectRequest = {
+    "org_id": "org_123",
+    "name": "analytics",
+    "database": {
+        "host": "db.internal",
+        "port": 5432,
+        "name": "app",
+        "username": "readonly",
+        "password": "...",
+        "ssl_mode": "require",
+    },
+}
+
+with PgBeamClient() as client:
+    created = client.projects.create_project(body=body)
+    project_id = created["project"]["id"]
+
+    project = client.projects.get_project(project_id=project_id)
+    print(project["name"], project["status"])
+
+    client.projects.delete_project(project_id=project_id)
+
+    try:
+        client.projects.get_project(project_id=project_id)
+    except ApiError as err:
+        print(err.status, err)  # 404 project not found
+```
+
+## Async
+
+```python
+import asyncio
+
+from pgbeam import AsyncPgBeamClient
+
+
+async def main() -> None:
+    async with AsyncPgBeamClient() as client:
+        projects = await client.projects.list_projects(org_id="org_123", page_size=20)
+        for project in projects["projects"]:
+            print(project["id"], project["name"])
+
+
+asyncio.run(main())
+```
+
+## Types
+
+Every request and response body is a `TypedDict` in `pgbeam.models`, and the package ships a `py.typed` marker, so mypy and pyright check your calls against the API contract with no stubs to install.
+
+```python
+from pgbeam.models import Project, ListProjectsResponse
+```
+
+Timestamps are RFC 3339 strings, exactly as the API sends them. They are deliberately not parsed into `datetime`: what you read is what came over the wire, and the TypeScript SDK behaves the same way.
+
+## Errors
+
+`ApiError` means the API answered and the answer was an error. `NetworkError` means it never answered: DNS failure, a refused or reset connection, or a timeout. Both derive from `PgBeamError`.
+
+```python
+from pgbeam import ApiError, NetworkError, PgBeamClient
+
+with PgBeamClient() as client:
+    try:
+        client.projects.get_project(project_id="prj_123")
+    except ApiError as err:
+        print(err.status)  # 404
+        print(err.body)    # {"error": {"code": "NOT_FOUND", "message": "project not found"}}
+    except NetworkError as err:
+        print(err.url, err.attempts, err.elapsed_ms, err.timed_out)
+```
+
+`NetworkError.timed_out` is the field worth branching on. A call that spent its whole budget without an answer is not one your own retry loop should try again immediately.
+
+Status codes are documented in [Error codes](/docs/error-codes).
+
+## Retries and timeouts
+
+Every call retries 408, 429, 502, 503 and 504 up to five times with jittered exponential backoff, honouring `Retry-After` when the server sends one. A `POST` or `PATCH` that is retried carries one `Idempotency-Key` across all its attempts, so a retry of a request the server already accepted is not a second write.
+
+Three bounds apply, in the order they bite:
+
+1. `timeout_ms` caps one attempt (default 30 seconds).
+2. `RetryConfig.max_retries` caps how many attempts there are (default 5).
+3. `RetryConfig.total_budget_ms` caps the whole call from the first attempt (default 120 seconds). A retry that would land past the budget is not made.
+
+```python
+from pgbeam import PgBeamClient, RetryConfig
+
+with PgBeamClient(
+    timeout_ms=10_000,
+    retry=RetryConfig(max_retries=2, total_budget_ms=30_000),
+) as client:
+    ...
+```
+
+The TypeScript SDK applies the same policy with the same defaults, so a 429 or a 409 means the same thing whichever client a service reaches for.
+
+## Operations map
+
+`OPERATIONS_BY_TAG` and `OPERATIONS_BY_PATH` carry every operation's method and path, for building tooling on top of the SDK.
+
+```python
+from pgbeam import OPERATIONS_BY_PATH
+
+print(OPERATIONS_BY_PATH["GET /v1/projects/{project_id}"])
+# OperationMeta(method='GET', path='/v1/projects/{project_id}')
+```
+
+## Source
+
+The SDK is Apache 2.0, and it will be mirrored to `github.com/sferarc/pgbeam-python` alongside the first release. That repository does not exist yet, which is why this sentence does not link to it. `models.py`, `operations.py` and `services.py` are generated from the [OpenAPI specification](/docs/api), so the client and the API cannot disagree about a field.
