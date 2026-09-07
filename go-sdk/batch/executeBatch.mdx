@@ -1,0 +1,67 @@
+---
+title: ExecuteBatch
+description: Apply many project operations in one request
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Applies up to 100 project-scoped operations in a single request, so an agent acting on many resources does not have to loop one call at a time. The loops this exists for are the ones the single-resource endpoints leave an operator running by hand: revoking or disabling every agent credential during an incident, triaging a burst of anomaly alerts, and importing the column descriptions for a whole schema.
+
+The operation set is closed. A batch is not a tunnel for arbitrary requests; each kind it can perform is named in the contract, carries its own permission, and is authorized independently against the caller's scope before any of them runs, so a batch can never act outside the scope the caller already had. Every operation targets the project in the path, and an id belonging to another project is reported exactly as a nonexistent one is, so this cannot be used to probe for resources the caller cannot see.
+
+`mode` is required and decides what a failure means. `atomic` runs the whole batch in one transaction: the first runtime failure rolls it back, the response is 409, and every operation that did not itself fail is reported `not_applied`. `independent` applies each operation on its own and answers 200 with a per-operation status, so a caller can retry exactly the failures. Structural problems (an unknown operation kind, a missing field, a duplicate target) are all found before any work happens and are answered with a single 400.
+
+A batch costs the rate limiter one unit per operation, not one per HTTP request, so it is exactly as expensive as the loop it replaces and cannot be used to sidestep the quota. When the remaining quota cannot cover the whole batch the response is 429 and nothing runs, which is a better answer than a loop that discovers the same thing halfway through. A batch refused this way still costs the one unit any request costs, so an oversized batch is not a free way to probe the quota.
+
+## Usage
+
+```go
+result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
+    Mode: "...",
+    Operations: nil,
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.BatchRequest` | Yes | Request body |
+| req.Mode | `string` | Yes | How the batch treats a failing operation. `atomic` applies all of them or none: the first runtime failure rolls the whole batch back and the response is 409, so the status code alone never says a batch applied when it did not. `independent` applies each operation on its own, so one failure stops nothing else and the response is 200 with the outcome of each item. There is no default. An operator revoking fifty credentials during an incident wants all fifty gone, an operator importing fifty column annotations wants the forty-seven that parsed, and picking one of those for a caller who did not say would silently do the wrong thing to the other. |
+| req.Operations | `[]pgbeam.BatchOperation` | Yes | The operations to apply, in order. At most 100 per request; a longer list is rejected with 400 and nothing runs. Each entry must carry a distinct `id`, and no two entries may target the same resource. |
+
+## Response
+
+`(*pgbeam.BatchResponse, error)`: the batch ran. in `independent` mode some operations may have failed; read `summary` and the per-operation `status`.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
+    Mode: "...",
+    Operations: nil,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | Invalid request parameters. |
+| 401 | Missing or invalid authentication. |
+| 403 | Operation not allowed by current plan limits. |
+| 404 | Resource not found. |
+| 409 | An atomic batch was rolled back. Nothing applied. The failing operations carry their error and every other one is `not_applied`. |
+| 429 | Rate limited. Try again later. |
