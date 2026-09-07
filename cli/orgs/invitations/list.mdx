@@ -1,0 +1,42 @@
+---
+title: orgs invitations list
+description: List invitations
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Lists invitations to join the organization and where each has got to.
+
+## Usage
+
+```bash
+pgbeam orgs invitations list [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `--status <value>` | Filter to a single status. Omit to list every invitation. One of: pending, accepted, rejected, canceled. | No | - |
+| `--limit <value>` | Maximum number of items (1-100) | No | - |
+| `--all` | Fetch every page | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# List invitations
+pgbeam orgs invitations list
+
+# Output as JSON
+pgbeam orgs invitations list --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

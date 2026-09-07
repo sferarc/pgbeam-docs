@@ -1,0 +1,41 @@
+---
+title: orgs invitations create
+description: Invite someone to the organization
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Creates an invitation and emails it. Inviting an address that already has a pending invitation returns a conflict rather than a second invitation. `owner` cannot be invited: ownership transfer is a separate, higher-privilege flow.
+
+## Usage
+
+```bash
+pgbeam orgs invitations create <email> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<email>` |  | Yes | - |
+| `--role <value>` | A role that can be assigned through the member API. This is `OrgRole` without `owner`: ownership is transferred through a separate flow, so requesting it here is rejected with a 400. One of: admin, member, security_admin, billing_admin, auditor, policy-author, approver. | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Invite someone to the organization
+pgbeam orgs invitations create
+
+# Output as JSON
+pgbeam orgs invitations create --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

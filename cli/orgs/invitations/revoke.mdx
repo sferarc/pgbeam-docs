@@ -1,0 +1,41 @@
+---
+title: orgs invitations revoke
+description: Revoke an invitation
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Cancels a pending invitation so it can no longer be accepted.
+
+## Usage
+
+```bash
+pgbeam orgs invitations revoke <id> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<id>` |  | Yes | - |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Revoke an invitation
+pgbeam orgs invitations revoke
+
+# Output as JSON
+pgbeam orgs invitations revoke --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

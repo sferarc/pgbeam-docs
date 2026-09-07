@@ -1,0 +1,60 @@
+---
+title: CreateOrgInvitation
+description: Invite someone to the organization
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Creates an invitation and emails it. Inviting an address that already has a pending invitation returns a conflict rather than a second invitation. `owner` cannot be invited: ownership transfer is a separate, higher-privilege flow.
+
+## Usage
+
+```go
+result, err := client.Account.CreateOrgInvitation(ctx, "org_abc123", pgbeam.CreateOrgInvitationRequest{
+    Email: "engineer@example.com",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| req | `pgbeam.CreateOrgInvitationRequest` | Yes | Request body |
+| req.Email | `string` | Yes | Address to invite. |
+| req.Role | `*pgbeam.AssignableOrgRole` | No | A role that can be assigned through the member API. This is `OrgRole` without `owner`: ownership is transferred through a separate flow, so requesting it here is rejected with a 400. |
+
+## Response
+
+`(*pgbeam.OrgInvitation, error)`: the invitation was created.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Account.CreateOrgInvitation(ctx, "org_abc123", pgbeam.CreateOrgInvitationRequest{
+    Email: "engineer@example.com",
+    Role: pgbeam.AssignableOrgRole{ /* ... */ },
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

@@ -1,0 +1,60 @@
+---
+title: updateOrgMemberRole
+description: Change a member's role
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Changes what a member is allowed to do. An organization must keep at least one owner, so the last owner cannot be demoted, and `owner` cannot be assigned here: ownership transfer is a separate, higher-privilege flow.
+
+## Usage
+
+```typescript
+const result = await api.account.updateOrgMemberRole({
+    pathParams: { org_id: "org_abc123", member_id: "..." },
+    body: {
+      role: { ... },
+    },
+  });
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| pathParams.member_id | `string` | Yes | Unique organization membership identifier. Unlike the resources PgBeam mints itself, memberships carry no type prefix: the id is opaque and is assigned when the membership row is created. Read it from `listOrgMembers` rather than constructing it. |
+| body.role | `AssignableOrgRole` | Yes | A role that can be assigned through the member API. This is `OrgRole` without `owner`: ownership is transferred through a separate flow, so requesting it here is rejected with a 400. |
+
+## Response
+
+`Promise<OrgMember>`: the updated membership.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.account.updateOrgMemberRole({
+  pathParams: { org_id: "org_abc123", member_id: "..." },
+  body: {
+      role: { ... },
+    },
+});
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |

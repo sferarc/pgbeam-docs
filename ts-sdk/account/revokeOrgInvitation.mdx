@@ -1,0 +1,58 @@
+---
+title: revokeOrgInvitation
+description: Revoke an invitation
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Cancels a pending invitation so it can no longer be accepted.
+
+## Usage
+
+```typescript
+const result = await api.account.revokeOrgInvitation({
+  pathParams: {
+    org_id: "org_abc123",
+    invitation_id: "9f3c1a7b2e4d6058b1c9d3f5a7e02468",
+  },
+});
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| pathParams.invitation_id | `string` | Yes | Unique organization invitation identifier. Opaque, with no type prefix. Invitations created through this API are 32 lowercase hex characters; invitations created in the dashboard carry an id of a different shape, so treat it as opaque and read it from `listOrgInvitations`. |
+
+## Response
+
+`Promise<void>`: no content.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.account.revokeOrgInvitation({
+  pathParams: {
+    org_id: "org_abc123",
+    invitation_id: "9f3c1a7b2e4d6058b1c9d3f5a7e02468",
+  },
+});
+```
+
+## Errors
+
+| Status | Description                                   |
+| ------ | --------------------------------------------- |
+| 400    | Invalid request parameters.                   |
+| 401    | Missing or invalid authentication.            |
+| 403    | Operation not allowed by current plan limits. |
+| 404    | Resource not found.                           |
+| 429    | Rate limited. Try again later.                |

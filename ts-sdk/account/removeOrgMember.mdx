@@ -1,0 +1,53 @@
+---
+title: removeOrgMember
+description: Remove a member
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Removes someone from the organization. An organization must keep at least one owner, so the last remaining owner cannot be removed and cannot be demoted either: transfer ownership first.
+
+## Usage
+
+```typescript
+const result = await api.account.removeOrgMember({
+  pathParams: { org_id: "org_abc123", member_id: "..." },
+});
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| pathParams.member_id | `string` | Yes | Unique organization membership identifier. Unlike the resources PgBeam mints itself, memberships carry no type prefix: the id is opaque and is assigned when the membership row is created. Read it from `listOrgMembers` rather than constructing it. |
+
+## Response
+
+`Promise<void>`: no content.
+
+## Example
+
+```typescript
+import { PgBeamClient } from "pgbeam";
+
+const client = new PgBeamClient({
+  token: "pbk_...",
+  baseUrl: "https://api.pgbeam.com",
+});
+
+const result = await client.api.account.removeOrgMember({
+  pathParams: { org_id: "org_abc123", member_id: "..." },
+});
+```
+
+## Errors
+
+| Status | Description                                              |
+| ------ | -------------------------------------------------------- |
+| 400    | Invalid request parameters.                              |
+| 401    | Missing or invalid authentication.                       |
+| 403    | Operation not allowed by current plan limits.            |
+| 404    | Resource not found.                                      |
+| 409    | Resource already exists or conflicts with current state. |
+| 429    | Rate limited. Try again later.                           |
