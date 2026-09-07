@@ -10,15 +10,18 @@ Lists an organization's self-host enrollments. Tokens are never returned.
 ## Usage
 
 ```go
-result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123")
+result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123", nil)
 ```
 
 ## Parameters
 
-| Parameter | Type              | Required | Description                     |
-| --------- | ----------------- | -------- | ------------------------------- |
-| ctx       | `context.Context` | Yes      | Request context                 |
-| orgID     | `string`          | Yes      | Unique organization identifier. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| orgID | `string` | Yes | Unique organization identifier. |
+| params | `*pgbeam.ListSelfHostEnrollmentsParams` | No | Query parameters |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 
@@ -33,7 +36,10 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123")
+result, err := client.Platform.ListSelfHostEnrollments(ctx, "org_abc123", &pgbeam.ListSelfHostEnrollmentsParams{
+    PageSize: 20,
+    PageToken: "...",
+  })
 if err != nil {
   log.Fatal(err)
 }

@@ -17,9 +17,11 @@ const result = await api.platform.listSelfHostEnrollments({
 
 ## Parameters
 
-| Parameter         | Type     | Required | Description                     |
-| ----------------- | -------- | -------- | ------------------------------- |
-| pathParams.org_id | `string` | Yes      | Unique organization identifier. |
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| pathParams.org_id | `string` | Yes | Unique organization identifier. |
+| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 
@@ -37,6 +39,7 @@ const client = new PgBeamClient({
 
 const result = await client.api.platform.listSelfHostEnrollments({
   pathParams: { org_id: "org_abc123" },
+  queryParams: { page_size: 20, page_token: "..." },
 });
 ```
 

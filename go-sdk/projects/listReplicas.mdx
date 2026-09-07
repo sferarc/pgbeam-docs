@@ -5,12 +5,12 @@ description: List replicas
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Lists all read replicas for a database.
+Lists a database's read replicas.
 
 ## Usage
 
 ```go
-result, err := client.Projects.ListReplicas(ctx, "db_xxx")
+result, err := client.Projects.ListReplicas(ctx, "db_xxx", nil)
 ```
 
 ## Parameters
@@ -19,6 +19,9 @@ result, err := client.Projects.ListReplicas(ctx, "db_xxx")
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | databaseID | `string` | Yes | Unique database identifier (prefixed, e.g. db_xxx). |
+| params | `*pgbeam.ListReplicasParams` | No | Query parameters |
+| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 
@@ -33,7 +36,10 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   APIKey: "pgb_your_api_key",
 })
 
-result, err := client.Projects.ListReplicas(ctx, "db_xxx")
+result, err := client.Projects.ListReplicas(ctx, "db_xxx", &pgbeam.ListReplicasParams{
+    PageSize: 20,
+    PageToken: "...",
+  })
 if err != nil {
   log.Fatal(err)
 }

@@ -5,7 +5,7 @@ description: List replicas
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Lists all read replicas for a database.
+Lists a database's read replicas.
 
 ## Usage
 
@@ -20,6 +20,8 @@ const result = await api.projects.listReplicas({
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | pathParams.database_id | `string` | Yes | Unique database identifier (prefixed, e.g. db_xxx). |
+| queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 
@@ -37,6 +39,7 @@ const client = new PgBeamClient({
 
 const result = await client.api.projects.listReplicas({
   pathParams: { database_id: "db_xxx" },
+  queryParams: { page_size: 20, page_token: "..." },
 });
 ```
 
