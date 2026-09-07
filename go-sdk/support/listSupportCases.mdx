@@ -23,6 +23,7 @@ result, err := client.Support.ListSupportCases(ctx, "org_abc123", nil)
 | params.Status | `pgbeam.SupportCaseStatus` | No | Filter by case status. |
 | params.Search | `string` | No | Search cases by title. |
 | params.PageSize | `int` | No | Number of results per page (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 | params.Page | `int` | No | Page number (1-based, default 1). |
 
 ## Response
@@ -42,7 +43,7 @@ result, err := client.Support.ListSupportCases(ctx, "org_abc123", &pgbeam.ListSu
     Status: "open",
     Search: "...",
     PageSize: 20,
-    Page: 20,
+    PageToken: "...",
   })
 if err != nil {
   log.Fatal(err)

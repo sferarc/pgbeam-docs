@@ -17,7 +17,48 @@ Every endpoint follows the same conventions for status codes, error responses, r
 
 ## Pagination
 
-List endpoints return an array plus pagination metadata.
+Every collection pages the same way, whatever it is listing.
+
+- `page_size` sets how many items to return. The maximum is 100 and the default is 20. Asking for more than the maximum is rejected with `400`.
+- `page_token` continues from where the last page stopped. Omit it for the first page.
+- `next_page_token` comes back in the body when there is another page. Its absence means you have reached the end.
+
+```json
+{
+  "projects": [{ "id": "prj_01j9x8y7z6w5v4u3t2s1r0q9p8" }],
+  "next_page_token": "eyJpZCI6InByal8wMWo5eDh5N3o2In0"
+}
+```
+
+### Follow the Link header instead
+
+Every page that has a successor also carries an [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288.html) `Link` header:
+
+```http
+Link: </v1/projects?page_size=20&page_token=eyJpZCI6…>; rel="next"
+```
+
+The target is a relative URI-reference, which RFC 8288 resolves against the URL you requested. It keeps your filters, your sort and your page size, so following it needs no knowledge of this API beyond "fetch `rel=next` until there isn't one". Resolve it against the response URL and that is the whole loop:
+
+```ts
+let url: string | null = "https://api.pgbeam.com/v1/projects?page_size=100";
+while (url) {
+  const res = await fetch(url, { headers });
+  for (const project of (await res.json()).projects) handle(project);
+  const next = parseLinkHeader(res.headers.get("link"))?.next;
+  url = next ? new URL(next, url).toString() : null;
+}
+```
+
+`new URL(next, url)` is what resolves the reference, and it is a no-op for an absolute target, so the same loop works either way. Most Link header libraries and every browser `fetch` in a page do this for you.
+
+The target stays relative deliberately. An absolute one would have to name a host, and the only hosts available at that point come from the request headers you sent, so a poisoned header could point `rel=next` at somebody else's server and your `Authorization` header would follow it there. A relative target can only ever resolve to the origin you already chose.
+
+When there is no next page there is no `Link` header. Stopping on its absence is what terminates the loop.
+
+### The token is opaque
+
+`page_token` is a string to hand back, not a value to construct. Some collections put a record id in it, one puts an offset, and which is which is free to change. Parsing it, incrementing it, or building one yourself will break.
 
 ## Error envelope
 

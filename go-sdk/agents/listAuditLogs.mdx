@@ -28,6 +28,7 @@ result, err := client.Agents.ListAuditLogs(ctx, "prj_xxx", nil)
 | params.End | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
 | params.Before | `string` | No | Return entries strictly older than this timestamp (keyset pagination cursor). |
 | params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 

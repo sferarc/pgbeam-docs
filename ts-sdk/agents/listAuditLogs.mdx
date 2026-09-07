@@ -28,6 +28,7 @@ const result = await api.agents.listAuditLogs({
 | queryParams.end | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
 | queryParams.before | `string` | No | Return entries strictly older than this timestamp (keyset pagination cursor). |
 | queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
 
 ## Response
 
@@ -54,6 +55,7 @@ const result = await client.api.agents.listAuditLogs({
     end: "...",
     before: "...",
     page_size: 20,
+    page_token: "...",
   },
 });
 ```

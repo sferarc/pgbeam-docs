@@ -23,6 +23,7 @@ const result = await api.support.listSupportCases({
 | queryParams.status | `SupportCaseStatus` | No | Filter by case status. |
 | queryParams.search | `string` | No | Search cases by title. |
 | queryParams.page_size | `number` | No | Number of results per page (1-100, default 20). |
+| queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
 | queryParams.page | `number` | No | Page number (1-based, default 1). |
 
 ## Response
@@ -41,7 +42,13 @@ const client = new PgBeamClient({
 
 const result = await client.api.support.listSupportCases({
   pathParams: { org_id: "org_abc123" },
-  queryParams: { status: "open", search: "...", page_size: 20, page: 20 },
+  queryParams: {
+    status: "open",
+    search: "...",
+    page_size: 20,
+    page_token: "...",
+    page: 20,
+  },
 });
 ```
 
