@@ -25,22 +25,54 @@ try {
 
 ## ApiError properties
 
-| Property     | Type      | Description          |
-| ------------ | --------- | -------------------- |
-| `status`     | `number`  | HTTP status code     |
-| `statusText` | `string`  | HTTP status text     |
-| `body`       | `unknown` | Parsed response body |
+Every error the API returns is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) problem document, and `ApiError` lifts its fields onto itself so you do not have to reach into `body`.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `status` | `number` | HTTP status code |
+| `statusText` | `string` | HTTP status text |
+| `code` | `string \| undefined` | Stable identity of the condition, e.g. `PLAN_LIMIT_REACHED` |
+| `type` | `string \| undefined` | The same identity as a URI, resolving to the error catalog |
+| `title` | `string \| undefined` | Short summary of the condition |
+| `detail` | `string \| undefined` | Explanation of this occurrence. Same value as `message` |
+| `instance` | `string \| undefined` | Path of the request that produced the error |
+| `requestId` | `string \| undefined` | Correlation id, also in the `X-Request-Id` header |
+| `errors` | `ApiFieldError[] \| undefined` | Field-level detail when the request failed validation |
+| `message` | `string` | `detail`, falling back to the status text |
+| `body` | `unknown` | Parsed response body |
+
+## Branch on `code`, not on `message`
+
+`code` is stable across wording changes and separates conditions that share a status. A `403` is either a permissions problem or a billing one, and those are resolved in completely different ways.
+
+```typescript
+try {
+  await api.projects.createProject({ name: "analytics" });
+} catch (err) {
+  if (err instanceof ApiError) {
+    switch (err.code) {
+      case "PLAN_LIMIT_REACHED":
+        return promptUpgrade(err.detail);
+      case "FORBIDDEN":
+        return askAnAdminForAccess();
+      case "INVALID_INPUT":
+        return err.errors?.forEach((e) => markField(e.field, e.detail));
+    }
+  }
+  throw err;
+}
+```
 
 ## extractMessage helper
 
-Pulls the human-readable message from the standard `{ error: { code, message } }` envelope:
+Pulls the human-readable message out of an error body: the problem document's `detail`, falling back to the older `{ error: { message } }` and `{ message }` shapes that non-control-plane endpoints still answer with.
 
 ```typescript
 const msg = extractMessage(err.body);
 // "Project not found"
 ```
 
-See [Response Conventions](/docs/api/response-conventions) for the full list of error codes and the error envelope format.
+See the [error catalog](/docs/api/errors) for every code the API can return.
 
 ## Retries
 

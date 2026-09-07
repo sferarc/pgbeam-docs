@@ -1,0 +1,132 @@
+---
+title: Error Catalog
+icon: TriangleAlert
+description: Every error code the PgBeam API can return, what causes it, and what to do about it.
+---
+
+Every error the API returns is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) problem detail, served as `application/problem+json`:
+
+```json
+{
+  "type": "https://pgbeam.com/docs/api/errors/plan-limit-reached",
+  "title": "Plan limit reached",
+  "status": 403,
+  "detail": "project limit reached: your plan allows 3 projects",
+  "instance": "/v1/projects",
+  "code": "PLAN_LIMIT_REACHED",
+  "request_id": "9f8a1c2b3d4e5f60"
+}
+```
+
+## Branch on `code`, not on `detail`
+
+`code` is the identity of the error condition. `type` is the same identity as a URI, and resolves to that condition's entry below. They never disagree.
+
+`detail` is written for a person and is free to change between releases, so a client that matches on it will break. `status` is not enough on its own either: two different conditions can share one, and the two that matter most do. A `403` is either a permissions problem or a billing one, and those are resolved in completely different ways.
+
+```ts
+try {
+  await api.projects.createProject({ ... });
+} catch (err) {
+  if (err instanceof ApiError) {
+    switch (err.code) {
+      case "PLAN_LIMIT_REACHED":
+        return promptUpgrade(err.detail);
+      case "FORBIDDEN":
+        return askAnAdminForAccess();
+      case "RESOURCE_EXISTS":
+        return useTheExistingOne();
+    }
+  }
+  throw err;
+}
+```
+
+New codes are added when new conditions appear, which the [lifecycle policy](/docs/api-lifecycle) allows inside a major version. Treat the set as open: handle the codes you know and fall back on `status` for anything else.
+
+## Validation errors name the field
+
+When a request fails validation, `errors` says which part of it was rejected, so a client can correct the request without parsing the sentence.
+
+```json
+{
+  "type": "https://pgbeam.com/docs/api/errors/invalid-input",
+  "title": "Invalid input",
+  "status": 400,
+  "detail": "database host is required",
+  "code": "INVALID_INPUT",
+  "errors": [
+    { "field": "database.host", "detail": "database host is required" }
+  ]
+}
+```
+
+`field` is a dotted path into the request body.
+
+## The catalog
+
+### Request problems
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `INVALID_INPUT` | 400 | The request body or a parameter failed validation. | Read `errors` for the offending fields and correct them. Retrying unchanged will fail again. |
+| `UNSUPPORTED_MEDIA_TYPE` | 415 | The body is not JSON, or carries a body with no `Content-Type`. | Send `Content-Type: application/json`. |
+| `PAYLOAD_TOO_LARGE` | 413 | The body exceeds 2 MB. | Split the request. |
+| `METHOD_NOT_ALLOWED` | 405 | The path exists but not for that method. | Check the method against the spec; the `Allow` header lists what the path accepts. |
+
+### Authentication and authorization
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `UNAUTHORIZED` | 401 | No credential, or one that is expired, revoked or malformed. | Create an API key in the dashboard, or refresh the session. Do not retry with the same credential. |
+| `PAYMENT_REQUIRED` | 402 | A per-request charge has not been settled. The `WWW-Authenticate` header carries the payment challenge. | Settle the challenge and replay the request with the proof. Distinct from `PLAN_LIMIT_REACHED`, which is about the subscription rather than a single request. |
+| `FORBIDDEN` | 403 | Authenticated, but the caller's role does not allow this operation. | Ask an organization admin for a role that carries the permission. |
+| `PLAN_LIMIT_REACHED` | 403 | The organization's plan does not include this, or a quota is spent. | Change plan, or remove an existing resource. Retrying will not help. |
+| `NOT_FOUND` | 404 | The resource does not exist, or the caller is not entitled to know that it does. | Check the id. A resource in another organization answers exactly as one that never existed, deliberately. |
+
+### Conditional requests
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `PRECONDITION_FAILED` | 412 | The `If-Match` tag does not match the current representation, so the resource changed after the read this write was based on. Nothing was modified. | Re-read the resource, re-apply the change, and retry with the `ETag` the 412 returned. Unlike a 409 this is expected to succeed on the retry. |
+
+### Conflicts
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `RESOURCE_EXISTS` | 409 | A name or value is already taken. | Pick another, or use the existing resource. |
+| `INVALID_STATE` | 409 | The resource is no longer in a state that allows this (a revoked credential, an approval already decided). | Re-read the resource and decide from its current state. |
+| `IDEMPOTENCY_KEY_REUSED` | 409 | The same `Idempotency-Key` was sent with a different request body. | Generate a fresh key. A key is a promise about one specific request, so reusing it is a client bug. See [idempotency](/docs/api/response-conventions#idempotency). |
+| `CONFLICT` | 409 | A state conflict with no more specific code. | Re-read the resource and retry from its current state. |
+
+### Throttling and server problems
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `RATE_LIMITED` | 429 | The quota for this credential or address is spent. | Wait for `Retry-After` seconds. `RateLimit` says how much is left and when the window resets. |
+| `INTERNAL_ERROR` | 500 | Something failed on our side. | Retry with backoff. If it persists, quote `request_id`. |
+| `BAD_GATEWAY` | 502 | An upstream dependency answered badly. | Retry with backoff. |
+| `SERVICE_UNAVAILABLE` | 503 | Temporarily unable to serve. | Wait for `Retry-After` seconds, then retry. |
+| `TIMEOUT` | 504 | The request took too long upstream. | Retry with backoff. Narrow the request if it is a large query. |
+
+### Demo credential vending
+
+The demo surface refuses in four distinct ways, all `503`. Which one it is decides what to do next, so branch on the code rather than the status.
+
+| Code | Status | Cause | What to do |
+| --- | --- | --- | --- |
+| `DEMO_NOT_CONFIGURED` | 503 | This deployment has no demo database, or the tier has no policy provisioned. | Stop asking this deployment. `GET /v1/demo` says what it offers. Retrying will not help. |
+| `DEMO_PAUSED` | 503 | The operator paused the demo with the project kill-switch. | Wait for `Retry-After` seconds, then retry. |
+| `DEMO_CAPACITY_FULL` | 503 | The global ceiling on concurrent demo credentials is full. | Wait for `Retry-After`, which says when the oldest session expires. Backing off individually will not help; this is a global limit. |
+| `DEMO_BUSY` | 503 | Too many demo credentials are being issued at once. This is admission control on vends in flight, not the ceiling on live credentials. | Wait for `Retry-After`, which is seconds rather than minutes, and retry. |
+| `DEMO_TIER_NOT_PURCHASABLE` | 503 | A paid tier was asked for on a deployment with no payment method wired. | Use the free tier, which is available now. See `GET /v1/demo`. |
+
+## Correlation
+
+Every response carries `X-Request-Id`, and every error repeats it in the body as `request_id`. The body is what ends up pasted into a support thread, which is why it appears in both places. Quote it when reporting a problem and we can find the exact request.
+
+## Retrying
+
+`INTERNAL_ERROR`, `BAD_GATEWAY`, `SERVICE_UNAVAILABLE`, `TIMEOUT` and `RATE_LIMITED` are worth retrying. Everything else describes a request that will fail the same way until it changes.
+
+The SDKs already retry those, with backoff, reusing one `Idempotency-Key` across attempts so a retry cannot double-create a resource. See the [TypeScript](/docs/ts-sdk/error-handling) and [Go](/docs/go-sdk/error-handling) SDK docs.

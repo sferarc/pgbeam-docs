@@ -38,7 +38,7 @@ const result = await client.api.payments.listPaymentResources();
 
 ## Errors
 
-| Status | Description                      |
-| ------ | -------------------------------- |
-| 429    | Rate limited. Try again later.   |
-| 503    | Service temporarily unavailable. |
+| Status | Description |
+| --- | --- |
+| 429 | Rate limited. `code` is `RATE_LIMITED`. |
+| 503 | The service is temporarily unable to answer. `code` is `SERVICE_UNAVAILABLE`. Safe to retry after the delay in `Retry-After`. |

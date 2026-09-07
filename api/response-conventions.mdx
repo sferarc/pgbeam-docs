@@ -60,39 +60,36 @@ When there is no next page there is no `Link` header. Stopping on its absence is
 
 `page_token` is a string to hand back, not a value to construct. Some collections put a record id in it, one puts an offset, and which is which is free to change. Parsing it, incrementing it, or building one yourself will break.
 
-## Error envelope
+## Error document
 
-All errors use the same JSON envelope:
+Every error is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) problem detail, served as `application/problem+json`:
 
 ```json
 {
-  "error": {
-    "code": "NOT_FOUND",
-    "message": "Project not found"
-  }
+  "type": "https://pgbeam.com/docs/api/errors/not-found",
+  "title": "Not found",
+  "status": 404,
+  "detail": "Project not found",
+  "instance": "/v1/projects/prj_abc123",
+  "code": "NOT_FOUND",
+  "request_id": "9f8a1c2b3d4e5f60"
 }
 ```
 
-| Field           | Type     | Description                 |
-| --------------- | -------- | --------------------------- |
-| `error.code`    | `string` | Machine-readable error code |
-| `error.message` | `string` | Human-readable description  |
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | `string` | URI identifying the condition; resolves to its entry in the error catalog |
+| `title` | `string` | Short summary of the condition |
+| `status` | `integer` | HTTP status, repeated so the document stands alone |
+| `detail` | `string` | Explanation of this occurrence, written for a person |
+| `instance` | `string` | Path of the request that failed |
+| `code` | `string` | Machine-readable identity; the same identity as `type`, as a short token |
+| `request_id` | `string` | Correlation id, also in the `X-Request-Id` header |
+| `errors` | `array` | Field-level detail on a validation failure, each entry `{ field, detail }` |
 
 ### Error codes
 
-| HTTP Status | `error.code` | Description |
-| --- | --- | --- |
-| 400 | `INVALID_INPUT` | Bad request — fix the input |
-| 401 | `UNAUTHORIZED` | Missing or invalid authentication |
-| 403 | `FORBIDDEN` | Insufficient permissions or plan limits |
-| 404 | `NOT_FOUND` | Resource not found |
-| 409 | `CONFLICT` | Resource already exists or state conflict |
-| 422 | `INVALID_INPUT` | Validation error |
-| 429 | `RATE_LIMITED` | Too many requests (includes `Retry-After` header) |
-| 500 | `INTERNAL_ERROR` | Internal server error |
-| 502 | — | Bad gateway |
-| 503 | — | Service unavailable |
-| 504 | — | Gateway timeout |
+Every code, what causes it and what to do about it is in the [error catalog](/docs/api/errors). Branch on `code`, not on `detail`: the detail is written for a person and is free to change, and two conditions can share a status. A `403` is either a permissions problem (`FORBIDDEN`) or a billing one (`PLAN_LIMIT_REACHED`), and those are resolved differently.
 
 ## Conditional requests
 
@@ -203,12 +200,15 @@ A key is a promise about one specific request, so the server records a fingerpri
 
 ```json
 {
-  "error": {
-    "code": "CONFLICT",
-    "message": "Idempotency-Key was already used for a request with a different body; use a new key for a new request"
-  }
+  "type": "https://pgbeam.com/docs/api/errors/idempotency-key-reused",
+  "title": "Idempotency key reused with a different body",
+  "status": 409,
+  "detail": "Idempotency-Key was already used for a request with a different body; use a new key for a new request",
+  "code": "IDEMPOTENCY_KEY_REUSED"
 }
 ```
+
+The code is what tells this apart from the other 409s. See the [error catalog](/docs/api/errors) for the full list.
 
 Without this the second request would be answered from the cache with the first request's result, so a client that reused a key by mistake would be handed a `201` describing a resource it never asked to create. Generate a fresh key per logical operation and the case never arises.
 

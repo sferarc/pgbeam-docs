@@ -51,10 +51,13 @@ const result = await client.api.policies.recommendAgentPolicy({
 
 ## Errors
 
-| Status | Description                                   |
-| ------ | --------------------------------------------- |
-| 400    | Invalid request parameters.                   |
-| 401    | Missing or invalid authentication.            |
-| 403    | Operation not allowed by current plan limits. |
-| 404    | Resource not found.                           |
-| 429    | Rate limited. Try again later.                |
+| Status | Description |
+| --- | --- |
+| 400 | The request was rejected. `code` is `INVALID_INPUT`, and `errors` names the offending fields when the failure was a validation one. |
+| 401 | Missing or invalid authentication. `code` is `UNAUTHORIZED`. |
+| 403 | The caller is authenticated but not allowed to perform this operation. `code` is `FORBIDDEN` when the caller's role is insufficient, and `PLAN_LIMIT_REACHED` when the organization's plan is what stands in the way. The two are answered differently, so branch on the code rather than the status. |
+| 404 | The resource does not exist, or the caller is not entitled to know that it does. `code` is `NOT_FOUND`. |
+| 413 | The request body exceeds the 2 MB limit. `code` is `PAYLOAD_TOO_LARGE`. |
+| 415 | The request body is not JSON, or carries a body without declaring a Content-Type. `code` is `UNSUPPORTED_MEDIA_TYPE`. |
+| 429 | Rate limited. `code` is `RATE_LIMITED`. |
+| 500 | The request failed for a reason on our side. `code` is `INTERNAL_ERROR`. Quote `request_id` when reporting it. |

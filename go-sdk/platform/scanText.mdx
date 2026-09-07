@@ -59,7 +59,7 @@ fmt.Println(result)
 
 | Status | Description |
 | --- | --- |
-| 400 | Invalid request parameters. |
+| 400 | The request was rejected. `code` is `INVALID_INPUT`, and `errors` names the offending fields when the failure was a validation one. |
 | 402 | The free allowance is spent and no payment was presented. The `WWW-Authenticate` header carries the payment challenge; the body says the same thing in prose a model can act on. |
-| 429 | Rate limited. Try again later. |
-| 503 | Service temporarily unavailable. |
+| 429 | Rate limited. `code` is `RATE_LIMITED`. |
+| 503 | The service is temporarily unable to answer. `code` is `SERVICE_UNAVAILABLE`. Safe to retry after the delay in `Retry-After`. |
