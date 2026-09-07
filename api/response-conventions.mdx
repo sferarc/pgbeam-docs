@@ -53,6 +53,58 @@ All errors use the same JSON envelope:
 | 503 | — | Service unavailable |
 | 504 | — | Gateway timeout |
 
+## Conditional requests
+
+Every JSON read carries an `ETag`, and `Cache-Control: private, no-cache`. The data is per-tenant, so no shared cache may keep it, and a stored copy has to be revalidated before use. The tag is what makes revalidating cheap.
+
+### Polling without transferring
+
+Send the tag back in `If-None-Match`. If nothing has changed you get `304 Not Modified` with no body.
+
+```http
+GET /v1/projects/prj_abc123/webhooks/whk_xyz
+ETag: "515a477090e052427bdb6093be3865ea"
+Cache-Control: private, no-cache
+
+GET /v1/projects/prj_abc123/webhooks/whk_xyz
+If-None-Match: "515a477090e052427bdb6093be3865ea"
+
+HTTP/1.1 304 Not Modified
+ETag: "515a477090e052427bdb6093be3865ea"
+```
+
+`If-None-Match` accepts a comma-separated list, and `*` matches any current representation.
+
+### Writing without losing someone else's change
+
+This is the half that matters. Without a precondition, a write is last-writer-wins: read a policy profile, decide what to change, write it back, and any edit that landed in between is silently gone.
+
+Send the `ETag` from the read in `If-Match` on the write. The write proceeds only if the resource still matches; otherwise it is refused with `412 Precondition Failed` and **nothing is changed**.
+
+```http
+PUT /v1/projects/prj_abc123/webhooks/whk_xyz
+If-Match: "515a477090e052427bdb6093be3865ea"
+
+HTTP/1.1 412 Precondition Failed
+ETag: "aa5d8df00b533ffc227e9d74ffe17089"
+{"error":{"code":"PRECONDITION_FAILED","message":"the resource has changed since the version this request was based on; re-read it and retry"}}
+```
+
+The `412` carries the current tag, so the recovery is: re-read, re-apply your change, retry with the new tag.
+
+Supported on the six resources you read and write back: `updateProject`, `updateDatabase`, `updatePolicyProfile`, `updateWebhookEndpoint`, `updateHoneytoken` and `updateAgentCredentialStatus`. Omitting the header keeps the previous unconditional behaviour, so this is opt-in.
+
+### How it relates to Idempotency-Key
+
+They cover different failures and compose.
+
+|  | Prevents |
+| --- | --- |
+| `Idempotency-Key` | A retry creating a **second** resource |
+| `If-Match` | A write landing on a resource that is **no longer the one you read** |
+
+An agent doing read-modify-write under retry wants both.
+
 ## Retries
 
 ### Retryable status codes
