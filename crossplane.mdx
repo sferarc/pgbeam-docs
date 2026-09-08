@@ -50,7 +50,7 @@ stringData:
 ```
 
 ```yaml title="provider-config.yaml"
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: ProviderConfig
 metadata:
   name: default
@@ -72,7 +72,7 @@ kubectl apply -f secret.yaml -f provider-config.yaml
 ### Create a project
 
 ```yaml title="project.yaml"
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: Project
 metadata:
   name: my-app
@@ -127,7 +127,7 @@ kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
 Manages a PgBeam project with a primary database.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: Project
 metadata:
   name: example
@@ -157,7 +157,7 @@ spec:
 Manages an upstream database connection within a PgBeam project.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: Database
 metadata:
   name: example
@@ -200,7 +200,7 @@ Manages a read replica for a PgBeam database.
 Replicas are immutable; any spec change triggers recreation.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: Replica
 metadata:
   name: example
@@ -223,7 +223,7 @@ Manages a custom domain for a PgBeam project.
 CustomDomains are immutable; any spec change triggers recreation.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: CustomDomain
 metadata:
   name: example
@@ -242,7 +242,7 @@ spec:
 Manages a per-query cache rule. Deletion disables caching (soft-delete).
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: CacheRule
 metadata:
   name: example
@@ -265,7 +265,7 @@ spec:
 Manages the monthly spend limit for an organization.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: SpendLimit
 metadata:
   name: example
@@ -284,7 +284,7 @@ spec:
 Manages a scoped agent credential (a PgBeam-issued Postgres login plus a hosted MCP token) for an AI agent. The connection string and MCP token are one-time secrets returned only at creation and exposed as sensitive computed outputs; they cannot be retrieved again. To rotate the secrets, taint/replace the resource (or use the rotate endpoint out of band).
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: AgentCredential
 metadata:
   name: example
@@ -307,7 +307,7 @@ spec:
 Manages a policy profile: a named bundle of agent-gateway enforcement rules (access mode, table allow/deny lists, statement-kind rules, PII masking rules, per-relation row filters, query/egress budgets, write mode, approvals, and migration safety) attached to agent credentials and enforced in the PG wire protocol. Nested-list fields (masking_rules, row_filters) and the nested statement_rules object are expressed as structured config.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: PolicyProfile
 metadata:
   name: example
@@ -345,7 +345,7 @@ spec:
 Manages a webhook endpoint that receives project audit and anomaly event deliveries. The signing secret is write-only and never returned by the API.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: WebhookEndpoint
 metadata:
   name: example
@@ -374,7 +374,7 @@ Manages a self-host (BYOC) enrollment: a token a self-hosted proxy uses to authe
 SelfHostEnrollments are immutable; any spec change triggers recreation.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: SelfHostEnrollment
 metadata:
   name: example
@@ -395,7 +395,7 @@ spec:
 Manages a honeytoken: a decoy (canary) relation that no legitimate query should ever touch. Any agent statement referencing it is blocked and recorded as a canary_tripped audit event; the kill action additionally disables the tripping credential via the kill-switch. The relation does not have to exist in the upstream database: enforcement is by name, in the wire protocol, before the statement reaches Postgres.
 
 ```yaml
-apiVersion: pgbeam.io/v1alpha1
+apiVersion: pgbeam.com/v1alpha1
 kind: Honeytoken
 metadata:
   name: example
