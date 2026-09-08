@@ -1,6 +1,6 @@
 ---
 title: Python SDK
-description: The pgbeam Python SDK. Blocking and asyncio clients, authentication, and a full agent-gateway round trip. Not yet released to PyPI.
+description: The pgbeam Python SDK. Blocking and asyncio clients, authentication, and a full agent-gateway round trip.
 ---
 
 The PgBeam Python SDK is the official client for the PgBeam control-plane API. It covers every API resource: projects and databases, plus the agent gateway (agent credentials, policy profiles, approvals, webhooks, anomalies, and audit logs), so you can provision safe, scoped Postgres access for AI agents from Python.
@@ -9,15 +9,17 @@ It ships two clients over one transport. `PgBeamClient` blocks, `AsyncPgBeamClie
 
 ## Installation
 
-<Callout type="warn">
-  **Not released yet, so do not install it.** The first release has not run, and
-  no project called `pgbeam` on PyPI is ours. If you find one there today it is
-  somebody else's, and it is not this SDK. This page will carry the install
-  command once we have published, and until then the code below is here to be
-  read rather than run.
-</Callout>
+```bash
+pip install pgbeam
+```
 
-The package will require Python 3.10 or newer, and its only runtime dependency is [httpx](https://www.python-httpx.org/).
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add pgbeam
+```
+
+The package requires Python 3.10 or newer, and its only runtime dependency is [httpx](https://www.python-httpx.org/).
 
 ## Client setup
 
