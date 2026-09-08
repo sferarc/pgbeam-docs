@@ -72,19 +72,19 @@ Pass `"layers": ["structural"]` to run only the layer that produces no false pos
 
 <Callout
   type="warn"
-  title="These numbers come from a 41-value corpus, not from production traffic"
+  title="These numbers come from a 42-value corpus, not from production traffic"
 >
-  The detector is tested against a corpus of 12 hostile and 29 benign values
+  The detector is tested against a corpus of 13 hostile and 29 benign values
   that lives in the source tree, and the figures below are that test's printed
-  output. They describe how the detector behaves on those 41 values. They are
+  output. They describe how the detector behaves on those 42 values. They are
   not a benchmark score, they are not measured on your data, and no accuracy
   figure that has not been measured is published here.
 </Callout>
 
 |  | Recall | Precision | False positives on benign text |
 | --- | --- | --- | --- |
-| Structural only | 58.3% (7/12) | 100.0% (7/7) | 0.0% (0/29) |
-| Both layers | 91.7% (11/12) | 91.7% (11/12) | 3.4% (1/29) |
+| Structural only | 61.5% (8/13) | 100.0% (8/8) | 0.0% (0/29) |
+| Both layers | 92.3% (12/13) | 92.3% (12/13) | 3.4% (1/29) |
 
 The benign half of that corpus is deliberately the hardest content a real database holds: names written in Cyrillic and Greek, right-to-left addresses, emoji, assay names and lab units that spell a Greek letter as Greek, Japanese with a Latin letter inside the token, LLM chat transcripts, and support tickets quoting an injection payload while reporting it. The single benign false positive is the last of those, which is what phrase matching is rather than a tuning problem.
 
