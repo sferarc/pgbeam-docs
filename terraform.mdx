@@ -284,6 +284,8 @@ resource "pgbeam_policy_profile" "example" {
   migration_safety = "off"
   egress_bytes_per_day = 0
   max_affected_rows = 0
+  content_scan_mode = "off"
+  content_scan_max_bytes = 0
 }
 ```
 
