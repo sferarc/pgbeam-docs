@@ -232,7 +232,17 @@ The management API has dozens of endpoints. Exposing each as its own MCP tool fl
 | `describe_endpoint` | Return one operation's full schema: parameters and request body. Takes `operation_id`. |
 | `call_endpoint` | Invoke an operation. Takes `operation_id`, plus `path_params`, `query_params`, and `body` as needed. |
 
-The operation ids and shapes come from the [OpenAPI spec](/docs/api). The typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`. Both transports expose the same three meta-tools.
+The operation ids and shapes come from the [OpenAPI spec](/docs/api). The typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.
+
+The remote transport (`api.pgbeam.com/v1/mcp`) also exposes three read-only agent-skills tools, so an agent new to PgBeam can find and install a skill in the same session:
+
+| Tool | Purpose |
+| --- | --- |
+| `list_skills` | List the installable PgBeam agent skills: name and description only. |
+| `get_skill` | Return one skill's full `SKILL.md` body. Takes `name`. |
+| `install_skill` | Return a skill's content plus its conventional target path (e.g. `.claude/skills/<name>/SKILL.md`) and a digest to verify it. This server cannot write to your filesystem, so it hands back content and path for the agent to write itself. Takes `name`. |
+
+Start with `pgbeam-connect` to see how an agent wires itself to Postgres safely. The CLI's stdio transport (`pgbeam mcp`) does not expose these three; it carries only the meta-tools above.
 
 <Callout type="info" title="This is the management MCP">
   This server manages your PgBeam account (projects, databases, policies,
