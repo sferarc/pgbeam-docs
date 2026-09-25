@@ -1,0 +1,45 @@
+---
+title: anomalies rules update
+description: Update an anomaly rule
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Replaces the rule's scope, metric and sensitivity. A rule whose enabled flag is turned off silences its metric for its scope rather than being deactivated.
+
+## Usage
+
+```bash
+pgbeam anomalies rules update <id> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<id>` |  | Yes | - |
+| `--credential-id <value>` | Agent credential to scope the rule to. Null or omitted applies it to every credential in the project. The credential must belong to this project. | No | - |
+| `--metric <value>` | One of the five detection metrics. A rule retunes how sensitive one of them is; it adds no detection algorithm and no alert kind. One of: queries_per_hour, bytes_per_hour, distinct_shapes, errors_per_hour, active_hours. | Yes | - |
+| `--sigma-threshold <value>` | N in the "mean + N \* dispersion" spike rule. Must be greater than zero; the detector reads any value at or below zero as "use the default", so a stored zero could never mean what setting it would suggest. Rejected for distinct_shapes and active_hours, which have no rate for sigma to put a threshold on. Null or omitted leaves the deployment default in place. | No | - |
+| `--floor <value>` | Absolute floor below which the metric never alerts. Must be greater than zero, for the same reason as sigma_threshold. Rejected for distinct_shapes and active_hours, which have no rate for a floor to bound. Null or omitted leaves the deployment default in place. | No | - |
+| `--enabled <value>` | False silences this metric for this scope. The baseline keeps advancing while it is silenced, so re-enabling resumes from the existing history rather than a cold warm-up. | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Update an anomaly rule
+pgbeam anomalies rules update
+
+# Output as JSON
+pgbeam anomalies rules update --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

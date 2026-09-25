@@ -1,0 +1,71 @@
+---
+title: CreateAnomalyRule
+description: Create an anomaly rule
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Retunes one detection metric for this project, or for one agent credential in it. Without a rule every metric resolves to the deployment default.
+
+A rule adds no detection algorithm and no alert kind: it changes how sensitive one of the five existing metrics is. enabled=false silences that metric for that scope; the baseline keeps advancing, so re-enabling resumes from the existing history rather than a cold warm-up.
+
+## Usage
+
+```go
+result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.AnomalyRuleInput{
+    Metric: pgbeam.AnomalyMetric{ /* ... */ },
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| req | `pgbeam.AnomalyRuleInput` | Yes | Request body |
+| req.CredentialID | `*string` | No | Agent credential to scope the rule to. Null or omitted applies it to every credential in the project. The credential must belong to this project. |
+| req.Metric | `pgbeam.AnomalyMetric` | Yes | One of the five detection metrics. A rule retunes how sensitive one of them is; it adds no detection algorithm and no alert kind. |
+| req.SigmaThreshold | `*float64` | No | N in the "mean + N \* dispersion" spike rule. Must be greater than zero; the detector reads any value at or below zero as "use the default", so a stored zero could never mean what setting it would suggest. Rejected for distinct_shapes and active_hours, which have no rate for sigma to put a threshold on. Null or omitted leaves the deployment default in place. |
+| req.Floor | `*float64` | No | Absolute floor below which the metric never alerts. Must be greater than zero, for the same reason as sigma_threshold. Rejected for distinct_shapes and active_hours, which have no rate for a floor to bound. Null or omitted leaves the deployment default in place. |
+| req.Enabled | `*bool` | No | False silences this metric for this scope. The baseline keeps advancing while it is silenced, so re-enabling resumes from the existing history rather than a cold warm-up. |
+
+## Response
+
+`(*pgbeam.AnomalyRule, error)`: anomaly rule created.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pgb_your_api_key",
+})
+
+result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.AnomalyRuleInput{
+    CredentialID: "agt_01j9x8y7z6w5v4u3t2s1r0q9p8",
+    Metric: pgbeam.AnomalyMetric{ /* ... */ },
+    SigmaThreshold: 4.5,
+    Floor: 100,
+    Enabled: true,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | The request was rejected. `code` is `INVALID_INPUT`, and `errors` names the offending fields when the failure was a validation one. |
+| 401 | Missing or invalid authentication. `code` is `UNAUTHORIZED`. |
+| 403 | The caller is authenticated but not allowed to perform this operation. `code` is `FORBIDDEN` when the caller's role is insufficient, and `PLAN_LIMIT_REACHED` when the organization's plan is what stands in the way. The two are answered differently, so branch on the code rather than the status. |
+| 404 | The resource does not exist, or the caller is not entitled to know that it does. `code` is `NOT_FOUND`. |
+| 409 | The request conflicts with the current state. `code` distinguishes the cases: `RESOURCE_EXISTS` for a name or value already in use, `INVALID_STATE` for a resource that is no longer in a state that allows the operation, and `IDEMPOTENCY_KEY_REUSED` for a retry whose body does not match the request the key was first used for. |
+| 413 | The request body exceeds the 2 MB limit. `code` is `PAYLOAD_TOO_LARGE`. |
+| 415 | The request body is not JSON, or carries a body without declaring a Content-Type. `code` is `UNSUPPORTED_MEDIA_TYPE`. |
+| 429 | Rate limited. `code` is `RATE_LIMITED`. |
+| 500 | The request failed for a reason on our side. `code` is `INTERNAL_ERROR`. Quote `request_id` when reporting it. |

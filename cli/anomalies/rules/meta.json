@@ -1,0 +1,12 @@
+{
+	"defaultOpen": false,
+	"title": "rules",
+	"icon": "SlidersHorizontal",
+	"pages": [
+		"list",
+		"create",
+		"show",
+		"update",
+		"delete"
+	]
+}

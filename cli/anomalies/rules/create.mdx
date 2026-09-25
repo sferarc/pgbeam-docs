@@ -1,0 +1,46 @@
+---
+title: anomalies rules create
+description: Create an anomaly rule
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Retunes one detection metric for this project, or for one agent credential in it. Without a rule every metric resolves to the deployment default.
+
+A rule adds no detection algorithm and no alert kind: it changes how sensitive one of the five existing metrics is. enabled=false silences that metric for that scope; the baseline keeps advancing, so re-enabling resumes from the existing history rather than a cold warm-up.
+
+## Usage
+
+```bash
+pgbeam anomalies rules create <metric> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<metric>` |  | Yes | - |
+| `--credential-id <value>` | Agent credential to scope the rule to. Null or omitted applies it to every credential in the project. The credential must belong to this project. | No | - |
+| `--sigma-threshold <value>` | N in the "mean + N \* dispersion" spike rule. Must be greater than zero; the detector reads any value at or below zero as "use the default", so a stored zero could never mean what setting it would suggest. Rejected for distinct_shapes and active_hours, which have no rate for sigma to put a threshold on. Null or omitted leaves the deployment default in place. | No | - |
+| `--floor <value>` | Absolute floor below which the metric never alerts. Must be greater than zero, for the same reason as sigma_threshold. Rejected for distinct_shapes and active_hours, which have no rate for a floor to bound. Null or omitted leaves the deployment default in place. | No | - |
+| `--enabled <value>` | False silences this metric for this scope. The baseline keeps advancing while it is silenced, so re-enabling resumes from the existing history rather than a cold warm-up. | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Create an anomaly rule
+pgbeam anomalies rules create
+
+# Output as JSON
+pgbeam anomalies rules create --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

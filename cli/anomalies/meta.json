@@ -5,6 +5,7 @@
 	"pages": [
 		"list",
 		"ack",
-		"resolve"
+		"resolve",
+		"rules"
 	]
 }

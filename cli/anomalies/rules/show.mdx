@@ -1,0 +1,40 @@
+---
+title: anomalies rules show
+description: Get an anomaly rule
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Returns a single anomaly rule by ID.
+
+## Usage
+
+```bash
+pgbeam anomalies rules show <id>
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| ------ | ----------- | -------- | ------- |
+| `<id>` |             | Yes      | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Get an anomaly rule
+pgbeam anomalies rules show
+
+# Output as JSON
+pgbeam anomalies rules show --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.
