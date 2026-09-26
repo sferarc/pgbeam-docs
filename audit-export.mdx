@@ -16,7 +16,10 @@ Audit export pushes PgBeam events to your systems as they happen. Point it at a 
 | `masked` | A result is returned with one or more masked columns. |
 | `migration_flagged` | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
 | `approval_requested` | A write or DDL is held for [approval](/docs/approvals). |
+| `canary_tripped` | A statement references a [honeytoken](/docs/honeytokens) decoy relation. |
+| `content_flagged` | The result-content scan finds instruction-shaped text in the values a statement returned. |
 | `anomaly_alert` | [Anomaly detection](/docs/anomaly-detection) raises an alert. |
+| `audit_checkpoint` | A signed checkpoint is issued over the project's audit chain. |
 
 For each event's full payload shape, see [webhook events](/docs/webhook-events).
 

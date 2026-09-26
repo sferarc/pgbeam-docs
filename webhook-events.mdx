@@ -16,6 +16,8 @@ description: The full set of webhook event types PgBeam delivers, when each one 
 | `masked` | A result is returned with one or more [masked](/docs/masking) columns. |
 | `migration_flagged` | A DDL statement is flagged by the [safe-migration](/docs/safe-migrations) linter. |
 | `approval_requested` | A write or DDL is held for [approval](/docs/approvals). |
+| `canary_tripped` | A statement references a [honeytoken](/docs/honeytokens) decoy relation. |
+| `content_flagged` | The result-content scan finds instruction-shaped text in the values a statement returned. |
 | `anomaly_alert` | [Anomaly detection](/docs/anomaly-detection) raises an alert. |
 | `audit_checkpoint` | A signed checkpoint is issued over the project's audit chain. |
 
@@ -47,7 +49,7 @@ The [SIEM formats](/docs/audit-export#siem-formats) (`splunk_hec`, `datadog`, `e
 
 ## Audit-derived events
 
-`query_blocked`, `budget_exhausted`, `masked`, `migration_flagged`, and `approval_requested` all come from the [audit log](/docs/audit-log). They share the same `data` shape; the `event` field inside `data` tells you which underlying audit event it was.
+`query_blocked`, `budget_exhausted`, `masked`, `migration_flagged`, `approval_requested`, `canary_tripped`, and `content_flagged` all come from the [audit log](/docs/audit-log). They share the same `data` shape; the `event` field inside `data` tells you which underlying audit event it was.
 
 ```json title="query_blocked data"
 {
@@ -90,6 +92,21 @@ The [SIEM formats](/docs/audit-export#siem-formats) (`splunk_hec`, `datadog`, `e
 | `source` | Where the statement came from: a connection string or MCP. |
 
 The `kill_switch` type also fires from the audit stream when a statement is killed mid-flight, with the same `data` shape as above.
+
+### `content_flagged`
+
+This one is not an outcome. The statement ran, every row was forwarded to the agent unchanged, and it records its own `query`, `masked`, or `truncated` outcome as well. What the event says is that the values coming back carried instruction-shaped text: invisible character runs, Unicode Tag smuggling, unterminated bidi embeddings, mixed-script words. Text like that is written by whoever filled the row, which for a support ticket or a product review is someone outside your trust boundary, and it lands in the agent's context.
+
+`decision_rule` is the field to filter on, and it carries one of two values:
+
+| `decision_rule` | Meaning |
+| --- | --- |
+| `content_scan_high_confidence` | At least one high-confidence structural finding. This is the one that also raises an anomaly alert. |
+| `content_scan` | Findings were medium confidence only. A BOM from a CSV export and an unterminated bidi embedding in a right-to-left address both produce these honestly. |
+
+Both are delivered, because a receiver can threshold for itself and a delivery that never arrives is indistinguishable from a statement that was never flagged.
+
+`reason` names the columns, the techniques, and how many values matched. It carries no bytes from the row, which is true of every field on this event and of the audit trail behind it. Turn the scan on with `content_scan_mode` on the policy profile; the [Prompt Scan API](/docs/prompt-scan) runs the same detector over text you hold yourself.
 
 ## `kill_switch` (project)
 
