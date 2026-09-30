@@ -5,7 +5,7 @@ description: List anomaly alerts
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Lists anomaly alerts for the project, newest first, optionally filtered by status.
+Lists anomaly alerts for the project, newest first, optionally filtered by status and kind.
 
 ## Usage
 
@@ -21,6 +21,7 @@ const result = await api.anomalies.listAnomalyAlerts({
 | --- | --- | --- | --- |
 | pathParams.project_id | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | queryParams.status | `"open" \| "acknowledged" \| "resolved"` | No | Filter to a single status. |
+| queryParams.kind | `AnomalyKind` | No | Filter to a single anomaly kind. |
 | queryParams.page_size | `number` | No | Maximum number of items to return (1-100, default 20). |
 | queryParams.page_token | `string` | No | Opaque token for cursor-based pagination. |
 
@@ -40,7 +41,12 @@ const client = new PgBeamClient({
 
 const result = await client.api.anomalies.listAnomalyAlerts({
   pathParams: { project_id: "prj_xxx" },
-  queryParams: { status: "open", page_size: 20, page_token: "..." },
+  queryParams: {
+    status: "open",
+    kind: "...",
+    page_size: 20,
+    page_token: "...",
+  },
 });
 ```
 

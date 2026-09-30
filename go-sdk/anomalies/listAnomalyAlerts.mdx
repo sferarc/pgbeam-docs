@@ -5,7 +5,7 @@ description: List anomaly alerts
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Lists anomaly alerts for the project, newest first, optionally filtered by status.
+Lists anomaly alerts for the project, newest first, optionally filtered by status and kind.
 
 ## Usage
 
@@ -21,6 +21,7 @@ result, err := client.Anomalies.ListAnomalyAlerts(ctx, "prj_xxx", nil)
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | params | `*pgbeam.ListAnomalyAlertsParams` | No | Query parameters |
 | params.Status | `string` | No | Filter to a single status. |
+| params.Kind | `pgbeam.AnomalyKind` | No | Filter to a single anomaly kind. |
 | params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
 | params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
 
@@ -39,6 +40,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 result, err := client.Anomalies.ListAnomalyAlerts(ctx, "prj_xxx", &pgbeam.ListAnomalyAlertsParams{
     Status: "open",
+    Kind: "...",
     PageSize: 20,
     PageToken: "...",
   })
