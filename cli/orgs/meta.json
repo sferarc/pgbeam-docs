@@ -1,4 +1,14 @@
 {
-	"defaultOpen": false, "title": "orgs", "icon": "Building2",
-	"pages": ["list", "switch", "usage", "activity", "plan"]
+	"defaultOpen": false,
+	"title": "orgs",
+	"icon": "Building2",
+	"pages": [
+		"list",
+		"switch",
+		"usage",
+		"activity",
+		"plan",
+		"members",
+		"invitations"
+	]
 }

@@ -5,6 +5,7 @@
 	"pages": [
 		"list",
 		"export",
-		"session"
+		"session",
+		"verify"
 	]
 }

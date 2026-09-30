@@ -11,6 +11,8 @@
 		"rotate",
 		"revoke",
 		"disable",
-		"enable"
+		"enable",
+		"recommend-policy",
+		"usage"
 	]
 }

@@ -1,0 +1,10 @@
+{
+	"defaultOpen": false,
+	"title": "members",
+	"icon": "Users",
+	"pages": [
+		"list",
+		"remove",
+		"set-role"
+	]
+}

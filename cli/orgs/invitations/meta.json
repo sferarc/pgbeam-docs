@@ -1,0 +1,10 @@
+{
+	"defaultOpen": false,
+	"title": "invitations",
+	"icon": "Mail",
+	"pages": [
+		"create",
+		"list",
+		"revoke"
+	]
+}
