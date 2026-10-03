@@ -22,6 +22,8 @@ It covers agent and human credentials, and records each credential's `principal_
 | Latency    | Time to serve the statement.                             |
 | Source     | Connection string or hosted MCP.                         |
 
+A blocked statement leaves your database as it was. The one exception is `result_withheld`: with `content_scan_mode=block` on the policy profile, the statement ran, the scan found agent-directed content in a returned value, and the agent got an error instead of the result. A write it made has committed. Rows and Bytes on that entry count what the agent received before the refusal.
+
 ## Read the log
 
 Open the **Audit** tab in the dashboard to filter by agent, decision, or time range and export the result. From the terminal or API:

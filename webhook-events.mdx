@@ -106,7 +106,7 @@ This one is not an outcome. The statement ran, every row was forwarded to the ag
 
 Both are delivered, because a receiver can threshold for itself and a delivery that never arrives is indistinguishable from a statement that was never flagged.
 
-`reason` names the columns, the techniques, and how many values matched. It carries no bytes from the row, which is true of every field on this event and of the audit trail behind it. Turn the scan on with `content_scan_mode` on the policy profile; the [Prompt Scan API](/docs/prompt-scan) runs the same detector over text you hold yourself.
+`reason` names the columns, the techniques, and how many values matched. It carries no bytes from the row, which is true of every field on this event and of the audit trail behind it. Under `content_scan_mode=block` the reason says the statement was refused, and the statement's own row in the [audit log](/docs/audit-log) records `result_withheld`: the statement ran on your database, and the agent received an error instead of the result. Turn the scan on with `content_scan_mode` on the policy profile; the [Prompt Scan API](/docs/prompt-scan) runs the same detector over text you hold yourself.
 
 ## `kill_switch` (project)
 
