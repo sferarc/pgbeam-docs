@@ -42,4 +42,4 @@ pgbeam audit session 0000a41f --json
 
 ## Output
 
-Prints the session window, credentials and sources, the allowed/blocked/masked/truncated statement counts, rows and bytes returned, and the tables read, written, and blocked.
+Prints the session window, credentials and sources, the allowed/blocked/masked/truncated statement counts, rows and bytes returned, and the tables read, written, and blocked. When your role holds anomaly:read it also lists the alerts raised from the session's own entries, and separately the rate and shape alerts on its credentials whose window overlaps the session, which are not attributed to the session itself.
