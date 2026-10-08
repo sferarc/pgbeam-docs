@@ -1,0 +1,48 @@
+---
+title: approvals rules update
+description: Update an approval rule
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Replaces the rule's name, statement kinds, scope, row threshold and enabled flag. An approval request already held keeps the name it was held under.
+
+Returns 409 when the update leaves the rule enabled while the organization has a live self-hosted data plane enrollment, for the same reason as create. Setting enabled to false is still accepted.
+
+## Usage
+
+```bash
+pgbeam approvals rules update <id> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<id>` |  | Yes | - |
+| `--name <value>` | Label shown to the reviewer on every approval request this rule holds. Must be unique within the project and not blank. | Yes | - |
+| `--statement-kinds <value>` | Statement kinds the rule holds. Empty or omitted holds every kind. One of: insert, update, delete, ddl. | No | - |
+| `--schema-name <value>` | Schema to scope the rule to. Null, empty or omitted matches every schema. | No | - |
+| `--relation-name <value>` | Relation to scope the rule to. Null, empty or omitted matches every relation. Without a schema it matches that name in every schema. | No | - |
+| `--min-affected-rows <value>` | Hold only statements affecting at least this many rows. Must be at least 1. Null or omitted holds every matching statement. The count is taken in a rolled-back trial run; a statement that reports no count (DDL, a batch, a data-modifying CTE) is held regardless. | No | - |
+| `--enabled <value>` | False switches the rule off, so it holds nothing. | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Update an approval rule
+pgbeam approvals rules update
+
+# Output as JSON
+pgbeam approvals rules update --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

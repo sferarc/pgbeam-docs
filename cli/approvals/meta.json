@@ -5,6 +5,7 @@
 	"pages": [
 		"list",
 		"approve",
-		"reject"
+		"reject",
+		"rules"
 	]
 }
