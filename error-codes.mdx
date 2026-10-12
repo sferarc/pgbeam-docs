@@ -12,8 +12,8 @@ PgBeam returns standard PostgreSQL SQLSTATE error codes. This reference covers e
 | --- | --- | --- |
 | `08004` | Unknown project | `project not found for hostname ...` |
 | `08004` | Organization suspended | `organization suspended — update payment at dash.pgbeam.com` |
-| `08004` | IP not allowed | `connection rejected: IP not in allowlist` |
-| `08004` | Auth rate limited | `too many authentication attempts` |
+| `08004` | IP not allowed | `connection rejected: IP address not in project allowlist` |
+| `08004` | Auth rate limited | `too many connection attempts from your IP; please retry with exponential backoff` |
 | `08006` | Upstream auth failure | Forwarded from upstream |
 | `08006` | Circuit breaker open | `upstream unavailable (circuit breaker open)` |
 | `53300` | Connection limit exceeded | `too many connections for project` |
@@ -54,7 +54,7 @@ FATAL: organization suspended — update payment at dash.pgbeam.com
 ### IP not allowed
 
 ```
-FATAL: connection rejected: IP not in allowlist
+FATAL: connection rejected: IP address not in project allowlist
 ```
 
 **Cause:** The project has an [IP allowlist](/docs/ip-allowlist) configured and the client's source IP does not match any of the allowed CIDR ranges. The connection is rejected before authentication.
@@ -69,15 +69,15 @@ FATAL: connection rejected: IP not in allowlist
 ### Auth rate limited
 
 ```
-FATAL: too many authentication attempts
+FATAL: too many connection attempts from your IP; please retry with exponential backoff
 ```
 
-**Cause:** Too many failed authentication attempts from the same IP address in a short period. PgBeam rate-limits auth attempts per IP to protect the upstream database from brute-force attacks.
+**Cause:** Too many connection attempts from the same IP address in a short period. PgBeam rate-limits connection attempts per IP to protect the upstream database from brute-force attacks. Loopback addresses are exempt.
 
 **Fix:**
 
 1. Verify your credentials are correct by connecting directly to the origin database
-2. Wait for the rate limit window to expire (typically a few minutes)
+2. Retry with exponential backoff, as the message says, rather than in a tight loop
 3. If the issue persists, check for misconfigured clients that are retrying with wrong credentials in a loop
 
 ## `08006`: Connection failure

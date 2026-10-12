@@ -55,7 +55,7 @@ The hostname does not match any project. Common causes:
 ### `08004`: IP not allowed
 
 ```
-FATAL: connection rejected: IP not in allowlist
+FATAL: connection rejected: IP address not in project allowlist
 ```
 
 The project has an IP allowlist configured and your client's IP is not in it.
@@ -103,15 +103,15 @@ PgBeam forwarded your credentials to the origin database and it rejected them. T
 ### `08004`: Auth rate limited
 
 ```
-FATAL: too many authentication attempts
+FATAL: too many connection attempts from your IP; please retry with exponential backoff
 ```
 
-Too many failed authentication attempts from the same IP address in a short period.
+Too many connection attempts from the same IP address in a short period. Loopback addresses are exempt.
 
 **Fix:**
 
 1. Stop the source of failed authentications (misconfigured client, wrong password in environment)
-2. Wait a few minutes for the rate limit to expire
+2. Retry with exponential backoff rather than in a tight loop
 3. Verify credentials are correct before retrying
 
 ## Upstream problems

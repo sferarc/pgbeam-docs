@@ -2,10 +2,10 @@
 title: Terraform
 icon: Blocks
 tag: HCL
-description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, and anomaly rules as infrastructure using Terraform and the pgbeam provider.
+description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as infrastructure using Terraform and the pgbeam provider.
 ---
 
-Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, and anomaly rules.
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
 
 ## Setup
 
@@ -101,12 +101,12 @@ Terraform creates the PgBeam project and its primary database atomically. The `p
 ## Resources
 
 <Callout type="info">
-  **Approval rules are not yet managed as code.** Policy profiles, honeytokens
-  and anomaly rules are managed resources, so the enforcement rules, the decoys
-  and the detection sensitivity all live in your reviewed IaC flow and are
-  covered by drift detection. Approval rules are not: the API exposes them only
-  as events to review after the fact (approve/reject), so there is nothing to
-  declare yet. Approvals still live outside IaC.
+  **Every policy rule type is managed as code.** Policy profiles, honeytokens,
+  anomaly rules and approval rules are managed resources, so the enforcement
+  rules, the decoys, the detection sensitivity and what needs a human all live
+  in your reviewed IaC flow and are covered by drift detection. Approving or
+  rejecting an individual held statement is an operational decision rather than
+  configuration, so it stays in the dashboard, the CLI and the API.
 </Callout>
 
 ### pgbeam_project
@@ -368,6 +368,26 @@ resource "pgbeam_anomaly_rule" "example" {
 
 **Import:** `terraform import pgbeam_anomaly_rule.example <project_id>/<id>`
 
+### pgbeam_approval_rule
+
+Manages an approval rule: a named, project-scoped rule that sends the agent statements it matches to a human for approval, whatever the policy profile's approval_mode says. A rule can only add approval; no rule can exempt a statement from approval_mode. Match on statement kinds, a schema, a relation, and optionally a minimum affected-row count. The name is shown to the reviewer on every approval request the rule holds and must be unique within the project. enabled=false switches the rule off. A write is pushed to connected data planes immediately.
+
+```hcl
+resource "pgbeam_approval_rule" "example" {
+  project_id = "prj_01j9x8y7z6w5v4u3t2s1r0q9p8"
+  name = "payments deletes"
+  statement_kinds = ["..."]
+  schema_name = "public"
+  relation_name = "payments"
+  min_affected_rows = 1000
+  enabled = true
+}
+```
+
+**Computed:** `created_at`, `updated_at`
+
+**Import:** `terraform import pgbeam_approval_rule.example <project_id>/<id>`
+
 ## Configuration
 
 | Setting | Source | Description |
@@ -397,6 +417,7 @@ Some property changes trigger resource replacement (destroy + create) rather tha
 | SelfHostEnrollment | Any property change (immutable) |
 | Honeytoken | `project_id` |
 | AnomalyRule | `project_id` |
+| ApprovalRule | `project_id` |
 
 ## Further reading
 
