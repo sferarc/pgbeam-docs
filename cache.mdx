@@ -215,7 +215,19 @@ SET pgbeam.debug = on;
 SHOW pgbeam.cache;
 SHOW pgbeam.cache_ttl;
 SHOW pgbeam.debug;
+
+-- Return a setting to its default, or clear all three
+RESET pgbeam.cache;
+RESET ALL;
 ```
+
+| Setting            | Accepted values                                       |
+| ------------------ | ----------------------------------------------------- |
+| `pgbeam.cache`     | `on`, `off`, `true`, `false`, `1`, `0`, `default`     |
+| `pgbeam.cache_ttl` | A whole number of seconds (`0` or more), or `default` |
+| `pgbeam.debug`     | `on`, `off`, `true`, `false`, `1`, `0`, `default`     |
+
+Values may be quoted (`'off'` or `"off"`) and the `SET SESSION` spelling works the same as `SET`. Any other value is rejected with SQLSTATE `22023` (`invalid value for parameter "pgbeam.cache": "yes"`) and the setting keeps its previous value. `SET LOCAL` is rejected with `0A000` because these settings apply to the whole session, not a single transaction.
 
 When `pgbeam.debug` is on, every query returns a `NOTICE` with cache information:
 
