@@ -195,18 +195,19 @@ Before you begin, you need:
 
 Caching starts off disabled for new databases. That is the safer default. Once traffic is flowing, you can enable it for stable reads that benefit from reuse.
 
+{/* prettier-ignore */}
 <Tabs items={["Dashboard", "SQL", "Session override"]}>
   <Tab value="Dashboard">
     Open your database in the dashboard and go to **Cache Rules**. PgBeam tracks
     query shapes automatically, so you can enable caching on the high-frequency
     reads that are worth it.
   </Tab>
-
-<Tab value="SQL">
-  ```sql /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products WHERE
-  active = true; /* @pgbeam:cache noCache */ SELECT NOW(); ```
-</Tab>
-
+  <Tab value="SQL">
+    ```sql
+    /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products WHERE active = true;
+    /* @pgbeam:cache noCache */ SELECT NOW();
+    ```
+  </Tab>
   <Tab value="Session override">
     ```sql
     SET pgbeam.cache = on;

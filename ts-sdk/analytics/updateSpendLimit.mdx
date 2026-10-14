@@ -23,7 +23,7 @@ const result = await api.analytics.updateSpendLimit({
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | pathParams.org_id | `string` | Yes | Unique organization identifier. |
-| body.spend_limit | `number` | No | Monthly spend limit in dollars. Null to remove the limit. |
+| body.spend_limit | `number` | No | Monthly spend limit in dollars. Null to remove the limit. An active spend cap lifts only when the limit is removed or raised. |
 
 ## Response
 

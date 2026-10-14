@@ -22,7 +22,7 @@ result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.Updat
 | ctx | `context.Context` | Yes | Request context |
 | orgID | `string` | Yes | Unique organization identifier. |
 | req | `pgbeam.UpdateSpendLimitRequest` | Yes | Request body |
-| req.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. |
+| req.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. An active spend cap lifts only when the limit is removed or raised. |
 
 ## Response
 

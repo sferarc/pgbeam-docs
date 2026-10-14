@@ -162,23 +162,25 @@ This precedence lets you set broad defaults and override them precisely where ne
 
 Embed cache directives directly in your SQL as comments. PgBeam strips the annotations before forwarding to the upstream, so your database never sees them.
 
+{/* prettier-ignore */}
 <Tabs items={["Enable caching", "Custom TTL and SWR", "Disable caching", "Route to replica"]}>
   <Tab value="Enable caching">
     ```sql
     /* @pgbeam:cache */ SELECT * FROM products WHERE active = true;
     ```
   </Tab>
-
-<Tab value="Custom TTL and SWR">
-  ```sql -- Cache for 5 minutes, serve stale for 1 minute during refresh /*
-  @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products; ```
-</Tab>
-
-<Tab value="Disable caching">
-  ```sql -- Force this query to always hit the upstream /* @pgbeam:cache noCache
-  */ SELECT NOW(); ```
-</Tab>
-
+  <Tab value="Custom TTL and SWR">
+    ```sql
+    -- Cache for 5 minutes, serve stale for 1 minute during refresh
+    /* @pgbeam:cache maxAge=300 swr=60 */ SELECT * FROM products;
+    ```
+  </Tab>
+  <Tab value="Disable caching">
+    ```sql
+    -- Force this query to always hit the upstream
+    /* @pgbeam:cache noCache */ SELECT NOW();
+    ```
+  </Tab>
   <Tab value="Route to replica">
     ```sql
     /* @pgbeam:replica */ SELECT * FROM events ORDER BY created_at DESC LIMIT 100;
