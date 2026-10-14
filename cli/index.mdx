@@ -50,7 +50,7 @@ Pick whichever fits how you already install tools. They all give you the same `p
     curl -fsSL https://pgbeam.com/install | sh
     ```
 
-    Downloads the same native binary as Homebrew and puts it on your PATH. macOS and Linux, x86\_64 and ARM64.
+    Downloads the same native binary as Homebrew and puts it on your PATH. macOS and Linux, x86\_64 and ARM64. The binary is checked against the release's `SHA256SUMS` first, and nothing is installed if it does not match. Set `PGBEAM_VERSION` to install a specific release.
 
   </Tab>
 
@@ -58,6 +58,8 @@ Pick whichever fits how you already install tools. They all give you the same `p
     ```powershell
     irm https://pgbeam.com/install/windows | iex
     ```
+
+    Checks the binary against the release's `SHA256SUMS` before installing it, like the install script.
 
     Once `@pgbeam/cli` is published, npm will work the same on Windows: `npm install -g @pgbeam/cli`.
 
