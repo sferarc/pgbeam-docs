@@ -128,7 +128,7 @@ When a project kill-switch is engaged from the control plane, the event carries 
 
 ## `anomaly_alert`
 
-Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts from its baseline.
+Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts from its baseline, trips a honeytoken, or reads a high-confidence content scan finding.
 
 ```json title="anomaly_alert data"
 {
@@ -149,7 +149,7 @@ Raised by [anomaly detection](/docs/anomaly-detection) when a credential drifts 
 | `id` | The anomaly alert id. |
 | `project_id` | The project the alert belongs to. |
 | `credential_id` | The credential the alert is about. |
-| `kind` | The signal that tripped: `volume_spike`, `egress_spike`, `new_query_shape`, `off_hours`, or `error_spike`. |
+| `kind` | The signal that tripped: `volume_spike`, `egress_spike`, `new_query_shape`, `off_hours`, `error_spike`, `canary_tripped`, or `content_flagged`. New kinds may be added, so handle unknown values. |
 | `severity` | The alert severity. |
 | `title` | A short human-readable summary. |
 | `details` | Signal-specific detail (varies by `kind`). |

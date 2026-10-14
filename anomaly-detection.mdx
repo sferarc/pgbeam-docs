@@ -4,7 +4,7 @@ icon: Activity
 description: PgBeam learns each credential's normal behavior and alerts when it drifts. Volume spikes, off-hours access, new query shapes, and error or egress spikes.
 ---
 
-Anomaly detection watches each credential's traffic and raises an alert when it drifts from its own baseline. A bot that quietly read four tables for a month and suddenly scans a fifth, runs at 3am, or pulls ten times its usual rows is doing something worth a look. PgBeam flags it without you writing a single threshold.
+Anomaly detection watches each credential's traffic and raises an alert when it drifts from its own baseline. A bot that quietly read four tables for a month and suddenly scans a fifth, runs at 3am, or pulls ten times its usual rows is doing something worth a look. PgBeam flags it with no thresholds to write up front; [custom rules](#custom-rules) let you retune a metric when the defaults do not fit a credential.
 
 It runs on agent credentials and human credentials alike. The baseline is per-credential, so a noisy analytics agent and a quiet support bot each get judged against their own history, not a shared average.
 
@@ -17,6 +17,10 @@ It runs on agent credentials and human credentials alike. The baseline is per-cr
 | New query shape | A normalized statement shape never seen from this credential before. |
 | Error spike | A burst of blocked or failing statements (often probing or a loop). |
 | Egress spike | Bytes returned well above baseline (a possible bulk exfiltration). |
+| Honeytoken trip | A statement referenced a [honeytoken](/docs/honeytokens). Raised on ingest, not from a baseline. |
+| Content flagged | The [result-content scan](/docs/webhook-events#content_flagged) found high-confidence instruction-shaped text in returned values. Raised on ingest, not from a baseline. |
+
+Each alert carries a machine-readable `kind`: `volume_spike`, `off_hours`, `new_query_shape`, `error_spike`, `egress_spike`, `canary_tripped`, or `content_flagged`. The last two fire the moment the audit entry arrives, so a brand new credential with no history can still raise them, and custom rules do not change them.
 
 Volume, egress and new-shape detection count every statement that ran on your database, including ones whose result was masked, capped, auto-approved, or withheld by content scanning (`content_scan_mode=block`, see [audit log](/docs/audit-log)). The error count includes every refusal the agent saw: policy blocks, exhausted budgets, failed logins, honeytoken trips, rejected or expired approvals, and withheld results.
 
@@ -44,6 +48,26 @@ curl -X PATCH \
 The CLI does the same with [`pgbeam anomalies ack`](/docs/cli/anomalies/ack): pass one or more alert ids, or `--all` to acknowledge every open alert in the project. [`pgbeam anomalies resolve`](/docs/cli/anomalies/resolve) closes them out, and [`pgbeam anomalies list`](/docs/cli/anomalies/list) shows what is open.
 
 Every alert can also fire an [`anomaly_alert`](/docs/audit-export) webhook, so it lands in Slack, PagerDuty, or your SIEM the moment it is raised.
+
+## Custom rules
+
+The baseline signals use deployment defaults until you add a rule. A rule retunes one metric for the whole project, or for one credential in it, and sets:
+
+- `metric`: one of `queries_per_hour`, `bytes_per_hour`, `distinct_shapes`, `errors_per_hour`, or `active_hours`.
+- `credential_id`: the credential to scope it to. Omit it to apply the rule to every credential in the project.
+- `sigma_threshold`: N in the "mean + N × dispersion" spike rule. Higher is quieter.
+- `floor`: an absolute value below which the metric never alerts.
+- `enabled`: `false` silences the metric for that scope. The baseline keeps advancing, so turning it back on resumes from existing history.
+
+`sigma_threshold` and `floor` apply only to the rate metrics (`queries_per_hour`, `bytes_per_hour`, `errors_per_hour`); leave either out to keep the default. One rule exists per project, credential and metric. A rule adds no new alert kind.
+
+```bash title="Loosen egress detection for a bulk-export agent"
+pgbeam anomalies rules create bytes_per_hour \
+  --credential-id agt_01j9x8y7z6w5v4u3t2s1r0q9p8 \
+  --sigma-threshold 6 --floor 50000000
+```
+
+Manage rules with [`pgbeam anomalies rules`](/docs/cli/anomalies/rules/list), the API, or the [`pgbeam_anomaly_rule`](/docs/terraform) Terraform resource.
 
 ## From alert to action
 
