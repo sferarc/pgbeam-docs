@@ -197,7 +197,7 @@ spec:
 
 Manages a read replica for a PgBeam database.
 
-Replicas are immutable; any spec change triggers recreation.
+Replicas are immutable: the API server rejects any spec change, so delete and recreate the resource instead.
 
 ```yaml
 apiVersion: pgbeam.com/v1alpha1
@@ -220,7 +220,7 @@ spec:
 
 Manages a custom domain for a PgBeam project.
 
-CustomDomains are immutable; any spec change triggers recreation.
+CustomDomains are immutable: the API server rejects any spec change, so delete and recreate the resource instead.
 
 ```yaml
 apiVersion: pgbeam.com/v1alpha1
@@ -373,7 +373,7 @@ spec:
 
 Manages a self-host (BYOC) enrollment: a token a self-hosted proxy uses to authenticate to the control plane's config/audit stream. The token is a one-time secret returned only at creation and exposed as a sensitive computed output; it cannot be retrieved again. To rotate the token, replace the resource. Deletion revokes the enrollment.
 
-SelfHostEnrollments are immutable; any spec change triggers recreation.
+SelfHostEnrollments are immutable: the API server rejects any spec change, so delete and recreate the resource instead.
 
 ```yaml
 apiVersion: pgbeam.com/v1alpha1
@@ -467,13 +467,13 @@ spec:
 | `apiKeySecretRef` | ProviderConfig | Secret reference for the API key |
 | `baseUrl` | ProviderConfig | API base URL (default: `https://api.pgbeam.com`) |
 
-## Replacement vs update
+## Immutable fields
 
-Some spec changes trigger resource recreation rather than in-place updates:
+Crossplane never replaces a managed resource on its own. The fields below are immutable: the API server rejects an edit that changes, sets or removes them, with an error such as `projectID is immutable; delete and recreate the resource to change it`. To change one, delete the managed resource and create it again with the new value.
 
-| Resource | Recreation triggers |
+| Resource | Immutable fields |
 | --- | --- |
-| Project | `orgID`, `cloud`, `selfHosted` |
+| Project | `orgID`, `cloud`, `selfHosted`, `database` |
 | Database | `projectID` |
 | Replica | Any spec change (immutable) |
 | CustomDomain | Any spec change (immutable) |
