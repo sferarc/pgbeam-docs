@@ -37,7 +37,7 @@ Replace the default `*.proxy.pgbeam.app` hostname in your connection string with
 
       <Tab value="API">
         ```bash
-        curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/custom-domains \
+        curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/domains \
           -H "Authorization: Bearer <key>" \
           -H "Content-Type: application/json" \
           -d '{"domain": "db.example.com"}'
@@ -46,7 +46,7 @@ Replace the default `*.proxy.pgbeam.app` hostname in your connection string with
 
       <Tab value="CLI">
         ```bash
-        pgbeam projects domains add --domain db.example.com
+        pgbeam domains add db.example.com
         ```
       </Tab>
     </Tabs>
@@ -90,14 +90,14 @@ Replace the default `*.proxy.pgbeam.app` hostname in your connection string with
       <Tab value="API">
         ```bash
         curl -X POST \
-          https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId}/verify \
+          https://api.pgbeam.com/v1/projects/{projectId}/domains/{domainId}/verify \
           -H "Authorization: Bearer <key>"
         ```
       </Tab>
 
       <Tab value="CLI">
         ```bash
-        pgbeam projects domains verify --domain db.example.com
+        pgbeam domains verify <domain-id>
         ```
       </Tab>
     </Tabs>
@@ -157,14 +157,14 @@ DATABASE_URL=postgresql://user:pass@db-staging.example.com:5432/mydb
   <Tab value="API">
     ```bash
     curl -X DELETE \
-      https://api.pgbeam.com/v1/projects/{projectId}/custom-domains/{domainId} \
+      https://api.pgbeam.com/v1/projects/{projectId}/domains/{domainId} \
       -H "Authorization: Bearer <key>"
     ```
   </Tab>
 
   <Tab value="CLI">
     ```bash
-    pgbeam projects domains delete --domain db.example.com
+    pgbeam domains delete <domain-id>
     ```
   </Tab>
 </Tabs>

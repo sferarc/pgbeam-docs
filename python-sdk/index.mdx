@@ -94,7 +94,7 @@ with PgBeamClient() as client:
     try:
         client.projects.get_project(project_id=project_id)
     except ApiError as err:
-        print(err.status, err)  # 404 project not found
+        print(err.status, err.code, err)  # 404 NOT_FOUND project not found
 ```
 
 ## Async
@@ -129,18 +129,41 @@ Timestamps are RFC 3339 strings, exactly as the API sends them. They are deliber
 
 `ApiError` means the API answered and the answer was an error. `NetworkError` means it never answered: DNS failure, a refused or reset connection, or a timeout. Both derive from `PgBeamError`.
 
+The API answers every error with an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem document:
+
+```json
+{
+  "type": "https://pgbeam.com/docs/api/errors/plan-limit-reached",
+  "title": "Plan limit reached",
+  "status": 403,
+  "detail": "the Starter plan allows 3 projects",
+  "instance": "/v1/projects",
+  "code": "PLAN_LIMIT_REACHED",
+  "request_id": "req_abc123"
+}
+```
+
+`ApiError` lifts its fields onto attributes: `code`, `type`, `title`, `detail`, `instance`, `request_id`, and `errors`, a list of `{"field", "detail"}` entries when the request failed validation. The message is `detail`. Branch on `code`, not on the status or the message: a 403 is either `FORBIDDEN` or `PLAN_LIMIT_REACHED`, and those are fixed in different ways.
+
 ```python
 from pgbeam import ApiError, NetworkError, PgBeamClient
 
 with PgBeamClient() as client:
     try:
-        client.projects.get_project(project_id="prj_123")
+        client.projects.create_project(body=body)
     except ApiError as err:
-        print(err.status)  # 404
-        print(err.body)    # {"error": {"code": "NOT_FOUND", "message": "project not found"}}
+        if err.code == "PLAN_LIMIT_REACHED":
+            print("upgrade the plan:", err)
+        elif err.code == "INVALID_INPUT":
+            for field_error in err.errors:
+                print(field_error["field"], field_error["detail"])
+        else:
+            print(err.status, err.code, err.request_id, err)
     except NetworkError as err:
         print(err.url, err.attempts, err.elapsed_ms, err.timed_out)
 ```
+
+`status`, `status_text` and the decoded `body` are still there for anything the attributes do not cover.
 
 `NetworkError.timed_out` is the field worth branching on. A call that spent its whole budget without an answer is not one your own retry loop should try again immediately.
 

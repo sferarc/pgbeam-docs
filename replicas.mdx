@@ -36,13 +36,12 @@ Register one or more read replicas for a database. Each replica needs its own co
   <Tab value="API">
     ```bash
     curl -X POST \
-      https://api.pgbeam.com/v1/projects/{projectId}/databases/{databaseId}/replicas \
+      https://api.pgbeam.com/v1/databases/{databaseId}/replicas \
       -H "Authorization: Bearer <key>" \
       -H "Content-Type: application/json" \
       -d '{
         "host": "replica.example.com",
         "port": 5432,
-        "database": "mydb",
         "ssl_mode": "verify-full"
       }'
     ```
@@ -53,7 +52,6 @@ Register one or more read replicas for a database. Each replica needs its own co
     pgbeam replicas add --database-id <id> \
       --host replica.example.com \
       --port 5432 \
-      --database mydb \
       --ssl-mode verify-full
     ```
   </Tab>

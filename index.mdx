@@ -238,7 +238,7 @@ The [PgBeam CLI](/docs/cli) covers the same setup flow:
 curl -fsSL https://pgbeam.com/install | sh
 pgbeam auth login
 pgbeam projects create --name my-project
-pgbeam db add --host db.example.com --port 5432 --database mydb --ssl-mode verify-full
+pgbeam db add --host db.example.com --port 5432 --name mydb --ssl-mode verify-full
 pgbeam env pull
 ```
 
