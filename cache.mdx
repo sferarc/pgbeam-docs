@@ -60,6 +60,14 @@ Caching is **not** a good fit for:
     SELECT * FROM products WHERE id = 2;
     ```
 
+    Session settings a result can depend on are part of the key too. A session
+    that runs `SET search_path`, `SET ROLE`, or sets any other session parameter
+    only shares entries with sessions that ran the same `SET`
+    statements in the same order, so a schema-per-tenant or role-per-tenant
+    application never reads another tenant's rows. Those entries are not
+    refreshed in the background. Timeouts, `application_name`,
+    `client_min_messages` and `pgbeam.*` do not count.
+
   </Step>
 
   <Step>
@@ -248,7 +256,8 @@ PgBeam skips the cache entirely when any of these conditions are true:
 | Caching not enabled for the query | No rule, annotation, or session override |
 | Statement mutates data | `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE` |
 | Statement changes session state | `SET`, `DISCARD`, `RESET` |
-| Query uses volatile functions | `NOW()`, `RANDOM()`, `pg_advisory_lock()`, etc. |
+| Session ran `set_config()` or a `DO` block, or sent a `SET` through the extended protocol | The cache key cannot follow the setting, so the rest of the session bypasses |
+| Query uses volatile functions or reads session state | `NOW()`, `RANDOM()`, `pg_advisory_lock()`, `current_setting()`, etc. |
 | Query is inside an explicit transaction | `BEGIN` ... `COMMIT` blocks |
 | SQL annotation says `noCache` | Explicit opt-out |
 | Session override is `pgbeam.cache = off` | Session-level opt-out |
