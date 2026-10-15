@@ -29,7 +29,7 @@ result, err := client.Agents.ExportAuditLogs(ctx, "prj_xxx", nil)
 
 ## Response
 
-`(*pgbeam.unknown, error)`: the result.
+`([]byte, error)`: the raw `text/csv` body. CSV stream of filtered audit entries.
 
 ## Example
 
@@ -49,7 +49,7 @@ result, err := client.Agents.ExportAuditLogs(ctx, "prj_xxx", &pgbeam.ExportAudit
 if err != nil {
   log.Fatal(err)
 }
-fmt.Println(result)
+fmt.Print(string(result))
 ```
 
 ## Errors

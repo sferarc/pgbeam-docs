@@ -141,8 +141,9 @@ export function verify(
 
 <Callout type="info" title="Delivery and retries">
   PgBeam expects a `2xx` within a few seconds. A non-`2xx` or a timeout is
-  retried with exponential backoff. Make your receiver idempotent by keying on
-  the event `id`, which is stable across retries.
+  retried with exponential backoff. Redirects are not followed: a `3xx` counts
+  as a failed attempt, so register the final URL. Make your receiver idempotent
+  by keying on the event `id`, which is stable across retries.
 </Callout>
 
 ## SIEM formats
