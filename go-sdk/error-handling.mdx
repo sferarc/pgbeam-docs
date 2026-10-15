@@ -54,6 +54,8 @@ The SDK automatically retries transient errors with exponential backoff. Non-ret
 
 When the server returns a `Retry-After` header (on 429 or 503), the SDK uses that value instead of its own computed backoff.
 
+Every call is bounded twice. Each attempt times out after `ClientOptions.Timeout` (default 30s), and a timed-out attempt is retried like a network error. `RetryConfig.TotalBudget` (default 120s) caps the whole call, measured from the first attempt: a retry whose wait would land past it is not made, and the last error is returned. A `Retry-After` longer than the remaining budget therefore returns the error at once.
+
 See [Response Conventions](/docs/api/response-conventions#retries) for the backoff formula and retry behavior details.
 
 ### Retry configuration
@@ -67,7 +69,9 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
         MaxRetries:   5,                       // default: 5 (0 to disable)
         InitialDelay: 500 * time.Millisecond,  // default: 500ms
         MaxDelay:     30 * time.Second,         // default: 30s
+        TotalBudget:  120 * time.Second,        // default: 120s (0 to disable)
     },
+    Timeout: 30 * time.Second, // per attempt, default: 30s (negative to disable)
 })
 ```
 
@@ -76,6 +80,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 | `MaxRetries` | `int` | `5` | Max retry attempts after the initial request. `0` disables retries. |
 | `InitialDelay` | `time.Duration` | `500ms` | Initial backoff delay. |
 | `MaxDelay` | `time.Duration` | `30s` | Maximum backoff delay. |
+| `TotalBudget` | `time.Duration` | `120s` | Ceiling for the whole call, including time spent in requests. `0` disables it. |
+
+A `RetryConfig` you pass is used as given: fields you leave out are zero, not the defaults above, so set `TotalBudget` explicitly if you want a budget alongside custom retry settings.
+
+`ClientOptions.Timeout` bounds each attempt, including reading the response body. `0` means the 30s default and a negative value disables it. It is applied through the request context, so it also holds when you supply your own `HTTPClient`.
 
 ### Disabling retries
 

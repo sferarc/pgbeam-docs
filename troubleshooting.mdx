@@ -187,6 +187,26 @@ The project exceeded its QPS limit (10 / 50 / 250 depending on plan).
 3. **Check for runaway clients.** A misconfigured cron job or retry loop can exhaust the QPS budget.
 4. **Upgrade your plan** for a higher QPS allowance.
 
+## Agent problems
+
+Agent credentials get errors of their own, each with a stable message prefix. [Error Codes](/docs/error-codes) lists every message and the policy control behind it.
+
+### `42501`: Blocked by agent policy
+
+The policy refused the statement. The message after `blocked by PgBeam agent policy: ` names the rule; check it with `pgbeam policies dry-eval` before changing the policy. See [Blocked by policy](/docs/error-codes#42501-blocked-by-policy).
+
+### `0A000`: Statement shape not supported
+
+Approvals, row filters, masking, affected-row caps and dry-run writes need the simple query protocol for some statements, and most drivers default to prepared statements. Switch the driver to simple-protocol mode for agent credentials. See [Not supported](/docs/error-codes#0a000-not-supported).
+
+### `28000`: Agent session terminated
+
+The credential was revoked, disabled, expired or rotated, or the project kill-switch was engaged, while the session was open. Reconnect with a valid credential. See [Agent session terminated](/docs/error-codes#28000-agent-session-terminated).
+
+### `53400`: Agent budget exhausted
+
+The credential spent its query or egress budget, or an approval timed out. The message gives the reset time. See [Agent budget or approval limit](/docs/error-codes#53400-agent-budget-or-approval-limit).
+
 ## Cache problems
 
 ### Cache is not caching anything
@@ -269,8 +289,12 @@ If your database is in one region but your application is in another, cache miss
 | `08006` | Circuit breaker open | [Upstream problems](#08006-circuit-breaker-open) |
 | `53300` | Too many connections | [Connection limit problems](#53300-too-many-connections) |
 | `53400` | Query rate limit exceeded | [Rate limit problems](#53400-query-rate-limit-exceeded) |
+| `42501` | Blocked by agent policy | [Agent problems](#42501-blocked-by-agent-policy) |
+| `0A000` | Statement shape not supported for an agent | [Agent problems](#0a000-statement-shape-not-supported) |
+| `28000` | Agent session terminated | [Agent problems](#28000-agent-session-terminated) |
+| `53400` | Agent budget exhausted | [Agent problems](#53400-agent-budget-exhausted) |
 
-See [Error Codes](/docs/error-codes) for the full reference with code examples.
+See [Error Codes](/docs/error-codes) for every SQLSTATE PgBeam returns, with code examples.
 
 ## Still stuck?
 

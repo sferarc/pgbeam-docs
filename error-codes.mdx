@@ -4,24 +4,73 @@ icon: TriangleAlert
 description: SQLSTATE error codes returned by PgBeam, what causes them, and how to resolve each one.
 ---
 
-PgBeam returns standard PostgreSQL SQLSTATE error codes. This reference covers every PgBeam-specific error, what triggers it, and how to fix it.
+PgBeam returns standard PostgreSQL SQLSTATE error codes. This reference covers every error the proxy itself sends, what triggers it, and how to fix it. Errors raised by your origin database pass through unchanged and are not listed here.
+
+Most agent errors share a message prefix, so a client can tell a PgBeam refusal from a database error without parsing the rest of the sentence:
+
+- `blocked by PgBeam agent policy: `: a policy, masking, approval, write-mode or content-scan refusal
+- `blocked by PgBeam migration-safety policy: `: a DDL statement refused by [safe migrations](/docs/safe-migrations)
+- `PgBeam agent session terminated: `: the session was closed because its credential changed
 
 ## Quick reference
 
 | SQLSTATE | Situation | Message |
 | --- | --- | --- |
+| `08004` | TLS not used | `SSL/TLS is required to connect to PgBeam` |
+| `08004` | Invalid hostname | `invalid hostname` |
 | `08004` | Unknown project | `project not found for hostname ...` |
 | `08004` | Organization suspended | `organization suspended — update payment at dash.pgbeam.com` |
+| `08004` | Project suspended | `project suspended: reactivate it at dash.pgbeam.com` |
 | `08004` | IP not allowed | `connection rejected: IP address not in project allowlist` |
 | `08004` | Auth rate limited | `too many connection attempts from your IP; please retry with exponential backoff` |
+| `08004` | Data residency not enforceable | `connection rejected: this project's data-residency setting has not reached this proxy, ...` |
+| `08004` | Data residency violation | `connection rejected: this project requires ... data residency ...` |
+| `08004` | Agent access disabled | `agent access is disabled for this project` |
 | `08006` | Upstream auth failure | Forwarded from upstream |
 | `08006` | Circuit breaker open | `upstream unavailable (circuit breaker open)` |
+| `0A000` | Statement shape not supported under agent policy | `blocked by PgBeam agent policy: ...` |
+| `0A000` | `SET LOCAL` on a PgBeam setting | `SET LOCAL is not supported for parameter ...` |
+| `22023` | Invalid PgBeam setting value | `invalid value for parameter ...: ...` |
+| `25000` | Transaction control in statement pool mode | `transaction control statements are not allowed in statement pool mode` |
+| `25001` | Controlled write inside a transaction | `blocked by PgBeam agent policy: this write is row-capped, approval-gated or dry-run ...` |
+| `25P01` | Controlled write transaction failed | `transaction control failed: ...` |
+| `26000` | Unknown prepared statement (agent) | `blocked by PgBeam agent policy: prepared statement ... is not known to this session; ...` |
+| `28000` | Agent session terminated | `PgBeam agent session terminated: ...` |
+| `28P01` | Agent credential rejected | `password authentication failed for user ...` |
+| `42000` | Controlled write failed upstream | `statement failed: ...` |
+| `42501` | Blocked by agent policy | `blocked by PgBeam agent policy: ...` |
+| `42501` | Blocked by migration safety | `blocked by PgBeam migration-safety policy: ...` |
 | `53300` | Connection limit exceeded | `too many connections for project` |
 | `53400` | Query rate limit exceeded | `query rate limit exceeded` |
+| `53400` | Agent query or egress budget exhausted | `PgBeam agent ... budget ... exhausted; ...` |
+| `53400` | Human approval unavailable or timed out | `blocked by PgBeam agent policy: ...` |
+| `54000` | Too many prepared statements (agent) | `blocked by PgBeam agent policy: this session already holds 1000 prepared statements; ...` |
+| `58000` | Statement timeout policy could not be applied | `PgBeam could not apply this credential's statement timeout policy; connection refused` |
+| `58000` | Unreadable database error withheld by masking | `error withheld by PgBeam agent policy: ...` |
 
 ## `08004`: Connection rejected
 
-SQLSTATE `08004` means PgBeam rejected the connection before it reached the upstream database. The three causes are distinct:
+SQLSTATE `08004` means PgBeam rejected the connection before it reached the upstream database. Each cause has its own message:
+
+### TLS required
+
+```
+FATAL: SSL/TLS is required to connect to PgBeam
+```
+
+**Cause:** The client completed the startup handshake without negotiating TLS. PgBeam accepts encrypted connections only.
+
+**Fix:** Remove `sslmode=disable` from the connection string, or set `sslmode=require`. See [Connection string](/docs/connection-string).
+
+### Invalid hostname
+
+```
+FATAL: invalid hostname
+```
+
+**Cause:** The hostname is under the PgBeam proxy domain, but the subdomain is not a well-formed project identifier. This is usually a typo or a truncated hostname.
+
+**Fix:** Copy the project hostname from the dashboard into the connection string exactly.
 
 ### Project not found
 
@@ -51,6 +100,16 @@ FATAL: organization suspended — update payment at dash.pgbeam.com
 2. Update the payment method or reactivate the subscription
 3. Connections resume immediately after billing is restored
 
+### Project suspended
+
+```
+FATAL: project suspended: reactivate it at dash.pgbeam.com
+```
+
+**Cause:** The project itself is not active, even though the organization is in good standing. A project is suspended or deleted independently of billing.
+
+**Fix:** Open the project in [dash.pgbeam.com](https://dash.pgbeam.com) and reactivate it. If it was deleted, create a new project and update the connection string.
+
 ### IP not allowed
 
 ```
@@ -79,6 +138,36 @@ FATAL: too many connection attempts from your IP; please retry with exponential 
 1. Verify your credentials are correct by connecting directly to the origin database
 2. Retry with exponential backoff, as the message says, rather than in a tight loop
 3. If the issue persists, check for misconfigured clients that are retrying with wrong credentials in a loop
+
+### Data residency not enforceable
+
+```
+FATAL: connection rejected: this project's data-residency setting has not reached this proxy, so it cannot be enforced; retry shortly
+```
+
+**Cause:** The project has a data-residency requirement, but the proxy that received the connection has not yet received it. PgBeam refuses the connection rather than serve it without the check.
+
+**Fix:** Retry after a few seconds. This clears once the project configuration propagates.
+
+### Data residency violation
+
+```
+FATAL: connection rejected: this project requires "<residency>" data residency but is being served from region "<region>", which is outside the allowed jurisdiction; connect from an allowed region
+```
+
+**Cause:** The project restricts processing to one jurisdiction, and the client was routed to a region outside it. Clients are routed to the nearest region, so a client running outside the jurisdiction reaches a region that is not allowed.
+
+**Fix:** Run the client inside the allowed jurisdiction, or change the project's residency setting if the restriction no longer applies.
+
+### Agent access disabled
+
+```
+FATAL: agent access is disabled for this project
+```
+
+**Cause:** An agent credential tried to connect while the project-level [kill-switch](/docs/kill-switch) is engaged.
+
+**Fix:** Release the kill-switch once it is safe to let agents back in. Application connections that do not use agent credentials are unaffected.
 
 ## `08006`: Connection failure
 
@@ -116,6 +205,172 @@ FATAL: upstream unavailable (circuit breaker open)
 
 See [Resilience](/docs/resilience) for details on circuit breaker behavior.
 
+## `0A000`: Not supported
+
+### Statement shape not supported under agent policy
+
+```
+ERROR: blocked by PgBeam agent policy: this statement requires human approval, which is only supported via the simple query protocol (not prepared statements); resubmit it as a simple query
+```
+
+**Cause:** An agent credential's policy needs a control that the statement's shape cannot carry, so PgBeam refuses it rather than run it unchecked. The text after the prefix names the case:
+
+| Message after `blocked by PgBeam agent policy: ` | Control | Fix |
+| --- | --- | --- |
+| `row-filtered tables must be queried with the simple query protocol (not prepared statements)` | [Row-level policies](/docs/row-level-policies) | Send the query as a simple query |
+| `this statement requires human approval, which is only supported via the simple query protocol ...` | [Approvals](/docs/approvals) | Send the statement as a simple query |
+| `this credential enforces a hard affected-row cap, which cannot bound a data-modifying WITH (CTE) statement; ...` | `max_affected_rows` in [Policies](/docs/policies) | Rewrite it as a top-level `INSERT`, `UPDATE` or `DELETE` |
+| `this credential enforces a hard affected-row cap on writes, which requires the simple query protocol ...` | `max_affected_rows` in [Policies](/docs/policies) | Send the write as a simple query |
+| `multi-statement batches are not supported for capped or approval-gated writes; resubmit as a single statement` | `max_affected_rows` or [Approvals](/docs/approvals) | Send one statement per query |
+| `this credential runs writes in rollback (dry-run) mode, which requires the simple query protocol` | [Sandbox writes](/docs/sandbox-writes) | Send the write as a simple query |
+| `<reason>; ask your operator to enable rollback mode for safe dry-run writes instead` | Sandbox mode in [Sandbox writes](/docs/sandbox-writes) | The sandbox branch could not be provisioned. Retry, or switch the credential to rollback mode |
+| `unrecognized write mode for this credential; ask your operator to reconfigure the policy` | [Sandbox writes](/docs/sandbox-writes) | Set the profile's write mode again |
+| `multiple statements in one extended-protocol batch cannot be safely masked; ...` | [Masking](/docs/masking) | Send each statement on its own, or as simple queries |
+| `this query returns masked columns, which requires the result description in the same protocol cycle; ...` | [Masking](/docs/masking) | Send it as a simple query or turn off client-side statement caching |
+| `a statement bound in the same extended-protocol batch as a different parsed statement cannot be safely masked; ...` | [Masking](/docs/masking) | Send each statement in its own batch |
+
+Most drivers and ORMs use prepared statements by default. To send a simple query, use the driver's simple-protocol option (for example `QueryExecModeSimpleProtocol` in pgx, or `preferQueryMode=simple` in JDBC).
+
+### `SET LOCAL` on a PgBeam setting
+
+```
+ERROR: SET LOCAL is not supported for parameter "pgbeam.cache"
+```
+
+**Cause:** PgBeam settings such as `pgbeam.cache` and `pgbeam.debug` are handled by the proxy and cannot be scoped to a transaction.
+
+**Fix:** Use `SET` instead of `SET LOCAL`, and `RESET` the setting when you are done.
+
+## `22023`: Invalid PgBeam setting value
+
+```
+ERROR: invalid value for parameter "pgbeam.debug": "loud"
+```
+
+**Cause:** A `SET pgbeam.*` statement carried a value the setting does not accept.
+
+**Fix:** Use one of the values listed for that setting. See [Caching](/docs/cache) and [Troubleshooting](/docs/troubleshooting#start-with-debug-mode).
+
+## `25000`: Transaction control in statement pool mode
+
+```
+ERROR: transaction control statements are not allowed in statement pool mode
+```
+
+**Cause:** The project uses statement pool mode, which returns the upstream connection after every statement. `BEGIN`, `COMMIT`, `ROLLBACK`, `SAVEPOINT` and similar statements cannot work there.
+
+**Fix:** Switch the project to transaction pool mode if the application needs transactions. See [Connection Pooling](/docs/pooling).
+
+## `25001`: Controlled write inside a transaction
+
+```
+ERROR: blocked by PgBeam agent policy: this write is row-capped, approval-gated or dry-run and cannot run inside an explicit transaction; roll back and resubmit it outside BEGIN/COMMIT
+```
+
+**Cause:** PgBeam runs capped, auto-approved and dry-run writes in a transaction of its own, so it can count the rows and commit or roll back. Inside the client's own transaction that would end the client's transaction early, so PgBeam refuses before touching the database.
+
+**Fix:** Roll back, then send the write on its own, outside `BEGIN` and `COMMIT`. See [Approvals](/docs/approvals) and [Sandbox writes](/docs/sandbox-writes).
+
+## `25P01`: Controlled write transaction failed
+
+```
+ERROR: transaction control failed: <database error>
+```
+
+**Cause:** The `BEGIN`, `COMMIT` or `ROLLBACK` that PgBeam wraps around a capped, approval-gated or dry-run write failed at the database. PgBeam attempted a rollback, so the write did not persist.
+
+**Fix:** Read the database error after the prefix. It is usually a dropped database connection; retry the statement.
+
+## `26000`: Unknown prepared statement
+
+```
+ERROR: blocked by PgBeam agent policy: prepared statement "stmt_1" is not known to this session; prepare it again
+```
+
+**Cause:** An agent session bound a prepared statement that PgBeam never saw prepared on this session, so it cannot check it against the policy.
+
+**Fix:** Prepare the statement again on the same connection before executing it. Clients that cache prepared statements across pooled connections should disable that cache for agent credentials.
+
+## `28000`: Agent session terminated
+
+```
+FATAL: PgBeam agent session terminated: this credential has been revoked
+```
+
+**Cause:** The agent credential changed while the session was open. PgBeam checks the credential before every statement and closes the connection when it no longer holds. The text after the prefix names what changed:
+
+| Message after `PgBeam agent session terminated: ` | What happened |
+| --- | --- |
+| `agent access has been disabled for this project` | The project-level [kill-switch](/docs/kill-switch) was engaged |
+| `this credential has been revoked` | The credential was revoked or replaced |
+| `this credential has been disabled` | The credential was disabled, which is the per-agent [kill-switch](/docs/kill-switch) |
+| `this credential has expired` | The credential reached its expiry time |
+| `this credential's secret has been rotated` | The credential's password was rotated |
+| `the policy profile governing this connection has been removed or unassigned; reconnect to apply the project's current policy` | The policy profile was deleted or unassigned from a non-agent connection it governed |
+
+**Fix:** Expected after a kill-switch, revocation or rotation. Reconnect with a valid credential, or release the kill-switch. See [Agent credentials](/docs/agent-credentials).
+
+## `28P01`: Agent credential rejected
+
+```
+FATAL: password authentication failed for user "agent_reporting"
+```
+
+**Cause:** PgBeam authenticates agent credentials itself, before any upstream connection. This error means the username is not an active agent credential, the credential has expired, or the password or SCRAM proof did not match.
+
+**Fix:**
+
+1. Check that the credential exists and is active with `pgbeam agents show`
+2. If it was rotated, use the new password
+3. Repeated failures count toward the [auth rate limit](#auth-rate-limited)
+
+See [Agent credentials](/docs/agent-credentials) and [SCRAM authentication](/docs/scram-auth).
+
+## `42000`: Controlled write failed
+
+```
+ERROR: statement failed: <database error>
+```
+
+**Cause:** A write that PgBeam ran in its own transaction (row-capped, auto-approved or dry-run) failed at the database. PgBeam rolled the transaction back and reports the database's error after the prefix.
+
+**Fix:** Fix the statement according to the database error. Nothing was committed.
+
+## `42501`: Blocked by policy
+
+### Blocked by agent policy
+
+```
+ERROR: blocked by PgBeam agent policy: <reason>; <hint>
+```
+
+**Cause:** The agent credential's policy refused the statement before it reached the database, or, for content scanning, refused to return its result. The text after the prefix names the rule. The common cases:
+
+| Message after `blocked by PgBeam agent policy: ` | Control |
+| --- | --- |
+| A reason and hint from the policy engine, such as a read-only, allowlist or statement rule | [Policies](/docs/policies), [Read-only](/docs/read-only), [Allowlists](/docs/allowlists) |
+| The same, for a statement that touched a [honeytoken](/docs/honeytokens) | [Honeytokens](/docs/honeytokens) |
+| A reason why a row filter could not be applied safely | [Row-level policies](/docs/row-level-policies) |
+| `this credential may only run its project's pre-approved query templates, and this statement is not one of them` | Query templates in [Policies](/docs/policies) |
+| `this write would affect <n> row(s), exceeding the hard cap of <cap>; the transaction was rolled back and nothing changed. ...` | `max_affected_rows` in [Policies](/docs/policies) |
+| `this write could not be safely counted against the <cap>-row cap and was rolled back; contact your operator` | `max_affected_rows` in [Policies](/docs/policies) |
+| `a human reviewer rejected this statement` (with the reviewer's reason in parentheses when given) | [Approvals](/docs/approvals) |
+| `column "<name>" carries agent-directed content (<technique>, <confidence> confidence); content_scan_mode=block refuses the statement rather than return it` | Content scanning, see [Audit log](/docs/audit-log) |
+
+**Fix:** The message says which rule fired. Change the statement to fit the policy, or ask the operator to change the policy. To check a statement against a policy without running it, use `pgbeam policies dry-eval`.
+
+A content-scan refusal is different from the others: the statement already ran, so a write it made has committed. Only the result was withheld.
+
+### Blocked by migration safety
+
+```
+ERROR: blocked by PgBeam migration-safety policy: <findings>
+```
+
+**Cause:** The credential's policy sets `migration_safety` to `block`, and the DDL statement takes a lock or rewrite that the linter flags. The findings list each issue and how to fix it.
+
+**Fix:** Apply the fix the findings suggest (for example `CREATE INDEX CONCURRENTLY`), or lint the migration first with `pgbeam migrations lint`. See [Safe migrations](/docs/safe-migrations).
+
 ## `53300`: Too many connections
 
 ```
@@ -140,7 +395,7 @@ FATAL: too many connections for project
 ## `53400`: Query rate limit exceeded
 
 ```
-FATAL: query rate limit exceeded
+ERROR: query rate limit exceeded
 ```
 
 **Cause:** The project exceeded its queries-per-second (QPS) limit:
@@ -156,6 +411,77 @@ FATAL: query rate limit exceeded
 1. **Enable caching** for frequently repeated reads. Cached queries do not count against the QPS limit at the upstream. See [Caching](/docs/cache).
 2. **Reduce query frequency.** Batch reads where possible, or add application-level deduplication for concurrent identical queries.
 3. **Upgrade your plan** for a higher QPS allowance.
+
+## `53400`: Agent budget or approval limit
+
+### Agent query budget exhausted
+
+```
+ERROR: PgBeam agent hour query budget exhausted; resets at 2026-10-14T15:00:00Z; ask your operator to raise the limit
+```
+
+**Cause:** The agent credential used up its hourly or daily query budget. Each statement counts once, so a multi-statement batch that does not fit in what is left gets `PgBeam agent <window> query budget exhausted: this batch of <n> statements does not fit in what is left; ...`. When the project accepts budget top-ups, the message ends with where to buy more queries.
+
+**Fix:** Wait for the reset time in the message, raise the budget on the policy profile, or buy a top-up. See [Budgets](/docs/budgets) and [Agent payments](/docs/agent-payments).
+
+### Agent egress budget exhausted
+
+```
+ERROR: PgBeam agent daily egress budget (104857600 bytes) exhausted; resets at next UTC midnight; ask your operator to raise the limit
+```
+
+**Cause:** The agent credential has received more bytes today than its daily egress cap allows. PgBeam refuses further statements before they reach the database.
+
+**Fix:** Wait for the reset at UTC midnight, or raise `egress_bytes_per_day` on the policy profile. See [Budgets](/docs/budgets).
+
+### Human approval unavailable or timed out
+
+```
+ERROR: blocked by PgBeam agent policy: this statement timed out awaiting human approval; resubmit to request approval again
+```
+
+**Cause:** The statement needed [human approval](/docs/approvals) and did not get it. The text after the prefix names the case:
+
+| Message after `blocked by PgBeam agent policy: ` | Fix |
+| --- | --- |
+| `this statement timed out awaiting human approval; resubmit to request approval again` | Resubmit, and approve it within the approval timeout |
+| `this statement requires human approval, which is currently unavailable` | Retry shortly |
+| `approval request failed: <error>` | Retry shortly |
+| `the statement was approved but the database connection was lost while waiting; resubmit the statement` | Resubmit on a new connection |
+
+A rejected statement returns `42501`, not `53400`. See [Blocked by agent policy](#blocked-by-agent-policy).
+
+## `54000`: Too many prepared statements
+
+```
+ERROR: blocked by PgBeam agent policy: this session already holds 1000 prepared statements; close unused ones before preparing more
+```
+
+**Cause:** An agent session reached the limit of 1000 prepared statements PgBeam tracks per session.
+
+**Fix:** Deallocate prepared statements the client no longer needs, or lower the driver's statement cache size.
+
+## `58000`: System error
+
+### Statement timeout policy could not be applied
+
+```
+FATAL: PgBeam could not apply this credential's statement timeout policy; connection refused
+```
+
+**Cause:** The agent credential's policy sets a statement timeout, and PgBeam could not apply it to the database connection. PgBeam refuses the session rather than let the agent run without the cap.
+
+**Fix:** Retry the connection. If it keeps failing, check that the origin database is healthy and accepts `SET statement_timeout`. See [Query timeout](/docs/query-timeout).
+
+### Database error withheld by masking
+
+```
+ERROR: error withheld by PgBeam agent policy: the statement referenced a masked column and the database error text could disclose a masked value; the SQLSTATE is preserved
+```
+
+**Cause:** A statement on a credential with [masking](/docs/masking) failed at the database, and the database's error text could echo a masked value. PgBeam replaces the message and drops the detail, hint and context fields. The SQLSTATE is usually the database's own; `58000` appears only when the database error could not be read at all.
+
+**Fix:** Use the SQLSTATE to find the cause, or reproduce the statement with a credential that does not mask the column.
 
 ## Handling errors in application code
 
@@ -229,3 +555,4 @@ Most PostgreSQL drivers expose the SQLSTATE code programmatically. Use it to dis
 - [Troubleshooting](/docs/troubleshooting): Step-by-step debug workflows for common failures
 - [Resilience](/docs/resilience): Circuit breaker states, scale-to-zero, and recovery behavior
 - [Plans & Limits](/docs/plans): Connection, QPS, and query quotas per plan tier
+- [Policies](/docs/policies): The agent policy controls behind the `42501`, `0A000` and `53400` refusals
