@@ -25,7 +25,7 @@ Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi` pack
 
 ### Configure credentials
 
-Set your PgBeam API key via Pulumi config or environment variable:
+Set your PgBeam API key as a secret in Pulumi config, or through the environment:
 
 <Tabs items={["Pulumi config", "Environment variable", "Programmatic"]}>
 <Tab value="Pulumi config">
@@ -41,10 +41,15 @@ PGBEAM_API_KEY=pgb_your_api_key
 <Tab value="Programmatic">
 ```ts title="index.ts"
 import * as pgbeam from "@pgbeam/pulumi";
+import * as pulumi from "@pulumi/pulumi";
 
-pgbeam.configure({ apiKey: "pgb_your_api_key" });
+const config = new pulumi.Config();
+
+pgbeam.configure({ apiKey: config.requireSecret("pgbeamApiKey") });
 
 ````
+
+Pass `configure()` a secret, never a string literal: a literal key ends up in your program source.
 </Tab>
 </Tabs>
 
