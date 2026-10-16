@@ -5,7 +5,7 @@ description: Export agent audit logs as CSV
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Stream the linked project's agent audit entries as a CSV file, newest first, honoring the same credential, event, decision, source, and date-range filters as `audit list`. The full filtered set is streamed (no pagination), suitable for spreadsheets, SIEM ingestion, and compliance archives. Writes to stdout by default, or to a file with `--output`. The API emits CSV only; the wire/mcp/rest/control-formatted views are selected with `--source`, not a separate output format.
+Export the linked project's agent audit entries as CSV, newest first, honoring the same credential, event, decision, source, and date-range filters as `audit list`. The full filtered set comes back in one response (no pagination), suitable for spreadsheets, SIEM ingestion, and compliance archives. Writes to stdout by default, or with `--output` to a file readable only by you (mode 0600), replaced in one step so an interrupted export never leaves a partial file. The API emits CSV only; the wire/mcp/rest/control-formatted views are selected with `--source`, not a separate output format.
 
 ## Usage
 
