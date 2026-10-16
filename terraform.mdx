@@ -393,7 +393,7 @@ resource "pgbeam_approval_rule" "example" {
 | Setting | Source | Description |
 | --- | --- | --- |
 | `api_key` | Provider block | API key (sensitive, recommended: use a variable) |
-| `base_url` | Provider block | API base URL (default: `https://api.pgbeam.com`) |
+| `base_url` | Provider block | API base URL (default: `https://api.pgbeam.com`). Must use `https`; `http` is accepted only for `localhost`, `127.0.0.1` and `::1` |
 | `PGBEAM_API_KEY` | Environment | Fallback API key |
 | `PGBEAM_API_URL` | Environment | Fallback base URL |
 
