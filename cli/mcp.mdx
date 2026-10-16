@@ -108,7 +108,7 @@ Content-Type: application/json
 Accept: application/json, text/event-stream
 ```
 
-The remote endpoint follows the [MCP Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports) (spec version 2025-03-26). Use it when the CLI isn't available or you need server-to-server integration.
+The remote endpoint follows the [MCP Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports) in stateless mode, and the protocol version is negotiated at `initialize`. Use it when the CLI isn't available or you need server-to-server integration.
 
 <Tabs items={["Claude Code", "Cursor", "Generic MCP"]}>
   <Tab value="Claude Code">
@@ -215,7 +215,7 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
     "params": {
       "name": "call_endpoint",
       "arguments": {
-        "operation_id": "listProjects",
+        "operation_id": "ListProjects",
         "query_params": { "org_id": "org_abc123" }
       }
     }

@@ -4,7 +4,7 @@ description: Remote MCP endpoint for AI agent integration.
 icon: Bot
 ---
 
-`POST /v1/mcp` is a remote [Model Context Protocol](https://modelcontextprotocol.io) server using the Streamable HTTP transport. It lets AI assistants manage PgBeam resources (projects, databases, policies, agent credentials) through three meta-tools rather than one tool per endpoint.
+`POST /v1/mcp` is a remote [Model Context Protocol](https://modelcontextprotocol.io) server using the Streamable HTTP transport. It lets AI assistants manage PgBeam resources (projects, databases, policies, agent credentials) through three meta-tools rather than one tool per endpoint, plus three read-only tools that serve PgBeam's agent skills.
 
 See the [MCP command docs](/docs/cli/mcp) for full setup instructions covering both the CLI (stdio) and remote (HTTP) transports.
 
@@ -40,7 +40,8 @@ curl -X POST https://api.pgbeam.com/v1/mcp \
 
 | Property | Value |
 | --- | --- |
-| Transport | Streamable HTTP (MCP spec 2025-03-26) |
+| Transport | Streamable HTTP, stateless (no session id) |
+| Protocol version | Negotiated at `initialize` |
 | Wire format | JSON-RPC 2.0 |
 | Auth | `Authorization: Bearer <token>` |
 | Methods | `initialize`, `notifications/initialized`, `tools/list`, `tools/call`, `ping` |
@@ -51,7 +52,7 @@ The MCP endpoint uses the same authentication as the REST API. Pass a bearer tok
 
 ## Tools
 
-`tools/list` returns three meta-tools that wrap the whole API. This keeps the agent's context small — it discovers operations on demand instead of loading a schema for every endpoint up front.
+`tools/list` returns six tools. Three meta-tools wrap the whole API. This keeps the agent's context small — it discovers operations on demand instead of loading a schema for every endpoint up front.
 
 | Tool | Purpose |
 | --- | --- |
@@ -59,4 +60,6 @@ The MCP endpoint uses the same authentication as the REST API. Pass a bearer tok
 | `describe_endpoint` | Full schema for one operation (`operation_id`): parameters and request body. |
 | `call_endpoint` | Invoke an operation: `operation_id`, plus `path_params`, `query_params`, and `body` as needed. |
 
-The operation ids and shapes mirror the [OpenAPI spec](/docs/api). A typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`.
+The operations and their shapes mirror the [OpenAPI spec](/docs/api), with ids spelled the way `search_endpoints` returns them: `ListProjects` for the spec's `listProjects`. A typical flow is `search_endpoints` → `describe_endpoint` → `call_endpoint`. Operations are not tools themselves: to list projects, call `call_endpoint` with `operation_id: "ListProjects"` and `query_params: { "org_id": "..." }`.
+
+The other three tools are read-only and serve the installable agent skills: `list_skills` lists them, `get_skill` returns one skill's instructions by `name`, and `install_skill` returns its content plus the path to write it to.

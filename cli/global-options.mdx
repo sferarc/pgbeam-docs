@@ -37,9 +37,12 @@ With `--json`, errors are machine-readable too: instead of human-formatted conso
 
 | Variable | Description |
 | --- | --- |
-| `PGBEAM_API_KEY` | Use an API key directly (skips profile lookup). Canonical; `PGBEAM_TOKEN` and `PGBEAM_API_TOKEN` are accepted as aliases. |
+| `PGBEAM_API_KEY` | Use an API key instead of the stored profile's token. The organization still comes from `--org` or the active profile, so pass `--org` when the key belongs to a different organization. Canonical; `PGBEAM_TOKEN` and `PGBEAM_API_TOKEN` are accepted as aliases. |
 | `PGBEAM_PROFILE` | Select a named profile without `--profile` |
+| `PGBEAM_API_URL` | Override the API base URL (defaults to `https://api.pgbeam.com`) |
 | `PGBEAM_NO_UPDATE_CHECK` | Disable automatic update checks |
+
+`pgbeam auth status` shows which organization commands target and where it came from, and warns when a `--token` or `PGBEAM_API_KEY` credential is paired with an organization from a stored profile.
 
 ## Raw API access
 
