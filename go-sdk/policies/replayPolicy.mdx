@@ -10,9 +10,7 @@ Replays the project's recorded agent audit traffic against a candidate policy (e
 ## Usage
 
 ```go
-result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayInput{
-
-  })
+result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayInput{})
 ```
 
 ## Parameters
@@ -21,14 +19,14 @@ result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayI
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.PolicyReplayInput` | Yes | Request body |
-| req.PolicyID | `*string` | No | ID of an existing saved policy profile to replay against. |
-| req.Policy | `*pgbeam.PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
-| req.CredentialID | `*string` | No | Restrict the replay to traffic recorded for one agent credential. |
-| req.BoundPolicyID | `*string` | No | Restrict the replay to traffic recorded for the agent credentials currently bound to this policy profile. Use it to preview a change to a live policy against the traffic that policy actually governs: without it the replay covers every credential in the project, including credentials bound to other profiles, whose behaviour saving this candidate cannot change. Mutually exclusive with credential_id. |
-| req.StartTs | `*string` | No | Start of the traffic window (inclusive). Defaults to 7 days before end_ts. |
-| req.EndTs | `*string` | No | End of the traffic window (exclusive). Defaults to now. |
-| req.Limit | `*int` | No | Maximum number of distinct queries to replay, newest first. Traffic is deduplicated by normalized query hash before evaluation. |
+| body | `pgbeam.PolicyReplayInput` | Yes | Request body |
+| body.PolicyId | `*string` | No | ID of an existing saved policy profile to replay against. |
+| body.Policy | `*pgbeam.PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
+| body.CredentialId | `*string` | No | Restrict the replay to traffic recorded for one agent credential. |
+| body.BoundPolicyId | `*string` | No | Restrict the replay to traffic recorded for the agent credentials currently bound to this policy profile. Use it to preview a change to a live policy against the traffic that policy actually governs: without it the replay covers every credential in the project, including credentials bound to other profiles, whose behaviour saving this candidate cannot change. Mutually exclusive with credential_id. |
+| body.StartTs | `*time.Time` | No | Start of the traffic window (inclusive). Defaults to 7 days before end_ts. |
+| body.EndTs | `*time.Time` | No | End of the traffic window (exclusive). Defaults to now. |
+| body.Limit | `*int` | No | Maximum number of distinct queries to replay, newest first. Traffic is deduplicated by normalized query hash before evaluation. |
 
 ## Response
 
@@ -40,16 +38,18 @@ result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayI
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+policyId := "pol_01h455vb4pex5vsknk084sn02q"
+credentialId := "cred_01h455vb4pex5vsknk084sn02q"
+boundPolicyId := "pol_01h455vb4pex5vsknk084sn02q"
+limit := 200
 result, err := client.Policies.ReplayPolicy(ctx, "prj_xxx", pgbeam.PolicyReplayInput{
-    PolicyID: "pol_01h455vb4pex5vsknk084sn02q",
-    Policy: pgbeam.PolicyProfileInput{ /* ... */ },
-    CredentialID: "cred_01h455vb4pex5vsknk084sn02q",
-    BoundPolicyID: "pol_01h455vb4pex5vsknk084sn02q",
-    StartTs: "...",
-    EndTs: "...",
+    PolicyId: &policyId,
+    CredentialId: &credentialId,
+    BoundPolicyId: &boundPolicyId,
+    Limit: &limit,
   })
 if err != nil {
   log.Fatal(err)

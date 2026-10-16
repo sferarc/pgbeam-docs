@@ -22,10 +22,10 @@ result, err := client.Projects.CreateReplica(ctx, "db_xxx", pgbeam.CreateReplica
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | databaseID | `string` | Yes | Unique database identifier (prefixed, e.g. db_xxx). |
-| req | `pgbeam.CreateReplicaRequest` | Yes | Request body |
-| req.Host | `string` | Yes | PostgreSQL replica host. |
-| req.Port | `int` | Yes | PostgreSQL replica port. |
-| req.SSLMode | `*pgbeam.SSLMode` | No | PostgreSQL SSL connection mode. |
+| body | `pgbeam.CreateReplicaRequest` | Yes | Request body |
+| body.Host | `string` | Yes | PostgreSQL replica host. |
+| body.Port | `int` | Yes | PostgreSQL replica port. |
+| body.SslMode | `*pgbeam.SSLMode` | No | PostgreSQL SSL connection mode. |
 
 ## Response
 
@@ -37,13 +37,12 @@ result, err := client.Projects.CreateReplica(ctx, "db_xxx", pgbeam.CreateReplica
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Projects.CreateReplica(ctx, "db_xxx", pgbeam.CreateReplicaRequest{
     Host: "replica.us-west-2.rds.amazonaws.com",
     Port: 5432,
-    SSLMode: pgbeam.SSLMode{ /* ... */ },
   })
 if err != nil {
   log.Fatal(err)

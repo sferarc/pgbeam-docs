@@ -19,9 +19,10 @@ result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", nil)
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectMetricsParams` | No | Query parameters |
-| params.Limit | `int` | No | Maximum number of recent snapshots to return. |
-| params.Region | `string` | No | Filter metrics by region code. |
+| params | `*pgbeam.GetProjectMetricsParams` | No | Query and header parameters |
+| params.Limit | `*int` | No | Maximum number of recent snapshots to return. |
+| params.Region | `*string` | No | Filter metrics by region code. |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -33,12 +34,14 @@ result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", nil)
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+limit := 60
+region := "us-east-1"
 result, err := client.Projects.GetProjectMetrics(ctx, "prj_xxx", &pgbeam.GetProjectMetricsParams{
-    Limit: 20,
-    Region: "us-east-1",
+    Limit: &limit,
+    Region: &region,
   })
 if err != nil {
   log.Fatal(err)

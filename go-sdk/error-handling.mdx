@@ -3,21 +3,22 @@ title: Error Handling
 description: Catch and inspect API errors, configure retries, and use idempotency keys in the PgBeam Go SDK.
 ---
 
-All methods return an `error` on failure. Use `pgbeam.IsNotFound()` to check for 404 responses, and `errors.As` to extract detailed status information from `*pgbeam.APIError`.
+All methods return an `error` on failure. An error from the API is a `*pgbeam.APIError`. Use `pgbeam.HasCode` to branch on the condition, and `errors.As` to read the rest of the problem document.
 
 ```go
 import pgbeam "go.pgbeam.com/sdk"
 
 project, err := client.Projects.GetProject(ctx, "prj_missing")
 if err != nil {
-    if pgbeam.IsNotFound(err) {
+    if pgbeam.HasCode(err, "NOT_FOUND") {
         fmt.Println("Project not found")
         return
     }
 
     var apiErr *pgbeam.APIError
     if errors.As(err, &apiErr) {
-        fmt.Printf("API error %d: %s\n", apiErr.StatusCode, apiErr.Error())
+        fmt.Printf("API error %d [%s]: %s (request %s)\n",
+            apiErr.StatusCode, apiErr.Code, apiErr.Detail, apiErr.RequestID)
         return
     }
 
@@ -27,15 +28,51 @@ if err != nil {
 
 ## APIError properties
 
-| Property     | Type     | Description       |
-| ------------ | -------- | ----------------- |
-| `StatusCode` | `int`    | HTTP status code  |
-| `Status`     | `string` | HTTP status text  |
-| `Body`       | `string` | Raw response body |
+Every error the API returns is an [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457.html) problem document, and `APIError` parses its fields out so you do not have to unmarshal `Body`. A body that is not a problem document leaves those fields empty; `StatusCode`, `Status` and `Body` are always set.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `StatusCode` | `int` | HTTP status code |
+| `Status` | `string` | HTTP status text |
+| `Body` | `string` | Raw response body |
+| `Code` | `string` | Stable identity of the condition, e.g. `PLAN_LIMIT_REACHED` |
+| `Type` | `string` | The same identity as a URI, resolving to the error catalog |
+| `Title` | `string` | Short summary of the condition |
+| `Detail` | `string` | Explanation of this occurrence |
+| `Instance` | `string` | Path of the request that produced the error |
+| `RequestID` | `string` | Correlation id, also in the `X-Request-Id` header. Quote it when reporting a problem |
+| `Errors` | `[]pgbeam.FieldError` | Field-level detail when the request failed validation. Each entry has `Field` (dotted path in the request body) and `Detail` |
+
+`apiErr.Error()` returns a one-line summary with the status, the code and the detail.
+
+## Branch on `Code`, not on the message
+
+`Code` is stable across wording changes and separates conditions that share a status. A `403` is either a permissions problem or a billing one, and those are resolved in different ways. `pgbeam.HasCode(err, code)` reports whether `err` is an `APIError` with that code. It uses `errors.As`, so it works on a wrapped error too.
+
+```go
+_, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{ /* ... */ })
+switch {
+case err == nil:
+    // Created
+case pgbeam.HasCode(err, "PLAN_LIMIT_REACHED"):
+    promptUpgrade(err)
+case pgbeam.HasCode(err, "FORBIDDEN"):
+    askAnAdminForAccess()
+case pgbeam.HasCode(err, "INVALID_INPUT"):
+    var apiErr *pgbeam.APIError
+    if errors.As(err, &apiErr) {
+        for _, f := range apiErr.Errors {
+            markField(f.Field, f.Detail)
+        }
+    }
+default:
+    log.Fatal(err)
+}
+```
 
 ## IsNotFound helper
 
-`pgbeam.IsNotFound(err)` returns `true` if the underlying error is a 404 response. It uses `errors.As` internally, so it works even when the error is wrapped with `fmt.Errorf("...: %w", err)`.
+`pgbeam.IsNotFound(err)` returns `true` if the underlying error is a 404 response. Like `HasCode`, it uses `errors.As`, so it works even when the error is wrapped with `fmt.Errorf("...: %w", err)`.
 
 ```go
 _, err := client.Projects.GetProject(ctx, "prj_missing")
@@ -44,7 +81,7 @@ if pgbeam.IsNotFound(err) {
 }
 ```
 
-See [Response Conventions](/docs/api/response-conventions) for the full list of error codes and the error envelope format.
+See the [error catalog](/docs/api/errors) for every code the API can return, and [Response Conventions](/docs/api/response-conventions) for the error envelope format.
 
 ## Retries
 
@@ -64,7 +101,7 @@ See [Response Conventions](/docs/api/response-conventions#retries) for the backo
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-    APIKey: "your-api-key",
+    APIKey: "pbu_your_api_key",
     Retry: &pgbeam.RetryConfig{
         MaxRetries:   5,                       // default: 5 (0 to disable)
         InitialDelay: 500 * time.Millisecond,  // default: 500ms
@@ -90,7 +127,7 @@ A `RetryConfig` you pass is used as given: fields you leave out are zero, not th
 
 ```go
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-    APIKey: "your-api-key",
+    APIKey: "pbu_your_api_key",
     Retry:  &pgbeam.RetryConfig{MaxRetries: 0},
 })
 ```

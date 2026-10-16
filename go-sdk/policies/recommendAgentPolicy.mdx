@@ -10,9 +10,7 @@ Derives the tightest policy that would still pass every statement this agent cre
 ## Usage
 
 ```go
-result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", pgbeam.PolicyRecommendationInput{
-
-  })
+result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", pgbeam.PolicyRecommendationInput{})
 ```
 
 ## Parameters
@@ -22,9 +20,9 @@ result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", p
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | agentID | `string` | Yes | Unique agent credential identifier (prefixed, e.g. agt_xxx). |
-| req | `pgbeam.PolicyRecommendationInput` | Yes | Request body |
-| req.LookbackDays | `*int` | No | How many days of recorded audit history to analyze. |
-| req.Limit | `*int` | No | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
+| body | `pgbeam.PolicyRecommendationInput` | Yes | Request body |
+| body.LookbackDays | `*int` | No | How many days of recorded audit history to analyze. |
+| body.Limit | `*int` | No | Maximum number of distinct query shapes to analyze and replay, newest first. Traffic is deduplicated by normalized query hash. |
 
 ## Response
 
@@ -36,12 +34,14 @@ result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", p
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+lookbackDays := 30
+limit := 200
 result, err := client.Policies.RecommendAgentPolicy(ctx, "prj_xxx", "agt_xxx", pgbeam.PolicyRecommendationInput{
-    LookbackDays: 30,
-    Limit: 200,
+    LookbackDays: &lookbackDays,
+    Limit: &limit,
   })
 if err != nil {
   log.Fatal(err)

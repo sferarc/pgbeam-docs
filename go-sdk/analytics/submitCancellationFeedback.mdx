@@ -10,9 +10,7 @@ Records optional feedback when a user cancels their subscription.
 ## Usage
 
 ```go
-err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", pgbeam.CancellationFeedbackRequest{
-
-  })
+err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", pgbeam.CancellationFeedbackRequest{})
 ```
 
 ## Parameters
@@ -21,9 +19,9 @@ err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", pgbeam.Can
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | orgID | `string` | Yes | Unique organization identifier. |
-| req | `pgbeam.CancellationFeedbackRequest` | Yes | Request body |
-| req.Reason | `*string` | No | Predefined cancellation reason. |
-| req.Feedback | `*string` | No | Free-text feedback from the user. |
+| body | `pgbeam.CancellationFeedbackRequest` | Yes | Request body |
+| body.Reason | `*string` | No | Predefined cancellation reason. |
+| body.Feedback | `*string` | No | Free-text feedback from the user. |
 
 ## Response
 
@@ -35,12 +33,14 @@ err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", pgbeam.Can
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+reason := "too-expensive"
+feedback := "Switching to a self-hosted solution."
 err := client.Analytics.SubmitCancellationFeedback(ctx, "org_abc123", pgbeam.CancellationFeedbackRequest{
-    Reason: "too-expensive",
-    Feedback: "Switching to a self-hosted solution.",
+    Reason: &reason,
+    Feedback: &feedback,
   })
 if err != nil {
   log.Fatal(err)

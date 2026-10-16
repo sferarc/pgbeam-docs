@@ -10,9 +10,7 @@ Updates the status of a support case (close or reopen).
 ## Usage
 
 ```go
-result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgbeam.UpdateSupportCaseRequest{
-
-  })
+result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgbeam.UpdateSupportCaseRequest{})
 ```
 
 ## Parameters
@@ -22,8 +20,8 @@ result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgb
 | ctx | `context.Context` | Yes | Request context |
 | orgID | `string` | Yes | Unique organization identifier. |
 | caseID | `string` | Yes | Unique support case identifier (prefixed, e.g. sc_xxx). |
-| req | `pgbeam.UpdateSupportCaseRequest` | Yes | Request body |
-| req.Status | `*pgbeam.SupportCaseStatus` | No | Current status of the support case. |
+| body | `pgbeam.UpdateSupportCaseRequest` | Yes | Request body |
+| body.Status | `*pgbeam.SupportCaseStatus` | No | Current status of the support case. |
 
 ## Response
 
@@ -35,12 +33,10 @@ result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgb
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
-result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgbeam.UpdateSupportCaseRequest{
-    Status: pgbeam.SupportCaseStatus{ /* ... */ },
-  })
+result, err := client.Support.UpdateSupportCase(ctx, "org_abc123", "sc_xxx", pgbeam.UpdateSupportCaseRequest{})
 if err != nil {
   log.Fatal(err)
 }

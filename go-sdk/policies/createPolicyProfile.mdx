@@ -21,27 +21,27 @@ result, err := client.Policies.CreatePolicyProfile(ctx, "prj_xxx", pgbeam.Policy
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.PolicyProfileInput` | Yes | Request body |
-| req.Name | `string` | Yes | Human-readable name for the policy profile. |
-| req.AccessMode | `*string` | No | read_only blocks all data and schema mutations. |
-| req.StatementRules | `*pgbeam.StatementRules` | No | Per-statement-kind allow/deny lists. Empty allow means all kinds permitted by the access mode. |
-| req.TableAllowlist | `*[]string` | No | If non-empty, only these relations are reachable. A bare entry grants the public schema only; list another schema in full, as in billing.orders. |
-| req.TableDenylist | `*[]string` | No | Relations explicitly blocked. A bare entry blocks that relation in every schema. |
-| req.MaskingRules | `*[]pgbeam.MaskingRule` | No | Column masking rules applied to query results. |
-| req.BudgetQueriesPerHour | `*int` | No | Max queries per rolling hour window. 0 means unlimited. |
-| req.BudgetQueriesPerDay | `*int` | No | Max queries per day window. 0 means unlimited. |
-| req.MaxRows | `*int` | No | Max rows returned per query. 0 means unlimited. |
-| req.StatementTimeoutMs | `*int` | No | Upstream statement timeout for agent sessions. 0 uses the project default. |
-| req.RowFilters | `*[]pgbeam.RowFilter` | No | Per-relation row filters ANDed into agent reads. |
-| req.WriteMode | `*string` | No | How writes are handled. normal commits, rollback auto-rolls back, sandbox routes to an ephemeral branch. |
-| req.ApprovalMode | `*string` | No | Which statement classes require human approval before execution. |
-| req.ApprovalAutoMaxRows | `*int` | No | Statements touching at most this many rows are auto-approved. 0 means none. |
-| req.ApprovalTimeoutSeconds | `*int` | No | How long a held statement waits for a decision before expiring. |
-| req.MigrationSafety | `*string` | No | Migration safety mode. warn surfaces findings, block refuses unsafe DDL. |
-| req.EgressBytesPerDay | `*int` | No | Per-day egress budget in bytes. 0 means unlimited. |
-| req.MaxAffectedRows | `*int` | No | Hard cap on rows a single write (INSERT/UPDATE/DELETE) may affect. A write whose affected-row count would exceed this is executed inside a transaction, checked, and rolled back so nothing persists, then blocked. Enforced independently of human approval. 0 means unlimited. |
-| req.ContentScanMode | `*string` | No | Result-content scanning, enforced on the data-plane relay path: values on their way out to an agent are checked for instruction-shaped content (stored prompt injection). off scans nothing and costs nothing. annotate scans and forwards every value unchanged, recording what it found. block scans the same way and refuses instead: a value the structural detectors report at high confidence withholds that row and the rest of the exchange, and the statement's completion is replaced with an error (SQLSTATE 42501) naming the column, so a withheld result reads as a failed statement rather than a short one. Rows the scan had already cleared stay delivered, because this is a streaming protocol; what block guarantees is that no value carrying such a finding is ever sent to the agent. A lower-confidence finding never refuses, under any mode. No mode rewrites a value or withholds a row without saying so. A flagged statement records one content_flagged audit entry naming the columns, the techniques and whether the scan covered the whole result, alongside the proxy's own metrics and logs; the entry carries no value from the row itself, and it is delivered to any endpoint subscribed to the content_flagged webhook event, at either confidence, with decision_rule telling them apart. A finding the structural detectors report at high confidence also raises an anomaly alert, at most one per credential per hour; lower-confidence findings stay in the audit trail and the webhook stream. Values the scan cannot read (binary-format columns, columns this profile masks, and anything past content_scan_max_bytes) are counted as unscanned rather than reported clean. A proxy build older than result-content scanning ignores this field. |
-| req.ContentScanMaxBytes | `*int` | No | Byte budget for one statement's content scan, spanning all values in the result. Values past it are reported unscannable rather than skipped quietly. The budget covers a whole statement, so the statements of one simple-query batch share it rather than each getting a fresh allowance. 0 uses the scanner default (4 MiB), which covers an interactive result set and deliberately does not cover a bulk export. |
+| body | `pgbeam.PolicyProfileInput` | Yes | Request body |
+| body.Name | `string` | Yes | Human-readable name for the policy profile. |
+| body.AccessMode | `*pgbeam.PolicyProfileInputAccessMode` | No | read_only blocks all data and schema mutations. |
+| body.StatementRules | `*pgbeam.StatementRules` | No | Per-statement-kind allow/deny lists. Empty allow means all kinds permitted by the access mode. |
+| body.TableAllowlist | `*[]string` | No | If non-empty, only these relations are reachable. A bare entry grants the public schema only; list another schema in full, as in billing.orders. |
+| body.TableDenylist | `*[]string` | No | Relations explicitly blocked. A bare entry blocks that relation in every schema. |
+| body.MaskingRules | `*[]pgbeam.MaskingRule` | No | Column masking rules applied to query results. |
+| body.BudgetQueriesPerHour | `*int` | No | Max queries per rolling hour window. 0 means unlimited. |
+| body.BudgetQueriesPerDay | `*int` | No | Max queries per day window. 0 means unlimited. |
+| body.MaxRows | `*int` | No | Max rows returned per query. 0 means unlimited. |
+| body.StatementTimeoutMs | `*int` | No | Upstream statement timeout for agent sessions. 0 uses the project default. |
+| body.RowFilters | `*[]pgbeam.RowFilter` | No | Per-relation row filters ANDed into agent reads. |
+| body.WriteMode | `*pgbeam.PolicyProfileInputWriteMode` | No | How writes are handled. normal commits, rollback auto-rolls back, sandbox routes to an ephemeral branch. |
+| body.ApprovalMode | `*pgbeam.PolicyProfileInputApprovalMode` | No | Which statement classes require human approval before execution. |
+| body.ApprovalAutoMaxRows | `*int` | No | Statements touching at most this many rows are auto-approved. 0 means none. |
+| body.ApprovalTimeoutSeconds | `*int` | No | How long a held statement waits for a decision before expiring. |
+| body.MigrationSafety | `*pgbeam.PolicyProfileInputMigrationSafety` | No | Migration safety mode. warn surfaces findings, block refuses unsafe DDL. |
+| body.EgressBytesPerDay | `*int64` | No | Per-day egress budget in bytes. 0 means unlimited. |
+| body.MaxAffectedRows | `*int` | No | Hard cap on rows a single write (INSERT/UPDATE/DELETE) may affect. A write whose affected-row count would exceed this is executed inside a transaction, checked, and rolled back so nothing persists, then blocked. Enforced independently of human approval. 0 means unlimited. |
+| body.ContentScanMode | `*pgbeam.PolicyProfileInputContentScanMode` | No | Result-content scanning, enforced on the data-plane relay path: values on their way out to an agent are checked for instruction-shaped content (stored prompt injection). off scans nothing and costs nothing. annotate scans and forwards every value unchanged, recording what it found. block scans the same way and refuses instead: a value the structural detectors report at high confidence withholds that row and the rest of the exchange, and the statement's completion is replaced with an error (SQLSTATE 42501) naming the column, so a withheld result reads as a failed statement rather than a short one. Rows the scan had already cleared stay delivered, because this is a streaming protocol; what block guarantees is that no value carrying such a finding is ever sent to the agent. A lower-confidence finding never refuses, under any mode. No mode rewrites a value or withholds a row without saying so. A flagged statement records one content_flagged audit entry naming the columns, the techniques and whether the scan covered the whole result, alongside the proxy's own metrics and logs; the entry carries no value from the row itself, and it is delivered to any endpoint subscribed to the content_flagged webhook event, at either confidence, with decision_rule telling them apart. A finding the structural detectors report at high confidence also raises an anomaly alert, at most one per credential per hour; lower-confidence findings stay in the audit trail and the webhook stream. Values the scan cannot read (binary-format columns, columns this profile masks, and anything past content_scan_max_bytes) are counted as unscanned rather than reported clean. A proxy build older than result-content scanning ignores this field. |
+| body.ContentScanMaxBytes | `*int64` | No | Byte budget for one statement's content scan, spanning all values in the result. Values past it are reported unscannable rather than skipped quietly. The budget covers a whole statement, so the statements of one simple-query batch share it rather than each getting a fresh allowance. 0 uses the scanner default (4 MiB), which covers an interactive result set and deliberately does not cover a bulk export. |
 
 ## Response
 
@@ -53,16 +53,21 @@ result, err := client.Policies.CreatePolicyProfile(ctx, "prj_xxx", pgbeam.Policy
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+accessMode := pgbeam.PolicyProfileInputAccessMode("read_only")
+budgetQueriesPerHour := 0
+budgetQueriesPerDay := 0
+maxRows := 0
+statementTimeoutMs := 0
 result, err := client.Policies.CreatePolicyProfile(ctx, "prj_xxx", pgbeam.PolicyProfileInput{
     Name: "...",
-    AccessMode: "read_only",
-    StatementRules: pgbeam.StatementRules{ /* ... */ },
-    TableAllowlist: nil,
-    TableDenylist: nil,
-    MaskingRules: nil,
+    AccessMode: &accessMode,
+    BudgetQueriesPerHour: &budgetQueriesPerHour,
+    BudgetQueriesPerDay: &budgetQueriesPerDay,
+    MaxRows: &maxRows,
+    StatementTimeoutMs: &statementTimeoutMs,
   })
 if err != nil {
   log.Fatal(err)

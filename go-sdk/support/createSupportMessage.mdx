@@ -22,8 +22,8 @@ result, err := client.Support.CreateSupportMessage(ctx, "org_abc123", "sc_xxx", 
 | ctx | `context.Context` | Yes | Request context |
 | orgID | `string` | Yes | Unique organization identifier. |
 | caseID | `string` | Yes | Unique support case identifier (prefixed, e.g. sc_xxx). |
-| req | `pgbeam.CreateSupportMessageRequest` | Yes | Request body |
-| req.Body | `string` | Yes | Message content. |
+| body | `pgbeam.CreateSupportMessageRequest` | Yes | Request body |
+| body.Body | `string` | Yes | Message content. |
 
 ## Response
 
@@ -35,7 +35,7 @@ result, err := client.Support.CreateSupportMessage(ctx, "org_abc123", "sc_xxx", 
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Support.CreateSupportMessage(ctx, "org_abc123", "sc_xxx", pgbeam.CreateSupportMessageRequest{

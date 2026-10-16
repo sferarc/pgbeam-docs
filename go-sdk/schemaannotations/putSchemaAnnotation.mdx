@@ -22,11 +22,11 @@ result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbe
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.SchemaAnnotationInput` | Yes | Request body |
-| req.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified form. |
-| req.TableName | `string` | Yes | Relation (table or view) the annotation describes. |
-| req.ColumnName | `*string` | No | Optional column. Null describes the table itself. |
-| req.Description | `string` | Yes | The operator-written description text. |
+| body | `pgbeam.SchemaAnnotationInput` | Yes | Request body |
+| body.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified form. |
+| body.TableName | `string` | Yes | Relation (table or view) the annotation describes. |
+| body.ColumnName | `*string` | No | Optional column. Null describes the table itself. |
+| body.Description | `string` | Yes | The operator-written description text. |
 
 ## Response
 
@@ -38,14 +38,16 @@ result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbe
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+schemaName := "public"
+columnName := "email"
 result, err := client.Schemaannotations.PutSchemaAnnotation(ctx, "prj_xxx", pgbeam.SchemaAnnotationInput{
-    SchemaName: "public",
     TableName: "users",
-    ColumnName: "email",
     Description: "Primary customer account. One row per signed-up user.",
+    SchemaName: &schemaName,
+    ColumnName: &columnName,
   })
 if err != nil {
   log.Fatal(err)

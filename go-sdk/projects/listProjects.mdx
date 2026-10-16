@@ -11,7 +11,7 @@ Lists projects filtered by organization. Requires org_id query parameter.
 
 ```go
 result, err := client.Projects.ListProjects(ctx, &pgbeam.ListProjectsParams{
-    OrgID: "org_abc123",
+    OrgId: "org_abc123",
   })
 ```
 
@@ -20,11 +20,12 @@ result, err := client.Projects.ListProjects(ctx, &pgbeam.ListProjectsParams{
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
-| params | `*pgbeam.ListProjectsParams` | Yes | Query parameters |
-| params.OrgID | `string` | Yes | Organization ID to filter projects. |
-| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
-| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
-| params.SortBy | `string` | No | Sort field for projects list. |
+| params | `*pgbeam.ListProjectsParams` | Yes | Query and header parameters |
+| params.OrgId | `string` | Yes | Organization ID to filter projects. |
+| params.PageSize | `*int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `*string` | No | Opaque token for cursor-based pagination. |
+| params.SortBy | `*pgbeam.ListProjectsParamsSortBy` | No | Sort field for projects list. |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -36,14 +37,15 @@ result, err := client.Projects.ListProjects(ctx, &pgbeam.ListProjectsParams{
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+pageSize := 20
+sortBy := pgbeam.ListProjectsParamsSortBy("created_at")
 result, err := client.Projects.ListProjects(ctx, &pgbeam.ListProjectsParams{
-    OrgID: "org_abc123",
-    PageSize: 20,
-    PageToken: "...",
-    SortBy: "created_at",
+    OrgId: "org_abc123",
+    PageSize: &pageSize,
+    SortBy: &sortBy,
   })
 if err != nil {
   log.Fatal(err)

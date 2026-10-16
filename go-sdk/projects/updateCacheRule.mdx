@@ -23,10 +23,10 @@ result, err := client.Projects.UpdateCacheRule(ctx, "prj_xxx", "db_xxx", "...", 
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | databaseID | `string` | Yes | Unique database identifier (prefixed, e.g. db_xxx). |
 | queryHash | `string` | Yes | xxhash64 hex of the normalized SQL. |
-| req | `pgbeam.UpdateCacheRuleRequest` | Yes | Request body |
-| req.CacheEnabled | `bool` | Yes | Whether to enable caching for this query shape. |
-| req.CacheTTLSeconds | `*int` | No | TTL override in seconds. Null to use project default. |
-| req.CacheSWRSeconds | `*int` | No | SWR override in seconds. Null to use project default. |
+| body | `pgbeam.UpdateCacheRuleRequest` | Yes | Request body |
+| body.CacheEnabled | `bool` | Yes | Whether to enable caching for this query shape. |
+| body.CacheTtlSeconds | `*int` | No | TTL override in seconds. Null to use project default. |
+| body.CacheSwrSeconds | `*int` | No | SWR override in seconds. Null to use project default. |
 
 ## Response
 
@@ -38,13 +38,15 @@ result, err := client.Projects.UpdateCacheRule(ctx, "prj_xxx", "db_xxx", "...", 
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+cacheTtlSeconds := 300
+cacheSwrSeconds := 60
 result, err := client.Projects.UpdateCacheRule(ctx, "prj_xxx", "db_xxx", "...", pgbeam.UpdateCacheRuleRequest{
     CacheEnabled: true,
-    CacheTTLSeconds: 300,
-    CacheSWRSeconds: 60,
+    CacheTtlSeconds: &cacheTtlSeconds,
+    CacheSwrSeconds: &cacheSwrSeconds,
   })
 if err != nil {
   log.Fatal(err)

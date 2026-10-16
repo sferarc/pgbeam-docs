@@ -19,9 +19,10 @@ result, err := client.Projects.ListCustomDomains(ctx, "prj_xxx", nil)
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.ListCustomDomainsParams` | No | Query parameters |
-| params.PageSize | `int` | No | Maximum number of items to return (1-100, default 20). |
-| params.PageToken | `string` | No | Opaque token for cursor-based pagination. |
+| params | `*pgbeam.ListCustomDomainsParams` | No | Query and header parameters |
+| params.PageSize | `*int` | No | Maximum number of items to return (1-100, default 20). |
+| params.PageToken | `*string` | No | Opaque token for cursor-based pagination. |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -33,12 +34,12 @@ result, err := client.Projects.ListCustomDomains(ctx, "prj_xxx", nil)
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+pageSize := 20
 result, err := client.Projects.ListCustomDomains(ctx, "prj_xxx", &pgbeam.ListCustomDomainsParams{
-    PageSize: 20,
-    PageToken: "...",
+    PageSize: &pageSize,
   })
 if err != nil {
   log.Fatal(err)

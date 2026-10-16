@@ -11,7 +11,7 @@ Analyzes a migration script for unsafe schema changes and returns findings.
 
 ```go
 result, err := client.Migrations.LintMigration(ctx, "prj_xxx", pgbeam.MigrationLintRequest{
-    SQL: "...",
+    Sql: "...",
   })
 ```
 
@@ -21,9 +21,9 @@ result, err := client.Migrations.LintMigration(ctx, "prj_xxx", pgbeam.MigrationL
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.MigrationLintRequest` | Yes | Request body |
-| req.SQL | `string` | Yes | The migration SQL to analyze. May contain multiple statements. |
-| req.DatabaseID | `*string` | No | Optional database to scope the lint to. |
+| body | `pgbeam.MigrationLintRequest` | Yes | Request body |
+| body.Sql | `string` | Yes | The migration SQL to analyze. May contain multiple statements. |
+| body.DatabaseId | `*string` | No | Optional database to scope the lint to. |
 
 ## Response
 
@@ -35,12 +35,11 @@ result, err := client.Migrations.LintMigration(ctx, "prj_xxx", pgbeam.MigrationL
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Migrations.LintMigration(ctx, "prj_xxx", pgbeam.MigrationLintRequest{
-    SQL: "...",
-    DatabaseID: "...",
+    Sql: "...",
   })
 if err != nil {
   log.Fatal(err)

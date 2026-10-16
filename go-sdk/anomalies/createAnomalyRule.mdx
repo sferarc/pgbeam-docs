@@ -13,7 +13,7 @@ A rule adds no detection algorithm and no alert kind: it changes how sensitive o
 
 ```go
 result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.AnomalyRuleInput{
-    Metric: pgbeam.AnomalyMetric{ /* ... */ },
+    Metric: "...",
   })
 ```
 
@@ -23,12 +23,12 @@ result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.Anomaly
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.AnomalyRuleInput` | Yes | Request body |
-| req.CredentialID | `*string` | No | Agent credential to scope the rule to. Null or omitted applies it to every credential in the project. The credential must belong to this project. |
-| req.Metric | `pgbeam.AnomalyMetric` | Yes | One of the five detection metrics. A rule retunes how sensitive one of them is; it adds no detection algorithm and no alert kind. |
-| req.SigmaThreshold | `*float64` | No | N in the "mean + N \* dispersion" spike rule. Must be greater than zero; the detector reads any value at or below zero as "use the default", so a stored zero could never mean what setting it would suggest. Rejected for distinct_shapes and active_hours, which have no rate for sigma to put a threshold on. Null or omitted leaves the deployment default in place. |
-| req.Floor | `*float64` | No | Absolute floor below which the metric never alerts. Must be greater than zero, for the same reason as sigma_threshold. Rejected for distinct_shapes and active_hours, which have no rate for a floor to bound. Null or omitted leaves the deployment default in place. |
-| req.Enabled | `*bool` | No | False silences this metric for this scope. The baseline keeps advancing while it is silenced, so re-enabling resumes from the existing history rather than a cold warm-up. |
+| body | `pgbeam.AnomalyRuleInput` | Yes | Request body |
+| body.CredentialId | `*string` | No | Agent credential to scope the rule to. Null or omitted applies it to every credential in the project. The credential must belong to this project. |
+| body.Metric | `pgbeam.AnomalyMetric` | Yes | One of the five detection metrics. A rule retunes how sensitive one of them is; it adds no detection algorithm and no alert kind. |
+| body.SigmaThreshold | `*float64` | No | N in the "mean + N \* dispersion" spike rule. Must be greater than zero; the detector reads any value at or below zero as "use the default", so a stored zero could never mean what setting it would suggest. Rejected for distinct_shapes and active_hours, which have no rate for sigma to put a threshold on. Null or omitted leaves the deployment default in place. |
+| body.Floor | `*float64` | No | Absolute floor below which the metric never alerts. Must be greater than zero, for the same reason as sigma_threshold. Rejected for distinct_shapes and active_hours, which have no rate for a floor to bound. Null or omitted leaves the deployment default in place. |
+| body.Enabled | `*bool` | No | False silences this metric for this scope. The baseline keeps advancing while it is silenced, so re-enabling resumes from the existing history rather than a cold warm-up. |
 
 ## Response
 
@@ -40,15 +40,19 @@ result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.Anomaly
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+credentialId := "agt_01j9x8y7z6w5v4u3t2s1r0q9p8"
+sigmaThreshold := float64(4.5)
+floor := float64(100)
+enabled := true
 result, err := client.Anomalies.CreateAnomalyRule(ctx, "prj_xxx", pgbeam.AnomalyRuleInput{
-    CredentialID: "agt_01j9x8y7z6w5v4u3t2s1r0q9p8",
-    Metric: pgbeam.AnomalyMetric{ /* ... */ },
-    SigmaThreshold: 4.5,
-    Floor: 100,
-    Enabled: true,
+    Metric: "...",
+    CredentialId: &credentialId,
+    SigmaThreshold: &sigmaThreshold,
+    Floor: &floor,
+    Enabled: &enabled,
   })
 if err != nil {
   log.Fatal(err)

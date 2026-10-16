@@ -22,8 +22,8 @@ result, err := client.Anomalies.UpdateAnomalyAlert(ctx, "prj_xxx", "ano_xxx", pg
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | anomalyID | `string` | Yes | Unique anomaly alert identifier (prefixed, e.g. ano_xxx). |
-| req | `pgbeam.UpdateAnomalyAlertRequest` | Yes | Request body |
-| req.Status | `string` | Yes | New triage state for the alert. |
+| body | `pgbeam.UpdateAnomalyAlertRequest` | Yes | Request body |
+| body.Status | `pgbeam.UpdateAnomalyAlertRequestStatus` | Yes | New triage state for the alert. |
 
 ## Response
 
@@ -35,7 +35,7 @@ result, err := client.Anomalies.UpdateAnomalyAlert(ctx, "prj_xxx", "ano_xxx", pg
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Anomalies.UpdateAnomalyAlert(ctx, "prj_xxx", "ano_xxx", pgbeam.UpdateAnomalyAlertRequest{

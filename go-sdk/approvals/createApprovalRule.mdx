@@ -25,13 +25,13 @@ result, err := client.Approvals.CreateApprovalRule(ctx, "prj_xxx", pgbeam.Approv
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.ApprovalRuleInput` | Yes | Request body |
-| req.Name | `string` | Yes | Label shown to the reviewer on every approval request this rule holds. Must be unique within the project and not blank. |
-| req.StatementKinds | `*[]pgbeam.ApprovalRuleStatementKind` | No | Statement kinds the rule holds. Empty or omitted holds every kind. |
-| req.SchemaName | `*string` | No | Schema to scope the rule to. Null, empty or omitted matches every schema. |
-| req.RelationName | `*string` | No | Relation to scope the rule to. Null, empty or omitted matches every relation. Without a schema it matches that name in every schema. |
-| req.MinAffectedRows | `*int` | No | Hold only statements affecting at least this many rows. Must be at least 1. Null or omitted holds every matching statement. The count is taken in a rolled-back trial run; a statement that reports no count (DDL, a batch, a data-modifying CTE) is held regardless. |
-| req.Enabled | `*bool` | No | False switches the rule off, so it holds nothing. |
+| body | `pgbeam.ApprovalRuleInput` | Yes | Request body |
+| body.Name | `string` | Yes | Label shown to the reviewer on every approval request this rule holds. Must be unique within the project and not blank. |
+| body.StatementKinds | `*[]pgbeam.ApprovalRuleStatementKind` | No | Statement kinds the rule holds. Empty or omitted holds every kind. |
+| body.SchemaName | `*string` | No | Schema to scope the rule to. Null, empty or omitted matches every schema. |
+| body.RelationName | `*string` | No | Relation to scope the rule to. Null, empty or omitted matches every relation. Without a schema it matches that name in every schema. |
+| body.MinAffectedRows | `*int32` | No | Hold only statements affecting at least this many rows. Must be at least 1. Null or omitted holds every matching statement. The count is taken in a rolled-back trial run; a statement that reports no count (DDL, a batch, a data-modifying CTE) is held regardless. |
+| body.Enabled | `*bool` | No | False switches the rule off, so it holds nothing. |
 
 ## Response
 
@@ -43,16 +43,19 @@ result, err := client.Approvals.CreateApprovalRule(ctx, "prj_xxx", pgbeam.Approv
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+schemaName := "public"
+relationName := "payments"
+minAffectedRows := int32(1000)
+enabled := true
 result, err := client.Approvals.CreateApprovalRule(ctx, "prj_xxx", pgbeam.ApprovalRuleInput{
     Name: "payments deletes",
-    StatementKinds: nil,
-    SchemaName: "public",
-    RelationName: "payments",
-    MinAffectedRows: 1000,
-    Enabled: true,
+    SchemaName: &schemaName,
+    RelationName: &relationName,
+    MinAffectedRows: &minAffectedRows,
+    Enabled: &enabled,
   })
 if err != nil {
   log.Fatal(err)

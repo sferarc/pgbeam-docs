@@ -11,7 +11,7 @@ Evaluates a single SQL statement against a policy (either a draft policy supplie
 
 ```go
 result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput{
-    SQL: "SELECT email FROM users WHERE id = 1",
+    Sql: "SELECT email FROM users WHERE id = 1",
   })
 ```
 
@@ -21,10 +21,10 @@ result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.DryEvalInput` | Yes | Request body |
-| req.SQL | `string` | Yes | The single SQL statement to evaluate. |
-| req.PolicyID | `*string` | No | ID of an existing saved policy profile to evaluate against. |
-| req.Policy | `*pgbeam.PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
+| body | `pgbeam.DryEvalInput` | Yes | Request body |
+| body.Sql | `string` | Yes | The single SQL statement to evaluate. |
+| body.PolicyId | `*string` | No | ID of an existing saved policy profile to evaluate against. |
+| body.Policy | `*pgbeam.PolicyProfileInput` | No | Mutable fields of a policy profile (used for create and update). |
 
 ## Response
 
@@ -36,13 +36,13 @@ result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+policyId := "pol_01h455vb4pex5vsknk084sn02q"
 result, err := client.Policies.DryEvalPolicy(ctx, "prj_xxx", pgbeam.DryEvalInput{
-    SQL: "SELECT email FROM users WHERE id = 1",
-    PolicyID: "pol_01h455vb4pex5vsknk084sn02q",
-    Policy: pgbeam.PolicyProfileInput{ /* ... */ },
+    Sql: "SELECT email FROM users WHERE id = 1",
+    PolicyId: &policyId,
   })
 if err != nil {
   log.Fatal(err)

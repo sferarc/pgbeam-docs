@@ -22,10 +22,10 @@ result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.Honeyt
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.HoneytokenInput` | Yes | Request body |
-| req.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified/public form. |
-| req.RelationName | `string` | Yes | Relation (table or view) name of the decoy. |
-| req.Action | `string` | Yes | Response when the honeytoken is tripped. |
+| body | `pgbeam.HoneytokenInput` | Yes | Request body |
+| body.SchemaName | `*string` | No | Optional schema. Null or empty matches the unqualified/public form. |
+| body.RelationName | `string` | Yes | Relation (table or view) name of the decoy. |
+| body.Action | `pgbeam.HoneytokenInputAction` | Yes | Response when the honeytoken is tripped. |
 
 ## Response
 
@@ -37,13 +37,14 @@ result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.Honeyt
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+schemaName := "public"
 result, err := client.Honeytokens.CreateHoneytoken(ctx, "prj_xxx", pgbeam.HoneytokenInput{
-    SchemaName: "public",
     RelationName: "customer_ssns",
     Action: "...",
+    SchemaName: &schemaName,
   })
 if err != nil {
   log.Fatal(err)

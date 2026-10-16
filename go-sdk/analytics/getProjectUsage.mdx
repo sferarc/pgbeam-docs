@@ -11,8 +11,8 @@ Returns daily usage data for a specific project, broken down by region.
 
 ```go
 result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
-    StartDate: "2024-01-01",
-    EndDate: "2024-01-31",
+    StartDate: openapi_types.Date{Time: time.Now()},
+    EndDate: openapi_types.Date{Time: time.Now()},
   })
 ```
 
@@ -22,9 +22,10 @@ result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProje
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectUsageParams` | Yes | Query parameters |
-| params.StartDate | `string` | Yes | Start date (inclusive, YYYY-MM-DD). |
-| params.EndDate | `string` | Yes | End date (inclusive, YYYY-MM-DD). |
+| params | `*pgbeam.GetProjectUsageParams` | Yes | Query and header parameters |
+| params.StartDate | `openapi_types.Date` | Yes | Start date (inclusive, YYYY-MM-DD). |
+| params.EndDate | `openapi_types.Date` | Yes | End date (inclusive, YYYY-MM-DD). |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -36,12 +37,12 @@ result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProje
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Analytics.GetProjectUsage(ctx, "prj_xxx", &pgbeam.GetProjectUsageParams{
-    StartDate: "2024-01-01",
-    EndDate: "2024-01-31",
+    StartDate: openapi_types.Date{Time: time.Now()},
+    EndDate: openapi_types.Date{Time: time.Now()},
   })
 if err != nil {
   log.Fatal(err)

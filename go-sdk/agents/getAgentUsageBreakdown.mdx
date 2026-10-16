@@ -27,9 +27,10 @@ result, err := client.Agents.GetAgentUsageBreakdown(ctx, "prj_xxx", nil)
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetAgentUsageBreakdownParams` | No | Query parameters |
-| params.Start | `string` | No | Return entries at or after this timestamp (inclusive lower bound). |
-| params.End | `string` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
+| params | `*pgbeam.GetAgentUsageBreakdownParams` | No | Query and header parameters |
+| params.Start | `*time.Time` | No | Return entries at or after this timestamp (inclusive lower bound). |
+| params.End | `*time.Time` | No | Return entries strictly older than this timestamp (cursor / upper bound). |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -41,13 +42,10 @@ result, err := client.Agents.GetAgentUsageBreakdown(ctx, "prj_xxx", nil)
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
-result, err := client.Agents.GetAgentUsageBreakdown(ctx, "prj_xxx", &pgbeam.GetAgentUsageBreakdownParams{
-    Start: "...",
-    End: "...",
-  })
+result, err := client.Agents.GetAgentUsageBreakdown(ctx, "prj_xxx", &pgbeam.GetAgentUsageBreakdownParams{})
 if err != nil {
   log.Fatal(err)
 }

@@ -12,7 +12,7 @@ Creates a new project within the specified organization.
 ```go
 result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Name: "my-app",
-    OrgID: "org_abc123",
+    OrgId: "org_abc123",
     Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
   })
 ```
@@ -22,14 +22,14 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
-| req | `pgbeam.CreateProjectRequest` | Yes | Request body |
-| req.Name | `string` | Yes | Human-readable project name. |
-| req.OrgID | `string` | Yes | Better Auth organization ID. |
-| req.Description | `*string` | No | Optional project description. |
-| req.Tags | `*[]string` | No | User-defined labels to attach to the project. |
-| req.Cloud | `*string` | No | Cloud provider for the project. |
-| req.SelfHosted | `*bool` | No | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
-| req.Database | `pgbeam.CreateDatabaseRequest` | Yes | Request body for registering an upstream database. |
+| body | `pgbeam.CreateProjectRequest` | Yes | Request body |
+| body.Name | `string` | Yes | Human-readable project name. |
+| body.OrgId | `string` | Yes | Better Auth organization ID. |
+| body.Description | `*string` | No | Optional project description. |
+| body.Tags | `*[]string` | No | User-defined labels to attach to the project. |
+| body.Cloud | `*pgbeam.CreateProjectRequestCloud` | No | Cloud provider for the project. |
+| body.SelfHosted | `*bool` | No | Mark this project as running on a self-hosted (BYOC) data plane in the customer's own VPC/cluster. Requires the Scale or enterprise plan. |
+| body.Database | `pgbeam.CreateDatabaseRequest` | Yes | Request body for registering an upstream database. |
 
 ## Response
 
@@ -41,16 +41,19 @@ result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+description := "Production database proxy"
+tags := []string{"production", "us-east-1"}
+cloud := pgbeam.CreateProjectRequestCloud("aws")
 result, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     Name: "my-app",
-    OrgID: "org_abc123",
-    Description: "Production database proxy",
-    Tags: []string{"production", "us-east-1"},
-    Cloud: "aws",
-    SelfHosted: false,
+    OrgId: "org_abc123",
+    Database: pgbeam.CreateDatabaseRequest{ /* ... */ },
+    Description: &description,
+    Tags: &tags,
+    Cloud: &cloud,
   })
 if err != nil {
   log.Fatal(err)

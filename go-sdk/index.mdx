@@ -3,7 +3,7 @@ title: Go SDK installation
 description: Install the pgbeam-go SDK, configure the client, authenticate, and learn the service-based access pattern with a full agent-gateway quickstart.
 ---
 
-The PgBeam Go SDK is the official client for the PgBeam control-plane API. It covers every API resource — projects and databases, plus the agent gateway: agent credentials, policy profiles, approvals, webhooks, anomalies, and audit logs — so you can provision safe, scoped Postgres access for AI agents from Go.
+The PgBeam Go SDK is the official client for the PgBeam control-plane API. It covers every API resource (projects and databases, plus the agent gateway: agent credentials, policy profiles, approvals, webhooks, anomalies, and audit logs), so you can provision safe, scoped Postgres access for AI agents from Go.
 
 The module path is `go.pgbeam.com/sdk` (a vanity import that resolves to the public mirror). The package name is `pgbeam`.
 
@@ -13,7 +13,7 @@ The module path is `go.pgbeam.com/sdk` (a vanity import that resolves to the pub
 go get go.pgbeam.com/sdk
 ```
 
-Requires Go 1.24 or newer. Import it as:
+Requires Go 1.25 or newer. Import it as:
 
 ```go
 import pgbeam "go.pgbeam.com/sdk"
@@ -25,7 +25,7 @@ import pgbeam "go.pgbeam.com/sdk"
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-    APIKey:  "pgb_your_api_key",
+    APIKey:  "pbu_your_api_key",
     BaseURL: "https://api.pgbeam.com", // optional
 })
 ```
@@ -34,9 +34,11 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `APIKey` | `string` | PgBeam API key (required, prefix `pgb_`) |
+| `APIKey` | `string` | PgBeam API key (required). Account keys start with `pbu_`, organization keys with `pbo_` |
 | `BaseURL` | `string` | API base URL (default: `https://api.pgbeam.com`) |
-| `HTTPClient` | `*http.Client` | Custom HTTP client for proxies, timeouts, etc. |
+| `HTTPClient` | `*http.Client` | Custom HTTP client for proxies, transports, etc. |
+| `Retry` | `*pgbeam.RetryConfig` | Retry and backoff settings. `nil` uses the defaults (5 retries, 500ms initial delay, 120s total budget). See [Retries](/docs/go-sdk/error-handling#retries) |
+| `Timeout` | `time.Duration` | Per-attempt timeout. `0` means 30s, a negative value disables it |
 
 ## Authentication
 
@@ -44,7 +46,7 @@ client := pgbeam.NewClient(&pgbeam.ClientOptions{
   <Tab value="Explicit key">
     ```go
     client := pgbeam.NewClient(&pgbeam.ClientOptions{
-        APIKey:  "pgb_your_api_key",
+        APIKey:  "pbu_your_api_key",
         BaseURL: "https://api.pgbeam.com",
     })
     ```
@@ -67,7 +69,7 @@ See [API Keys](/docs/api-keys) for key creation and rotation.
 The Go SDK uses service-based access, matching the TypeScript SDK's tag-based `api.projects.*`, `api.databases.*` pattern:
 
 ```go
-// Projects — note request bodies are passed by value
+// Projects: request bodies are passed by value
 project, err := client.Projects.CreateProject(ctx, pgbeam.CreateProjectRequest{
     OrgId: "org_xxx",
     Name:  "production",
@@ -107,7 +109,7 @@ Each service field on the client maps to an API tag:
 
 ## Quickstart: provision an agent credential
 
-This end-to-end example creates a read-only policy profile and issues a scoped agent credential against it. The connection string and MCP token are returned **once** — capture them immediately.
+This end-to-end example creates a read-only policy profile and issues a scoped agent credential against it. The connection string and MCP token are returned **once**, so capture them immediately.
 
 ```go
 package main
@@ -152,7 +154,7 @@ func main() {
         log.Fatalf("create credential: %v", err)
     }
 
-    // Shown once — hand these to the agent now.
+    // Shown once: hand these to the agent now.
     fmt.Println("Connection string:", secrets.ConnectionString)
     fmt.Println("MCP URL:          ", secrets.McpUrl)
     fmt.Println("MCP token:        ", secrets.McpToken)
@@ -176,10 +178,10 @@ for _, p := range profiles.Policies {
 ### Rotate or revoke an agent credential
 
 ```go
-// Rotate — returns fresh secrets, old credential stops working.
+// Rotate: returns fresh secrets, the old credential stops working.
 rotated, err := client.Agents.RotateAgentCredential(ctx, projectID, "agt_xxx")
 
-// Revoke — immediate kill-switch.
+// Revoke: immediate kill-switch.
 err = client.Agents.RevokeAgentCredential(ctx, projectID, "agt_xxx")
 ```
 
@@ -222,4 +224,4 @@ for _, e := range logs.Entries {
 }
 ```
 
-For per-method reference — every parameter, response type, and error code — see the service pages in the sidebar. For error handling, retries, and idempotency, see [Error Handling](/docs/go-sdk/error-handling).
+For the per-method reference (every parameter, response type, and error code), see the service pages in the sidebar. For error handling, retries, and idempotency, see [Error Handling](/docs/go-sdk/error-handling).

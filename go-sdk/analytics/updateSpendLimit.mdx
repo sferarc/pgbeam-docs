@@ -10,9 +10,7 @@ Sets the monthly spend limit for an organization. Null removes the limit.
 ## Usage
 
 ```go
-result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.UpdateSpendLimitRequest{
-
-  })
+result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.UpdateSpendLimitRequest{})
 ```
 
 ## Parameters
@@ -21,8 +19,8 @@ result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.Updat
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | orgID | `string` | Yes | Unique organization identifier. |
-| req | `pgbeam.UpdateSpendLimitRequest` | Yes | Request body |
-| req.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. An active spend cap lifts only when the limit is removed or raised. |
+| body | `pgbeam.UpdateSpendLimitRequest` | Yes | Request body |
+| body.SpendLimit | `*float64` | No | Monthly spend limit in dollars. Null to remove the limit. An active spend cap lifts only when the limit is removed or raised. |
 
 ## Response
 
@@ -34,11 +32,12 @@ result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.Updat
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+spendLimit := float64(500)
 result, err := client.Analytics.UpdateSpendLimit(ctx, "org_abc123", pgbeam.UpdateSpendLimitRequest{
-    SpendLimit: 500,
+    SpendLimit: &spendLimit,
   })
 if err != nil {
   log.Fatal(err)

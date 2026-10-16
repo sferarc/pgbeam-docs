@@ -10,10 +10,10 @@ Receives a forwarded Slack event from the dashboard webhook handler and creates 
 ## Usage
 
 ```go
-result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
-    ChannelID: "...",
+err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
+    ChannelId: "...",
     ThreadTs: "...",
-    UserID: "...",
+    UserId: "...",
     Text: "...",
   })
 ```
@@ -23,15 +23,15 @@ result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPay
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
-| req | `pgbeam.SlackEventPayload` | Yes | Request body |
-| req.ChannelID | `string` | Yes | Slack channel ID where the message was posted. |
-| req.ThreadTs | `string` | Yes | Slack thread timestamp identifying the support case thread. |
-| req.UserID | `string` | Yes | Slack user ID of the message author. |
-| req.Text | `string` | Yes | Message text from Slack. |
+| body | `pgbeam.SlackEventPayload` | Yes | Request body |
+| body.ChannelId | `string` | Yes | Slack channel ID where the message was posted. |
+| body.ThreadTs | `string` | Yes | Slack thread timestamp identifying the support case thread. |
+| body.UserId | `string` | Yes | Slack user ID of the message author. |
+| body.Text | `string` | Yes | Message text from Slack. |
 
 ## Response
 
-`(*pgbeam.unknown, error)`: the result.
+`error`: returns nil on success.
 
 ## Example
 
@@ -39,19 +39,18 @@ result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPay
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
-result, err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
-    ChannelID: "...",
+err := client.Internal.HandleSlackSupportEvent(ctx, pgbeam.SlackEventPayload{
+    ChannelId: "...",
     ThreadTs: "...",
-    UserID: "...",
+    UserId: "...",
     Text: "...",
   })
 if err != nil {
   log.Fatal(err)
 }
-fmt.Println(result)
 ```
 
 ## Errors

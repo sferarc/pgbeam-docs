@@ -16,9 +16,7 @@ Purchased queries do not raise the credential's policy budget. They are a separa
 ## Usage
 
 ```go
-result, err := client.Payments.CreateBudgetTopup(ctx, pgbeam.BudgetTopupInput{
-
-  })
+result, err := client.Payments.CreateBudgetTopup(ctx, pgbeam.BudgetTopupInput{})
 ```
 
 ## Parameters
@@ -26,8 +24,8 @@ result, err := client.Payments.CreateBudgetTopup(ctx, pgbeam.BudgetTopupInput{
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
-| req | `pgbeam.BudgetTopupInput` | Yes | Request body |
-| req.Packs | `*int` | No | Packs of query budget to buy. One pack is `units_per_pack` queries at `amount_per_pack`, both readable from `GET /v1/payments/resources`. |
+| body | `pgbeam.BudgetTopupInput` | Yes | Request body |
+| body.Packs | `*int64` | No | Packs of query budget to buy. One pack is `units_per_pack` queries at `amount_per_pack`, both readable from `GET /v1/payments/resources`. |
 
 ## Response
 
@@ -39,11 +37,12 @@ result, err := client.Payments.CreateBudgetTopup(ctx, pgbeam.BudgetTopupInput{
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+packs := int64(1)
 result, err := client.Payments.CreateBudgetTopup(ctx, pgbeam.BudgetTopupInput{
-    Packs: 1,
+    Packs: &packs,
   })
 if err != nil {
   log.Fatal(err)

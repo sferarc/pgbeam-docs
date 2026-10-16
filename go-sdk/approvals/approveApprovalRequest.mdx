@@ -10,9 +10,7 @@ Approves a pending approval request, releasing the held statement.
 ## Usage
 
 ```go
-result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{
-
-  })
+result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{})
 ```
 
 ## Parameters
@@ -22,8 +20,8 @@ result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx"
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | approvalID | `string` | Yes | Unique approval request identifier (prefixed, e.g. apr_xxx). |
-| req | `pgbeam.ApprovalDecisionRequest` | Yes | Request body |
-| req.Reason | `*string` | No | Human-readable note explaining the decision. |
+| body | `pgbeam.ApprovalDecisionRequest` | Yes | Request body |
+| body.Reason | `*string` | No | Human-readable note explaining the decision. |
 
 ## Response
 
@@ -35,12 +33,10 @@ result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx"
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
-result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{
-    Reason: "...",
-  })
+result, err := client.Approvals.ApproveApprovalRequest(ctx, "prj_xxx", "apr_xxx", pgbeam.ApprovalDecisionRequest{})
 if err != nil {
   log.Fatal(err)
 }

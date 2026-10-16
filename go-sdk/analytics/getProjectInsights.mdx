@@ -19,9 +19,10 @@ result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", nil)
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| params | `*pgbeam.GetProjectInsightsParams` | No | Query parameters |
-| params.Range | `string` | No | Time range to query. Defaults to 24h. |
-| params.Limit | `int` | No | Maximum number of top queries to return (1-100). |
+| params | `*pgbeam.GetProjectInsightsParams` | No | Query and header parameters |
+| params.Range | `*pgbeam.GetProjectInsightsParamsRange` | No | Time range to query. Defaults to 24h. |
+| params.Limit | `*int` | No | Maximum number of top queries to return (1-100). |
+| params.IfNoneMatch | `*string` | No | Entity tag the client already holds, taken from the `ETag` of an earlier response. When it still matches the current representation the server answers `304 Not Modified` with no body, so a poll that finds nothing changed costs a round trip rather than a transfer. A comma-separated list is accepted, and `*` matches any current representation. |
 
 ## Response
 
@@ -33,12 +34,14 @@ result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", nil)
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+rangeValue := pgbeam.GetProjectInsightsParamsRange("24h")
+limit := 20
 result, err := client.Analytics.GetProjectInsights(ctx, "prj_xxx", &pgbeam.GetProjectInsightsParams{
-    Range: "24h",
-    Limit: 20,
+    Range: &rangeValue,
+    Limit: &limit,
   })
 if err != nil {
   log.Fatal(err)

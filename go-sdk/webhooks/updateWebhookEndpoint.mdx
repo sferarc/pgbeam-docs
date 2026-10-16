@@ -11,7 +11,7 @@ Updates a webhook endpoint.
 
 ```go
 result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", pgbeam.WebhookEndpointInput{
-    URL: "https://example.com/hooks/pgbeam",
+    Url: "https://example.com/hooks/pgbeam",
   })
 ```
 
@@ -22,13 +22,13 @@ result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", 
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | webhookID | `string` | Yes | Unique webhook endpoint identifier (prefixed, e.g. whk_xxx). |
-| req | `pgbeam.WebhookEndpointInput` | Yes | Request body |
-| req.URL | `string` | Yes | HTTPS endpoint that receives event deliveries. |
-| req.Secret | `*string` | No | Shared secret used to sign delivery payloads. Write-only. |
-| req.Format | `*string` | No | Payload format for delivered events. |
-| req.EventTypes | `*[]pgbeam.WebhookEventType` | No | Event types to deliver. Empty means all events. |
-| req.Enabled | `*bool` | No | Whether deliveries are active for this endpoint. |
-| req.Description | `*string` | No | Human-readable label for the endpoint. |
+| body | `pgbeam.WebhookEndpointInput` | Yes | Request body |
+| body.Url | `string` | Yes | HTTPS endpoint that receives event deliveries. |
+| body.Secret | `*string` | No | Shared secret used to sign delivery payloads. Write-only. |
+| body.Format | `*pgbeam.WebhookEndpointInputFormat` | No | Payload format for delivered events. |
+| body.EventTypes | `*[]pgbeam.WebhookEventType` | No | Event types to deliver. Empty means all events. |
+| body.Enabled | `*bool` | No | Whether deliveries are active for this endpoint. |
+| body.Description | `*string` | No | Human-readable label for the endpoint. |
 
 ## Response
 
@@ -40,16 +40,21 @@ result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", 
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
+secret := "whsec_do-not-log-this"
+format := pgbeam.WebhookEndpointInputFormat("json")
+eventTypes := []pgbeam.WebhookEventType{"query_blocked", "canary_tripped"}
+enabled := true
+description := "Read-only access for the reporting agent"
 result, err := client.Webhooks.UpdateWebhookEndpoint(ctx, "prj_xxx", "whk_xxx", pgbeam.WebhookEndpointInput{
-    URL: "https://example.com/hooks/pgbeam",
-    Secret: "whsec_do-not-log-this",
-    Format: "json",
-    EventTypes: []pgbeam.WebhookEventType{"query_blocked", "canary_tripped"},
-    Enabled: true,
-    Description: "Read-only access for the reporting agent",
+    Url: "https://example.com/hooks/pgbeam",
+    Secret: &secret,
+    Format: &format,
+    EventTypes: &eventTypes,
+    Enabled: &enabled,
+    Description: &description,
   })
 if err != nil {
   log.Fatal(err)

@@ -18,7 +18,6 @@ A batch costs the rate limiter one unit per operation, not one per HTTP request,
 ```go
 result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
     Mode: "...",
-    Operations: nil,
   })
 ```
 
@@ -28,9 +27,9 @@ result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
 | --- | --- | --- | --- |
 | ctx | `context.Context` | Yes | Request context |
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
-| req | `pgbeam.BatchRequest` | Yes | Request body |
-| req.Mode | `string` | Yes | How the batch treats a failing operation. `atomic` applies all of them or none: the first runtime failure rolls the whole batch back and the response is 409, so the status code alone never says a batch applied when it did not. `independent` applies each operation on its own, so one failure stops nothing else and the response is 200 with the outcome of each item. There is no default. An operator revoking fifty credentials during an incident wants all fifty gone, an operator importing fifty column annotations wants the forty-seven that parsed, and picking one of those for a caller who did not say would silently do the wrong thing to the other. |
-| req.Operations | `[]pgbeam.BatchOperation` | Yes | The operations to apply, in order. At most 100 per request; a longer list is rejected with 400 and nothing runs. Each entry must carry a distinct `id`, and no two entries may target the same resource. |
+| body | `pgbeam.BatchRequest` | Yes | Request body |
+| body.Mode | `pgbeam.BatchRequestMode` | Yes | How the batch treats a failing operation. `atomic` applies all of them or none: the first runtime failure rolls the whole batch back and the response is 409, so the status code alone never says a batch applied when it did not. `independent` applies each operation on its own, so one failure stops nothing else and the response is 200 with the outcome of each item. There is no default. An operator revoking fifty credentials during an incident wants all fifty gone, an operator importing fifty column annotations wants the forty-seven that parsed, and picking one of those for a caller who did not say would silently do the wrong thing to the other. |
+| body.Operations | `[]pgbeam.BatchOperation` | Yes | The operations to apply, in order. At most 100 per request; a longer list is rejected with 400 and nothing runs. Each entry must carry a distinct `id`, and no two entries may target the same resource. |
 
 ## Response
 
@@ -42,12 +41,11 @@ result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
 import pgbeam "go.pgbeam.com/sdk"
 
 client := pgbeam.NewClient(&pgbeam.ClientOptions{
-  APIKey: "pgb_your_api_key",
+  APIKey: "pbu_...",
 })
 
 result, err := client.Batch.ExecuteBatch(ctx, "prj_xxx", pgbeam.BatchRequest{
     Mode: "...",
-    Operations: nil,
   })
 if err != nil {
   log.Fatal(err)
