@@ -388,6 +388,59 @@ resource "pgbeam_approval_rule" "example" {
 
 **Import:** `terraform import pgbeam_approval_rule.example <project_id>/<id>`
 
+## Data sources
+
+### pgbeam_custom_domain_verification
+
+Triggers DNS verification for a custom domain and reads the result. Every read runs the check again, so each plan re-verifies. Make it depend on the DNS records it checks so the first read happens after they are created.
+
+```hcl
+resource "pgbeam_custom_domain" "example" {
+  project_id = "prj_01h455vb4pex5vsknk084sn02q"
+  domain = "db.example.com"
+}
+
+resource "aws_route53_record" "cname" {
+  zone_id = var.zone_id
+  name    = pgbeam_custom_domain.example.dns_instructions.cname_host
+  type    = "CNAME"
+  ttl     = 300
+  records = [pgbeam_custom_domain.example.dns_instructions.cname_target]
+}
+
+resource "aws_route53_record" "txt" {
+  zone_id = var.zone_id
+  name    = pgbeam_custom_domain.example.dns_instructions.txt_host
+  type    = "TXT"
+  ttl     = 300
+  records = [pgbeam_custom_domain.example.dns_instructions.txt_value]
+}
+
+resource "aws_route53_record" "acme_cname" {
+  zone_id = var.zone_id
+  name    = pgbeam_custom_domain.example.dns_instructions.acme_cname_host
+  type    = "CNAME"
+  ttl     = 300
+  records = [pgbeam_custom_domain.example.dns_instructions.acme_cname_target]
+}
+
+data "pgbeam_custom_domain_verification" "example" {
+  project_id = pgbeam_custom_domain.example.project_id
+  domain_id = pgbeam_custom_domain.example.id
+
+  depends_on = [aws_route53_record.cname, aws_route53_record.txt, aws_route53_record.acme_cname]
+}
+```
+
+**Arguments:** `project_id`, `domain_id` (required)
+
+**Computed:** `verified`, `error`
+
+| Attribute  | Description                           |
+| ---------- | ------------------------------------- |
+| `verified` | Whether DNS verification succeeded.   |
+| `error`    | Error message if verification failed. |
+
 ## Configuration
 
 | Setting | Source | Description |

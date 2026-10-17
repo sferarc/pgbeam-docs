@@ -152,6 +152,8 @@ spec:
 
 **Status:** `proxyHost`, `queriesPerSecond`, `burstSize`, `maxConnections`, `databaseCount`, `activeConnections`, `createdAt`, `updatedAt`, `primaryDatabaseID`
 
+**Connection secret** (with `writeConnectionSecretToRef`): `proxyHost`
+
 ### Database
 
 Manages an upstream database connection within a PgBeam project.
@@ -192,6 +194,8 @@ spec:
 ```
 
 **Status:** `connectionString`, `createdAt`, `updatedAt`
+
+**Connection secret** (with `writeConnectionSecretToRef`): `connectionString`
 
 ### Replica
 
@@ -236,6 +240,8 @@ spec:
 ```
 
 **Status:** `verified`, `verifiedAt`, `tlsCertExpiry`, `dnsVerificationToken`, `dnsInstructions`, `createdAt`, `updatedAt`
+
+**Connection secret** (with `writeConnectionSecretToRef`): `dnsVerificationToken`
 
 ### CacheRule
 
@@ -300,7 +306,9 @@ spec:
     name: default
 ```
 
-**Status:** `pgUsername`, `authMethod`, `lastUsedAt`, `createdAt`, `updatedAt`, `connectionString`, `mcpURL`, `mcpToken`
+**Status:** `pgUsername`, `authMethod`, `lastUsedAt`, `createdAt`, `updatedAt`, `mcpURL`
+
+**Connection secret** (with `writeConnectionSecretToRef`): `connectionString`, `mcpToken`
 
 ### PolicyProfile
 
@@ -390,7 +398,9 @@ spec:
     name: default
 ```
 
-**Status:** `createdBy`, `createdAt`, `lastSeenAt`, `revokedAt`, `token`
+**Status:** `createdBy`, `createdAt`, `lastSeenAt`, `revokedAt`
+
+**Connection secret** (with `writeConnectionSecretToRef`): `token`
 
 ### Honeytoken
 

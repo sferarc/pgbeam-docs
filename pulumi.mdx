@@ -369,7 +369,7 @@ const res = new pgbeam.ApprovalRule("example", {
 | `PGBEAM_API_KEY` | Environment | Fallback API key |
 | `PGBEAM_API_URL` | Environment | Fallback base URL |
 
-Config resolution order: `configure()` call > Pulumi stack config > environment variables.
+Config resolution order: `configure()` call > Pulumi stack config > environment variables. A `configure()` call replaces both settings: if it omits `baseUrl`, the default URL applies, not `pgbeam:baseUrl` or `PGBEAM_API_URL`.
 
 ## Replacement vs update
 
