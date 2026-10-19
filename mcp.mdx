@@ -222,7 +222,7 @@ The docs tools (`search_docs`, `read_doc`) are read-only and not scoped to your 
 
 The MCP endpoint executes SQL as a PostgreSQL wire client through the nearest data plane, using the agent credential. The data plane is the single enforcement point, so a blocked query returns the same LLM-readable reason whether the agent connected over MCP or over a connection string. Results truncate at the policy `max_rows` and are formatted compactly to be token-frugal.
 
-A truncated result says so. When the policy `max_rows` cap or the endpoint's own 1000-row ceiling withholds rows, the `query` result carries `"truncated": true` and a `notices` list naming the cap that fired, so an agent can tell a short answer from a complete one instead of reporting the prefix as the total. The same signal reaches a connection-string client as a PostgreSQL `NOTICE`.
+A truncated result says so. When the policy `max_rows` cap or the endpoint's own 1000-row or 4 MiB result ceiling withholds rows, the `query` result carries `"truncated": true` and a `notices` list naming the cap that fired, so an agent can tell a short answer from a complete one instead of reporting the prefix as the total. The same signal reaches a connection-string client as a PostgreSQL `NOTICE`.
 
 ## Errors an agent will see
 
