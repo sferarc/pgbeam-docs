@@ -20,7 +20,8 @@ pgbeam webhooks create [url] [flags]
 | `<url>` | Destination URL for webhook deliveries. If omitted, you will be prompted. | No | - |
 | `--format <value>` | Delivery format: json, splunk_hec, datadog, or elastic. | No | `json` |
 | `--event <value>` | Event type(s) to subscribe to. Comma-separated. Omit to receive all events. | No | - |
-| `--secret <value>` | Shared secret used to sign webhook payloads. | No | - |
+| `--secret <value>` | Shared secret used to sign webhook payloads. Visible in shell history and the process list; prefer `--secret-stdin`. | No | - |
+| `--secret-stdin` | Read the signing secret from stdin. One trailing newline is removed. | No | `false` |
 | `--description <value>` | Human-readable description for the webhook endpoint. | No | - |
 | `--disabled` | Create the webhook in a disabled state. | No | `false` |
 
@@ -42,8 +43,8 @@ pgbeam webhooks create https://example.com/hook
 # Create a Datadog webhook for specific events
 pgbeam webhooks create https://example.com/hook --format datadog --event query_blocked,canary_tripped
 
-# Create a disabled webhook with a secret
-pgbeam webhooks create https://example.com/hook --secret s3cr3t --disabled
+# Create a disabled webhook with a signing secret read from stdin
+printf %s "$SECRET" | pgbeam webhooks create https://example.com/hook --secret-stdin --disabled
 ```
 
 ## Output

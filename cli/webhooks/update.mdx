@@ -21,7 +21,8 @@ pgbeam webhooks update <id> [flags]
 | `--url <value>` | New destination URL for webhook deliveries. | No | - |
 | `--format <value>` | New delivery format: json, splunk_hec, datadog, or elastic. | No | - |
 | `--event <value>` | Replace subscribed event type(s). Comma-separated. | No | - |
-| `--secret <value>` | New shared secret used to sign webhook payloads. | No | - |
+| `--secret <value>` | New shared secret used to sign webhook payloads. Visible in shell history and the process list; prefer `--secret-stdin`. | No | - |
+| `--secret-stdin` | Read the signing secret from stdin. One trailing newline is removed. | No | `false` |
 | `--description <value>` | New human-readable description for the webhook endpoint. | No | - |
 | `--enabled` | Enable (true) or disable (false) the webhook endpoint. | No | - |
 
@@ -42,6 +43,9 @@ pgbeam webhooks update wh_xxx --event query_blocked,canary_tripped
 
 # Disable a webhook
 pgbeam webhooks update wh_xxx --enabled=false
+
+# Rotate a webhook's signing secret from stdin
+printf %s "$SECRET" | pgbeam webhooks update wh_xxx --secret-stdin
 ```
 
 ## Output
