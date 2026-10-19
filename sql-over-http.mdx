@@ -34,7 +34,7 @@ Parameters are bound over the PostgreSQL extended query protocol. Values are nev
 
 A parameter that is itself a JSON array binds as a PostgreSQL array, so `"params": [[1, 2, 3]]` works against `WHERE id = ANY($1)`. A JSON object binds as JSON. Both keep their exact values: a whole number never picks up exponent notation, and a string is never read back as SQL `NULL` or trimmed of surrounding whitespace.
 
-One statement per request. Batch bodies (a `queries` array) are rejected with a clear error; if you need multi-statement transactions in one request, use the [Neon-compatible `/sql` endpoint](/docs/serverless) and `sql.transaction([...])`.
+One statement per request. Batch bodies (a `queries` array) and query text holding more than one statement (`SELECT 1; SELECT 2`) are rejected with HTTP 400 before anything runs; a trailing semicolon, or one inside a string, comment, or dollar-quoted function body, is fine. If you need multi-statement transactions in one request, use the [Neon-compatible `/sql` endpoint](/docs/serverless) and `sql.transaction([...])`.
 
 ## Response
 
@@ -56,7 +56,7 @@ One statement per request. Batch bodies (a `queries` array) are rejected with a 
 | Field | Description |
 | --- | --- |
 | `columns` | Result columns with the PostgreSQL type name and OID. Empty for statements without a result set. |
-| `rows` | One JSON object per row, keyed by column name. Always present, `[]` when empty. |
+| `rows` | One JSON object per row, keyed by column name. A repeated column name gets a suffix (`id`, `id_2`) in both `columns` and `rows`, so every value keeps its own key. Always present, `[]` when empty. |
 | `command` | The completed command tag (`SELECT`, `INSERT`, `UPDATE`, ...). |
 | `rowCount` | Rows returned (reads) or affected (writes). `null` when the command reports no count. |
 

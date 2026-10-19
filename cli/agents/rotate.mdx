@@ -5,7 +5,7 @@ description: Rotate an agent credential's secrets
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Generate a new Postgres password and MCP token for an existing credential, keeping its id, username, name, and policy. Connections using the old password are dropped within seconds. The new secrets are shown once and cannot be retrieved again, so update your agent before its next call. A ready-to-paste MCP client config is printed alongside the secrets.
+Generate a new Postgres password and MCP token for an existing credential, keeping its id, username, name, and policy. Connections using the old password are dropped within seconds. The new secrets are shown once and cannot be retrieved again, so update your agent before its next call. A ready-to-paste MCP client config is printed alongside the secrets. The old secrets cannot be restored, so a confirmation prompt is shown unless `--yes` is passed.
 
 ## Usage
 
@@ -19,6 +19,7 @@ pgbeam agents rotate <id> [flags]
 | --- | --- | --- | --- |
 | `<id>` | Agent credential ID | Yes | - |
 | `--client <value>` | MCP client to emit config for: claude (default), claude-desktop, cursor, vscode, cline, windsurf, or all | No | `claude` |
+| `--yes`, `-y` | Skip the confirmation prompt (useful for scripts and CI/CD) | No | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -29,14 +30,14 @@ pgbeam agents rotate <id> [flags]
 ## Examples
 
 ```bash
-# Rotate a credential's secrets
+# Rotate a credential's secrets (with confirmation)
 pgbeam agents rotate agt_xxx
 
 # Rotate and emit a VS Code MCP config
 pgbeam agents rotate agt_xxx --client vscode
 
-# Rotate and capture secrets as JSON
-pgbeam agents rotate agt_xxx --json
+# Rotate without confirmation and capture secrets as JSON (CI/CD)
+pgbeam agents rotate agt_xxx --yes --json
 ```
 
 ## Output
