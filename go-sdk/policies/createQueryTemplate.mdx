@@ -1,0 +1,80 @@
+---
+title: CreateQueryTemplate
+description: Create a query template
+---
+
+{/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
+
+Adds a named, parameterized statement to the project. A template admits a statement for a policy profile that runs templates only; it never grants access, and the statement still meets the credential's whole policy.
+
+The SQL is parsed and checked when it is written: exactly one SELECT, INSERT, UPDATE or DELETE, placeholders $1 to $n, one declared parameter for each. A template that fails is refused with 400 and a message naming the problem. Returns 409 when the project already has a template of that name.
+
+The template is pushed to connected data planes when it is written.
+
+Returns 409 for an enabled template while the organization has a live self-hosted data plane enrollment, because PgBeam cannot yet confirm that a self-hosted proxy runs a build that enforces templates. A template with enabled set to false is still accepted.
+
+## Usage
+
+```go
+result, err := client.Policies.CreateQueryTemplate(ctx, "prj_xxx", pgbeam.QueryTemplateInput{
+    Name: "open_orders_for_customer",
+    Sql: "SELECT id, total FROM orders WHERE customer_id = $1 AND status = 'open' ORDER BY created_at DESC",
+  })
+```
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| ctx | `context.Context` | Yes | Request context |
+| projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
+| body | `pgbeam.QueryTemplateInput` | Yes | Request body |
+| body.Name | `string` | Yes | Name an agent invokes the template by. A lower-case identifier starting with a letter, at most 63 characters, unique within the project. |
+| body.Description | `*string` | No | What the template is for, shown to an agent that lists the templates. |
+| body.Sql | `string` | Yes | The statement, with its parameters as $1, $2 and so on. Exactly one SELECT, INSERT, UPDATE or DELETE, at most 16384 bytes. Every placeholder must be declared in params and every declared parameter must be used. |
+| body.Params | `*[]pgbeam.QueryTemplateParam` | No | Declared parameters, in placeholder order. Omitted means none. |
+| body.IncludeSql | `*bool` | No | True shows the SQL text to an agent that lists the templates. Defaults to false, since a WHERE clause can itself be sensitive. |
+| body.Enabled | `*bool` | No | Defaults to true, so a template is admitted as soon as it is written. False saves it withdrawn. |
+
+## Response
+
+`(*pgbeam.QueryTemplate, error)`: query template created.
+
+## Example
+
+```go
+import pgbeam "go.pgbeam.com/sdk"
+
+client := pgbeam.NewClient(&pgbeam.ClientOptions{
+  APIKey: "pbu_...",
+})
+
+description := "Open orders for one customer, newest first."
+includeSql := false
+enabled := true
+result, err := client.Policies.CreateQueryTemplate(ctx, "prj_xxx", pgbeam.QueryTemplateInput{
+    Name: "open_orders_for_customer",
+    Sql: "SELECT id, total FROM orders WHERE customer_id = $1 AND status = 'open' ORDER BY created_at DESC",
+    Description: &description,
+    IncludeSql: &includeSql,
+    Enabled: &enabled,
+  })
+if err != nil {
+  log.Fatal(err)
+}
+fmt.Println(result)
+```
+
+## Errors
+
+| Status | Description |
+| --- | --- |
+| 400 | The request was rejected. `code` is `INVALID_INPUT`, and `errors` names the offending fields when the failure was a validation one. |
+| 401 | Missing or invalid authentication. `code` is `UNAUTHORIZED`. |
+| 403 | The caller is authenticated but not allowed to perform this operation. `code` is `FORBIDDEN` when the caller's role is insufficient, and `PLAN_LIMIT_REACHED` when the organization's plan is what stands in the way. The two are answered differently, so branch on the code rather than the status. |
+| 404 | The resource does not exist, or the caller is not entitled to know that it does. `code` is `NOT_FOUND`. |
+| 409 | The request conflicts with the current state. `code` distinguishes the cases: `RESOURCE_EXISTS` for a name or value already in use, `INVALID_STATE` for a resource that is no longer in a state that allows the operation, and `IDEMPOTENCY_KEY_REUSED` for a retry whose body does not match the request the key was first used for. |
+| 413 | The request body exceeds the 2 MB limit. `code` is `PAYLOAD_TOO_LARGE`. |
+| 415 | The request body is not JSON, or carries a body without declaring a Content-Type. `code` is `UNSUPPORTED_MEDIA_TYPE`. |
+| 429 | Rate limited. `code` is `RATE_LIMITED`. |
+| 500 | The request failed for a reason on our side. `code` is `INTERNAL_ERROR`. Quote `request_id` when reporting it. |
