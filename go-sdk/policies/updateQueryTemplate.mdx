@@ -5,16 +5,9 @@ description: Update a query template
 
 {/* Auto-generated from OpenAPI. Do not edit. Run `pnpm generate:sdk-docs` to regenerate. */}
 
-Replaces the template's name, description, SQL, parameters, include_sql
-and enabled flag. The SQL is checked as on create. A statement already
-admitted under the old template is not affected; the next one is
-matched against the new text.
+Replaces the template's name, description, SQL, parameters, include_sql and enabled flag. The SQL is checked as on create. A statement already admitted under the old template is not affected; the next one is matched against the new text.
 
-Returns 409 on a rename to a name the project already uses, and when
-the update leaves the template enabled while the organization has a
-live self-hosted data plane enrollment, for the same reason as create.
-Setting enabled to false is still accepted.
-
+Returns 409 on a rename to a name the project already uses, and when the update leaves the template enabled while the organization has a live self-hosted data plane enrollment, for the same reason as create. Setting enabled to false is still accepted.
 
 ## Usage
 

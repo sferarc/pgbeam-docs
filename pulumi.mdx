@@ -2,13 +2,10 @@
 title: Pulumi
 icon: Blocks
 tag: TypeScript
-description:
-  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as
-  infrastructure using Pulumi and the @pgbeam/pulumi package.
+description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as infrastructure using Pulumi and the @pgbeam/pulumi package.
 ---
 
-Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi`
-package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
+Manage your PgBeam infrastructure as code with Pulumi. The `@pgbeam/pulumi` package provides native Pulumi resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
 
 ## Setup
 
@@ -18,21 +15,9 @@ package provides native Pulumi resources for projects, databases, replicas, cust
 ### Install the package
 
 <Tabs items={["npm", "pnpm", "yarn"]}>
-<Tab value="npm">
-```bash
-npm install @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
-<Tab value="pnpm">
-```bash
-pnpm add @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
-<Tab value="yarn">
-```bash
-yarn add @pgbeam/pulumi @pulumi/pulumi
-```
-</Tab>
+  <Tab value="npm">```bash npm install @pgbeam/pulumi @pulumi/pulumi ```</Tab>
+  <Tab value="pnpm">```bash pnpm add @pgbeam/pulumi @pulumi/pulumi ```</Tab>
+  <Tab value="yarn">```bash yarn add @pgbeam/pulumi @pulumi/pulumi ```</Tab>
 </Tabs>
 
 </Step>
@@ -61,7 +46,8 @@ import * as pulumi from "@pulumi/pulumi";
 const config = new pulumi.Config();
 
 pgbeam.configure({ apiKey: config.requireSecret("pgbeamApiKey") });
-```
+
+````
 
 Pass `configure()` a secret, never a string literal: a literal key ends up in your program source.
 </Tab>
@@ -91,7 +77,7 @@ const project = new pgbeam.Project("my-app", {
 });
 
 export const proxyHost = project.proxyHost;
-```
+````
 
 </Step>
 <Step>
@@ -102,9 +88,7 @@ export const proxyHost = project.proxyHost;
 pulumi up
 ```
 
-Pulumi creates the PgBeam project and its primary database atomically.
-The `proxyHost` output gives you the PgBeam proxy endpoint to use in your
-application connection string.
+Pulumi creates the PgBeam project and its primary database atomically. The `proxyHost` output gives you the PgBeam proxy endpoint to use in your application connection string.
 
 </Step>
 </Steps>
@@ -113,11 +97,11 @@ application connection string.
 
 <Callout type="info">
   **Every policy rule type is managed as code.** Policy profiles, honeytokens,
-  anomaly rules and approval rules are managed resources, so the enforcement rules,
-  the decoys, the detection sensitivity and what needs a human all live in your
-  reviewed IaC flow and are covered by drift detection. Approving or rejecting an
-  individual held statement is an operational decision rather than configuration,
-  so it stays in the dashboard, the CLI and the API.
+  anomaly rules and approval rules are managed resources, so the enforcement
+  rules, the decoys, the detection sensitivity and what needs a human all live
+  in your reviewed IaC flow and are covered by drift detection. Approving or
+  rejecting an individual held statement is an operational decision rather than
+  configuration, so it stays in the dashboard, the CLI and the API.
 </Callout>
 
 ### Project
@@ -130,7 +114,10 @@ const res = new pgbeam.Project("example", {
   name: "my-app",
   description: "Production database proxy",
   tags: ["production", "us-east-1"],
-  allowedCidrs: [{ cidr: "10.0.0.0/8", label: "VPC" }, { cidr: "2001:db8::/32", label: "IPv6 range" }],
+  allowedCidrs: [
+    { cidr: "10.0.0.0/8", label: "VPC" },
+    { cidr: "2001:db8::/32", label: "IPv6 range" },
+  ],
   defaultPolicyProfileId: "pol_01h455vb4pex5vsknk084sn02q",
   residency: "eu",
   agentsDisabled: false,
@@ -382,14 +369,11 @@ const res = new pgbeam.ApprovalRule("example", {
 | `PGBEAM_API_KEY` | Environment | Fallback API key |
 | `PGBEAM_API_URL` | Environment | Fallback base URL |
 
-Config resolution order: `configure()` call > Pulumi stack config > environment
-variables. A `configure()` call replaces both settings: if it omits `baseUrl`,
-the default URL applies, not `pgbeam:baseUrl` or `PGBEAM_API_URL`.
+Config resolution order: `configure()` call > Pulumi stack config > environment variables. A `configure()` call replaces both settings: if it omits `baseUrl`, the default URL applies, not `pgbeam:baseUrl` or `PGBEAM_API_URL`.
 
 ## Replacement vs update
 
-Some property changes trigger resource replacement (delete + create) rather
-than in-place updates:
+Some property changes trigger resource replacement (delete + create) rather than in-place updates:
 
 | Resource | Replacement triggers |
 | --- | --- |
