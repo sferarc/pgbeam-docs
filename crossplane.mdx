@@ -2,10 +2,14 @@
 title: Crossplane
 icon: Blocks
 tag: Kubernetes
-description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as Kubernetes custom resources using the Crossplane provider.
+description:
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as
+  Kubernetes custom resources using the Crossplane provider.
 ---
 
-Manage your PgBeam infrastructure as Kubernetes custom resources with Crossplane. The `provider-pgbeam` package provides managed resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
+Manage your PgBeam infrastructure as Kubernetes custom resources with
+Crossplane. The `provider-pgbeam` package provides managed resources for
+projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
 
 ## Setup
 
@@ -15,7 +19,7 @@ Manage your PgBeam infrastructure as Kubernetes custom resources with Crossplane
 ### Install the provider
 
 <Callout type="info">
-  The Crossplane provider is coming soon. Registry publishing is on the roadmap.
+The Crossplane provider is coming soon. Registry publishing is on the roadmap.
 </Callout>
 
 ```yaml title="provider.yaml"
@@ -59,7 +63,7 @@ spec:
     name: pgbeam-credentials
     namespace: crossplane-system
     key: api-key
-  baseUrl: https://api.pgbeam.com # optional
+  baseUrl: https://api.pgbeam.com  # optional
 ```
 
 ```bash
@@ -102,7 +106,9 @@ spec:
 kubectl apply -f project.yaml
 ```
 
-Crossplane creates the PgBeam project and its primary database atomically. The proxy hostname is available in `status.atProvider.proxyHost` and published to the connection secret.
+Crossplane creates the PgBeam project and its primary database atomically.
+The proxy hostname is available in `status.atProvider.proxyHost` and
+published to the connection secret.
 
 ```bash
 kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
@@ -115,11 +121,11 @@ kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
 
 <Callout type="info">
   **Every policy rule type is managed as code.** Policy profiles, honeytokens,
-  anomaly rules and approval rules are managed resources, so the enforcement
-  rules, the decoys, the detection sensitivity and what needs a human all live
-  in your reviewed IaC flow and are covered by drift detection. Approving or
-  rejecting an individual held statement is an operational decision rather than
-  configuration, so it stays in the dashboard, the CLI and the API.
+  anomaly rules and approval rules are managed resources, so the enforcement rules,
+  the decoys, the detection sensitivity and what needs a human all live in your
+  reviewed IaC flow and are covered by drift detection. Approving or rejecting an
+  individual held statement is an operational decision rather than configuration,
+  so it stays in the dashboard, the CLI and the API.
 </Callout>
 
 ### Project
@@ -137,11 +143,7 @@ spec:
     name: my-app
     description: Production database proxy
     tags: ["production", "us-east-1"]
-    allowedCidrs:
-      [
-        { cidr: "10.0.0.0/8", label: "VPC" },
-        { cidr: "2001:db8::/32", label: "IPv6 range" },
-      ]
+    allowedCidrs: [{ cidr: "10.0.0.0/8", label: "VPC" }, { cidr: "2001:db8::/32", label: "IPv6 range" }]
     defaultPolicyProfileID: pol_01h455vb4pex5vsknk084sn02q
     residency: eu
     agentsDisabled: false
@@ -479,7 +481,11 @@ spec:
 
 ## Immutable fields
 
-Crossplane never replaces a managed resource on its own. The fields below are immutable: the API server rejects an edit that changes, sets or removes them, with an error such as `projectID is immutable; delete and recreate the resource to change it`. To change one, delete the managed resource and create it again with the new value.
+Crossplane never replaces a managed resource on its own. The fields below are
+immutable: the API server rejects an edit that changes, sets or removes them,
+with an error such as `projectID is immutable; delete and recreate the
+resource to change it`. To change one, delete the managed resource and create
+it again with the new value.
 
 | Resource | Immutable fields |
 | --- | --- |

@@ -2,10 +2,13 @@
 title: Terraform
 icon: Blocks
 tag: HCL
-description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as infrastructure using Terraform and the pgbeam provider.
+description:
+  Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as
+  infrastructure using Terraform and the pgbeam provider.
 ---
 
-Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
+Manage your PgBeam infrastructure as code with Terraform. The `pgbeam`
+provider offers native resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
 
 ## Setup
 
@@ -15,7 +18,7 @@ Manage your PgBeam infrastructure as code with Terraform. The `pgbeam` provider 
 ### Configure the provider
 
 <Callout type="info">
-  The Terraform provider is coming soon. Registry publishing is on the roadmap.
+The Terraform provider is coming soon. Registry publishing is on the roadmap.
 </Callout>
 
 ```hcl title="main.tf"
@@ -48,15 +51,15 @@ variable "pgbeam_api_key" {
   sensitive = true
 }
 
-provider "pgbeam" { api_key = var.pgbeam_api_key }
-
-````
+provider "pgbeam" {
+  api_key = var.pgbeam_api_key
+}
+```
 </Tab>
 <Tab value="Environment variable">
 ```bash
 export PGBEAM_API_KEY=pgb_your_api_key
-````
-
+```
 </Tab>
 </Tabs>
 
@@ -93,7 +96,9 @@ output "proxy_host" {
 terraform apply
 ```
 
-Terraform creates the PgBeam project and its primary database atomically. The `proxy_host` output gives you the PgBeam proxy endpoint to use in your application connection string.
+Terraform creates the PgBeam project and its primary database atomically.
+The `proxy_host` output gives you the PgBeam proxy endpoint to use in your
+application connection string.
 
 </Step>
 </Steps>
@@ -102,11 +107,11 @@ Terraform creates the PgBeam project and its primary database atomically. The `p
 
 <Callout type="info">
   **Every policy rule type is managed as code.** Policy profiles, honeytokens,
-  anomaly rules and approval rules are managed resources, so the enforcement
-  rules, the decoys, the detection sensitivity and what needs a human all live
-  in your reviewed IaC flow and are covered by drift detection. Approving or
-  rejecting an individual held statement is an operational decision rather than
-  configuration, so it stays in the dashboard, the CLI and the API.
+  anomaly rules and approval rules are managed resources, so the enforcement rules,
+  the decoys, the detection sensitivity and what needs a human all live in your
+  reviewed IaC flow and are covered by drift detection. Approving or rejecting an
+  individual held statement is an operational decision rather than configuration,
+  so it stays in the dashboard, the CLI and the API.
 </Callout>
 
 ### pgbeam_project
@@ -436,10 +441,10 @@ data "pgbeam_custom_domain_verification" "example" {
 
 **Computed:** `verified`, `error`
 
-| Attribute  | Description                           |
-| ---------- | ------------------------------------- |
-| `verified` | Whether DNS verification succeeded.   |
-| `error`    | Error message if verification failed. |
+| Attribute | Description |
+| --- | --- |
+| `verified` | Whether DNS verification succeeded. |
+| `error` | Error message if verification failed. |
 
 ## Configuration
 
@@ -454,7 +459,8 @@ Config resolution order: provider block > environment variables.
 
 ## Replacement vs update
 
-Some property changes trigger resource replacement (destroy + create) rather than in-place updates:
+Some property changes trigger resource replacement (destroy + create) rather
+than in-place updates:
 
 | Resource | Replacement triggers |
 | --- | --- |
