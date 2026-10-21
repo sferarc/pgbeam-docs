@@ -25,7 +25,6 @@
 		"account",
 		"demo",
 		"support",
-		"batch",
-		"internal"
+		"batch"
 	]
 }
