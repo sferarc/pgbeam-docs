@@ -1,0 +1,41 @@
+---
+title: templates list
+description: List query templates
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Lists the project's query templates, including disabled ones.
+
+## Usage
+
+```bash
+pgbeam templates list [flags]
+```
+
+## Options
+
+| Option            | Description                     | Required | Default |
+| ----------------- | ------------------------------- | -------- | ------- |
+| `--limit <value>` | Maximum number of items (1-100) | No       | -       |
+| `--all`           | Fetch every page                | No       | -       |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# List query templates
+pgbeam templates list
+
+# Output as JSON
+pgbeam templates list --json
+```
+
+## Output
+
+Renders a human-readable table or detail view by default; pass `--json` for the raw API response.

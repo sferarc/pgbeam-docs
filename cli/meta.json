@@ -23,6 +23,7 @@
 		"approvals",
 		"anomalies",
 		"honeytokens",
+		"templates",
 		"audit",
 		"webhooks",
 		"branches",

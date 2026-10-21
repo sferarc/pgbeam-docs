@@ -1,0 +1,51 @@
+---
+title: templates update
+description: Update a query template
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Update an existing query template. Only the fields you pass are changed; every other field is carried over from the stored template. `--param` replaces the whole parameter list, so pass every parameter again in placeholder order, or `--clear-params` for a statement that takes none. The API parses the result again and refuses it if the SQL and the parameters no longer agree.
+
+## Usage
+
+```bash
+pgbeam templates update <id> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<id>` | ID of the query template to update | Yes | - |
+| `--name <value>` | Rename the template. Agents invoke it by the new name. | No | - |
+| `--sql <value>` | Replace the statement. | No | - |
+| `--sql-file <value>` | Replace the statement from a file, or from stdin with `-`. | No | - |
+| `--param <value>` | Replace the parameter list. Declare each as name:type or name:type:null, repeated in placeholder order. | No | - |
+| `--clear-params` | Remove every declared parameter. | No | `false` |
+| `--description <value>` | Replace the description shown to agents. | No | - |
+| `--include-sql` | Show (true) or hide (false) the SQL text to agents that list the templates. | No | - |
+| `--enabled` | Admit (true) or withdraw (false) the template. | No | - |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Withdraw a template without deleting it
+pgbeam templates update qtp_xxx --enabled=false
+
+# Replace the statement and its parameters
+pgbeam templates update qtp_xxx --sql-file open_orders.sql --param customer_id:bigint --param status:text
+
+# Show the SQL to agents that list the templates
+pgbeam templates update qtp_xxx --include-sql
+```
+
+## Output
+
+Prints a success message confirming the template was updated. With `--json`, returns the full updated template object from the API.

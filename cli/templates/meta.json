@@ -1,0 +1,12 @@
+{
+	"defaultOpen": false,
+	"title": "templates",
+	"icon": "FileCheck",
+	"pages": [
+		"list",
+		"create",
+		"show",
+		"update",
+		"delete"
+	]
+}

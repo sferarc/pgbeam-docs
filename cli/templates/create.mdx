@@ -1,0 +1,49 @@
+---
+title: templates create
+description: Create a query template
+---
+
+{/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
+
+Add a named, parameterized statement to the linked project. A template admits a statement for a policy profile that runs templates only; it never grants access, and a statement it admits still meets the credential's whole policy. Write placeholders as $1, $2 and so on, and declare one `--param name:type` for each, in placeholder order; append `:null` to let an argument be omitted. The API parses the SQL on write and refuses anything that is not exactly one SELECT, INSERT, UPDATE or DELETE whose placeholders match the declared parameters.
+
+## Usage
+
+```bash
+pgbeam templates create <name> [flags]
+```
+
+## Options
+
+| Option | Description | Required | Default |
+| --- | --- | --- | --- |
+| `<name>` | Name an agent invokes the template by: a lower-case identifier. | Yes | - |
+| `--sql <value>` | The statement, with parameters as $1, $2 and so on. | No | - |
+| `--sql-file <value>` | Read the statement from a file, or from stdin with `-`. | No | - |
+| `--param <value>` | Declare a parameter as name:type or name:type:null. Repeat once per placeholder, in order. Types: text, integer, bigint, double precision, numeric, boolean, uuid, date, timestamptz, jsonb. | No | - |
+| `--description <value>` | What the template is for, shown to an agent that lists the templates. | No | - |
+| `--include-sql` | Show the SQL text to an agent that lists the templates. Off by default. | No | `false` |
+| `--disabled` | Save the template withdrawn, so it admits nothing until enabled. | No | `false` |
+
+<Callout type="info" title="Global options">
+  All [global options](/docs/cli/global-options) (`--token`, `--profile`,
+  `--project`, `--org`, `--json`, `--no-color`, `--no-trunc`, `--debug`) are
+  also available on this command.
+</Callout>
+
+## Examples
+
+```bash
+# Create a template with one parameter
+pgbeam templates create open_orders --sql "SELECT id, total FROM orders WHERE customer_id = \$1 AND status = 'open'" --param customer_id:bigint
+
+# Read a multi-line statement from a file and describe it for agents
+pgbeam templates create orders_since --sql-file orders_since.sql --param customer_id:bigint --param since:timestamptz:null --description "Orders for one customer, optionally since a date"
+
+# Save a template withdrawn, so it admits nothing yet
+pgbeam templates create recent_signups --sql-file signups.sql --disabled
+```
+
+## Output
+
+Prints the new template's ID, its statement kind and its parameters. With `--json`, returns the full template object from the API.
