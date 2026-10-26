@@ -58,4 +58,4 @@ pgbeam-dev serve -policy policy.yaml \
 
 The gateway listens on `127.0.0.1:6432` (change with `-listen`) and prints a connection string for a local `agent_dev` credential. Connect any client, ORM, or agent to it and every statement is enforced exactly like production: blocked statements get the same LLM-readable errors, masked columns come back redacted, row filters are injected before the statement reaches your dev database. Each decision is logged to stdout.
 
-Local limits, by design: no TLS (loopback only), approvals fail closed (no reviewer exists locally), `write_mode: sandbox` writes are rejected (no instant branches), budgets reset on restart, and the query cache is disabled so every statement hits the database. The tool's README (`backend/tools/pgbeam-dev/README.md` in the source tree) has the full flag reference.
+Local limits, by design: no TLS (loopback only), approvals fail closed (no reviewer exists locally), budgets reset on restart, and the query cache is disabled so every statement hits the database. The tool's README (`backend/tools/pgbeam-dev/README.md` in the source tree) has the full flag reference.

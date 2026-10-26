@@ -30,7 +30,7 @@ result, err := client.Policies.CreateQueryTemplate(ctx, "prj_xxx", pgbeam.QueryT
 | projectID | `string` | Yes | Unique project identifier (prefixed, e.g. prj_xxx). |
 | body | `pgbeam.QueryTemplateInput` | Yes | Request body |
 | body.Name | `string` | Yes | Name an agent invokes the template by. A lower-case identifier starting with a letter, at most 63 characters, unique within the project. |
-| body.Description | `*string` | No | What the template is for, shown to an agent that lists the templates. |
+| body.Description | `*string` | No | What the template is for, shown to an agent that lists the templates. Defaults to empty. |
 | body.Sql | `string` | Yes | The statement, with its parameters as $1, $2 and so on. Exactly one SELECT, INSERT, UPDATE or DELETE, at most 16384 bytes. Every placeholder must be declared in params and every declared parameter must be used. |
 | body.Params | `*[]pgbeam.QueryTemplateParam` | No | Declared parameters, in placeholder order. Omitted means none. |
 | body.IncludeSql | `*bool` | No | True shows the SQL text to an agent that lists the templates. Defaults to false, since a WHERE clause can itself be sensitive. |

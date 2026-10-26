@@ -78,7 +78,7 @@ PgBeam signs every native (`json`) and `elastic` delivery. Two signature headers
 - `X-PgBeam-Signature` (v1) is the HMAC-SHA-256 of the raw request body only.
 - `X-PgBeam-Signature-V2` (v2) is the HMAC-SHA-256 of the exact byte string `timestamp + "." + body`, where `timestamp` is the same value sent in the `X-PgBeam-Timestamp` header (unix seconds, as a decimal string) and `.` is a single literal period. Because the timestamp is part of the signed bytes, a captured delivery cannot be replayed with a rewritten timestamp: rewriting it invalidates the signature. This is the same construction Stripe uses.
 
-Each delivery also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`, `X-PgBeam-Timestamp` (unix seconds), and `X-PgBeam-Delivery` (a per-attempt id for de-duplication).
+Each delivery also carries `X-PgBeam-Event`, `X-PgBeam-Event-Id`, `X-PgBeam-Timestamp` (unix seconds), and `X-PgBeam-Delivery`. `X-PgBeam-Event-Id` matches the event's `id` and is the same on every endpoint that receives the event. `X-PgBeam-Delivery` identifies one event sent to one endpoint: it stays the same on every retry of that delivery and differs between endpoints.
 
 We recommend verifying `X-PgBeam-Signature-V2` and rejecting stale timestamps. v1 stays in place unchanged for existing receivers, so you can migrate at your own pace. The SIEM/token destinations (Splunk HEC, Datadog) carry neither signature; they authenticate with the destination's own token.
 
@@ -140,15 +140,20 @@ export function verify(
 </Callout>
 
 <Callout type="info" title="Delivery and retries">
-  PgBeam expects a `2xx` within a few seconds. A non-`2xx` or a timeout is
-  retried with exponential backoff. Redirects are not followed: a `3xx` counts
-  as a failed attempt, so register the final URL. Make your receiver idempotent
-  by keying on the event `id`, which is stable across retries.
+  PgBeam expects a `2xx` response. A request that gets no response within 10
+  seconds counts as a timeout. A non-`2xx` response or a timeout is retried.
+  Redirects are not followed: a `3xx` counts as a failed attempt, so register
+  the final URL. Each delivery gets up to 8 attempts, with waits of 30 seconds,
+  2 minutes, 10 minutes, 1 hour, 6 hours, 12 hours, and 24 hours between them.
+  If the eighth attempt fails, about 43 hours after the first, the delivery is
+  given up. While an endpoint is disabled its deliveries are held without using
+  attempts, for up to 7 days. Make your receiver idempotent by keying on the
+  event `id` or `X-PgBeam-Delivery`, both of which are stable across retries.
 </Callout>
 
 ## SIEM formats
 
-For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that product ingests it. The signing and retry behavior is the same.
+For a SIEM, set the endpoint's `format` and PgBeam shapes each event the way that product ingests it. Retry behavior is the same. Signing differs for `splunk_hec` and `datadog`, as noted below the table.
 
 | Format | Sends |
 | --- | --- |

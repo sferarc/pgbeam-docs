@@ -2,10 +2,10 @@
 title: Crossplane
 icon: Blocks
 tag: Kubernetes
-description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules as Kubernetes custom resources using the Crossplane provider.
+description: Manage PgBeam projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, approval rules, and query templates as Kubernetes custom resources using the Crossplane provider.
 ---
 
-Manage your PgBeam infrastructure as Kubernetes custom resources with Crossplane. The `provider-pgbeam` package provides managed resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, and approval rules.
+Manage your PgBeam infrastructure as Kubernetes custom resources with Crossplane. The `provider-pgbeam` package provides managed resources for projects, databases, replicas, custom domains, cache rules, spend limits, agent credentials, policy profiles, webhook endpoints, self host enrollments, honeytokens, anomaly rules, approval rules, and query templates.
 
 ## Setup
 
@@ -115,10 +115,11 @@ kubectl get project my-app -o jsonpath='{.status.atProvider.proxyHost}'
 
 <Callout type="info">
   **Every policy rule type is managed as code.** Policy profiles, honeytokens,
-  anomaly rules and approval rules are managed resources, so the enforcement
-  rules, the decoys, the detection sensitivity and what needs a human all live
-  in your reviewed IaC flow and are covered by drift detection. Approving or
-  rejecting an individual held statement is an operational decision rather than
+  anomaly rules, approval rules and query templates are managed resources, so
+  the enforcement rules, the decoys, the detection sensitivity, what needs a
+  human and the statements a templates-only credential may run all live in your
+  reviewed IaC flow and are covered by drift detection. Approving or rejecting
+  an individual held statement is an operational decision rather than
   configuration, so it stays in the dashboard, the CLI and the API.
 </Callout>
 
@@ -344,6 +345,7 @@ spec:
     maxAffectedRows: 0
     contentScanMode: off
     contentScanMaxBytes: 0
+    queryMode: sql
   providerConfigRef:
     name: default
 ```
@@ -470,6 +472,30 @@ spec:
 
 **Status:** `createdAt`, `updatedAt`
 
+### QueryTemplate
+
+Manages a query template: a named, parameterized statement, scoped to a project, that a policy profile set to admit templates only lets its credentials run in place of raw SQL. A template admits a statement; it never grants access, so a statement it admits still meets the credential's whole policy. The sql is validated on every write and must be exactly one SELECT, INSERT, UPDATE or DELETE whose placeholders ($1, $2, ...) match params in order. The name must be unique within the project. enabled=false withdraws the template. A write is pushed to connected data planes immediately.
+
+```yaml
+apiVersion: pgbeam.com/v1alpha1
+kind: QueryTemplate
+metadata:
+  name: example
+spec:
+  forProvider:
+    projectID: prj_01j9x8y7z6w5v4u3t2s1r0q9p8
+    name: open_orders_for_customer
+    description: Open orders for one customer, newest first.
+    sql: SELECT id, total FROM orders WHERE customer_id = $1 AND status = 'open' ORDER BY created_at DESC
+    params: ["..."]
+    includeSQL: false
+    enabled: true
+  providerConfigRef:
+    name: default
+```
+
+**Status:** `statementKind`, `createdAt`, `updatedAt`
+
 ## Configuration
 
 | Setting | Source | Description |
@@ -496,6 +522,7 @@ Crossplane never replaces a managed resource on its own. The fields below are im
 | Honeytoken | `projectID` |
 | AnomalyRule | `projectID` |
 | ApprovalRule | `projectID` |
+| QueryTemplate | `projectID` |
 
 ## Further reading
 

@@ -1,10 +1,10 @@
 ---
 title: Vercel Marketplace
 icon: Blocks
-description: Deploy PgBeam as a Vercel Marketplace integration. Provision a policy-enforced Postgres gateway with pooling and caching directly from your Vercel dashboard.
+description: Provision a PgBeam project from the Vercel Marketplace, get its proxy connection string as Vercel environment variables, and pay for usage on your Vercel invoice.
 ---
 
-Deploy PgBeam directly from the [Vercel Marketplace](https://vercel.com/marketplace). The integration provisions a PgBeam project, connects it to your database, and injects connection secrets into your Vercel project. Zero configuration required.
+The [Vercel Marketplace](https://vercel.com/marketplace) integration creates PgBeam projects from your Vercel dashboard and bills them through Vercel. Each resource you provision is a PgBeam project. The integration does not register an upstream database or create database credentials, so the `DATABASE_URL` it sets is a template you complete before your app can connect.
 
 <Callout type="info">
   The integration is built and ready. The public Vercel Marketplace listing goes
@@ -18,37 +18,46 @@ Deploy PgBeam directly from the [Vercel Marketplace](https://vercel.com/marketpl
   <Step>
     ### Install from Vercel Marketplace
 
-    Find PgBeam in the Vercel Marketplace and click **Add Integration**. This
-    creates a PgBeam organization linked to your Vercel team.
+    Find PgBeam in the Vercel Marketplace and click **Add Integration**. PgBeam
+    creates an organization for the installation on the Starter plan.
 
   </Step>
 
   <Step>
     ### Provision a resource
 
-    From the integration page, create a new PgBeam resource. Provide your upstream
-    database connection details and PgBeam provisions a project with connection
-    pooling and optional query caching.
+    From the integration page, create a PgBeam resource with a name and a
+    billing plan. PgBeam creates an empty project with that name, applies the
+    plan's limits, and counts it against the organization's project limit. No
+    upstream database is attached at this point.
 
   </Step>
 
   <Step>
-    ### Connect your app
+    ### Complete the connection string
 
-    PgBeam automatically sets `DATABASE_URL` and `PGBEAM_PROJECT_ID` as
-    environment variables in your Vercel project. Update your application to use
-    the PgBeam connection string. No code changes beyond swapping the DSN.
+    PgBeam returns two environment variables to Vercel:
+
+    | Variable            | Value                                                        |
+    | ------------------- | ------------------------------------------------------------ |
+    | `PGBEAM_PROJECT_ID` | The ID of the PgBeam project                                 |
+    | `DATABASE_URL`      | `postgresql://USER:PASSWORD@<project-host>:5432/DATABASE`    |
+
+    `<project-host>` is the project's PgBeam proxy hostname. `USER`, `PASSWORD`
+    and `DATABASE` are literal placeholders, so `DATABASE_URL` does not connect
+    as set. Register your upstream database on the project, then replace the
+    placeholders with that database's name and credentials before your app
+    uses the variable.
 
   </Step>
 </Steps>
 
 ## Features
 
-- **One-click provisioning**: create PgBeam projects without leaving Vercel
-- **Automatic secrets**: connection strings injected as environment variables
+- **Provisioning from Vercel**: create, rename and change the plan of PgBeam projects from the integration page
+- **Environment variables**: `DATABASE_URL` (a template to complete) and `PGBEAM_PROJECT_ID` set on provisioning
 - **Unified billing**: PgBeam usage appears on your Vercel invoice
-- **Per-project resources**: each Vercel project gets its own PgBeam project
-- **Team sync**: Vercel team members get access to the PgBeam dashboard
+- **Per-resource projects**: each resource is its own PgBeam project, and deleting the resource deletes the project
 
 ## Billing
 

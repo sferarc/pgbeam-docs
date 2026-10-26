@@ -20,7 +20,7 @@ Policies apply to agent credentials and to human credentials alike. Every rule b
 | Write row cap | Hard cap on rows a single write may affect (over-cap writes roll back and block). | [Budgets](/docs/budgets) |
 | Approvals | Hold writes or DDL until a human approves them. | [Approvals](/docs/approvals) |
 | Migration linting | Warn or block dangerous DDL (locks, rewrites, unsafe drops). | [Safe migrations](/docs/safe-migrations) |
-| Sandbox target | Route writes to a throwaway branch or roll them back. | [Sandbox writes](/docs/sandbox-writes) |
+| Write mode | Commit writes normally or run them as a dry-run that rolls back. | [Dry-run writes](/docs/dry-run-writes) |
 
 ## Create and attach a policy
 
@@ -152,5 +152,5 @@ The most specific scope wins: a per-credential policy overrides a per-database p
 - [Query budgets](/docs/budgets)
 - [Approvals](/docs/approvals)
 - [Safe migrations](/docs/safe-migrations)
-- [Sandbox writes](/docs/sandbox-writes)
+- [Dry-run writes](/docs/dry-run-writes)
 - [Kill-switch](/docs/kill-switch)

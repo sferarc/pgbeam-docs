@@ -1,0 +1,67 @@
+---
+title: Dry-run Writes
+icon: RotateCcw
+description: Run every write an agent sends in always-rollback dry-run mode. The statement executes against your database and reports its real outcome, then rolls back. Nothing persists.
+---
+
+Read-only enforcement keeps an agent off your data by refusing every write. That is the right default. It is also too strict when you want to see what the agent would write: a backfill, a generated `UPDATE` you want to test before you trust it. Dry-run writes sit in between. The agent writes for real, and nothing it writes is kept.
+
+## Always-rollback dry-run
+
+Set a credential's write mode to `rollback` and PgBeam runs each write the agent sends, then rolls it back. The statement executes against your database, so the agent gets real errors, the true affected-row count, and any `RETURNING` rows, but the transaction never commits.
+
+<Tabs items={["CLI", "Dashboard", "API"]}>
+  <Tab value="CLI">
+    ```bash
+    # Writes execute, then roll back
+    pgbeam policies create --name writer-dryrun \
+      --mode read_write \
+      --write-mode rollback
+    # → Policy profile created: pol_1a2b3c…
+
+    pgbeam agents create --name backfill-bot --policy pol_1a2b3c…
+    ```
+
+  </Tab>
+
+<Tab value="Dashboard">
+  On the policy profile, set the access mode to read-write and **Write mode** to
+  **Always-rollback (dry-run)**.
+</Tab>
+
+  <Tab value="API">
+    ```json title="Dry-run policy"
+    {
+      "name": "writer-dryrun",
+      "access_mode": "read_write",
+      "write_mode": "rollback"
+    }
+    ```
+  </Tab>
+</Tabs>
+
+Use dry-run to validate a generated `UPDATE` against live data and constraints before you let it commit. When the result looks right, switch the credential back to `normal` (`pgbeam policies update pol_1a2b3c… --write-mode normal`).
+
+| Situation | Use |
+| --- | --- |
+| Agent should only read | [Read-only](/docs/read-only) |
+| Agent should write, but never persist | Always-rollback dry-run (this page) |
+| A human should sign off before a write lands | [Approvals](/docs/approvals) |
+
+## How it works
+
+The proxy brackets each write as `BEGIN; <statement>; ROLLBACK`. The database does the real work, then the proxy issues the rollback, so the agent observes the true outcome while your data stays untouched.
+
+- The mode is set on the credential by whoever wrote the policy profile, not switched on per query by the agent.
+- It applies to every write the credential sends. There is no way to opt one write out.
+- It needs the simple query protocol. The same write over the extended or prepared protocol is refused rather than silently committed.
+- It cannot run inside the client's own `BEGIN` and `COMMIT`. Send each write on its own. See [error codes](/docs/error-codes#25001-controlled-write-inside-a-transaction).
+
+The core guarantee holds for every statement: an agent with a dry-run credential cannot change your data. Every write it tries is still recorded in the [audit log](/docs/audit-log).
+
+## Related
+
+- [Read-only enforcement](/docs/read-only): block writes entirely.
+- [Approvals](/docs/approvals): hold a write for human sign-off.
+- [Policies](/docs/policies): how the write mode binds to a credential.
+- [Audit log](/docs/audit-log): every statement the agent ran.

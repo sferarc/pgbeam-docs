@@ -72,16 +72,13 @@ ERROR: migration blocked: unsafe_drop. DROP COLUMN destroys data with no undo.
 Hint: deprecate the column first, then drop it in a later release.
 ```
 
-<Callout type="info" title="Pair with approvals and branches">
+<Callout type="info" title="Pair with approvals">
   Blocking is the strict end. To let risky DDL through under supervision, hold
-  it for [approval](/docs/approvals). To let an agent iterate on DDL with no
-  risk at all, point it at a [branch](/docs/sandbox-writes), where a table
-  rewrite affects only the throwaway copy.
+  it for [approval](/docs/approvals).
 </Callout>
 
 ## Related
 
-- [Sandbox writes](/docs/sandbox-writes): run DDL against a throwaway branch.
 - [Approvals](/docs/approvals): hold flagged DDL for human sign-off.
 - [Audit export](/docs/audit-export): forward `migration_flagged` events.
 - [Policies](/docs/policies): set the migration enforcement level.

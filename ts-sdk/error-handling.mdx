@@ -123,3 +123,55 @@ const client = new PgBeamClient({
 When `idempotencyKeys` is enabled (the default), POST and PATCH requests include an `Idempotency-Key` header so retries never double-create resources. The server caches responses for 24 hours.
 
 See [Response Conventions](/docs/api/response-conventions#idempotency) for how idempotency keys work.
+
+## Conditional requests
+
+Reads that support it return an `ETag`. Send it back as `If-Match` on the write that follows, and the write is refused with `412 Precondition Failed` if someone else changed the resource in between, instead of silently overwriting their change. Operations that accept these headers take a `headers` param and an `onResponse` hook for that one call, which is how you read the `ETag`.
+
+```typescript
+import { ApiError } from "pgbeam";
+
+const path = { project_id: "prj_xxx", database_id: "db_xxx" };
+
+let etag: string | undefined;
+const db = await api.databases.getDatabase({
+  pathParams: path,
+  onResponse: (res) => {
+    etag = res.headers.get("ETag") ?? undefined;
+  },
+});
+
+try {
+  await api.databases.updateDatabase({
+    pathParams: path,
+    body: { name: `${db.name}-renamed` },
+    headers: { "If-Match": etag },
+  });
+} catch (err) {
+  if (!(err instanceof ApiError && err.status === 412)) throw err;
+  // Changed since the read: re-read, re-apply the change, try again.
+}
+```
+
+A `412` is not retried. Its problem document carries the usual `code`, and its `ETag` header is the current one, visible to the same `onResponse` hook.
+
+`If-None-Match` turns a poll into a cheap check. When nothing changed the server answers `304 Not Modified` with no body. The SDK throws that as an `ApiError` with `status` 304, never retries it, and `isNotModified(err)` recognises it:
+
+```typescript
+import { isNotModified } from "pgbeam";
+
+try {
+  const fresh = await api.databases.getDatabase({
+    pathParams: path,
+    headers: { "If-None-Match": etag },
+  });
+  render(fresh);
+} catch (err) {
+  if (!isNotModified(err)) throw err;
+  // Unchanged: keep what you have.
+}
+```
+
+`Authorization` and `Content-Type` cannot be set this way: the client sets them from its token and the request body, and a call that passes either is rejected with a `TypeError` before anything is sent. An `Idempotency-Key` passed here replaces the one the SDK would generate.
+
+For operations without a `headers` param, the client-level `onResponse` option sees every response, `ETag` included.

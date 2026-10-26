@@ -222,9 +222,8 @@ ERROR: blocked by PgBeam agent policy: this statement requires human approval, w
 | `this credential enforces a hard affected-row cap, which cannot bound a data-modifying WITH (CTE) statement; ...` | `max_affected_rows` in [Policies](/docs/policies) | Rewrite it as a top-level `INSERT`, `UPDATE` or `DELETE` |
 | `this credential enforces a hard affected-row cap on writes, which requires the simple query protocol ...` | `max_affected_rows` in [Policies](/docs/policies) | Send the write as a simple query |
 | `multi-statement batches are not supported for capped or approval-gated writes; resubmit as a single statement` | `max_affected_rows` or [Approvals](/docs/approvals) | Send one statement per query |
-| `this credential runs writes in rollback (dry-run) mode, which requires the simple query protocol` | [Sandbox writes](/docs/sandbox-writes) | Send the write as a simple query |
-| `<reason>; ask your operator to enable rollback mode for safe dry-run writes instead` | Sandbox mode in [Sandbox writes](/docs/sandbox-writes) | The sandbox branch could not be provisioned. Retry, or switch the credential to rollback mode |
-| `unrecognized write mode for this credential; ask your operator to reconfigure the policy` | [Sandbox writes](/docs/sandbox-writes) | Set the profile's write mode again |
+| `this credential runs writes in rollback (dry-run) mode, which requires the simple query protocol` | [Dry-run writes](/docs/dry-run-writes) | Send the write as a simple query |
+| `unrecognized write mode for this credential; ask your operator to reconfigure the policy` | Write mode in [Policies](/docs/policies) | Set the profile's write mode again |
 | `multiple statements in one extended-protocol batch cannot be safely masked; ...` | [Masking](/docs/masking) | Send each statement on its own, or as simple queries |
 | `this query returns masked columns, which requires the result description in the same protocol cycle; ...` | [Masking](/docs/masking) | Send it as a simple query or turn off client-side statement caching |
 | `a statement bound in the same extended-protocol batch as a different parsed statement cannot be safely masked; ...` | [Masking](/docs/masking) | Send each statement in its own batch |
@@ -269,7 +268,7 @@ ERROR: blocked by PgBeam agent policy: this write is row-capped, approval-gated 
 
 **Cause:** PgBeam runs capped, auto-approved and dry-run writes in a transaction of its own, so it can count the rows and commit or roll back. Inside the client's own transaction that would end the client's transaction early, so PgBeam refuses before touching the database.
 
-**Fix:** Roll back, then send the write on its own, outside `BEGIN` and `COMMIT`. See [Approvals](/docs/approvals) and [Sandbox writes](/docs/sandbox-writes).
+**Fix:** Roll back, then send the write on its own, outside `BEGIN` and `COMMIT`. See [Approvals](/docs/approvals) and [Dry-run writes](/docs/dry-run-writes).
 
 ## `25P01`: Controlled write transaction failed
 
@@ -277,7 +276,7 @@ ERROR: blocked by PgBeam agent policy: this write is row-capped, approval-gated 
 ERROR: transaction control failed: <database error>
 ```
 
-**Cause:** The `BEGIN`, `COMMIT` or `ROLLBACK` that PgBeam wraps around a capped, approval-gated or dry-run write failed at the database. PgBeam attempted a rollback, so the write did not persist.
+**Cause:** The `BEGIN`, `COMMIT` or `ROLLBACK` that PgBeam wraps around a capped, approval-gated or dry-run write failed at the database. PgBeam attempted a rollback, so the write did not persist. The audit log records the attempt as `blocked` with rule `transaction_control_failed`.
 
 **Fix:** Read the database error after the prefix. It is usually a dropped database connection; retry the statement.
 
