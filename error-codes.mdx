@@ -350,7 +350,7 @@ ERROR: blocked by PgBeam agent policy: <reason>; <hint>
 | A reason and hint from the policy engine, such as a read-only, allowlist or statement rule | [Policies](/docs/policies), [Read-only](/docs/read-only), [Allowlists](/docs/allowlists) |
 | The same, for a statement that touched a [honeytoken](/docs/honeytokens) | [Honeytokens](/docs/honeytokens) |
 | A reason why a row filter could not be applied safely | [Row-level policies](/docs/row-level-policies) |
-| `this credential may only run its project's pre-approved query templates, and this statement is not one of them` | Query templates in [Policies](/docs/policies) |
+| `this credential may only run its project's pre-approved query templates, and this statement is not one of them` | [Query templates](/docs/query-templates) |
 | `this write would affect <n> row(s), exceeding the hard cap of <cap>; the transaction was rolled back and nothing changed. ...` | `max_affected_rows` in [Policies](/docs/policies) |
 | `this write could not be safely counted against the <cap>-row cap and was rolled back; contact your operator` | `max_affected_rows` in [Policies](/docs/policies) |
 | `a human reviewer rejected this statement` (with the reviewer's reason in parentheses when given) | [Approvals](/docs/approvals) |

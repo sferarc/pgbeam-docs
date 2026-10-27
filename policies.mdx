@@ -16,6 +16,7 @@ Policies apply to agent credentials and to human credentials alike. Every rule b
 | Table allowlist | The schemas and tables the principal may read or write. | [Allowlists](/docs/allowlists) |
 | Row filters | A `WHERE` predicate that scopes a table to a slice of rows. | [Row-level policies](/docs/row-level-policies) |
 | Masking rules | Columns redacted, nulled, or hashed in flight. | [Masking](/docs/masking) |
+| Query mode | Raw SQL, or only the project's pre-approved query templates. | [Query templates](/docs/query-templates) |
 | Query budgets | Queries per window, max rows per result, statement timeout. | [Budgets](/docs/budgets) |
 | Write row cap | Hard cap on rows a single write may affect (over-cap writes roll back and block). | [Budgets](/docs/budgets) |
 | Approvals | Hold writes or DDL until a human approves them. | [Approvals](/docs/approvals) |

@@ -17,6 +17,7 @@
 		"allowlists",
 		"row-level-policies",
 		"masking",
+		"query-templates",
 		"scan-pii",
 		"budgets",
 		"agent-payments",

@@ -1,0 +1,138 @@
+---
+title: Query templates
+icon: FileCode
+description: Named, parameterized statements an operator writes once. A policy profile set to templates only lets its credentials run those statements, with their own arguments, and nothing else.
+---
+
+A template admits a statement. It never grants access. The statement a template matches still meets the credential's whole policy: access mode, allowlists, row filters, masking, budgets, approvals, honeytokens and content scanning. A template that reads `payments`, run by a credential whose allowlist leaves `payments` out, is refused exactly as the same SQL typed by hand would be. Templates add one restriction and no grant.
+
+Use them for a narrow job where you do not want to grant a shape of SQL at all: a support bot that looks up one customer's orders, or an agent that marks a ticket resolved. You write the statements, and the agent supplies only the values.
+
+## What a template is
+
+```sql
+SELECT id, status, total
+FROM orders
+WHERE customer_id = $1 AND status = 'open'
+ORDER BY placed_at DESC
+LIMIT $2
+```
+
+with two declared parameters, `customer_id uuid` and `max_rows integer`.
+
+- **One statement**: a `SELECT`, `INSERT`, `UPDATE` or `DELETE`, CTEs allowed. No DDL, no `SET`, no `COPY`, no transaction control, no `SELECT ... INTO`, and no multi-statement text.
+- **Placeholders are exactly `$1` to `$n`**, with one declared parameter each, in order, and every one used. A parameter has a name (a lower-case identifier, the same in SQL, JSON, CLI flags and MCP arguments), a type, and whether it may be NULL.
+- **Types are a closed set**: `text`, `integer`, `bigint`, `double precision`, `numeric`, `boolean`, `uuid`, `date`, `timestamptz`, `jsonb`. An argument is checked against its type before anything is sent.
+- **Templates belong to the project.** Every credential in the project sees the same set. Which credentials are confined to it is a setting on the policy profile, below.
+- **`include_sql`** decides whether an agent listing the templates sees the SQL text. It is off by default, since the `WHERE` clause can itself be sensitive. The dashboard always shows the SQL to an operator.
+- **`enabled`** is on by default. A disabled template admits nothing.
+
+The API parses the SQL on every write and refuses a template that breaks any rule above, naming the problem.
+
+## Create a template
+
+<Tabs items={["CLI", "Dashboard", "API", "Terraform"]}>
+  <Tab value="CLI">
+    ```bash
+    pgbeam templates create open_orders_for_customer \
+      --sql-file open_orders.sql \
+      --param customer_id:uuid --param max_rows:integer \
+      --description "Open orders for one customer, newest first"
+
+    pgbeam templates list
+    ```
+
+    Repeat `--param name:type` once per placeholder, in order, and append `:null` to allow a NULL argument. See [`templates create`](/docs/cli/templates/create).
+
+  </Tab>
+
+<Tab value="Dashboard">
+  Go to **Policies**. The **Query templates** card lists the project's templates
+  and creates, edits and deletes them. An error from the API is shown inside the
+  dialog, beside the SQL it is about.
+</Tab>
+
+  <Tab value="API">
+    ```bash
+    curl -X POST https://api.pgbeam.com/v1/projects/{projectId}/query-templates \
+      -H "Authorization: Bearer pbo_..." \
+      -d '{
+        "name": "open_orders_for_customer",
+        "description": "Open orders for one customer, newest first",
+        "sql": "SELECT id, status, total FROM orders WHERE customer_id = $1 AND status = '\''open'\'' ORDER BY placed_at DESC LIMIT $2",
+        "params": [
+          {"name": "customer_id", "type": "uuid"},
+          {"name": "max_rows", "type": "integer"}
+        ]
+      }'
+    ```
+
+    Reading templates needs `policy:read` and changing them needs `policy:write`, the same as policy profiles.
+
+  </Tab>
+
+  <Tab value="Terraform">
+    Use the `pgbeam_query_template` resource. See [Terraform](/docs/terraform); the Pulumi and Crossplane providers carry the same resource.
+  </Tab>
+</Tabs>
+
+Every write is pushed to the connected data planes at once, so a new, changed or disabled template applies to the next statement.
+
+## Confine a credential to templates
+
+Set `query_mode` on the credential's policy profile to `templates`. The default is `sql`, which leaves raw SQL to the rest of the policy.
+
+- **Dashboard**: open the profile in **Policies**. **Query mode** is in the **Access** section, and the profile list marks a templates-only profile.
+- **API**: send `"query_mode": "templates"` when you create the profile, or in the `PUT` to `/v1/projects/{projectId}/policies/{policyId}`. That `PUT` replaces the whole profile, so send its other fields too.
+- **CLI**: `pgbeam policies update pol_xxx --file ./mode.json`, where the file holds `{"query_mode": "templates"}`. The command reads the stored profile first, so the other fields are kept.
+- **Terraform**: `query_mode = "templates"` on `pgbeam_policy_profile`.
+
+Setting `templates` is refused with a 400 while the project has no enabled template, because a profile that admits nothing reads as an outage. An update that omits `query_mode` keeps the stored mode, so an older client saving the profile cannot turn it back to raw SQL.
+
+## How a statement is matched
+
+Under `templates`, the proxy compares each statement with the project's enabled templates before the policy runs. The comparison is on the parsed statement, not the text.
+
+- Whitespace, keyword case, comments, unquoted identifier case and a trailing semicolon do not matter. An agent can copy a template's SQL from `list_templates` and send it through any driver.
+- Everything else does. A changed literal, an extra predicate, an added column, a schema qualifier the template did not have, a cast on a placeholder, `FOR UPDATE`, or renumbered placeholders make a different statement, and it is refused.
+- Arguments travel separately from the SQL. A template with parameters matches only text that still carries its `$n`, so it has to be sent with the extended protocol, which every mainstream driver uses for a parameterized query. Over the simple protocol only a template with no parameters can match: a value written into the SQL is SQL the agent wrote.
+- Each argument is checked against the declared type, in text or binary format. A Parse that declares a different type for a parameter is refused rather than converted.
+
+## Run a template
+
+**Over MCP.** On a project with at least one enabled template, the [hosted MCP endpoint](/docs/mcp) shows two more tools. `list_templates` returns each template's name, description, statement kind and parameters, the SQL when `include_sql` allows it, and `templates_only`, which tells the agent whether `query` will refuse it. `run_template` takes a name and arguments keyed by parameter name. Pass arguments as strings when in doubt: a JSON number is bound only when it is exact, since a number past 2^53 would be rounded before it reached the database.
+
+**Over the wire.** A templates-only credential connects with its [connection string](/docs/connection-string) as usual and sends the template's SQL as a parameterized query.
+
+The catalog tools (`list_tables`, `describe_table`, `schema_catalog`) and `briefing` keep working under `templates`, so the agent can still see the schema it is confined to. Their catalog reads are admitted by statement, so a direct connection can send those same reads. That gives it the catalog access every credential already has, and no rows of your own tables.
+
+## Refusals
+
+| SQLSTATE | Message after `blocked by PgBeam agent policy: ` | Audit rule |
+| --- | --- | --- |
+| `42501` | `this credential may only run its project's pre-approved query templates, and this statement is not one of them` | `template_required` |
+| `42804` | `template "<name>": ...`, naming the parameter type the Parse declared that is not the template's | `template_argument` |
+| `22023` | `template "<name>": argument "<param>" ...`, naming what is wrong with the value | `template_argument` |
+
+The first refusal names no template: the agent learns the set from `list_templates`, not from an error. The others name the template and the parameter and never repeat the value, because arguments can be secrets and the message reaches the agent and the audit log.
+
+An allowed statement records its ordinary audit event with `template:<name>` as its rule, so a reviewer can tell which statements were templates. Arguments are never recorded.
+
+## Withdraw a template
+
+Disable or delete it. A templates-only profile stops admitting that statement on its next use, including on a connection that prepared it earlier. Disabling or deleting the last enabled template is allowed: the profile then admits nothing, which is how to cut an agent off in an incident without touching its credential.
+
+## Limits
+
+- **Transaction control is refused.** `BEGIN`, `COMMIT`, `ROLLBACK` and `SET` are not templates, so a templates-only credential cannot send them. A driver that opens transactions implicitly (psycopg with autocommit off, or JDBC's default `SET` statements) fails until it runs in autocommit mode.
+- **`explain` is refused** for a templates-only credential, since a plan for a statement it may not run would show row estimates.
+- **One set per project.** Every templates-only profile in the project admits the same set. Different sets for different agents need separate projects for now.
+- **Self-hosted data planes.** While an organization has a live [self-hosted](/docs/self-hosted) enrollment, enabling a template and setting `query_mode` to `templates` are refused (409), and a new enrollment is refused while any profile is templates-only. An older proxy would ignore the mode and run unrestricted SQL for a credential you believe is confined.
+- **Empty statements are admitted.** Text that runs nothing (an empty string, `;`, a comment) passes, because it is what a connection pool sends to check a connection.
+
+## Related
+
+- [Policies](/docs/policies): the profile that carries `query_mode`
+- [MCP](/docs/mcp): `list_templates` and `run_template`
+- [`pgbeam templates`](/docs/cli/templates/create): the CLI commands
+- [Audit log](/docs/audit-log): finding template runs
