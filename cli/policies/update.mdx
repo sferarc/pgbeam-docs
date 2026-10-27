@@ -25,6 +25,7 @@ pgbeam policies update <id> [flags]
 | `--approval-timeout-seconds <value>` | How long a held statement waits for a decision before expiring | No | - |
 | `--approval-auto-max-rows <value>` | Statements touching at most this many rows are auto-approved (0 disables) | No | - |
 | `--migration-safety <value>` | Migration safety mode: off, warn, or block | No | - |
+| `--query-mode <value>` | What an agent may send: sql (any statement the policy allows) or templates (only the project's enabled query templates) | No | - |
 | `--table-allowlist <value>` | Comma-separated relations to allow (replaces the current list) | No | - |
 | `--table-denylist <value>` | Comma-separated relations to deny (replaces the current list) | No | - |
 | `--allow <value>` | Relation to allowlist (repeatable, or comma-separated; replaces the current list) | No | - |
@@ -59,6 +60,9 @@ pgbeam policies update pol_xxx --mask users.email=redact --dry-run
 
 # Cap daily budget and rows per query
 pgbeam policies update pol_xxx --budget-queries-per-day 5000 --max-rows 1000
+
+# Confine a profile to the project's query templates
+pgbeam policies update pol_xxx --query-mode templates
 
 # Replace the full profile from a JSON file
 pgbeam policies update pol_xxx --file ./policy.json

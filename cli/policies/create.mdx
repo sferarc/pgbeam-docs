@@ -5,7 +5,7 @@ description: Create a policy profile
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Create a policy profile. Provide a name and access mode, then author the rules with flags (`--allow`, `--deny`, `--mask`, budget flags, and the write-safety flags `--write-mode`, `--approval-mode`, `--approval-timeout-seconds`, `--approval-auto-max-rows`, `--migration-safety`) or pass a JSON file describing the full profile (statement rules, allow/deny lists, masking, budgets). Fields set via `--file` are overlaid by any individual flags. The resolved profile is validated against the API schema before anything is sent; `--dry-run` prints the resolved profile JSON without calling the API.
+Create a policy profile. Provide a name and access mode, then author the rules with flags (`--allow`, `--deny`, `--mask`, budget flags, and the write-safety flags `--write-mode`, `--approval-mode`, `--approval-timeout-seconds`, `--approval-auto-max-rows`, `--migration-safety`, plus `--query-mode` to admit only the project's query templates) or pass a JSON file describing the full profile (statement rules, allow/deny lists, masking, budgets). Fields set via `--file` are overlaid by any individual flags. The resolved profile is validated against the API schema before anything is sent; `--dry-run` prints the resolved profile JSON without calling the API.
 
 ## Usage
 
@@ -24,6 +24,7 @@ pgbeam policies create [flags]
 | `--approval-timeout-seconds <value>` | How long a held statement waits for a decision before expiring | No | - |
 | `--approval-auto-max-rows <value>` | Statements touching at most this many rows are auto-approved (0 disables) | No | - |
 | `--migration-safety <value>` | Migration safety mode: off, warn, or block | No | - |
+| `--query-mode <value>` | What an agent may send: sql (any statement the policy allows) or templates (only the project's enabled query templates) | No | - |
 | `--table-allowlist <value>` | Comma-separated relations to allow | No | - |
 | `--table-denylist <value>` | Comma-separated relations to deny | No | - |
 | `--allow <value>` | Relation to allowlist (repeatable, or comma-separated) | No | - |

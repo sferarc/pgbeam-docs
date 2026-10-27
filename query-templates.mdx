@@ -84,7 +84,7 @@ Set `query_mode` on the credential's policy profile to `templates`. The default 
 
 - **Dashboard**: open the profile in **Policies**. **Query mode** is in the **Access** section, and the profile list marks a templates-only profile.
 - **API**: send `"query_mode": "templates"` when you create the profile, or in the `PUT` to `/v1/projects/{projectId}/policies/{policyId}`. That `PUT` replaces the whole profile, so send its other fields too.
-- **CLI**: `pgbeam policies update pol_xxx --file ./mode.json`, where the file holds `{"query_mode": "templates"}`. The command reads the stored profile first, so the other fields are kept.
+- **CLI**: `pgbeam policies update pol_xxx --query-mode templates`, or `--query-mode templates` on `pgbeam policies create`. The update reads the stored profile first, so the other fields are kept.
 - **Terraform**: `query_mode = "templates"` on `pgbeam_policy_profile`.
 
 Setting `templates` is refused with a 400 while the project has no enabled template, because a profile that admits nothing reads as an outage. An update that omits `query_mode` keeps the stored mode, so an older client saving the profile cannot turn it back to raw SQL.
