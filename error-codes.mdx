@@ -331,7 +331,7 @@ See [Agent credentials](/docs/agent-credentials) and [SCRAM authentication](/doc
 ERROR: statement failed: <database error>
 ```
 
-**Cause:** A write that PgBeam ran in its own transaction (row-capped, auto-approved or dry-run) failed at the database. PgBeam rolled the transaction back and reports the database's error after the prefix.
+**Cause:** A write that PgBeam ran in its own transaction (row-capped, auto-approved or dry-run) failed at the database. PgBeam rolled the transaction back and reports the database's error after the prefix. The audit log records the write as `query` with rule `statement_failed`.
 
 **Fix:** Fix the statement according to the database error. Nothing was committed.
 
