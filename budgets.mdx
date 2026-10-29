@@ -36,6 +36,24 @@ ERROR:  PgBeam agent day query budget exhausted; resets at 2026-06-15T00:00:00Z;
 
 The message names the window and the exact reset time, so an agent can back off rather than retry blindly. A per-day egress (bytes) budget produces a similar message when exceeded.
 
+### A warning before the cap
+
+On a plain Postgres connection (psql, a driver, an ORM), the error is not the first signal. When a statement leaves a query window at or under a tenth of its limit, the session gets a `NOTICE` (SQLSTATE `01000`) with the same figures:
+
+```text
+NOTICE:  PgBeam agent query budget low: 20 of 200 hourly queries left; resets at 2026-06-15T14:00:00Z
+```
+
+Each window is reported once per session, and the next window warns again. When the credential has queries bought with a [budget top-up](/docs/agent-payments) still unspent, the message ends with `; N purchased queries in reserve`. The daily egress budget warns the same way, once per UTC day:
+
+```text
+NOTICE:  PgBeam agent egress budget low: 10485760 of 104857600 daily bytes left; resets at 2026-06-16T00:00:00Z
+```
+
+Egress bytes are charged after a response is sent, so that warning arrives with the statement after the one that crossed the threshold, and a single response that goes from above a tenth straight past the cap gets no warning at all.
+
+The notice is advisory. It does not change the statement's result and writes no audit entry. Most drivers drop notices unless you register a handler (`OnNotice` in pgx, the `notice` event in node-postgres, `add_notice_handler` in psycopg), so wire one up if your agent runs long jobs. Match on the `PgBeam agent query budget low: ` or `PgBeam agent egress budget low: ` prefix rather than the whole sentence. The MCP endpoint does not forward these notices, because every tool result already carries the figures, as the next section shows.
+
 ### Headroom on the MCP endpoint
 
 Over the [hosted MCP endpoint](/docs/mcp), an agent does not have to wait for that error to learn where it stands. Every row-returning tool result (`query`, `explain`, `list_tables`, `describe_table`) carries a `budget` block for the credential that ran it:
