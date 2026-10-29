@@ -235,6 +235,7 @@ All of these come back as **tool-result errors** (the MCP endpoint authenticates
 - A blocked statement returns the policy reason in the tool result, so the agent can correct itself and retry within the rules.
 - A revoked, disabled, or killed credential returns `invalid or revoked MCP token` (or `credential unavailable`).
 - An exhausted [budget](/docs/budgets) returns a clear message naming the window and reset time.
+- A `query` the database refuses for an unknown table or column (SQLSTATE `42P01` or `42703`) returns the database's error followed by the closest names in the schema the credential may see, the same suggestions `validate_sql` gives. A masked column is never suggested. A credential whose policy sets a query or egress budget gets the error alone, because finding the suggestions takes two catalog reads.
 
 ## Related
 
