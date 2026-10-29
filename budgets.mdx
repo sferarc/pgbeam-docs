@@ -62,6 +62,8 @@ Over the [hosted MCP endpoint](/docs/mcp), an agent does not have to wait for th
 
 A window your policy leaves uncapped is omitted, so a present key means the cap is enforced. A credential with no budget at all gets no `budget` block. The figures are the same per-region counters the wire path enforces, so they are approximate in the same way, and the egress figure can trail the agent's last statement by a moment because bytes are charged after the response is sent. It is a signal for pacing a long job, not a billing record.
 
+`my_permissions` carries the same `budget` block next to the caps it reports under `budgets`, and so does the `permissions` half of `briefing`. `my_permissions` opens no database session, so an agent can check what is left before a long job without spending any of it.
+
 ## Write row cap
 
 `--max-affected-rows` bounds how many rows a single write may affect, separate from `--max-rows` (which truncates read results). A write whose affected-row count would exceed the cap runs inside a transaction, is checked, and is rolled back so nothing persists, then blocked. It applies to INSERT, UPDATE, and DELETE and is enforced independently of human approval. 0 means unlimited.

@@ -206,7 +206,7 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
 | `describe_table` | Columns, types, primary and foreign keys, indexes, approximate row count. |
 | `explain` | `EXPLAIN (FORMAT JSON)` for a statement. |
 | `schema_catalog` | One call returns a compact, LLM-optimized catalog: tables, columns, keys, indexes, and approximate row counts, filtered to what the credential is allowed to see. |
-| `my_permissions` | What this credential may do: access mode, permitted statement kinds, allowlist and denylist, row-filtered tables, masked columns, budgets, and how writes are routed. No arguments. |
+| `my_permissions` | What this credential may do: access mode, permitted statement kinds, allowlist and denylist, row-filtered tables, masked columns, budget caps and what is left of each, and how writes are routed. No arguments. |
 | `list_templates` | The project's pre-approved query templates: name, description, statement kind, and parameters in `$1..$n` order. The SQL is included only when the template's author allowed it. Reports `templates_only` when the credential may run nothing else. No arguments. Shown only when the project has a template. |
 | `run_template` | Run a query template by name, with arguments keyed by parameter name. Enforced on the wire like `query`, and returns the same shape. Shown only when the project has a template. |
 | `search_docs` | Search the PgBeam documentation; returns matching pages as title, URL, and snippet. |
