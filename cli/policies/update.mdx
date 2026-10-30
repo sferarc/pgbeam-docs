@@ -30,7 +30,7 @@ pgbeam policies update <id> [flags]
 | `--table-denylist <value>` | Comma-separated relations to deny (replaces the current list) | No | - |
 | `--allow <value>` | Relation to allowlist (repeatable, or comma-separated; replaces the current list) | No | - |
 | `--deny <value>` | Relation to denylist (repeatable, or comma-separated; replaces the current list) | No | - |
-| `--mask <value>` | Masking rule as table.column=kind, where kind is redact, null, or hash (repeatable; replaces the current rules) | No | - |
+| `--mask <value>` | Masking rule as table.column=kind, where kind is redact, null, hash, last4, or email_domain (repeatable; replaces the current rules) | No | - |
 | `--max-rows <value>` | Max rows returned per query (0 means unlimited) | No | - |
 | `--max-affected-rows <value>` | Hard cap on rows a single write may affect; over-cap writes are rolled back and blocked (0 means unlimited) | No | - |
 | `--budget-queries-per-hour <value>` | Max queries per rolling hour (0 means unlimited) | No | - |

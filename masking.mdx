@@ -1,7 +1,7 @@
 ---
 title: PII Masking
 icon: EyeOff
-description: Redact, null, or hash sensitive columns in agent results. Applied in flight, so your app sees real values and the agent never does.
+description: Redact, null, hash or partially reveal sensitive columns in agent results. Applied in flight, so your app sees real values and the agent never does.
 ---
 
 Masking rewrites sensitive column values in an agent's results before they leave the wire. You name the columns to protect and choose how to mask each one. Your application keeps reading the real values on its own connection. The agent receives the masked value and never the raw one.
@@ -12,7 +12,7 @@ Masking rewrites sensitive column values in an agent's results before they leave
 pgbeam policies create --name analytics \
   --mask users.email=hash \
   --mask users.ssn=redact \
-  --mask users.phone=null
+  --mask users.phone=last4
 ```
 
 In the dashboard, add masking rules on the policy profile under **Masking**.
@@ -24,8 +24,12 @@ In the dashboard, add masking rules on the policy profile under **Masking**.
 | `redact` | A fixed token, e.g. `[redacted]` | `NULL` | Free-text fields the agent must not read. |
 | `hash` | SHA-256 hex of the value | `NULL` | Identifiers whose equality the agent may correlate across rows in its own results (email, user key). |
 | `null` | Empty / `NULL` | `NULL` | Columns the agent should ignore entirely. |
+| `last4` | The last four characters after `****`, e.g. `****4567` | `NULL` | Phone and card numbers the agent needs to recognize but not read in full. |
+| `email_domain` | The domain after `****@`, e.g. `****@example.com` | `NULL` | Email addresses where the organization matters and the person does not. |
 
 `hash` maps the same input to the same output, so equal values are visibly equal in the rows the agent gets back and it can correlate them itself. It cannot ask the database to do that correlation: a masked column may be selected and nothing else. See the guard below.
+
+`last4` and `email_domain` put part of the real value in front of the agent, so choose them only where that part is meant to be seen. The prefix is a fixed `****` whatever the value's length. A value of four characters or fewer under `last4`, or one under `email_domain` without a local part or whose text after the last `@` is not a hostname (letters, digits and hyphens in dot-separated labels, at least one dot, at most 253 bytes) or a bracketed IP address, gets the `redact` token instead, so a short or malformed value is never shown whole. A value such as `alice@example.com; notes: ...` is redacted rather than shown with its notes. When two rules mask the same column name with different kinds, for example on two joined tables, the kind that reveals least wins: `null`, then `redact`, then `hash`, then `last4`, then `email_domain`.
 
 ## When masking applies
 
@@ -33,14 +37,14 @@ Masking is applied at serve time on the result path, for agent sessions only. It
 
 <Callout type="warn" title="Masking semantics">
   Binary-format result columns are masked to `NULL` to stay type-safe;
-  text-format columns get a redaction token or hash. When a query computes an
-  expression over a masked column (for example `lower(email)`), the result
-  cannot be proven to preserve the original value, so PgBeam masks that output
-  column to `NULL` rather than returning the computed value. This follows the
-  value through a subquery or CTE, so an aggregate over a derived column (for
-  example `SELECT sum(n) FROM (SELECT length(email) AS n FROM users) t`) is
-  masked too. Allowlist the columns you expose and mask the ones you must
-  protect.
+  text-format columns get a redaction token, a hash or the partial value. When a
+  query computes an expression over a masked column (for example
+  `lower(email)`), the result cannot be proven to preserve the original value,
+  so PgBeam masks that output column to `NULL` rather than returning the
+  computed value. This follows the value through a subquery or CTE, so an
+  aggregate over a derived column (for example `SELECT sum(n) FROM (SELECT
+  length(email) AS n FROM users) t`) is masked too. Allowlist the columns you
+  expose and mask the ones you must protect.
 </Callout>
 
 ## Views are not seen through
