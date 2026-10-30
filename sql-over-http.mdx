@@ -76,7 +76,7 @@ Errors are JSON with the PostgreSQL SQLSTATE preserved, in the same shape as the
 }
 ```
 
-HTTP status maps from the SQLSTATE class: authentication failures are `401`, syntax/access/policy errors (including policy blocks, `42501`) and constraint violations are `400`, resource exhaustion is `503`, upstream connection problems are `504`. See [error codes](/docs/error-codes) for the SQLSTATEs the policy engine emits.
+HTTP status follows Neon: any error a statement raises is `400` whatever its SQLSTATE class, a cancelled or timed-out request is `400` with code `08P01`, a connection failure the request caused (such as bad credentials or an unknown database) is `400`, an unreachable upstream is `500`, a response that is too large is `507` and a body that is too large is `413`. See [error codes](/docs/error-codes) for the SQLSTATEs the policy engine emits.
 
 ## Policy enforcement and audit
 
