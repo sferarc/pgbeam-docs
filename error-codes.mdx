@@ -278,7 +278,9 @@ ERROR: transaction control failed: <database error>
 
 **Cause:** The `BEGIN`, `COMMIT` or `ROLLBACK` that PgBeam wraps around a capped, approval-gated or dry-run write failed at the database. PgBeam attempted a rollback, so the write did not persist. The audit log records the attempt as `blocked` with rule `transaction_control_failed`.
 
-**Fix:** Read the database error after the prefix. It is usually a dropped database connection; retry the statement.
+One case is different: when the connection to the database is lost after `COMMIT` was sent, the database may have committed the write before the connection dropped. The message then says `the write may have committed`, and the audit reason starts with `COMMIT outcome unknown`.
+
+**Fix:** Read the database error after the prefix. It is usually a dropped database connection; retry the statement. If the message says the write may have committed, check whether it took effect before retrying, or the write can apply twice.
 
 ## `26000`: Unknown prepared statement
 
