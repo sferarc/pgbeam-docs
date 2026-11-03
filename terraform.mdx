@@ -288,6 +288,7 @@ resource "pgbeam_policy_profile" "example" {
   content_scan_mode = "off"
   content_scan_max_bytes = 0
   query_mode = "sql"
+  function_denylist = ["..."]
 }
 ```
 

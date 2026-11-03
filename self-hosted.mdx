@@ -59,6 +59,8 @@ The response includes the plaintext token once:
 
 Store the `token` securely; it cannot be retrieved again. List enrollments with `GET` on the same path.
 
+PgBeam cannot yet confirm which build a self-hosted proxy runs, so features an older build would ignore are refused (409) on both sides. A new enrollment is refused while any project in the organization has an enabled approval rule, a policy profile with `query_mode` set to `templates`, or a policy profile with a non-empty `function_denylist`. While an organization has a live enrollment, enabling an approval rule or a query template, setting `query_mode` to `templates`, and setting a non-empty `function_denylist` are refused the same way.
+
 ## Token lifecycle
 
 Treat an enrollment token like any other production secret, and use expiry and rotation to limit how long a leaked token stays useful.
