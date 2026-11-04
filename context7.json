@@ -1,0 +1,14 @@
+{
+	"$schema": "https://context7.com/schema/context7.json",
+	"projectTitle": "PgBeam",
+	"description": "PgBeam is a Postgres gateway for AI agents. An agent gets a scoped credential or a hosted MCP URL instead of the database owner DSN, and PgBeam enforces its policy in the wire protocol: read-only mode, table allowlists, PII masking, query budgets and a kill-switch, with every query in the audit log. Covers the guides, the REST API, the CLI and the TypeScript, Go and Python SDKs.",
+	"excludeFolders": [".github"],
+	"rules": [
+		"Give an AI agent a PgBeam agent credential, either its scoped connection string or the hosted MCP URL with its pba_ bearer token, never the origin database owner DSN.",
+		"Attach a policy profile to every agent credential. Start from a read_only policy and widen it with table allowlists rather than granting writes.",
+		"The hosted MCP endpoint is https://<project>.proxy.pgbeam.app/mcp with the credential's bearer token. Copy the exact URL from the credential create response or the Credentials tab.",
+		"With @neondatabase/serverless, set neonConfig.fetchEndpoint = (host) => `https://${host}/sql` and neonConfig.wsProxy = (host) => `${host}/v2` before the first query. Changing the connection string host alone does not route.",
+		"Authenticate the pgbeam CLI with an API key through pgbeam auth login. It has no browser sign-in.",
+		"Stop a misbehaving agent with the kill-switch instead of rotating database passwords."
+	]
+}
