@@ -59,5 +59,6 @@ const result = await client.api.payments.createBudgetTopup({
 | 402 | Payment required. The `WWW-Authenticate` header carries a complete `Payment` challenge and the body carries RFC 9457 problem details explaining why. A failed or replayed credential also answers `402` with a fresh challenge, never `401`. |
 | 403 | The caller is authenticated but not allowed to perform this operation. `code` is `FORBIDDEN` when the caller's role is insufficient, and `PLAN_LIMIT_REACHED` when the organization's plan is what stands in the way. The two are answered differently, so branch on the code rather than the status. |
 | 404 | The resource does not exist, or the caller is not entitled to know that it does. `code` is `NOT_FOUND`. |
+| 409 | The request conflicts with the current state. `code` distinguishes the cases: `RESOURCE_EXISTS` for a name or value already in use, `INVALID_STATE` for a resource that is no longer in a state that allows the operation, and `IDEMPOTENCY_KEY_REUSED` for a retry whose body does not match the request the key was first used for. |
 | 429 | Rate limited. `code` is `RATE_LIMITED`. |
 | 503 | The service is temporarily unable to answer. `code` is `SERVICE_UNAVAILABLE`. Safe to retry after the delay in `Retry-After`. |

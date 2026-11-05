@@ -64,5 +64,5 @@ const result = await client.api.batch.executeBatch({
 | 401 | Missing or invalid authentication. `code` is `UNAUTHORIZED`. |
 | 403 | The caller is authenticated but not allowed to perform this operation. `code` is `FORBIDDEN` when the caller's role is insufficient, and `PLAN_LIMIT_REACHED` when the organization's plan is what stands in the way. The two are answered differently, so branch on the code rather than the status. |
 | 404 | The resource does not exist, or the caller is not entitled to know that it does. `code` is `NOT_FOUND`. |
-| 409 | An atomic batch was rolled back. Nothing applied. The failing operations carry their error and every other one is `not_applied`. |
+| 409 | An atomic batch was rolled back. Nothing applied. The failing operations carry their error and every other one is `not_applied`. An `Idempotency-Key` reused with a different body answers 409 as problem details instead, with code `IDEMPOTENCY_KEY_REUSED`. |
 | 429 | Rate limited. `code` is `RATE_LIMITED`. |
