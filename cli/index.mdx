@@ -5,20 +5,10 @@ description: Install the PgBeam CLI with npm, Homebrew, or the install script, o
 
 The PgBeam CLI is open source at [sferarc/pgbeam-cli](https://github.com/sferarc/pgbeam-cli).
 
-<Callout type="warn" title="npm and Homebrew are not live yet">
-  The install script below works today. The npm package `@pgbeam/cli` and the
-  Homebrew tap `sferarc/pgbeam` are documented here as what they will be, and
-  neither installs anything until the first release publishes them. Use the
-  install script, or the Windows script, until then.
-</Callout>
-
 Pick whichever fits how you already install tools. They all give you the same `pgbeam` command.
 
 <Tabs items={["npm", "Homebrew", "Install script", "Windows"]}>
   <Tab value="npm">
-    Not published yet, so this command does not work today. It is what the npm
-    install will be.
-
     ```bash
     npm install -g @pgbeam/cli
     ```
@@ -32,9 +22,6 @@ Pick whichever fits how you already install tools. They all give you the same `p
   </Tab>
 
   <Tab value="Homebrew">
-    The tap is not populated yet, so this command does not work today. It is
-    what the Homebrew install will be.
-
     ```bash
     brew install sferarc/pgbeam/pgbeam
     ```
@@ -61,7 +48,7 @@ Pick whichever fits how you already install tools. They all give you the same `p
 
     Checks the binary against the release's `SHA256SUMS` before installing it, like the install script.
 
-    Once `@pgbeam/cli` is published, npm will work the same on Windows: `npm install -g @pgbeam/cli`.
+    npm works the same on Windows: `npm install -g @pgbeam/cli`.
 
   </Tab>
 </Tabs>
