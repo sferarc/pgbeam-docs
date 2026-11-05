@@ -16,7 +16,7 @@ The hosted MCP endpoint is a remote [Model Context Protocol](https://modelcontex
 
 The endpoint is served on your project's own host, `https://<project>.proxy.pgbeam.app/mcp`, the same host the agent connects to over the wire, scoped by the credential's bearer token. The exact URL and the `pba_…` token are shown in the **Credentials** tab and in the credential create response; copy them from there.
 
-<Tabs items={["Claude Code", "Claude Desktop", "Cursor", "VS Code", "Cline", "Windsurf", "MCP Inspector"]}>
+<Tabs items={["Claude Code", "Claude Desktop", "Cursor", "VS Code", "Cline", "Windsurf", "Codex CLI", "Gemini CLI", "Zed", "MCP Inspector"]}>
   <Tab value="Claude Code">
     Add it with the CLI:
 
@@ -89,8 +89,13 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
   </Tab>
 
   <Tab value="Cursor">
-    Add to `.cursor/mcp.json` (or **Settings → MCP → Add**). The tools appear
-    once the connection is established.
+    [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=pgbeam&config=eyJ1cmwiOiJodHRwczovLzxwcm9qZWN0Pi5wcm94eS5wZ2JlYW0uYXBwL21jcCIsImhlYWRlcnMiOnsiQXV0aG9yaXphdGlvbiI6IkJlYXJlciBwYmFfLi4uIn19) opens Cursor's install prompt with the entry below.
+    The link carries placeholders, so replace `<project>` and `pba_...` with your
+    credential's URL and token before you save. The **Credentials** tab offers
+    the same button already filled in for the credential you just created.
+
+    Or add it to `.cursor/mcp.json` (or **Settings → MCP → Add**). The tools
+    appear once the connection is established.
 
     ```json title=".cursor/mcp.json"
     {
@@ -106,7 +111,12 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
   </Tab>
 
   <Tab value="VS Code">
-    Add to `.vscode/mcp.json`:
+    [Add to VS Code](vscode:mcp/install?%7B%22name%22%3A%22pgbeam%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2F%3Cproject%3E.proxy.pgbeam.app%2Fmcp%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20pba_...%22%7D%7D) opens the entry below in VS Code's MCP server editor.
+    The link carries placeholders, so replace `<project>` and `pba_...` with your
+    credential's URL and token before you install. The **Credentials** tab offers
+    the same button already filled in for the credential you just created.
+
+    Or add it to `.vscode/mcp.json`:
 
     ```json title=".vscode/mcp.json"
     {
@@ -155,6 +165,9 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
   </Tab>
 
   <Tab value="Windsurf">
+    Windsurf is now Devin Desktop. The config below still applies to installs
+    that read `mcp_config.json`.
+
     Open Cascade, click the hammer icon, then **Configure**, and add the entry to
     `mcp_config.json`:
 
@@ -181,6 +194,59 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
 
   </Tab>
 
+  <Tab value="Codex CLI">
+    Add to `~/.codex/config.toml`, or to `.codex/config.toml` in a trusted
+    project:
+
+    ```toml title="~/.codex/config.toml"
+    [mcp_servers.pgbeam]
+    url = "https://<project>.proxy.pgbeam.app/mcp"
+    http_headers = { "Authorization" = "Bearer pba_..." }
+    ```
+
+    A table with `url` is a streamable HTTP server; one with `command` would be
+    a local process. The file holds your other Codex settings too, so add the
+    table instead of replacing the file.
+
+  </Tab>
+
+  <Tab value="Gemini CLI">
+    Add to `~/.gemini/settings.json`, or to `.gemini/settings.json` in one
+    project:
+
+    ```json title="~/.gemini/settings.json"
+    {
+      "mcpServers": {
+        "pgbeam": {
+          "httpUrl": "https://<project>.proxy.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+    The key is `httpUrl`, which selects streamable HTTP. Gemini CLI reads `url`
+    as an SSE endpoint, and SSE returns 405 against this endpoint.
+
+  </Tab>
+
+  <Tab value="Zed">
+    Run **zed: open settings file** and add the entry under `context_servers`,
+    or put it in `.zed/settings.json` for one project:
+
+    ```json title="settings.json"
+    {
+      "context_servers": {
+        "pgbeam": {
+          "url": "https://<project>.proxy.pgbeam.app/mcp",
+          "headers": { "Authorization": "Bearer pba_..." }
+        }
+      }
+    }
+    ```
+
+  </Tab>
+
   <Tab value="MCP Inspector">
     ```bash
     npx @modelcontextprotocol/inspector
@@ -188,6 +254,8 @@ The endpoint is served on your project's own host, `https://<project>.proxy.pgbe
     ```
   </Tab>
 </Tabs>
+
+[`pgbeam agents mcp-config`](/docs/cli/agents/mcp-config) prints any of these configs filled in with a credential's URL and token: pass `--client` with `claude`, `claude-desktop`, `cursor`, `vscode`, `cline`, `windsurf`, `codex`, `gemini`, `zed` or `all`.
 
 <Callout type="warn" title="Where the token may go">
   Send the `pba_…` token only to your project's `*.proxy.pgbeam.app` host. If a
