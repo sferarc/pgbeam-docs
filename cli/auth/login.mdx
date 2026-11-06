@@ -5,7 +5,7 @@ description: Authenticate with PgBeam
 
 {/* Auto-generated from CLI commands. Do not edit. Run `pnpm generate:cli-docs` to regenerate. */}
 
-Authenticate with PgBeam to access your projects and databases. Login uses an API key, which you generate from the PgBeam dashboard under Settings > API Keys; running the command prompts you to paste it. The key is verified against the API before it is stored (an invalid key fails the login), and your organization is resolved automatically: a single visible organization is selected for you, multiple organizations prompt a pick. Credentials are stored in a local profile on disk (`~/.config/pgbeam/`), and the profile you log into becomes the active one for subsequent commands. You can maintain multiple profiles for different environments using the `--profile` flag, and move between them with `pgbeam auth switch`.
+Authenticate with PgBeam to access your projects and databases. Login uses an API key, which you generate from the PgBeam dashboard under Settings > API Keys; running the command prompts you to paste it. The key is verified against the API before it is stored (an invalid key fails the login), and your organization is resolved automatically: a single visible organization is selected for you, multiple organizations prompt a pick. Credentials are stored in a local profile on disk (`~/.config/pgbeam/`), and the profile you log into becomes the active one for subsequent commands. You can maintain multiple profiles for different environments using the `--profile` flag, and move between them with `pgbeam auth switch`. For scripts and agents, `--with-token` reads the key from stdin and `--org` names the organization, so `--with-token --profile <name> --org <id>` logs in with no prompt. Without a terminal, any prompt the flags leave open fails at once and names the flag that replaces it.
 
 ## Usage
 
@@ -18,6 +18,7 @@ pgbeam auth login [flags]
 | Option | Description | Required | Default |
 | --- | --- | --- | --- |
 | `--api-key` | Authenticate with an API key (the default and only method) | No | `false` |
+| `--with-token` | Read the API key from stdin instead of prompting | No | `false` |
 
 <Callout type="info" title="Global options">
   All [global options](/docs/cli/global-options) (`--token`, `--profile`,
@@ -33,8 +34,11 @@ pgbeam auth login
 
 # Login with an API key and save to a named profile
 pgbeam auth login --profile production
+
+# Login without prompts, reading the key from stdin
+printf %s "$PGBEAM_KEY" | pgbeam auth login --with-token --profile ci --org org_xxx
 ```
 
 ## Output
 
-On success, prints a confirmation with the authenticated profile name and the selected organization, ready for `pgbeam projects list`. When the login replaces a different active profile, it also names the profile it switched from. The token is stored locally and used for all subsequent commands. A key the API rejects (401) is not stored and the command exits non-zero.
+On success, prints a confirmation with the authenticated profile name and the selected organization, ready for `pgbeam projects list`. When the login replaces a different active profile, it also names the profile it switched from. The token is stored locally and used for all subsequent commands. A key the API rejects (401) is not stored and the command exits non-zero, as does an `--org` the key cannot see. With `--json`, prints an object with `profile`, `method`, `verified` (false when the API was unreachable and the key was stored unverified), `orgId` and `orgName` (null when no organization was resolved).
